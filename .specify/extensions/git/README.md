@@ -12,6 +12,12 @@ This extension provides Git operations as an optional, self-contained module. It
 - **Git remote detection** for GitHub integration (e.g., issue creation)
 - **Auto-commit** after core commands (configurable per-command with custom messages)
 
+## Repository Policy Alignment
+
+- Feature development runs in dedicated worktrees under `tmp/`
+- Branch names are meaningful and traceable to feature intent
+- Commit messages are meaningful and describe scope/intent clearly
+
 ## Commands
 
 | Command | Description |
@@ -85,6 +91,7 @@ specify extension enable git
 ## Graceful Degradation
 
 When Git is not installed or the directory is not a Git repository:
+
 - Spec directories are still created under `specs/`
 - Branch creation is skipped with a warning
 - Branch validation is skipped with a warning

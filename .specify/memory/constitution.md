@@ -1,50 +1,126 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: 1.0.0 -> 1.1.0
+- Modified principles:
+	- II. Coverage-Gated Unit Testing -> II. Coverage-Gated Unit Testing
+	- IV. MCP-Free Development -> IV. MCP-Free Development
+- Added sections:
+	- Tech Stack Baseline
+- Removed sections:
+	- None
+- Templates requiring updates:
+	- .specify/templates/plan-template.md: ✅ updated
+	- .specify/templates/spec-template.md: ✅ updated
+	- .specify/templates/tasks-template.md: ✅ updated
+	- .specify/templates/commands/*.md: ⚠ pending (directory not present in this repository)
+	- .specify/extensions/git/commands/speckit.git.feature.md: ✅ updated
+	- .specify/extensions/git/commands/speckit.git.commit.md: ✅ updated
+	- .specify/extensions/git/README.md: ✅ updated
+- Deferred TODOs:
+	- None
+-->
+
+# Blood Pressure Tracker Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Ports & Adapters First (Hexagonal)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All new features MUST be implemented using a ports-and-adapters (hexagonal)
+architecture. Domain logic MUST depend only on port interfaces and MUST NOT depend
+directly on frameworks, transport layers, persistence drivers, or external APIs.
+Adapters MAY depend on domain ports, never the reverse.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Rationale: This preserves testability, supports adapter replacement, and prevents
+infrastructure concerns from leaking into business rules.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Coverage-Gated Unit Testing
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Unit tests are mandatory for every feature and bug fix. CI MUST enforce a minimum
+overall line coverage gate of 95%. Teams SHOULD drive changed modules and features
+to 100% coverage when practical and justified by risk.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: High automated test confidence is required to ship safely and keep
+regressions detectable early.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Additive Test Evolution
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+When adding a new feature, existing tests MUST NOT be rewritten for convenience.
+Existing tests MAY only change to correct defects, real requirement changes, or
+remove proven dead behavior. Every new feature MUST include new tests that validate
+its behavior and preserve or improve coverage.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Rationale: This protects historical behavior while ensuring features are introduced
+with explicit executable specifications.
+
+### IV. MCP-Free Development
+
+Development and implementation workflows MUST NOT rely on MCP-based tools,
+orchestrators, or runtime dependencies. Local tooling, repository scripts, and
+standard language/build/test toolchains are the only approved implementation path.
+
+Rationale: Keeping development MCP-free improves reproducibility, onboarding, and
+execution parity across environments.
+
+### V. Worktree-Isolated Feature Delivery
+
+Each feature MUST be developed in its own Git worktree, and all feature worktrees
+MUST be created under `tmp/`. Branch names and commit messages MUST be meaningful,
+human-readable, and directly traceable to feature intent.
+
+Rationale: Isolated worktrees reduce cross-feature contamination while clear Git
+history improves review quality and long-term maintainability.
+
+## Engineering Constraints
+
+- Architecture docs and plans MUST identify the domain ports and concrete adapters
+  introduced or changed by the feature.
+- Runtime and toolchain MUST use the latest active LTS release of Node.js.
+- Backend framework baseline MUST be the latest active LTS major of NestJS.
+- New dependencies SHOULD use official Node.js or NestJS packages first (for
+  example: `node:` built-ins, official `@nestjs/*` packages). Third-party modules
+  require a brief justification in the plan when an official option exists.
+- CI pipelines MUST fail when coverage is below 95%.
+- Feature-level coverage targets SHOULD be 100% unless an explicit exception is
+  documented in the implementation plan.
+- Test updates for pre-existing behavior require a written reason in the
+  specification or plan.
+- Direct development on the main repository checkout is prohibited for feature work;
+  worktree paths MUST be under `tmp/`.
+
+## Development Workflow & Quality Gates
+
+1. Create or switch to a dedicated worktree in `tmp/` before feature coding begins.
+2. Define or update domain ports first, then implement adapters and wiring.
+3. Add new tests for each new capability before marking implementation complete.
+4. Run local test suites and coverage checks before opening review.
+5. Ensure CI confirms coverage >= 95%; pursue 100% for changed feature areas when
+   feasible.
+6. Use meaningful branch names and commit messages that reflect intent and scope.
+7. Verify Node.js LTS and NestJS LTS targets are captured in plan/spec artifacts.
+8. Prefer official Node/NestJS modules before introducing third-party dependencies.
+9. Keep implementation MCP-free; if a process requires MCP, it is non-compliant.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes conflicting repository conventions. Amendments require:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. A written proposal describing the change and rationale.
+2. A review of impacted templates, workflows, and guidance files.
+3. Approval from maintainers responsible for architecture and quality gates.
+
+Versioning policy:
+
+- MAJOR: Removes or redefines principles in a backward-incompatible way.
+- MINOR: Adds a principle/section or materially expands required behavior.
+- PATCH: Clarifications, wording improvements, and non-semantic refinements.
+
+Compliance review expectations:
+
+- Every plan, specification, and task list MUST include explicit constitution checks.
+- Every pull request review MUST verify architecture boundaries, test additions,
+  coverage policy compliance, worktree usage, MCP-free implementation, and tech
+  stack baseline compliance.
+- Non-compliance MUST be documented with remediation before merge.
+
+**Version**: 1.1.0 | **Ratified**: 2026-05-24 | **Last Amended**: 2026-05-24

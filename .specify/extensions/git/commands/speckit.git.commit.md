@@ -17,6 +17,9 @@ This command is invoked as a hook after (or before) core commands. It:
 5. Uses the per-command `message` if configured, otherwise a default message
 6. If enabled and there are uncommitted changes, runs `git add .` + `git commit`
 
+Commit messages MUST be meaningful and describe intent/scope rather than generic
+placeholders.
+
 ## Execution
 
 Determine the event name from the hook that triggered this command, then run the script:
@@ -35,10 +38,10 @@ auto_commit:
   default: false          # Global toggle — set true to enable for all commands
   after_specify:
     enabled: true          # Override per-command
-    message: "[Spec Kit] Add specification"
+    message: "spec: add blood pressure measurement specification"
   after_plan:
     enabled: false
-    message: "[Spec Kit] Add implementation plan"
+    message: "plan: define ports, adapters, and test strategy"
 ```
 
 ## Graceful Degradation

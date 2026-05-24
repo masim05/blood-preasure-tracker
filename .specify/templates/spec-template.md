@@ -78,6 +78,20 @@
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
 
+## Architecture & Test Impact *(mandatory)*
+
+- **Ports Affected**: [List domain ports introduced/changed, or N/A]
+- **Adapters Affected**: [List concrete adapters introduced/changed, or N/A]
+- **Boundary Guarantee**: [Explain how domain logic stays framework-agnostic]
+- **Node.js Version Baseline**: [Latest active LTS version targeted]
+- **NestJS Version Baseline**: [Latest active LTS major targeted]
+- **Dependency Selection Rationale**: [Official Node/NestJS modules chosen first,
+  or justification for third-party choice]
+- **Existing Test Impact**: [State "No changes" or justify required updates]
+- **New Test Coverage**: [List the new unit/integration tests that will be added]
+- **Coverage Plan**: [How CI `>= 95%` is preserved and how 100% is pursued where feasible]
+- **Worktree Path**: [Feature worktree path under `tmp/`]
+
 ## Requirements *(mandatory)*
 
 <!--
@@ -92,6 +106,16 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-006**: Implementation MUST preserve hexagonal boundaries: domain depends on
+  ports only, adapters depend on domain interfaces.
+- **FR-007**: Each new feature MUST add new tests; existing tests MUST remain
+  unchanged unless the specification documents why a change is required.
+- **FR-008**: Development workflow MUST remain MCP-free and execute in a dedicated
+  feature worktree under `tmp/`.
+- **FR-009**: Runtime stack MUST target the latest active Node.js LTS and latest
+  active NestJS LTS.
+- **FR-010**: Dependency decisions MUST prefer official Node.js/NestJS modules;
+  third-party additions require explicit justification.
 
 *Example of marking unclear requirements:*
 

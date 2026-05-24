@@ -40,7 +40,22 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **Hexagonal boundaries defined**: Domain logic depends only on ports; planned
+  adapters are listed and isolated from domain code.
+- [ ] **Unit test strategy present**: New/changed behavior has corresponding unit
+  tests planned.
+- [ ] **Coverage policy acknowledged**: CI gate is `>= 95%`, with a plan to reach
+  `100%` for changed feature areas when feasible.
+- [ ] **Additive test evolution respected**: Existing tests remain unchanged unless
+  a requirement/defect rationale is documented.
+- [ ] **MCP-free implementation**: Plan uses local repository tooling only; no MCP
+  dependency in development steps.
+- [ ] **Feature isolation via worktree**: Feature branch/worktree strategy uses
+  dedicated worktrees under `tmp/` and meaningful branch naming.
+- [ ] **Tech stack baseline**: Plan targets latest active Node.js LTS and latest
+  active NestJS LTS.
+- [ ] **Dependency policy**: Official Node.js/NestJS modules are preferred; any
+  third-party alternative is justified.
 
 ## Project Structure
 
