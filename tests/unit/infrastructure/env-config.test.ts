@@ -1,6 +1,18 @@
+import { existsSync } from 'node:fs';
+
 import { EnvConfigService } from '../../../src/infrastructure/config/env-config';
 
+jest.mock('node:fs', () => ({
+  existsSync: jest.fn(),
+}));
+
+const existsSyncMock = jest.mocked(existsSync);
+
 describe('EnvConfigService', () => {
+  beforeEach(() => {
+    existsSyncMock.mockReturnValue(false);
+  });
+
   it('returns default values when environment variables are absent', () => {
     const service = new EnvConfigService();
 
@@ -53,6 +65,7 @@ describe('EnvConfigService', () => {
   it('loads values from a local .env file when using the runtime environment', () => {
     const service = new EnvConfigService();
     const previousApiKey = process.env.OPENAI_API_KEY;
+    existsSyncMock.mockReturnValue(true);
     const loadEnvFileSpy = jest
       .spyOn(process, 'loadEnvFile')
       .mockImplementation((path?: string | URL) => {
