@@ -13,6 +13,7 @@ type OpenAiVisionAdapterOptions = {
 };
 
 const uncertainProviderFields = ['hand', 'systolic', 'diastolic', 'pulse'] as const;
+const uncertainProviderFieldSet = new Set<string>(uncertainProviderFields);
 
 export class OpenAiVisionAdapter implements LlmProviderPort {
   readonly provider = 'openai';
@@ -96,15 +97,20 @@ function parseProviderResponse(outputText: string): LlmProviderResponse & { hand
   try {
     const parsed = JSON.parse(outputText) as Partial<LlmProviderResponse> & { hand?: unknown };
 
+    const rawUncertainFields = parsed.uncertainFields;
+    const uncertainFields = Array.isArray(rawUncertainFields)
+      ? rawUncertainFields.filter(
+          (field): field is string => typeof field === 'string' && uncertainProviderFieldSet.has(field),
+        )
+      : [];
+
     return {
       hand: typeof parsed.hand === 'string' || parsed.hand === null ? parsed.hand : null,
       systolic: typeof parsed.systolic === 'number' ? parsed.systolic : null,
       diastolic: typeof parsed.diastolic === 'number' ? parsed.diastolic : null,
       pulse: typeof parsed.pulse === 'number' ? parsed.pulse : null,
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : null,
-      uncertainFields: Array.isArray(parsed.uncertainFields)
-        ? parsed.uncertainFields.filter((field): field is string => typeof field === 'string')
-        : [...uncertainProviderFields],
+      uncertainFields: toProviderUncertainFields(rawUncertainFields, uncertainFields),
       rawNotes: typeof parsed.rawNotes === 'string' || parsed.rawNotes === null ? parsed.rawNotes : null,
     };
   } catch (error) {
@@ -118,4 +124,16 @@ function parseProviderResponse(outputText: string): LlmProviderResponse & { hand
       rawNotes: error instanceof Error ? `Unable to parse provider response: ${error.message}` : 'Unable to parse provider response',
     };
   }
+}
+
+function toProviderUncertainFields(rawValue: unknown, filteredFields: string[]): string[] {
+  if (!Array.isArray(rawValue)) {
+    return [...uncertainProviderFields];
+  }
+
+  if (rawValue.length === 0) {
+    return [];
+  }
+
+  return filteredFields.length > 0 ? filteredFields : [...uncertainProviderFields];
 }

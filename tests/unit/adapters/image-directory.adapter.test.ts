@@ -12,14 +12,22 @@ describe('ImageDirectoryAdapter', () => {
     mkdirSync(path.join(directory, 'nested'));
     writeFileSync(path.join(directory, 'ignore.txt'), 'ignored');
     writeFileSync(path.join(directory, 'img001.jpg'), 'fixture-image');
+    writeFileSync(path.join(directory, 'IMG002.JPG'), 'fixture-image');
 
     const images = await adapter.load(directory);
 
-    expect(images).toEqual([
-      expect.objectContaining({
-        imageId: 'img001',
-        contentType: 'image/jpeg',
-      }),
-    ]);
+    expect(images).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          imageId: 'img001',
+          contentType: 'image/jpeg',
+        }),
+        expect.objectContaining({
+          imageId: 'IMG002',
+          contentType: 'image/jpeg',
+        }),
+      ]),
+    );
+    expect(images).toHaveLength(2);
   });
 });

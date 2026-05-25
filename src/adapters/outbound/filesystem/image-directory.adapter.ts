@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import type { ImageSourcePort, SourceImage } from '../../../application/ports/image-source.port';
@@ -14,7 +14,7 @@ const supportedExtensions = new Map<string, string>([
 @Injectable()
 export class ImageDirectoryAdapter implements ImageSourcePort {
   async load(inputDirectory: string): Promise<SourceImage[]> {
-    const entries = readdirSync(inputDirectory, { withFileTypes: true });
+    const entries = await readdir(inputDirectory, { withFileTypes: true });
     const images: SourceImage[] = [];
 
     for (const entry of entries) {
@@ -31,10 +31,10 @@ export class ImageDirectoryAdapter implements ImageSourcePort {
       }
 
       images.push({
-        imageId: path.basename(entry.name, extension),
+        imageId: path.parse(entry.name).name,
         imagePath,
         contentType,
-        data: readFileSync(imagePath),
+        data: await readFile(imagePath),
       });
     }
 

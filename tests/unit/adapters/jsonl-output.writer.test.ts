@@ -67,6 +67,8 @@ describe('JsonlOutputWriter', () => {
     await writePromise;
 
     expect(completed).toBe(true);
+    expect(output.listenerCount('drain')).toBe(0);
+    expect(output.listenerCount('error')).toBe(0);
     expect(output.write).toHaveBeenCalledWith('{"type":"prediction"}\n');
   });
 
@@ -79,5 +81,7 @@ describe('JsonlOutputWriter', () => {
     output.emit('error', new Error('stream failed'));
 
     await expect(writePromise).rejects.toThrow('stream failed');
+    expect(output.listenerCount('drain')).toBe(0);
+    expect(output.listenerCount('error')).toBe(0);
   });
 });

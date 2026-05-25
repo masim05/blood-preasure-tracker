@@ -141,4 +141,66 @@ describe('OpenAiVisionAdapter', () => {
       rawNotes: null,
     });
   });
+
+  it('keeps only provider-owned uncertain fields from model output', async () => {
+    const create = jest.fn().mockResolvedValue({
+      output_text: JSON.stringify({
+        hand: 'left',
+        systolic: 121,
+        diastolic: 75,
+        pulse: 75,
+        confidence: 0.98,
+        uncertainFields: ['hand', 'time', 'confidence', 'pulse'],
+        rawNotes: null,
+      }),
+    });
+    const adapter = new OpenAiVisionAdapter({
+      apiKey: 'test-key',
+      model: 'gpt-5.4-mini',
+      client: { responses: { create } } as never,
+    });
+
+    await expect(
+      adapter.infer({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        contentType: 'image/jpeg',
+        data: Buffer.from('fixture-image'),
+        model: '',
+      }),
+    ).resolves.toMatchObject({
+      uncertainFields: ['hand', 'pulse'],
+    });
+  });
+
+  it('defaults uncertain fields when model output includes only unsupported fields', async () => {
+    const create = jest.fn().mockResolvedValue({
+      output_text: JSON.stringify({
+        hand: 'left',
+        systolic: 121,
+        diastolic: 75,
+        pulse: 75,
+        confidence: 0.98,
+        uncertainFields: ['time', 'confidence'],
+        rawNotes: null,
+      }),
+    });
+    const adapter = new OpenAiVisionAdapter({
+      apiKey: 'test-key',
+      model: 'gpt-5.4-mini',
+      client: { responses: { create } } as never,
+    });
+
+    await expect(
+      adapter.infer({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        contentType: 'image/jpeg',
+        data: Buffer.from('fixture-image'),
+        model: '',
+      }),
+    ).resolves.toMatchObject({
+      uncertainFields: ['hand', 'systolic', 'diastolic', 'pulse'],
+    });
+  });
 });
