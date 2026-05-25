@@ -49,4 +49,27 @@ describe('EnvConfigService', () => {
       }
     }
   });
+
+  it('loads values from a local .env file when using the runtime environment', () => {
+    const service = new EnvConfigService();
+    const previousApiKey = process.env.OPENAI_API_KEY;
+    const loadEnvFileSpy = jest
+      .spyOn(process, 'loadEnvFile')
+      .mockImplementation((path?: string | URL) => {
+        expect(path).toBe('.env');
+        process.env.OPENAI_API_KEY = 'from-dot-env';
+      });
+
+    try {
+      expect(service.load().openAiApiKey).toBe('from-dot-env');
+    } finally {
+      if (previousApiKey === undefined) {
+        delete process.env.OPENAI_API_KEY;
+      } else {
+        process.env.OPENAI_API_KEY = previousApiKey;
+      }
+
+      loadEnvFileSpy.mockRestore();
+    }
+  });
 });
