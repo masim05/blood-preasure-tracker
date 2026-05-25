@@ -27,7 +27,7 @@
 - [ ] T002 Update runtime and test dependencies for metadata extraction in `package.json`
 - [ ] T003 [P] Refresh environment examples for provider plus metadata behavior in `.env.example`
 - [ ] T004 [P] Add metadata fixture guidance in `tests/fixtures/README.md`
-- [ ] T005 [P] Update agent and developer context references for feature `002` in `.github/copilot-instructions.md`
+- [ ] T005 [P] Verify agent and developer context references point to `specs/002-extract-bp-readings/plan.md` and document any mismatch before implementation
 
 ---
 
@@ -65,14 +65,16 @@
 - [ ] T016 [P] [US1] Update prediction use-case tests for merged provider and metadata output in `tests/unit/application/predict-images.use-case.test.ts`
 - [ ] T017 [P] [US1] Extend predicted reading and uncertainty policy tests for metadata-owned `time` in `tests/unit/domain/predicted-reading.test.ts` and `tests/unit/domain/uncertainty-policy.test.ts`
 - [ ] T018 [P] [US1] Add predict CLI integration coverage for metadata timestamps in `tests/integration/cli.integration.test.ts`
+- [ ] T019 [P] [US1] Add predict CLI integration coverage for unsupported image extensions and corrupt image files in `tests/integration/cli.integration.test.ts`
+- [ ] T020 [P] [US1] Add metadata adapter tests for missing, malformed, and unsupported EXIF timestamp values in `tests/unit/adapters/image-metadata.adapter.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [P] [US1] Implement filesystem metadata extraction adapter in `src/adapters/outbound/filesystem/image-metadata.adapter.ts`
-- [ ] T020 [P] [US1] Refactor the OpenAI adapter response schema in `src/adapters/outbound/llm/openai-vision.adapter.ts`
-- [ ] T021 [US1] Update predict orchestration to merge provider output with metadata output in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T022 [US1] Update JSONL prediction serialization for metadata source fields in `src/adapters/inbound/cli/jsonl-output.writer.ts`
-- [ ] T023 [US1] Integrate metadata-backed `predict` flow in `src/main.ts`
+- [ ] T021 [P] [US1] Implement filesystem metadata extraction adapter in `src/adapters/outbound/filesystem/image-metadata.adapter.ts`
+- [ ] T022 [P] [US1] Refactor the OpenAI adapter response schema in `src/adapters/outbound/llm/openai-vision.adapter.ts`
+- [ ] T023 [US1] Update predict orchestration to merge provider output with metadata output in `src/application/use-cases/predict-images.use-case.ts`
+- [ ] T024 [US1] Update JSONL prediction serialization for metadata source fields in `src/adapters/inbound/cli/jsonl-output.writer.ts`
+- [ ] T025 [US1] Integrate metadata-backed `predict` flow in `src/main.ts`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -88,19 +90,19 @@
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T024 [P] [US2] Update evaluation use-case tests for metadata-backed predictions in `tests/unit/application/evaluate-images.use-case.test.ts`
-- [ ] T025 [P] [US2] Extend evaluation matcher tests for metadata timestamp comparisons and unmatched rows in `tests/unit/domain/evaluation-matcher.test.ts`
-- [ ] T026 [P] [US2] Update CSV dataset adapter tests for eval matching invariants in `tests/unit/adapters/csv-dataset.adapter.test.ts`
-- [ ] T027 [P] [US2] Extend eval CLI integration tests for metadata/provider failures in `tests/integration/cli.integration.test.ts`
+- [ ] T026 [P] [US2] Update evaluation use-case tests for metadata-backed predictions in `tests/unit/application/evaluate-images.use-case.test.ts`
+- [ ] T027 [P] [US2] Extend evaluation matcher tests for metadata timestamp comparisons and unmatched rows in `tests/unit/domain/evaluation-matcher.test.ts`
+- [ ] T028 [P] [US2] Update CSV dataset adapter tests for eval matching invariants in `tests/unit/adapters/csv-dataset.adapter.test.ts`
+- [ ] T029 [P] [US2] Extend eval CLI integration tests for metadata/provider failures in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T028 [P] [US2] Update ground-truth and evaluation report entities for metadata-missing accounting in `src/domain/entities/ground-truth-record.ts` and `src/domain/entities/evaluation-report.ts`
-- [ ] T029 [P] [US2] Update evaluation matcher rules for metadata-backed timestamps in `src/domain/services/evaluation-matcher.ts`
-- [ ] T030 [P] [US2] Refine CSV dataset loading and duplicate-stem validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
-- [ ] T031 [US2] Update eval orchestration to consume metadata-backed predictions in `src/application/use-cases/evaluate-images.use-case.ts`
-- [ ] T032 [US2] Extend JSONL comparison and summary output for metadata failures in `src/adapters/inbound/cli/jsonl-output.writer.ts`
-- [ ] T033 [US2] Integrate metadata-aware `eval` flow in `src/main.ts`
+- [ ] T030 [P] [US2] Update ground-truth and evaluation report entities for metadata-missing accounting in `src/domain/entities/ground-truth-record.ts` and `src/domain/entities/evaluation-report.ts`
+- [ ] T031 [P] [US2] Update evaluation matcher rules for metadata-backed timestamps in `src/domain/services/evaluation-matcher.ts`
+- [ ] T032 [P] [US2] Refine CSV dataset loading and duplicate-stem validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
+- [ ] T033 [US2] Update eval orchestration to consume metadata-backed predictions in `src/application/use-cases/evaluate-images.use-case.ts`
+- [ ] T034 [US2] Extend JSONL comparison and summary output for metadata failures in `src/adapters/inbound/cli/jsonl-output.writer.ts`
+- [ ] T035 [US2] Integrate metadata-aware `eval` flow in `src/main.ts`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -116,16 +118,16 @@
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T034 [P] [US3] Update CLI parser tests for predict/eval provider configuration in `tests/unit/adapters/cli-parser.test.ts`
-- [ ] T035 [P] [US3] Update CLI config and env-loading tests for provider credentials and metadata settings in `tests/unit/infrastructure/cli-config.test.ts` and `tests/unit/infrastructure/env-config.test.ts`
-- [ ] T036 [P] [US3] Update help renderer tests for metadata-only timestamp guidance in `tests/unit/adapters/help-renderer.test.ts`
-- [ ] T037 [P] [US3] Extend help CLI integration coverage in `tests/integration/cli.integration.test.ts`
+- [ ] T036 [P] [US3] Update CLI parser tests for predict/eval provider configuration in `tests/unit/adapters/cli-parser.test.ts`
+- [ ] T037 [P] [US3] Update CLI config and env-loading tests for provider credentials and metadata settings in `tests/unit/infrastructure/cli-config.test.ts` and `tests/unit/infrastructure/env-config.test.ts`
+- [ ] T038 [P] [US3] Update help renderer tests for metadata-only timestamp guidance in `tests/unit/adapters/help-renderer.test.ts`
+- [ ] T039 [P] [US3] Extend help CLI integration coverage in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [P] [US3] Update CLI parser option handling in `src/adapters/inbound/cli/cli-parser.ts`
-- [ ] T039 [P] [US3] Update help rendering and model catalog messaging in `src/adapters/inbound/cli/help-renderer.ts` and `src/adapters/outbound/llm/model-registry.ts`
-- [ ] T040 [US3] Finalize configuration validation and help wiring in `src/infrastructure/config/cli-config.ts` and `src/main.ts`
+- [ ] T040 [P] [US3] Update CLI parser option handling in `src/adapters/inbound/cli/cli-parser.ts`
+- [ ] T041 [P] [US3] Update help rendering for provider/model configuration and metadata-only timestamp messaging in `src/adapters/inbound/cli/help-renderer.ts`
+- [ ] T042 [US3] Finalize configuration validation and help wiring in `src/infrastructure/config/cli-config.ts` and `src/main.ts`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -135,11 +137,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T041 [P] Update README usage, environment, and help text in `README.md`
-- [ ] T042 [P] Refresh quickstart validation notes in `specs/002-extract-bp-readings/quickstart.md`
-- [ ] T043 [P] Update metadata and provider documentation examples in `specs/002-extract-bp-readings/contracts/cli.md` and `specs/002-extract-bp-readings/data-model.md`
-- [ ] T044 Run coverage hardening for changed feature areas in `tests/`
-- [ ] T045 Run quickstart and runtime validation commands in `specs/002-extract-bp-readings/quickstart.md`
+- [ ] T043 [P] Update README usage, environment, and help text in `README.md`
+- [ ] T044 [P] Refresh quickstart validation notes in `specs/002-extract-bp-readings/quickstart.md`
+- [ ] T045 [P] Update metadata and provider documentation examples in `specs/002-extract-bp-readings/contracts/cli.md` and `specs/002-extract-bp-readings/data-model.md`
+- [ ] T046 Run coverage hardening for changed feature areas in `tests/`
+- [ ] T047 Run quickstart and runtime validation commands in `specs/002-extract-bp-readings/quickstart.md`
 
 ---
 
@@ -216,7 +218,7 @@ Task: "Update help renderer tests for metadata-only timestamp guidance in tests/
 
 # Launch US3 implementation together:
 Task: "Update CLI parser option handling in src/adapters/inbound/cli/cli-parser.ts"
-Task: "Update help rendering and model catalog messaging in src/adapters/inbound/cli/help-renderer.ts and src/adapters/outbound/llm/model-registry.ts"
+Task: "Update help rendering for provider/model configuration and metadata-only timestamp messaging in src/adapters/inbound/cli/help-renderer.ts"
 ```
 
 ---
