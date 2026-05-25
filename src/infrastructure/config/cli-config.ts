@@ -45,6 +45,10 @@ function resolveCommand(parsedArgs: ParsedCliArgs): CliCommand {
 }
 
 export function validateProviderConfig(config: CliConfig, envConfig: EnvironmentConfig): void {
+  if (config.provider !== 'openai') {
+    throw new Error(`Unsupported provider: ${config.provider}`);
+  }
+
   if (config.provider === 'openai' && !envConfig.openAiApiKey) {
     throw new Error('OPENAI_API_KEY is required when provider is openai');
   }

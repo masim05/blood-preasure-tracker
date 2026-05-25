@@ -12,6 +12,8 @@ type OpenAiVisionAdapterOptions = {
   client?: OpenAI;
 };
 
+const uncertainProviderFields = ['hand', 'systolic', 'diastolic', 'pulse'] as const;
+
 export class OpenAiVisionAdapter implements LlmProviderPort {
   readonly provider = 'openai';
 
@@ -76,8 +78,7 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
       },
     });
 
-    const outputText = response.output_text;
-    const parsed = JSON.parse(outputText) as LlmProviderResponse & { hand: string | null };
+    const parsed = parseProviderResponse(response.output_text);
 
     return {
       hand: parsed.hand === 'left' || parsed.hand === 'right' || parsed.hand === 'unknown' ? parsed.hand : null,
@@ -87,6 +88,34 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
       confidence: parsed.confidence,
       uncertainFields: parsed.uncertainFields,
       rawNotes: parsed.rawNotes,
+    };
+  }
+}
+
+function parseProviderResponse(outputText: string): LlmProviderResponse & { hand: string | null } {
+  try {
+    const parsed = JSON.parse(outputText) as Partial<LlmProviderResponse> & { hand?: unknown };
+
+    return {
+      hand: typeof parsed.hand === 'string' || parsed.hand === null ? parsed.hand : null,
+      systolic: typeof parsed.systolic === 'number' ? parsed.systolic : null,
+      diastolic: typeof parsed.diastolic === 'number' ? parsed.diastolic : null,
+      pulse: typeof parsed.pulse === 'number' ? parsed.pulse : null,
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : null,
+      uncertainFields: Array.isArray(parsed.uncertainFields)
+        ? parsed.uncertainFields.filter((field): field is string => typeof field === 'string')
+        : [...uncertainProviderFields],
+      rawNotes: typeof parsed.rawNotes === 'string' || parsed.rawNotes === null ? parsed.rawNotes : null,
+    };
+  } catch (error) {
+    return {
+      hand: null,
+      systolic: null,
+      diastolic: null,
+      pulse: null,
+      confidence: null,
+      uncertainFields: [...uncertainProviderFields],
+      rawNotes: error instanceof Error ? `Unable to parse provider response: ${error.message}` : 'Unable to parse provider response',
     };
   }
 }

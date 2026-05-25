@@ -169,7 +169,7 @@ describe('main entrypoint', () => {
     ).rejects.toThrow('OPENAI_API_KEY is required');
   });
 
-  it('fails during provider creation when validation is bypassed and no API key is available', async () => {
+  it('fails when an unsupported provider is selected', async () => {
     await expect(
       runCliWithDependencies(
         ['predict'],
@@ -220,7 +220,7 @@ describe('main entrypoint', () => {
           } as never,
         },
       ),
-    ).rejects.toThrow('OPENAI_API_KEY is required');
+    ).rejects.toThrow('Unsupported provider: custom');
   });
 
 });

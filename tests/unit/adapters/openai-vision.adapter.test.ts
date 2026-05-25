@@ -75,4 +75,70 @@ describe('OpenAiVisionAdapter', () => {
       }),
     );
   });
+
+  it('returns a safe uncertain response when provider output is not JSON', async () => {
+    const create = jest.fn().mockResolvedValue({
+      output_text: 'not-json',
+    });
+    const adapter = new OpenAiVisionAdapter({
+      apiKey: 'test-key',
+      model: 'gpt-5.4-mini',
+      client: { responses: { create } } as never,
+    });
+
+    await expect(
+      adapter.infer({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        contentType: 'image/jpeg',
+        data: Buffer.from('fixture-image'),
+        model: '',
+      }),
+    ).resolves.toEqual({
+      hand: null,
+      systolic: null,
+      diastolic: null,
+      pulse: null,
+      confidence: null,
+      uncertainFields: ['hand', 'systolic', 'diastolic', 'pulse'],
+      rawNotes: expect.stringContaining('Unable to parse provider response'),
+    });
+  });
+
+  it('defaults malformed provider fields to null and uncertain fields', async () => {
+    const create = jest.fn().mockResolvedValue({
+      output_text: JSON.stringify({
+        hand: 42,
+        systolic: 'bad',
+        diastolic: null,
+        pulse: null,
+        confidence: null,
+        uncertainFields: 'bad',
+        rawNotes: 42,
+      }),
+    });
+    const adapter = new OpenAiVisionAdapter({
+      apiKey: 'test-key',
+      model: 'gpt-5.4-mini',
+      client: { responses: { create } } as never,
+    });
+
+    await expect(
+      adapter.infer({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        contentType: 'image/jpeg',
+        data: Buffer.from('fixture-image'),
+        model: '',
+      }),
+    ).resolves.toMatchObject({
+      hand: null,
+      systolic: null,
+      diastolic: null,
+      pulse: null,
+      confidence: null,
+      uncertainFields: ['hand', 'systolic', 'diastolic', 'pulse'],
+      rawNotes: null,
+    });
+  });
 });

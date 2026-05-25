@@ -60,7 +60,7 @@ export class EvaluationReport {
   toSummary(): EvaluationSummary {
     return {
       type: 'summary',
-      totalImages: this.comparisons.length,
+      totalImages: this.comparisons.filter((comparison) => comparison.prediction !== null).length,
       totalGroundTruthRows: this.totalGroundTruthRows,
       matchedRecords: this.countByStatus('matched'),
       mismatchedRecords: this.countByStatus('mismatch'),

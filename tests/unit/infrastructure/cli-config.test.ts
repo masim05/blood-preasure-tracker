@@ -109,4 +109,26 @@ describe('validateProviderConfig', () => {
       ),
     ).toThrow('OPENAI_API_KEY is required');
   });
+
+  it('fails when an unsupported provider is selected', () => {
+    expect(() =>
+      validateProviderConfig(
+        {
+          command: 'predict',
+          helpRequested: false,
+          inputDirectory: 'data/eval',
+          evaluationCsvPath: 'data/eval/a.csv',
+          provider: 'custom',
+          model: 'custom-model',
+        },
+        {
+          openAiApiKey: null,
+          inputDirectory: 'data/eval',
+          evaluationCsvPath: 'data/eval/a.csv',
+          provider: 'custom',
+          model: 'custom-model',
+        },
+      ),
+    ).toThrow('Unsupported provider: custom');
+  });
 });
