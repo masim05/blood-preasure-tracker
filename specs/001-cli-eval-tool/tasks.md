@@ -23,12 +23,12 @@
 
 **Purpose**: Project initialization and basic toolchain structure
 
-- [ ] T000 Verify the active feature worktree path is `tmp/001-add-cli-eval` and document the active branch/worktree before implementation
-- [ ] T001 Initialize Node.js/NestJS CLI project metadata and scripts in `package.json`
-- [ ] T002 Configure TypeScript compiler and Node 22 target in `tsconfig.json`
-- [ ] T003 [P] Configure Jest coverage thresholds >=95% in `jest.config.ts`
-- [ ] T004 [P] Add linting and formatting configuration in `eslint.config.js` and `.prettierrc`
-- [ ] T005 Create baseline source/test directory structure with placeholder index files in `src/` and `tests/`
+- [X] T000 Verify the active feature worktree path is `tmp/001-add-cli-eval` and document the active branch/worktree before implementation
+- [X] T001 Initialize Node.js/NestJS CLI project metadata and scripts in `package.json`
+- [X] T002 Configure TypeScript compiler and Node 22 target in `tsconfig.json`
+- [X] T003 [P] Configure Jest coverage thresholds >=95% in `jest.config.ts`
+- [X] T004 [P] Add linting and formatting configuration in `eslint.config.js` and `.prettierrc`
+- [X] T005 Create baseline source/test directory structure with placeholder index files in `src/` and `tests/`
 
 ---
 
@@ -38,17 +38,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Implement Nest standalone bootstrap in `src/main.ts`
-- [ ] T007 [P] Wire dependency injection and adapter providers in `src/app.module.ts`
-- [ ] T008 [P] Implement runtime configuration loading in `src/infrastructure/config/env-config.ts`
-- [ ] T009 Implement CLI configuration resolution in `src/infrastructure/config/cli-config.ts`
-- [ ] T010 [P] Define core application ports in `src/application/ports/llm-provider.port.ts`
-- [ ] T011 [P] Define core application ports in `src/application/ports/image-source.port.ts`
-- [ ] T012 [P] Define core application ports in `src/application/ports/output-writer.port.ts`
-- [ ] T013 [P] Define evaluation/model catalog ports in `src/application/ports/evaluation-dataset.port.ts` and `src/application/ports/model-catalog.port.ts`
-- [ ] T014 [P] Implement shared domain entity in `src/domain/entities/predicted-reading.ts`
-- [ ] T015 [P] Implement shared domain policy in `src/domain/services/uncertainty-policy.ts`
-- [ ] T016 Implement CLI argument parsing foundation in `src/adapters/inbound/cli/cli-parser.ts`
+- [X] T006 Implement Nest standalone bootstrap in `src/main.ts`
+- [X] T007 [P] Wire dependency injection and adapter providers in `src/app.module.ts`
+- [X] T008 [P] Implement runtime configuration loading in `src/infrastructure/config/env-config.ts`
+- [X] T009 Implement CLI configuration resolution in `src/infrastructure/config/cli-config.ts`
+- [X] T010 [P] Define core application ports in `src/application/ports/llm-provider.port.ts`
+- [X] T011 [P] Define core application ports in `src/application/ports/image-source.port.ts`
+- [X] T012 [P] Define core application ports in `src/application/ports/output-writer.port.ts`
+- [X] T013 [P] Define evaluation/model catalog ports in `src/application/ports/evaluation-dataset.port.ts` and `src/application/ports/model-catalog.port.ts`
+- [X] T014 [P] Implement shared domain entity in `src/domain/entities/predicted-reading.ts`
+- [X] T015 [P] Implement shared domain policy in `src/domain/services/uncertainty-policy.ts`
+- [X] T016 Implement CLI argument parsing foundation in `src/adapters/inbound/cli/cli-parser.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -64,19 +64,19 @@
 
 > **NOTE: These tests are mandatory. Write them first and ensure they fail before implementation.**
 
-- [ ] T017 [P] [US1] Add provider contract tests in `tests/contract/llm-provider.contract.test.ts`
-- [ ] T018 [P] [US1] Add prediction use-case tests in `tests/unit/application/predict-images.use-case.test.ts`
-- [ ] T019 [P] [US1] Add uncertainty policy tests in `tests/unit/domain/uncertainty-policy.test.ts`
-- [ ] T020 [P] [US1] Add predict CLI integration tests in `tests/integration/cli.integration.test.ts`
+- [X] T017 [P] [US1] Add provider contract tests in `tests/contract/llm-provider.contract.test.ts`
+- [X] T018 [P] [US1] Add prediction use-case tests in `tests/unit/application/predict-images.use-case.test.ts`
+- [X] T019 [P] [US1] Add uncertainty policy tests in `tests/unit/domain/uncertainty-policy.test.ts`
+- [X] T020 [P] [US1] Add predict CLI integration tests in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T021 [P] [US1] Implement image source adapter in `src/adapters/outbound/filesystem/image-directory.adapter.ts`
-- [ ] T022 [P] [US1] Implement OpenAI vision adapter in `src/adapters/outbound/llm/openai-vision.adapter.ts`
-- [ ] T023 [P] [US1] Implement JSONL prediction writer in `src/adapters/inbound/cli/jsonl-output.writer.ts`
-- [ ] T024 [P] [US1] Implement model registry for default provider/model selection in `src/adapters/outbound/llm/model-registry.ts`
-- [ ] T025 [US1] Implement prediction use case in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T026 [US1] Integrate `predict` command flow in `src/main.ts`
+- [X] T021 [P] [US1] Implement image source adapter in `src/adapters/outbound/filesystem/image-directory.adapter.ts`
+- [X] T022 [P] [US1] Implement OpenAI vision adapter in `src/adapters/outbound/llm/openai-vision.adapter.ts`
+- [X] T023 [P] [US1] Implement JSONL prediction writer in `src/adapters/inbound/cli/jsonl-output.writer.ts`
+- [X] T024 [P] [US1] Implement model registry for default provider/model selection in `src/adapters/outbound/llm/model-registry.ts`
+- [X] T025 [US1] Implement prediction use case in `src/application/use-cases/predict-images.use-case.ts`
+- [X] T026 [US1] Integrate `predict` command flow in `src/main.ts`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -92,22 +92,22 @@
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T027 [P] [US2] Add evaluation matcher tests in `tests/unit/domain/evaluation-matcher.test.ts`
-- [ ] T028 [P] [US2] Add evaluation use-case tests in `tests/unit/application/evaluate-images.use-case.test.ts`
-- [ ] T029 [P] [US2] Add CSV dataset adapter tests in `tests/unit/adapters/csv-dataset.adapter.test.ts`
-- [ ] T029a [P] [US2] Add duplicate imageId and duplicate filename-stem validation tests in `tests/unit/adapters/csv-dataset.adapter.test.ts` and `tests/unit/domain/evaluation-matcher.test.ts`
-- [ ] T030 [P] [US2] Extend CLI integration tests for `eval` mode in `tests/integration/cli.integration.test.ts`
+- [X] T027 [P] [US2] Add evaluation matcher tests in `tests/unit/domain/evaluation-matcher.test.ts`
+- [X] T028 [P] [US2] Add evaluation use-case tests in `tests/unit/application/evaluate-images.use-case.test.ts`
+- [X] T029 [P] [US2] Add CSV dataset adapter tests in `tests/unit/adapters/csv-dataset.adapter.test.ts`
+- [X] T029a [P] [US2] Add duplicate imageId and duplicate filename-stem validation tests in `tests/unit/adapters/csv-dataset.adapter.test.ts` and `tests/unit/domain/evaluation-matcher.test.ts`
+- [X] T030 [P] [US2] Extend CLI integration tests for `eval` mode in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T031 [P] [US2] Implement ground-truth entity in `src/domain/entities/ground-truth-record.ts`
-- [ ] T032 [P] [US2] Implement evaluation report entity in `src/domain/entities/evaluation-report.ts`
-- [ ] T033 [P] [US2] Implement filename-stem matching domain service in `src/domain/services/evaluation-matcher.ts`
-- [ ] T034 [P] [US2] Implement CSV dataset adapter in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
-- [ ] T034a [US2] Enforce duplicate filename-stem validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts` and `src/domain/services/evaluation-matcher.ts`
-- [ ] T035 [US2] Implement evaluation use case in `src/application/use-cases/evaluate-images.use-case.ts`
-- [ ] T036 [US2] Extend JSONL writer for comparison and summary records in `src/adapters/inbound/cli/jsonl-output.writer.ts`
-- [ ] T037 [US2] Integrate `eval` command flow in `src/main.ts`
+- [X] T031 [P] [US2] Implement ground-truth entity in `src/domain/entities/ground-truth-record.ts`
+- [X] T032 [P] [US2] Implement evaluation report entity in `src/domain/entities/evaluation-report.ts`
+- [X] T033 [P] [US2] Implement filename-stem matching domain service in `src/domain/services/evaluation-matcher.ts`
+- [X] T034 [P] [US2] Implement CSV dataset adapter in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
+- [X] T034a [US2] Enforce duplicate filename-stem validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts` and `src/domain/services/evaluation-matcher.ts`
+- [X] T035 [US2] Implement evaluation use case in `src/application/use-cases/evaluate-images.use-case.ts`
+- [X] T036 [US2] Extend JSONL writer for comparison and summary records in `src/adapters/inbound/cli/jsonl-output.writer.ts`
+- [X] T037 [US2] Integrate `eval` command flow in `src/main.ts`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -123,17 +123,17 @@
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T038 [P] [US3] Add model registry tests for static adapter model catalogs in `tests/unit/adapters/model-registry.test.ts`
-- [ ] T039 [P] [US3] Add help renderer tests that forbid live model discovery in `tests/unit/adapters/help-renderer.test.ts`
-- [ ] T040 [P] [US3] Extend CLI integration tests for help, model selection, and CLI-argument-over-environment precedence in `tests/integration/cli.integration.test.ts`
+- [X] T038 [P] [US3] Add model registry tests for static adapter model catalogs in `tests/unit/adapters/model-registry.test.ts`
+- [X] T039 [P] [US3] Add help renderer tests that forbid live model discovery in `tests/unit/adapters/help-renderer.test.ts`
+- [X] T040 [P] [US3] Extend CLI integration tests for help, model selection, and CLI-argument-over-environment precedence in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T041 [P] [US3] Implement provider model catalog entity behavior in `src/adapters/outbound/llm/model-registry.ts`
-- [ ] T042 [P] [US3] Implement help renderer in `src/adapters/inbound/cli/help-renderer.ts`
-- [ ] T043 [P] [US3] Implement list-models use case in `src/application/use-cases/list-models.use-case.ts`
-- [ ] T044 [US3] Extend CLI parser for provider/model/help options and CLI-argument-over-environment precedence in `src/adapters/inbound/cli/cli-parser.ts`
-- [ ] T045 [US3] Integrate help and static model catalog output in `src/main.ts`
+- [X] T041 [P] [US3] Implement provider model catalog entity behavior in `src/adapters/outbound/llm/model-registry.ts`
+- [X] T042 [P] [US3] Implement help renderer in `src/adapters/inbound/cli/help-renderer.ts`
+- [X] T043 [P] [US3] Implement list-models use case in `src/application/use-cases/list-models.use-case.ts`
+- [X] T044 [US3] Extend CLI parser for provider/model/help options and CLI-argument-over-environment precedence in `src/adapters/inbound/cli/cli-parser.ts`
+- [X] T045 [US3] Integrate help and static model catalog output in `src/main.ts`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -143,11 +143,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T046 [P] Document CLI usage and dataset expectations in `README.md`
-- [ ] T047 Update environment examples and defaults in `.env.example`
-- [ ] T048 [P] Add end-to-end fixture dataset notes in `specs/001-cli-eval-tool/quickstart.md`
-- [ ] T049 Run coverage hardening and close remaining gaps in `tests/`
-- [ ] T050 Run quickstart validation and record final command set in `specs/001-cli-eval-tool/quickstart.md`
+- [X] T046 [P] Document CLI usage and dataset expectations in `README.md`
+- [X] T047 Update environment examples and defaults in `.env.example`
+- [X] T048 [P] Add end-to-end fixture dataset notes in `specs/001-cli-eval-tool/quickstart.md`
+- [X] T049 Run coverage hardening and close remaining gaps in `tests/`
+- [X] T050 Run quickstart validation and record final command set in `specs/001-cli-eval-tool/quickstart.md`
 
 ---
 

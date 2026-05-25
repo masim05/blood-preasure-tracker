@@ -70,3 +70,30 @@ data/
 ```
 
 The CSV must contain an `imageId` column matching each image filename stem.
+
+Duplicate `imageId` values and duplicate normalized filename stems are treated as validation failures.
+
+## Fixture Notes
+
+- Supported input image extensions are `.jpg`, `.jpeg`, `.png`, and `.webp`.
+- The CLI matches `a.csv` rows to image files by filename stem only.
+- Blank optional values in the CSV are parsed as `null`.
+- `predict` and `eval` require a real `OPENAI_API_KEY` when using the default provider.
+
+## Validated Command Set
+
+These commands were run successfully in this workspace during implementation:
+
+```bash
+npm run build
+npm run cli -- --help
+npm test
+npm run test:coverage
+```
+
+These commands remain the supported runtime flow, but they require a real OpenAI key and local fixtures:
+
+```bash
+npm run cli -- predict --input ./data/eval
+npm run cli -- eval --input ./data/eval --csv ./data/eval/a.csv
+```
