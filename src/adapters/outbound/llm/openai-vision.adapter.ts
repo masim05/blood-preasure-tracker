@@ -51,7 +51,6 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
             type: 'object',
             additionalProperties: false,
             properties: {
-              time: { type: ['string', 'null'] },
               hand: { type: ['string', 'null'] },
               systolic: { type: ['number', 'null'] },
               diastolic: { type: ['number', 'null'] },
@@ -64,7 +63,6 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
               rawNotes: { type: ['string', 'null'] },
             },
             required: [
-              'time',
               'hand',
               'systolic',
               'diastolic',
@@ -82,7 +80,6 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
     const parsed = JSON.parse(outputText) as LlmProviderResponse & { hand: string | null };
 
     return {
-      time: parsed.time,
       hand: parsed.hand === 'left' || parsed.hand === 'right' || parsed.hand === 'unknown' ? parsed.hand : null,
       systolic: parsed.systolic,
       diastolic: parsed.diastolic,

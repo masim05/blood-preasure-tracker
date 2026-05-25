@@ -9,6 +9,7 @@ import { CliParser } from './adapters/inbound/cli/cli-parser';
 import { HelpRenderer } from './adapters/inbound/cli/help-renderer';
 import { CsvDatasetAdapter } from './adapters/outbound/filesystem/csv-dataset.adapter';
 import { ImageDirectoryAdapter } from './adapters/outbound/filesystem/image-directory.adapter';
+import { ImageMetadataAdapter } from './adapters/outbound/filesystem/image-metadata.adapter';
 import { OpenAiVisionAdapter } from './adapters/outbound/llm/openai-vision.adapter';
 import { ModelRegistry } from './adapters/outbound/llm/model-registry';
 import { EvaluateImagesUseCase } from './application/use-cases/evaluate-images.use-case';
@@ -27,6 +28,7 @@ type CliDependencies = {
   envConfigService: EnvConfigService;
   modelRegistry: ModelRegistry;
   imageDirectoryAdapter: ImageDirectoryAdapter;
+  imageMetadataAdapter: ImageMetadataAdapter;
   evaluationDataset: CsvDatasetAdapter;
   helpRenderer: HelpRenderer;
 };
@@ -46,6 +48,7 @@ export async function runCli(
       envConfigService: app.get(EnvConfigService),
       modelRegistry: app.get(ModelRegistry),
       imageDirectoryAdapter: app.get(ImageDirectoryAdapter),
+      imageMetadataAdapter: app.get(ImageMetadataAdapter),
       evaluationDataset: new CsvDatasetAdapter(),
       helpRenderer: new HelpRenderer(),
     });
@@ -117,6 +120,7 @@ function createCliDependencies(): CliDependencies {
     envConfigService,
     modelRegistry: new ModelRegistry(),
     imageDirectoryAdapter: new ImageDirectoryAdapter(),
+    imageMetadataAdapter: new ImageMetadataAdapter(),
     evaluationDataset: new CsvDatasetAdapter(),
     helpRenderer: new HelpRenderer(),
   };
@@ -132,6 +136,7 @@ async function executePredictCommand(
   const providerAdapter = createProviderAdapter(envConfig.openAiApiKey, cliConfig.model);
   const predictImagesUseCase = new PredictImagesUseCase(
     dependencies.imageDirectoryAdapter,
+    dependencies.imageMetadataAdapter,
     providerAdapter,
     outputWriter,
   );
@@ -155,6 +160,7 @@ async function executeEvalCommand(
   const evaluateImagesUseCase = new EvaluateImagesUseCase(
     dependencies.imageDirectoryAdapter,
     dependencies.evaluationDataset,
+    dependencies.imageMetadataAdapter,
     providerAdapter,
     outputWriter,
   );

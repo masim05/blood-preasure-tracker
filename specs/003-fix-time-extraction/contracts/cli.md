@@ -16,6 +16,7 @@ npm run cli -- predict --input ./data/eval
 
 - `time` MUST come only from embedded image metadata.
 - Supported metadata tag precedence is `DateTimeOriginal`, then `CreateDate`, then generic `DateTime`.
+- Parser output that exposes generic EXIF `DateTime` as `ModifyDate` is treated as the generic `DateTime` source.
 - EXIF-style values such as `2026:05:19 06:05:20` MUST be emitted as `2026-05-19 06:05:20`.
 - The CLI MUST NOT use provider output, filename text, file modification time, or runtime timezone inference as fallback.
 
@@ -72,6 +73,7 @@ npm run cli -- eval --input ./data/eval --csv ./data/eval/a.csv
 ## Compatibility
 
 - Provider-backed extraction for `hand`, `systolic`, `diastolic`, and `pulse` is unchanged.
+- Provider output schemas do not request or return `time`.
 - CSV filename-stem matching is unchanged.
 - JSONL record types remain `prediction`, `comparison`, and `summary`.
 - Environment variables and provider credentials are unchanged.

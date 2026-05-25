@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { PassThrough } from 'node:stream';
@@ -10,7 +10,6 @@ jest.mock('openai', () => {
       readonly responses = {
         create: jest.fn().mockResolvedValue({
           output_text: JSON.stringify({
-            time: '2026-05-20 14:01:23 GMT+7',
             hand: 'right',
             systolic: 127,
             diastolic: 72,
@@ -49,6 +48,51 @@ describe('CLI integration', () => {
     expect(stdout).toContain('"model":"gpt-5.4-mini"');
   });
 
+  it('emits metadata-derived time for the reported JPEG fixture', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-exif-'));
+    writeFileSync(
+      path.join(fixtureDir, '2026-05-19 06-05-20.JPG'),
+      readFileSync(path.join(process.cwd(), 'tests/fixtures/images/2026-05-19 06-05-20.JPG')),
+    );
+
+    const exitCode = await runCliWithDependencies(
+      ['predict', '--input', fixtureDir],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain('"time":"2026-05-19 06:05:20"');
+    expect(stdout).toContain('"uncertainFields":[]');
+  });
+
+  it('keeps missing metadata time null and uncertain while continuing prediction', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-missing-time-'));
+    writeFileSync(path.join(fixtureDir, 'img001.jpg'), Buffer.from('fixture-image'));
+
+    const exitCode = await runCliWithDependencies(
+      ['predict', '--input', fixtureDir],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain('"time":null');
+    expect(stdout).toContain('"uncertainFields":["time"]');
+  });
+
   it('shows predict in help output', async () => {
     const output = new PassThrough();
     let stdout = '';
@@ -85,6 +129,37 @@ describe('CLI integration', () => {
     expect(exitCode).toBe(0);
     expect(stdout).toContain('"type":"comparison"');
     expect(stdout).toContain('"type":"summary"');
+  });
+
+  it('matches eval CSV time against metadata-derived time', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-eval-exif-'));
+    writeFileSync(
+      path.join(fixtureDir, '2026-05-19 06-05-20.JPG'),
+      readFileSync(path.join(process.cwd(), 'tests/fixtures/images/2026-05-19 06-05-20.JPG')),
+    );
+    writeFileSync(
+      path.join(fixtureDir, 'a.csv'),
+      [
+        'imageId,time,hand,systolic,diastolic,pulse',
+        '2026-05-19 06-05-20,2026-05-19 06:05:20,right,127,72,69',
+      ].join('\n'),
+    );
+
+    const exitCode = await runCliWithDependencies(
+      ['eval', '--input', fixtureDir, '--csv', path.join(fixtureDir, 'a.csv')],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain('"matchStatus":"matched"');
+    expect(stdout).toContain('"time":"match"');
   });
 
   it('shows the static model catalog in help output', async () => {

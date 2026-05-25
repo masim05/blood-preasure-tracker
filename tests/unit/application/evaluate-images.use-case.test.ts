@@ -1,5 +1,6 @@
 import { EvaluateImagesUseCase } from '../../../src/application/use-cases/evaluate-images.use-case';
 import type { EvaluationDatasetPort } from '../../../src/application/ports/evaluation-dataset.port';
+import type { ImageMetadataPort } from '../../../src/application/ports/image-metadata.port';
 import type { ImageSourcePort } from '../../../src/application/ports/image-source.port';
 import type { LlmProviderPort } from '../../../src/application/ports/llm-provider.port';
 import type { OutputWriterPort } from '../../../src/application/ports/output-writer.port';
@@ -20,7 +21,7 @@ describe('EvaluateImagesUseCase', () => {
       load: jest.fn().mockResolvedValue([
         {
           imageId: 'img001',
-          time: '2026-05-20 14:01:23 GMT+7',
+          time: '2026-05-20 14:01:23',
           hand: 'right',
           systolic: 127,
           diastolic: 72,
@@ -28,10 +29,19 @@ describe('EvaluateImagesUseCase', () => {
         },
       ]),
     };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
     const llmProvider: LlmProviderPort = {
       provider: 'openai',
       infer: jest.fn().mockResolvedValue({
-        time: '2026-05-20 14:01:23 GMT+7',
         hand: 'right',
         systolic: 127,
         diastolic: 72,
@@ -45,7 +55,13 @@ describe('EvaluateImagesUseCase', () => {
       write: jest.fn().mockResolvedValue(undefined),
     };
 
-    const useCase = new EvaluateImagesUseCase(imageSource, dataset, llmProvider, outputWriter);
+    const useCase = new EvaluateImagesUseCase(
+      imageSource,
+      dataset,
+      imageMetadata,
+      llmProvider,
+      outputWriter,
+    );
 
     await useCase.execute({
       inputDirectory: 'data/eval',
@@ -54,5 +70,12 @@ describe('EvaluateImagesUseCase', () => {
     });
 
     expect(outputWriter.write).toHaveBeenCalledTimes(2);
+    expect(outputWriter.write).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        fieldResults: expect.objectContaining({ time: 'match' }),
+        matchStatus: 'matched',
+      }),
+    );
   });
 });

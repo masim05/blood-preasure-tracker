@@ -1,4 +1,5 @@
 import type { ImageSourcePort } from '../ports/image-source.port';
+import type { ImageMetadataPort } from '../ports/image-metadata.port';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import { PredictedReading } from '../../domain/entities/predicted-reading';
@@ -12,6 +13,7 @@ type PredictImagesCommand = {
 export class PredictImagesUseCase {
   constructor(
     private readonly imageSource: ImageSourcePort,
+    private readonly imageMetadata: ImageMetadataPort,
     private readonly llmProvider: LlmProviderPort,
     private readonly outputWriter: OutputWriterPort,
   ) {}
@@ -27,25 +29,33 @@ export class PredictImagesUseCase {
         data: image.data,
         model: command.model,
       });
+      const metadata = await this.imageMetadata.extractTimestamp({
+        imageId: image.imageId,
+        imagePath: image.imagePath,
+        data: image.data,
+      });
+      const uncertainFields = metadata.time === null
+        ? [...new Set([...inference.uncertainFields, 'time'])]
+        : [...inference.uncertainFields];
 
       const reading = new PredictedReading({
         imageId: image.imageId,
         imagePath: image.imagePath,
-        time: inference.time,
+        time: metadata.time,
         hand: inference.hand,
         systolic: inference.systolic,
         diastolic: inference.diastolic,
         pulse: inference.pulse,
         confidence: inference.confidence,
         status: deriveReadingStatus({
-          time: inference.time,
+          time: metadata.time,
           hand: inference.hand,
           systolic: inference.systolic,
           diastolic: inference.diastolic,
           pulse: inference.pulse,
-          uncertainFields: inference.uncertainFields,
+          uncertainFields,
         }),
-        uncertainFields: inference.uncertainFields,
+        uncertainFields,
         provider: this.llmProvider.provider,
         model: command.model,
         rawNotes: inference.rawNotes,

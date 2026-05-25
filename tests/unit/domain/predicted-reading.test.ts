@@ -79,4 +79,16 @@ describe('PredictedReading', () => {
         }),
     ).not.toThrow();
   });
+
+  it('allows partial status when only metadata time is uncertain', () => {
+    expect(
+      () =>
+        new PredictedReading({
+          ...baseReading,
+          time: null,
+          status: 'partial',
+          uncertainFields: ['time'],
+        }),
+    ).not.toThrow();
+  });
 });

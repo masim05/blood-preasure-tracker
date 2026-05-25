@@ -40,6 +40,9 @@ CLI arguments override environment defaults for `--input`, `--csv`, `--provider`
 
 - `predict` emits one JSONL `prediction` record per image.
 - `eval` emits one JSONL `comparison` record per image or unmatched row, followed by one `summary` record.
+- `time` is read only from embedded image metadata, using `DateTimeOriginal`, then `CreateDate`, then generic `DateTime`/`ModifyDate` parser output.
+- Metadata timestamps are emitted as `YYYY-MM-DD HH:mm:ss`, for example `2026-05-19 06:05:20`.
+- If no supported embedded timestamp is present, `time` remains `null` and `uncertainFields` includes `time`; the CLI does not fall back to provider output, filename text, file modification time, or runtime timezone inference.
 
 ## Dataset Expectations
 
@@ -81,4 +84,5 @@ npm run build
 npm run cli -- --help
 npm test
 npm run test:coverage
+npm run lint
 ```

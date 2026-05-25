@@ -13,7 +13,6 @@ jest.mock('openai', () => {
       readonly responses = {
         create: jest.fn().mockResolvedValue({
           output_text: JSON.stringify({
-            time: '2026-05-20 14:01:23 GMT+7',
             hand: 'right',
             systolic: 127,
             diastolic: 72,
@@ -77,6 +76,16 @@ describe('main entrypoint', () => {
               data: Buffer.from('fixture-image'),
             },
           ]),
+        } as never,
+        imageMetadataAdapter: {
+          extractTimestamp: jest.fn().mockResolvedValue({
+            imageId: 'img001',
+            imagePath: 'data/eval/img001.jpg',
+            time: '2026-05-20 14:01:23',
+            sourceTag: 'DateTimeOriginal',
+            rawValue: '2026:05:20 14:01:23',
+            issues: [],
+          }),
         } as never,
         evaluationDataset: {
           load: jest.fn().mockResolvedValue([]),
@@ -142,6 +151,16 @@ describe('main entrypoint', () => {
         imageDirectoryAdapter: {
           load: jest.fn().mockResolvedValue([]),
         } as never,
+        imageMetadataAdapter: {
+          extractTimestamp: jest.fn().mockResolvedValue({
+            imageId: 'unused',
+            imagePath: 'unused',
+            time: null,
+            sourceTag: null,
+            rawValue: null,
+            issues: [],
+          }),
+        } as never,
         evaluationDataset: {
           load: jest.fn().mockResolvedValue([]),
         } as never,
@@ -188,6 +207,16 @@ describe('main entrypoint', () => {
           imageDirectoryAdapter: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
+          imageMetadataAdapter: {
+            extractTimestamp: jest.fn().mockResolvedValue({
+              imageId: 'unused',
+              imagePath: 'unused',
+              time: null,
+              sourceTag: null,
+              rawValue: null,
+              issues: [],
+            }),
+          } as never,
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
@@ -231,6 +260,16 @@ describe('main entrypoint', () => {
           } as never,
           imageDirectoryAdapter: {
             load: jest.fn().mockResolvedValue([]),
+          } as never,
+          imageMetadataAdapter: {
+            extractTimestamp: jest.fn().mockResolvedValue({
+              imageId: 'unused',
+              imagePath: 'unused',
+              time: null,
+              sourceTag: null,
+              rawValue: null,
+              issues: [],
+            }),
           } as never,
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),

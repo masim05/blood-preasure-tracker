@@ -186,6 +186,43 @@ describe('EvaluationMatcher', () => {
     expect(comparisons[0]?.fieldResults.systolic).toBe('mismatch');
   });
 
+  it('matches normalized metadata timestamps exactly', () => {
+    const matcher = new EvaluationMatcher();
+
+    const comparisons = matcher.match(
+      [
+        {
+          imageId: '2026-05-19 06-05-20.JPG',
+          imagePath: 'data/eval/2026-05-19 06-05-20.JPG',
+          time: '2026-05-19 06:05:20',
+          hand: 'left',
+          systolic: 121,
+          diastolic: 75,
+          pulse: 75,
+          confidence: 0.98,
+          status: 'complete',
+          uncertainFields: [],
+          provider: 'openai',
+          model: 'gpt-5.4-mini',
+          rawNotes: null,
+        },
+      ],
+      [
+        {
+          imageId: '2026-05-19 06-05-20',
+          time: '2026-05-19 06:05:20',
+          hand: 'left',
+          systolic: 121,
+          diastolic: 75,
+          pulse: 75,
+        },
+      ],
+    );
+
+    expect(comparisons[0]?.matchStatus).toBe('matched');
+    expect(comparisons[0]?.fieldResults.time).toBe('match');
+  });
+
   it('accepts class instances and marks null field values as missing', () => {
     const matcher = new EvaluationMatcher();
 

@@ -27,6 +27,19 @@ describe('deriveReadingStatus', () => {
     ).toBe('partial');
   });
 
+  it('returns partial when vitals are present but metadata time is uncertain', () => {
+    expect(
+      deriveReadingStatus({
+        time: null,
+        hand: 'right',
+        systolic: 127,
+        diastolic: 72,
+        pulse: 69,
+        uncertainFields: ['time'],
+      }),
+    ).toBe('partial');
+  });
+
   it('returns unreadable when nothing is readable and uncertainty is present', () => {
     expect(
       deriveReadingStatus({

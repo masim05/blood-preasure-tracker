@@ -7,7 +7,6 @@ export type LlmProviderRequest = {
 };
 
 export type LlmProviderResponse = {
-  time: string | null;
   hand: 'left' | 'right' | 'unknown' | null;
   systolic: number | null;
   diastolic: number | null;

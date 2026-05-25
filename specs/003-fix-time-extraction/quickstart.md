@@ -35,6 +35,7 @@ Expected JSONL behavior after the fix:
 ```
 
 Other provider-derived fields may vary by model response, but `time` must be non-null for the metadata-bearing image.
+The provider response is not used as a timestamp source.
 
 ## Evaluate Timestamp Matching
 
@@ -67,8 +68,10 @@ Run `predict` against a fixture without supported embedded timestamp metadata. E
 npm run build
 npm test
 npm run test:coverage
+npm run lint
 npm run cli -- predict --input ./data/eval
 npm run cli -- eval --input ./data/eval --csv ./data/eval/a.csv
 ```
 
 Coverage must remain at or above 95% overall, with changed timestamp extraction branches covered directly.
+The automated test suite includes the committed fixture `tests/fixtures/images/2026-05-19 06-05-20.JPG` so timestamp validation can run without depending on ignored local `data/` files.

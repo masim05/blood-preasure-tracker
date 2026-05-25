@@ -28,4 +28,24 @@ describe('JsonlOutputWriter', () => {
       writeSpy.mockRestore();
     }
   });
+
+  it('serializes null metadata time and time uncertainty without rewriting values', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const writer = new JsonlOutputWriter(output);
+    await writer.write({
+      type: 'prediction',
+      imageId: 'missing-time',
+      time: null,
+      uncertainFields: ['time'],
+    });
+
+    expect(stdout).toBe(
+      '{"type":"prediction","imageId":"missing-time","time":null,"uncertainFields":["time"]}\n',
+    );
+  });
 });
