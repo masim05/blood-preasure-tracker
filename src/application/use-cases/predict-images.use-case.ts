@@ -1,5 +1,6 @@
 import type { ImageSourcePort } from '../ports/image-source.port';
 import type { ImageMetadataPort } from '../ports/image-metadata.port';
+import type { SourceImage } from '../ports/image-source.port';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import { PredictedReading } from '../../domain/entities/predicted-reading';
@@ -22,12 +23,23 @@ export class PredictImagesUseCase {
     const images = await this.imageSource.load(command.inputDirectory);
 
     for (const image of images) {
+      const reading = await this.predictImage(image, command.model);
+
+      await this.outputWriter.write({
+        type: 'prediction',
+        ...reading.toJSON(),
+      });
+    }
+  }
+
+  private async predictImage(image: SourceImage, model: string): Promise<PredictedReading> {
+    try {
       const inference = await this.llmProvider.infer({
         imageId: image.imageId,
         imagePath: image.imagePath,
         contentType: image.contentType,
         data: image.data,
-        model: command.model,
+        model,
       });
       const metadata = await this.imageMetadata.extractTimestamp({
         imageId: image.imageId,
@@ -38,7 +50,7 @@ export class PredictImagesUseCase {
         ? [...new Set([...inference.uncertainFields, 'time'])]
         : [...inference.uncertainFields];
 
-      const reading = new PredictedReading({
+      return new PredictedReading({
         imageId: image.imageId,
         imagePath: image.imagePath,
         time: metadata.time,
@@ -57,14 +69,29 @@ export class PredictImagesUseCase {
         }),
         uncertainFields,
         provider: this.llmProvider.provider,
-        model: command.model,
+        model,
         rawNotes: inference.rawNotes,
       });
-
-      await this.outputWriter.write({
-        type: 'prediction',
-        ...reading.toJSON(),
-      });
+    } catch (error) {
+      return this.createErrorReading(image, model, error);
     }
+  }
+
+  private createErrorReading(image: SourceImage, model: string, error: unknown): PredictedReading {
+    return new PredictedReading({
+      imageId: image.imageId,
+      imagePath: image.imagePath,
+      time: null,
+      hand: null,
+      systolic: null,
+      diastolic: null,
+      pulse: null,
+      confidence: null,
+      status: 'error',
+      uncertainFields: [],
+      provider: this.llmProvider.provider,
+      model,
+      rawNotes: error instanceof Error ? error.message : 'Unknown image processing error',
+    });
   }
 }

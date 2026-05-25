@@ -32,9 +32,10 @@ import { PassThrough } from 'node:stream';
 import { runCli, runCliWithDependencies } from '../../src/main';
 
 describe('main entrypoint', () => {
-  it('uses the default model registry entry when the CLI config model is empty', async () => {
+  it('uses the resolved CLI config model for predict', async () => {
     const output = new PassThrough();
     let stdout = '';
+    const getDefaultModel = jest.fn().mockReturnValue('registry-default-model');
     output.on('data', (chunk: Buffer) => {
       stdout += chunk.toString('utf8');
     });
@@ -51,7 +52,7 @@ describe('main entrypoint', () => {
             inputDirectory: 'data/eval',
             evaluationCsvPath: 'data/eval/a.csv',
             provider: 'openai',
-            model: '',
+            model: 'resolved-model',
           }),
         } as never,
         envConfigService: {
@@ -65,7 +66,7 @@ describe('main entrypoint', () => {
         } as never,
         modelRegistry: {
           list: () => [],
-          getDefaultModel: () => 'registry-default-model',
+          getDefaultModel,
         } as never,
         imageDirectoryAdapter: {
           load: jest.fn().mockResolvedValue([
@@ -97,7 +98,8 @@ describe('main entrypoint', () => {
     );
 
     expect(exitCode).toBe(0);
-    expect(stdout).toContain('"model":"registry-default-model"');
+    expect(stdout).toContain('"model":"resolved-model"');
+    expect(getDefaultModel).not.toHaveBeenCalled();
   });
 
   it('returns 1 when the Nest bootstrap path throws', async () => {
@@ -111,67 +113,6 @@ describe('main entrypoint', () => {
     const exitCode = await runCli(['predict'], { OPENAI_API_KEY: 'test-key' }, new PassThrough());
 
     expect(exitCode).toBe(1);
-  });
-
-  it('returns the fallback output for unsupported command branches', async () => {
-    const output = new PassThrough();
-    let stdout = '';
-    output.on('data', (chunk: Buffer) => {
-      stdout += chunk.toString('utf8');
-    });
-
-    const exitCode = await runCliWithDependencies(
-      [],
-      {},
-      output,
-      {
-        cliConfigService: {
-          resolve: () => ({
-            command: 'noop',
-            helpRequested: false,
-            inputDirectory: 'data/eval',
-            evaluationCsvPath: 'data/eval/a.csv',
-            provider: 'custom',
-            model: 'custom-model',
-          }),
-        } as never,
-        envConfigService: {
-          load: () => ({
-            openAiApiKey: null,
-            inputDirectory: 'data/eval',
-            evaluationCsvPath: 'data/eval/a.csv',
-            provider: 'custom',
-            model: 'custom-model',
-          }),
-        } as never,
-        modelRegistry: {
-          list: () => [],
-          getDefaultModel: () => 'unused',
-        } as never,
-        imageDirectoryAdapter: {
-          load: jest.fn().mockResolvedValue([]),
-        } as never,
-        imageMetadataAdapter: {
-          extractTimestamp: jest.fn().mockResolvedValue({
-            imageId: 'unused',
-            imagePath: 'unused',
-            time: null,
-            sourceTag: null,
-            rawValue: null,
-            issues: [],
-          }),
-        } as never,
-        evaluationDataset: {
-          load: jest.fn().mockResolvedValue([]),
-        } as never,
-        helpRenderer: {
-          render: () => 'help',
-        } as never,
-      },
-    );
-
-    expect(exitCode).toBe(0);
-    expect(stdout).toContain('noop foundation ready for provider custom and model custom-model.');
   });
 
   it('fails when predict uses openai without an API key', async () => {

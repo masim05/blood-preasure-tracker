@@ -1,6 +1,7 @@
 import type { EvaluationDatasetPort } from '../ports/evaluation-dataset.port';
 import type { ImageMetadataPort } from '../ports/image-metadata.port';
 import type { ImageSourcePort } from '../ports/image-source.port';
+import type { SourceImage } from '../ports/image-source.port';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import { EvaluationReport } from '../../domain/entities/evaluation-report';
@@ -30,46 +31,7 @@ export class EvaluateImagesUseCase {
     const predictions: PredictedReading[] = [];
 
     for (const image of images) {
-      const inference = await this.llmProvider.infer({
-        imageId: image.imageId,
-        imagePath: image.imagePath,
-        contentType: image.contentType,
-        data: image.data,
-        model: command.model,
-      });
-      const metadata = await this.imageMetadata.extractTimestamp({
-        imageId: image.imageId,
-        imagePath: image.imagePath,
-        data: image.data,
-      });
-      const uncertainFields = metadata.time === null
-        ? [...new Set([...inference.uncertainFields, 'time'])]
-        : [...inference.uncertainFields];
-
-      predictions.push(
-        new PredictedReading({
-          imageId: image.imageId,
-          imagePath: image.imagePath,
-          time: metadata.time,
-          hand: inference.hand,
-          systolic: inference.systolic,
-          diastolic: inference.diastolic,
-          pulse: inference.pulse,
-          confidence: inference.confidence,
-          status: deriveReadingStatus({
-            time: metadata.time,
-            hand: inference.hand,
-            systolic: inference.systolic,
-            diastolic: inference.diastolic,
-            pulse: inference.pulse,
-            uncertainFields,
-          }),
-          uncertainFields,
-          provider: this.llmProvider.provider,
-          model: command.model,
-          rawNotes: inference.rawNotes,
-        }),
-      );
+      predictions.push(await this.evaluateImage(image, command.model));
     }
 
     const comparisons = this.evaluationMatcher.match(predictions, groundTruthRows);
@@ -85,5 +47,68 @@ export class EvaluateImagesUseCase {
     }
 
     await this.outputWriter.write(evaluationReport.toSummary());
+  }
+
+  private async evaluateImage(image: SourceImage, model: string): Promise<PredictedReading> {
+    try {
+      const inference = await this.llmProvider.infer({
+        imageId: image.imageId,
+        imagePath: image.imagePath,
+        contentType: image.contentType,
+        data: image.data,
+        model,
+      });
+      const metadata = await this.imageMetadata.extractTimestamp({
+        imageId: image.imageId,
+        imagePath: image.imagePath,
+        data: image.data,
+      });
+      const uncertainFields = metadata.time === null
+        ? [...new Set([...inference.uncertainFields, 'time'])]
+        : [...inference.uncertainFields];
+
+      return new PredictedReading({
+        imageId: image.imageId,
+        imagePath: image.imagePath,
+        time: metadata.time,
+        hand: inference.hand,
+        systolic: inference.systolic,
+        diastolic: inference.diastolic,
+        pulse: inference.pulse,
+        confidence: inference.confidence,
+        status: deriveReadingStatus({
+          time: metadata.time,
+          hand: inference.hand,
+          systolic: inference.systolic,
+          diastolic: inference.diastolic,
+          pulse: inference.pulse,
+          uncertainFields,
+        }),
+        uncertainFields,
+        provider: this.llmProvider.provider,
+        model,
+        rawNotes: inference.rawNotes,
+      });
+    } catch (error) {
+      return this.createErrorReading(image, model, error);
+    }
+  }
+
+  private createErrorReading(image: SourceImage, model: string, error: unknown): PredictedReading {
+    return new PredictedReading({
+      imageId: image.imageId,
+      imagePath: image.imagePath,
+      time: null,
+      hand: null,
+      systolic: null,
+      diastolic: null,
+      pulse: null,
+      confidence: null,
+      status: 'error',
+      uncertainFields: [],
+      provider: this.llmProvider.provider,
+      model,
+      rawNotes: error instanceof Error ? error.message : 'Unknown image processing error',
+    });
   }
 }

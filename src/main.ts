@@ -74,21 +74,15 @@ export async function runCliWithDependencies(
     validateProviderConfig(cliConfig, envConfig);
   }
 
-  if (cliConfig.command === 'help') {
-    stdout.write(renderHelp(dependencies.modelRegistry, dependencies.helpRenderer));
-    return 0;
+  switch (cliConfig.command) {
+    case 'help':
+      stdout.write(renderHelp(dependencies.modelRegistry, dependencies.helpRenderer));
+      return 0;
+    case 'predict':
+      return await executePredictCommand(cliConfig, envConfig, dependencies, stdout);
+    case 'eval':
+      return await executeEvalCommand(cliConfig, envConfig, dependencies, stdout);
   }
-
-  if (cliConfig.command === 'predict') {
-    return await executePredictCommand(cliConfig, envConfig, dependencies, stdout);
-  }
-
-  if (cliConfig.command === 'eval') {
-    return await executeEvalCommand(cliConfig, envConfig, dependencies, stdout);
-  }
-
-  stdout.write(`${cliConfig.command} foundation ready for provider ${cliConfig.provider} and model ${cliConfig.model}.\n`);
-  return 0;
 }
 
 async function bootstrap(): Promise<void> {
@@ -143,7 +137,7 @@ async function executePredictCommand(
 
   await predictImagesUseCase.execute({
     inputDirectory: cliConfig.inputDirectory,
-    model: cliConfig.model || dependencies.modelRegistry.getDefaultModel(cliConfig.provider),
+    model: cliConfig.model,
   });
 
   return 0;
@@ -168,7 +162,7 @@ async function executeEvalCommand(
   await evaluateImagesUseCase.execute({
     inputDirectory: cliConfig.inputDirectory,
     evaluationCsvPath: cliConfig.evaluationCsvPath,
-    model: cliConfig.model || dependencies.modelRegistry.getDefaultModel(cliConfig.provider),
+    model: cliConfig.model,
   });
 
   return 0;

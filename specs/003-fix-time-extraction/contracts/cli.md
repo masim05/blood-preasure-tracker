@@ -25,7 +25,7 @@ npm run cli -- predict --input ./data/eval
 ```json
 {
   "type": "prediction",
-  "imageId": "2026-05-19 06-05-20.JPG",
+  "imageId": "2026-05-19 06-05-20",
   "imagePath": "data/eval/2026-05-19 06-05-20.JPG",
   "time": "2026-05-19 06:05:20",
   "hand": "left",

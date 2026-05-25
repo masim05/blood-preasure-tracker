@@ -31,7 +31,7 @@ npm run cli -- predict --input ./data/eval
 Expected JSONL behavior after the fix:
 
 ```json
-{"type":"prediction","imageId":"2026-05-19 06-05-20.JPG","time":"2026-05-19 06:05:20"}
+{"type":"prediction","imageId":"2026-05-19 06-05-20","time":"2026-05-19 06:05:20"}
 ```
 
 Other provider-derived fields may vary by model response, but `time` must be non-null for the metadata-bearing image.
