@@ -73,7 +73,7 @@ As a CLI user evaluating predictions against a CSV dataset, I want `eval` to com
 
 ## Architecture & Test Impact *(mandatory)*
 
-- **Ports Affected**: Existing image metadata extraction port behavior is affected; no new domain port is required.
+- **Ports Affected**: Introduce `ImageMetadataPort` for embedded timestamp extraction and update provider inference boundaries so `time` no longer comes from `LlmProviderPort`.
 - **Adapters Affected**: Filesystem image metadata adapter and prediction/evaluation flows that consume metadata-backed timestamps.
 - **Boundary Guarantee**: Timestamp parsing remains behind the metadata port; domain logic receives metadata extraction results and does not depend on filesystem or metadata parsing libraries.
 - **Node.js Version Baseline**: Node.js 22.13.1 or newer, matching the project baseline.
