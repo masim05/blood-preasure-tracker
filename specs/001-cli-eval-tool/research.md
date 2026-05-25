@@ -1,56 +1,78 @@
 # Research: CLI Eval Tool
 
-## Runtime and App Composition
+## Runtime and Composition
 
-**Decision**: Use TypeScript on Node.js 22.13.1 LTS with a NestJS 11 standalone application context for dependency wiring, while keeping all business logic outside Nest-specific classes.
+**Decision**: Keep TypeScript on Node.js 22.13.1 LTS with a NestJS 11 standalone application context for dependency wiring, while keeping business rules in framework-agnostic domain and application layers.
 
-**Rationale**: Node 22.13.1 matches the constitution baseline observed in the local toolchain. NestJS 11.1.x is the current baseline package version and can be used without an HTTP server, giving consistent provider wiring while keeping the domain hexagonal.
-
-**Alternatives considered**:
-
-- Pure manual wiring with no NestJS: smaller, but conflicts with the project constitution requiring a NestJS baseline.
-- Full Nest HTTP application: unnecessary for a local batch CLI and adds irrelevant transport concerns.
-
-## LLM Provider Integration
-
-**Decision**: Default to the official OpenAI SDK 6.39.0 behind an `LlmProviderPort`, with a provider/model registry that exposes a static model catalog and allows additional adapters later.
-
-**Rationale**: The spec requires OpenAI by default with `gpt-5.4-mini`, model selection, and adapter-based support for future providers. The official SDK satisfies the official-first dependency rule and is the thinnest way to reach the API.
+**Rationale**: This preserves the current constitution-aligned runtime baseline, keeps the CLI wiring consistent with the existing repository shape, and avoids introducing HTTP or server concerns into a purely local batch tool.
 
 **Alternatives considered**:
 
-- Direct `fetch` calls to provider endpoints: workable, but duplicates auth/request logic already handled by the official SDK.
-- Live model discovery for help output: rejected because the spec clarification requires statically configured models from installed adapters.
+- Pure manual wiring with no NestJS: smaller, but conflicts with the repository's NestJS baseline.
+- Full Nest HTTP app: unnecessary for an offline CLI.
 
-## CLI and Help Surface
+## Metadata Timestamp Extraction
 
-**Decision**: Implement CLI parsing with `process.argv` plus a small parser/renderer layer, and use JSONL as the default output format for `predict` and `eval`.
+**Decision**: Use `exif-parser` over image buffers to read embedded EXIF timestamp fields such as `DateTimeOriginal`; if no parseable metadata exists, emit `time: null` and mark the field uncertain rather than synthesizing time from another source.
 
-**Rationale**: This keeps the CLI dependency-light and aligned with official Node modules. JSONL matches the clarified spec, streams naturally for batches, and is easy to snapshot-test.
-
-**Alternatives considered**:
-
-- `commander`, `yargs`, or `nest-commander`: not necessary for the limited command surface and would add third-party dependencies where built-ins are sufficient.
-- JSON array output: simpler to reason about, but forces full buffering and is less stream-friendly.
-
-## Evaluation Dataset Handling
-
-**Decision**: Match images to CSV rows by filename stem and parse the CSV with a small validated parser over Node filesystem input, assuming a simple flat file shape.
-
-**Rationale**: Filename-stem matching is now part of the clarified spec. The evaluation dataset is local and narrow in scope, so a minimal parser with explicit header validation keeps dependencies down while still covering the required behavior.
+**Rationale**: The clarified spec explicitly requires `time` to come from image metadata and forbids model-generated timestamps. `exif-parser` is a focused library with minimal surface area and no external binary dependency.
 
 **Alternatives considered**:
 
-- Row-order matching: rejected by clarification.
-- `csv-parse` or similar parser library: deferred unless the real dataset introduces escaping/quoting complexity that exceeds the validated simple parser.
+- `piexifjs`: viable, but more browser-oriented than needed for this Node CLI.
+- File mtime fallback: rejected because it is filesystem metadata, not image metadata, and could silently misrepresent capture time.
+
+## Local Value Extraction
+
+**Decision**: Use `sharp` for optional orientation and contrast normalization, then run `tesseract.js` offline OCR and apply deterministic regex/range validation to derive `hand`, `systolic`, `diastolic`, and `pulse`.
+
+**Rationale**: Node and Nest do not provide built-in OCR. `tesseract.js` runs locally without network access and keeps the feature aligned with the no-LLM clarification. `sharp` improves OCR consistency on rotated or low-contrast monitor photos.
+
+**Alternatives considered**:
+
+- External OCR or vision APIs: rejected by clarification.
+- Hand-written image recognition: too much risk for an MVP CLI.
+- System-installed Tesseract binary: workable, but less reproducible than the npm/WASM path.
+
+## Output and Evaluation Flow
+
+**Decision**: Preserve JSONL output and filename-stem CSV matching, but remove provider/model concerns from emitted records, help text, and evaluation summaries.
+
+**Rationale**: The existing JSONL and eval matching clarifications remain valid and fit the local-only design. Removing provider/model state keeps the output contract honest and easier to validate.
+
+**Alternatives considered**:
+
+- JSON array output: rejected because it forces buffering.
+- Row-order matching: rejected by previous clarification.
+
+## Local Configuration Surface
+
+**Decision**: Keep `.env`-backed local execution, but reduce configuration to local file-path and extraction-tuning concerns, such as `CLI_INPUT_DIR`, `CLI_EVAL_CSV`, and an optional OCR confidence threshold.
+
+**Rationale**: The user already clarified `.env` usage. With no external APIs, the remaining useful configuration is local and non-secret.
+
+**Alternatives considered**:
+
+- Hard-coded paths only: simpler, but less usable for repeated local runs.
+- Provider/model environment variables: obsolete after the no-LLM clarification.
 
 ## Testing and Coverage
 
-**Decision**: Use Jest with Nest testing utilities for unit, contract, and integration tests, and enforce repository coverage thresholds of at least 95% in CI.
+**Decision**: Cover metadata extraction, OCR parsing boundaries, uncertainty handling, eval matching, and CLI command flows with fixture-based Jest tests; update or replace the old provider-contract tests with local adapter-boundary tests.
 
-**Rationale**: The feature needs high-coverage TypeScript tests, CLI integration tests, and adapter contract tests. Jest handles coverage thresholds and TS-centric testing ergonomically without adding custom coverage plumbing.
+**Rationale**: The clarified feature invalidates the earlier provider-focused test plan. High-confidence local parsing requires fixtures for EXIF presence/absence, OCR noise, and deterministic CSV matching.
 
 **Alternatives considered**:
 
-- `node:test` only: official-first, but would require extra TypeScript and coverage orchestration that adds more setup complexity than it removes.
-- Vitest: viable, but less aligned with NestJS defaults and not materially better for this small CLI.
+- Snapshot-only CLI tests: insufficient for OCR and metadata boundary behavior.
+- Live external validation datasets only: too slow and nondeterministic for CI.
+
+## Risks to Capture in Implementation
+
+**Decision**: Treat missing metadata, OCR misreads, and monitor-layout variance as first-class uncertainty/error cases in the implementation plan and tests.
+
+**Rationale**: These are the most likely sources of real-world extraction defects in a local-only pipeline.
+
+**Alternatives considered**:
+
+- Assuming high-quality images only: unrealistic and would hide required uncertainty behavior.

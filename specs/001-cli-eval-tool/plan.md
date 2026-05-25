@@ -1,49 +1,45 @@
 # Implementation Plan: CLI Eval Tool
 
-**Branch**: `[001-add-cli-eval]` | **Date**: 2026-05-24 | **Spec**: [spec.md](./spec.md)
+**Branch**: `[001-add-cli-eval]` | **Date**: 2026-05-25 | **Spec**: [specs/001-cli-eval-tool/spec.md](specs/001-cli-eval-tool/spec.md)
 
 **Input**: Feature specification from `/specs/001-cli-eval-tool/spec.md`
 
-**Note**: This plan covers Phase 0 research and Phase 1 design artifacts for a local CLI that predicts and evaluates blood-pressure readings from images through pluggable LLM adapters.
-
 ## Summary
 
-Build a local batch CLI on TypeScript and Node.js 22 LTS using a NestJS 11 standalone application context for composition, with hexagonal boundaries around domain use cases, filesystem input/output, and LLM providers. The tool will scan a configurable image directory, call a provider adapter (default OpenAI with `gpt-5.4-mini`), emit JSONL prediction records, and support `eval` mode by matching image files to CSV rows via filename stem and emitting per-image comparison records plus a summary record.
+Replace the older LLM-based extraction direction with a fully local CLI pipeline: load images from a local directory, extract `time` from image metadata, derive monitor values offline with local OCR plus deterministic parsing, and emit JSONL prediction/evaluation output matched to CSV ground truth by filename stem.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x on Node.js 22.13.1 LTS
+**Language/Version**: TypeScript 5.8 on Node.js 22.13.1 LTS
 
-**Primary Dependencies**: NestJS 11.1.x (`@nestjs/common`, `@nestjs/core`, `@nestjs/testing`), OpenAI SDK 6.39.0, TypeScript compiler toolchain, official Node.js built-ins (`node:fs`, `node:path`, `node:process`, `node:stream`)
+**Primary Dependencies**: NestJS 11 standalone application context for wiring, Jest 30 for tests, `exif-parser` for metadata extraction, `sharp` for image preprocessing, `tesseract.js` for offline OCR
 
-**Storage**: Local filesystem only; images in configurable directories and ground-truth CSV files on disk; no database
+**Storage**: Local filesystem only (`data/eval`, `.env`, fixture images, local CSV files)
 
-**Testing**: Jest with Nest testing utilities for unit/integration/contract suites and CI coverage thresholds >= 95%
+**Testing**: Jest unit, integration, and adapter-boundary tests with fixture-based metadata and OCR coverage
 
-**Target Platform**: Local macOS/Linux CLI environments running Node.js 22 LTS
+**Target Platform**: Local Node.js CLI execution on macOS/Linux developer machines and CI
 
-**Project Type**: CLI application using a NestJS standalone application context (no HTTP server)
+**Project Type**: Single-project CLI application
 
-**Performance Goals**: Stream JSONL output as each image is processed; support batches of roughly 10-200 images per run without holding full outputs in memory; keep CLI startup under 2 seconds before provider calls
+**Performance Goals**: Stream JSONL without full buffering; target typical local predict throughput of a few seconds per image with deterministic offline behavior
 
-**Constraints**: Hexagonal architecture, MCP-free workflow, worktree under `tmp/`, default OpenAI adapter with pluggable provider port, JSONL default output, filename-stem CSV matching, official Node/Nest modules first, CI coverage >= 95%
+**Constraints**: Offline-capable, no external LLM/network APIs, metadata is the only valid source for `time`, maintain CI coverage >= 95%, keep changed feature areas near 100%
 
-**Scale/Scope**: Single-operator local tool; one configured image directory and optional CSV per run; tens to low hundreds of images per invocation
+**Scale/Scope**: Single-operator local batch runs over tens to low hundreds of images per invocation
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- [x] **Hexagonal boundaries defined**: Domain entities/use cases live under `src/domain` and `src/application`; CLI, filesystem, and LLM integrations are separate adapters.
-- [x] **Unit test strategy present**: Use-case, parser, registry, and uncertainty behavior tests are planned under `tests/unit` with adapter contract tests and CLI integration tests.
-- [x] **Coverage policy acknowledged**: Jest coverage thresholds will be set to at least 95%, with changed feature modules targeted at 100% where feasible.
-- [x] **Additive test evolution respected**: This feature adds new tests only; no existing test rewrites are required.
-- [x] **MCP-free implementation**: Implementation relies only on local Node/Nest tooling, repository scripts, and provider SDKs.
-- [x] **Feature isolation via worktree**: Feature branch is `001-add-cli-eval` and the implementation worktree path is `tmp/001-add-cli-eval`.
-- [x] **Tech stack baseline**: Runtime targets Node.js 22.13.1 LTS and NestJS 11.1.x.
-- [x] **Dependency policy**: Official Node.js modules and official vendor SDKs are used first; only testing/tooling dependencies are added with justification.
-
-**Post-Design Re-check**: PASS. Phase 1 artifacts preserve the same adapter boundaries, testing posture, and dependency policy.
+- [X] **Hexagonal boundaries defined**: Domain owns normalization, uncertainty, and evaluation rules behind image parsing, metadata extraction, dataset, and output ports.
+- [X] **Unit test strategy present**: Planned tests cover metadata extraction, OCR parsing, uncertainty handling, eval matching, and CLI integration.
+- [X] **Coverage policy acknowledged**: CI remains `>= 95%`, with local extraction and metadata modules targeted for near-100% coverage.
+- [X] **Additive test evolution respected**: New behavior is introduced with new tests; existing tests only change where the clarified spec invalidates prior LLM-specific assumptions.
+- [X] **MCP-free implementation**: Plan relies on local Node/Nest tooling, fixture files, and offline OCR libraries only.
+- [X] **Feature isolation via worktree**: Work continues in `tmp/001-add-cli-eval` on branch `001-add-cli-eval`.
+- [X] **Tech stack baseline**: Plan keeps Node.js LTS and NestJS LTS in place.
+- [X] **Dependency policy**: Node built-ins remain first choice; `exif-parser`, `sharp`, and `tesseract.js` are justified because Node/Nest have no built-in EXIF or OCR capability.
 
 ## Project Structure
 
@@ -64,62 +60,31 @@ specs/001-cli-eval-tool/
 
 ```text
 src/
-├── app.module.ts
-├── main.ts
-├── application/
-│   ├── ports/
-│   │   ├── evaluation-dataset.port.ts
-│   │   ├── image-source.port.ts
-│   │   ├── llm-provider.port.ts
-│   │   ├── model-catalog.port.ts
-│   │   └── output-writer.port.ts
-│   └── use-cases/
-│       ├── evaluate-images.use-case.ts
-│       ├── list-models.use-case.ts
-│       └── predict-images.use-case.ts
-├── domain/
-│   ├── entities/
-│   │   ├── evaluation-report.ts
-│   │   ├── ground-truth-record.ts
-│   │   └── predicted-reading.ts
-│   └── services/
-│       ├── evaluation-matcher.ts
-│       └── uncertainty-policy.ts
 ├── adapters/
 │   ├── inbound/
 │   │   └── cli/
-│   │       ├── cli-parser.ts
-│   │       ├── help-renderer.ts
-│   │       └── jsonl-output.writer.ts
 │   └── outbound/
 │       ├── filesystem/
-│       │   ├── csv-dataset.adapter.ts
-│       │   └── image-directory.adapter.ts
-│       └── llm/
-│           ├── model-registry.ts
-│           └── openai-vision.adapter.ts
-└── infrastructure/
-    └── config/
-        ├── cli-config.ts
-        └── env-config.ts
+│       └── ocr/
+├── application/
+│   ├── ports/
+│   └── use-cases/
+├── domain/
+│   ├── entities/
+│   └── services/
+├── infrastructure/
+│   └── config/
+├── app.module.ts
+└── main.ts
 
 tests/
 ├── contract/
-│   └── llm-provider.contract.test.ts
 ├── integration/
-│   └── cli.integration.test.ts
 └── unit/
-    ├── application/
-    ├── domain/
-    └── adapters/
 ```
 
-**Structure Decision**: Use a single-project CLI layout with explicit `application`, `domain`, and adapter boundaries. NestJS is limited to composition/bootstrap in `app.module.ts` and provider wiring, avoiding transport/server layers while still satisfying the framework baseline and preserving testable ports.
+**Structure Decision**: Keep the existing single-project CLI layout and replace the old provider/model-oriented outbound adapter slice with local metadata/OCR adapters under `src/adapters/outbound/filesystem` and `src/adapters/outbound/ocr`.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-| --- | --- | --- |
-| None | - | - |
+No constitution violations are expected for this plan.
