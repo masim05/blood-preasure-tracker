@@ -92,6 +92,11 @@ describe('main entrypoint', () => {
         evaluationDataset: {
           load: jest.fn().mockResolvedValue([]),
         } as never,
+        predictionCsvWriter: {
+          open: jest.fn().mockResolvedValue(undefined),
+          write: jest.fn().mockResolvedValue(undefined),
+          close: jest.fn().mockResolvedValue(undefined),
+        } as never,
         helpRenderer: {
           render: () => 'help',
         } as never,
@@ -163,6 +168,11 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
+          predictionCsvWriter: {
+            open: jest.fn().mockResolvedValue(undefined),
+            write: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined),
+          } as never,
           helpRenderer: {
             render: () => 'help',
           } as never,
@@ -216,6 +226,11 @@ describe('main entrypoint', () => {
           } as never,
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
+          } as never,
+          predictionCsvWriter: {
+            open: jest.fn().mockResolvedValue(undefined),
+            write: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined),
           } as never,
           helpRenderer: {
             render: () => 'help',

@@ -29,10 +29,10 @@
 
 **Purpose**: Establish the isolated implementation workspace and verify baseline project commands.
 
-- [ ] T001 Create feature worktree `tmp/004-predict-csv-output` for branch `004-predict-csv-output`
-- [ ] T002 Verify baseline npm scripts in `package.json` with `npm run build`, `npm test`, `npm run test:coverage`, and `npm run lint`
-- [ ] T003 [P] Review CLI output contract in `specs/004-predict-csv-output/contracts/cli.md` before implementation
-- [ ] T004 [P] Review quickstart validation flow in `specs/004-predict-csv-output/quickstart.md` before implementation
+- [X] T001 Create feature worktree `tmp/004-predict-csv-output` for branch `004-predict-csv-output`
+- [X] T002 Verify baseline npm scripts in `package.json` with `npm run build`, `npm test`, `npm run test:coverage`, and `npm run lint`
+- [X] T003 [P] Review CLI output contract in `specs/004-predict-csv-output/contracts/cli.md` before implementation
+- [X] T004 [P] Review quickstart validation flow in `specs/004-predict-csv-output/quickstart.md` before implementation
 
 ---
 
@@ -42,10 +42,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Define `PredictionCsvWriterPort` lifecycle contract in `src/application/ports/prediction-csv-writer.port.ts`
-- [ ] T006 [P] Add fixed prediction CSV header and row mapping types in `src/domain/services/prediction-csv-schema.ts`
-- [ ] T007 [P] Add CSV escaping and nullable cell formatting helpers in `src/domain/services/csv-formatting.ts`
-- [ ] T008 Export new port and CSV schema utilities from `src/index.ts`
+- [X] T005 Define `PredictionCsvWriterPort` lifecycle contract in `src/application/ports/prediction-csv-writer.port.ts`
+- [X] T006 [P] Add fixed prediction CSV header and row mapping types in `src/domain/services/prediction-csv-schema.ts`
+- [X] T007 [P] Add CSV escaping and nullable cell formatting helpers in `src/domain/services/csv-formatting.ts`
+- [X] T008 Export new port and CSV schema utilities from `src/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
@@ -59,23 +59,23 @@
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T009 [P] [US1] Add unit tests for CSV escaping, empty cells, numeric cells, and JSON-array `uncertainFields` formatting in `tests/unit/domain/prediction-csv-schema.test.ts`
-- [ ] T010 [P] [US1] Add unit tests for header creation, stale file replacement, streamed row writes, backpressure, close, and write errors in `tests/unit/adapters/prediction-csv.writer.test.ts`
-- [ ] T011 [P] [US1] Add use-case or integration test proving `predict` reports a clear failure when `<input>/p.csv` cannot be written in `tests/unit/application/predict-images.use-case.test.ts` or `tests/integration/cli.integration.test.ts`
-- [ ] T012 [P] [US1] Add predict use-case tests for opening `p.csv`, writing rows per image, including partial/error rows, and closing writer in `tests/unit/application/predict-images.use-case.test.ts`
-- [ ] T013 [P] [US1] Add integration test for `predict` creating `<input>/p.csv` with expected rows in `tests/integration/cli.integration.test.ts`
-- [ ] T014 [P] [US1] Add integration test for empty input directory producing header-only `p.csv` in `tests/integration/cli.integration.test.ts`
+- [X] T009 [P] [US1] Add unit tests for CSV escaping, empty cells, numeric cells, and JSON-array `uncertainFields` formatting in `tests/unit/domain/prediction-csv-schema.test.ts`
+- [X] T010 [P] [US1] Add unit tests for header creation, stale file replacement, streamed row writes, backpressure, close, and write errors in `tests/unit/adapters/prediction-csv.writer.test.ts`
+- [X] T011 [P] [US1] Add use-case or integration test proving `predict` reports a clear failure when `<input>/p.csv` cannot be written in `tests/unit/application/predict-images.use-case.test.ts` or `tests/integration/cli.integration.test.ts`
+- [X] T012 [P] [US1] Add predict use-case tests for opening `p.csv`, writing rows per image, including partial/error rows, and closing writer in `tests/unit/application/predict-images.use-case.test.ts`
+- [X] T013 [P] [US1] Add integration test for `predict` creating `<input>/p.csv` with expected rows in `tests/integration/cli.integration.test.ts`
+- [X] T014 [P] [US1] Add integration test for empty input directory producing header-only `p.csv` in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement prediction CSV row schema conversion in `src/domain/services/prediction-csv-schema.ts`
-- [ ] T016 [US1] Implement CSV escaping and cell serialization in `src/domain/services/csv-formatting.ts`
-- [ ] T017 [US1] Implement filesystem streaming writer adapter in `src/adapters/outbound/filesystem/prediction-csv.writer.ts`
-- [ ] T018 [US1] Update `PredictImagesUseCase` to open the CSV writer before image processing in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T019 [US1] Update `PredictImagesUseCase` to write one CSV row after each produced prediction in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T020 [US1] Update `PredictImagesUseCase` to close or release the CSV writer on success and failure in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T021 [US1] Wire `PredictionCsvWriterPort` adapter construction in `src/main.ts`
-- [ ] T022 [US1] Register prediction CSV writer provider in `src/app.module.ts`
+- [X] T015 [US1] Implement prediction CSV row schema conversion in `src/domain/services/prediction-csv-schema.ts`
+- [X] T016 [US1] Implement CSV escaping and cell serialization in `src/domain/services/csv-formatting.ts`
+- [X] T017 [US1] Implement filesystem streaming writer adapter in `src/adapters/outbound/filesystem/prediction-csv.writer.ts`
+- [X] T018 [US1] Update `PredictImagesUseCase` to open the CSV writer before image processing in `src/application/use-cases/predict-images.use-case.ts`
+- [X] T019 [US1] Update `PredictImagesUseCase` to write one CSV row after each produced prediction in `src/application/use-cases/predict-images.use-case.ts`
+- [X] T020 [US1] Update `PredictImagesUseCase` to close or release the CSV writer on success and failure in `src/application/use-cases/predict-images.use-case.ts`
+- [X] T021 [US1] Wire `PredictionCsvWriterPort` adapter construction in `src/main.ts`
+- [X] T022 [US1] Register prediction CSV writer provider in `src/app.module.ts`
 
 **Checkpoint**: User Story 1 is fully functional and testable independently.
 
@@ -89,17 +89,17 @@
 
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T023 [P] [US2] Add CSV dataset adapter tests accepting generated `p.csv` service columns in `tests/unit/adapters/csv-dataset.adapter.test.ts`
-- [ ] T024 [P] [US2] Add CSV dataset adapter tests rejecting missing core columns while ignoring extra service columns in `tests/unit/adapters/csv-dataset.adapter.test.ts`
-- [ ] T025 [P] [US2] Add contract test for `eval --csv p.csv` treating generated CSV as reference data in `tests/contract/cli.contract.test.ts`
-- [ ] T026 [P] [US2] Add integration test for predict-generated `p.csv` accepted by eval in `tests/integration/cli.integration.test.ts`
+- [X] T023 [P] [US2] Add CSV dataset adapter tests accepting generated `p.csv` service columns in `tests/unit/adapters/csv-dataset.adapter.test.ts`
+- [X] T024 [P] [US2] Add CSV dataset adapter tests rejecting missing core columns while ignoring extra service columns in `tests/unit/adapters/csv-dataset.adapter.test.ts`
+- [X] T025 [P] [US2] Add contract test for `eval --csv p.csv` treating generated CSV as reference data in `tests/contract/cli.contract.test.ts`
+- [X] T026 [P] [US2] Add integration test for predict-generated `p.csv` accepted by eval in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Update CSV header validation to require only core columns in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
-- [ ] T028 [US2] Update CSV row parsing to ignore service information columns in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
-- [ ] T029 [US2] Preserve strict duplicate imageId, hand, and numeric validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
-- [ ] T030 [US2] Update eval CLI documentation for generated `p.csv` reference semantics in `README.md`
+- [X] T027 [US2] Update CSV header validation to require only core columns in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
+- [X] T028 [US2] Update CSV row parsing to ignore service information columns in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
+- [X] T029 [US2] Preserve strict duplicate imageId, hand, and numeric validation in `src/adapters/outbound/filesystem/csv-dataset.adapter.ts`
+- [X] T030 [US2] Update eval CLI documentation for generated `p.csv` reference semantics in `README.md`
 
 **Checkpoint**: User Story 2 works independently after US1 creates a valid `p.csv` artifact.
 
@@ -113,13 +113,13 @@
 
 ### Tests for User Story 3 (REQUIRED)
 
-- [ ] T031 [P] [US3] Add use-case test proving JSONL output writer still receives prediction records while CSV writer receives rows in `tests/unit/application/predict-images.use-case.test.ts`
-- [ ] T032 [P] [US3] Add integration test proving CLI stdout still emits prediction JSONL while `p.csv` is written in `tests/integration/cli.integration.test.ts`
+- [X] T031 [P] [US3] Add use-case test proving JSONL output writer still receives prediction records while CSV writer receives rows in `tests/unit/application/predict-images.use-case.test.ts`
+- [X] T032 [P] [US3] Add integration test proving CLI stdout still emits prediction JSONL while `p.csv` is written in `tests/integration/cli.integration.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Preserve output writer call order and payload shape in `src/application/use-cases/predict-images.use-case.ts`
-- [ ] T034 [US3] Update README command/output docs for simultaneous JSONL and `p.csv` output in `README.md`
+- [X] T033 [US3] Preserve output writer call order and payload shape in `src/application/use-cases/predict-images.use-case.ts`
+- [X] T034 [US3] Update README command/output docs for simultaneous JSONL and `p.csv` output in `README.md`
 
 **Checkpoint**: All user stories are independently functional.
 
@@ -129,13 +129,13 @@
 
 **Purpose**: Final validation, coverage, and documentation checks across all user stories.
 
-- [ ] T035 [P] Update generated CSV examples in `specs/004-predict-csv-output/quickstart.md` if implementation details require wording corrections
-- [ ] T036 [P] Update CLI contract examples in `specs/004-predict-csv-output/contracts/cli.md` if final output differs only in model/provider sample values
-- [ ] T037 Run `npm run build` from `package.json` and fix any TypeScript errors in `src/`
-- [ ] T038 Run `npm test` from `package.json` and fix failing tests in `tests/`
-- [ ] T039 Run `npm run test:coverage` from `package.json` and ensure overall coverage remains >= 95%
-- [ ] T040 Run `npm run lint` from `package.json` and fix lint issues in `src/` and `tests/`
-- [ ] T041 Execute quickstart predict/eval validation from `specs/004-predict-csv-output/quickstart.md`
+- [X] T035 [P] Update generated CSV examples in `specs/004-predict-csv-output/quickstart.md` if implementation details require wording corrections
+- [X] T036 [P] Update CLI contract examples in `specs/004-predict-csv-output/contracts/cli.md` if final output differs only in model/provider sample values
+- [X] T037 Run `npm run build` from `package.json` and fix any TypeScript errors in `src/`
+- [X] T038 Run `npm test` from `package.json` and fix failing tests in `tests/`
+- [X] T039 Run `npm run test:coverage` from `package.json` and ensure overall coverage remains >= 95%
+- [X] T040 Run `npm run lint` from `package.json` and fix lint issues in `src/` and `tests/`
+- [X] T041 Execute quickstart predict/eval validation from `specs/004-predict-csv-output/quickstart.md`
 
 ---
 

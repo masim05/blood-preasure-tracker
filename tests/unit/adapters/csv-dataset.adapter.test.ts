@@ -24,6 +24,61 @@ describe('CsvDatasetAdapter', () => {
     ]);
   });
 
+  it('parses CRLF CSV rows', async () => {
+    const adapter = new CsvDatasetAdapter();
+
+    const rows = await adapter.parse('imageId,time,hand,systolic,diastolic,pulse\r\nimg001,now,right,127,72,69\r\n');
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.imageId).toBe('img001');
+  });
+
+  it('accepts generated prediction CSV files with service columns', async () => {
+    const adapter = new CsvDatasetAdapter();
+
+    const rows = await adapter.parse(
+      [
+        'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes',
+        'img001,2026-05-20 14:01:23,right,127,72,69,complete,0.95,[],openai,gpt-5.4-mini,',
+        'img002,,left,120,70,68,partial,0.82,"[""time""]",openai,gpt-5.4-mini,"missing timestamp, still readable"',
+      ].join('\n'),
+    );
+
+    expect(rows).toEqual([
+      {
+        imageId: 'img001',
+        time: '2026-05-20 14:01:23',
+        hand: 'right',
+        systolic: 127,
+        diastolic: 72,
+        pulse: 69,
+      },
+      {
+        imageId: 'img002',
+        time: null,
+        hand: 'left',
+        systolic: 120,
+        diastolic: 70,
+        pulse: 68,
+      },
+    ]);
+  });
+
+  it('ignores quoted service columns with commas and line breaks', async () => {
+    const adapter = new CsvDatasetAdapter();
+
+    const rows = await adapter.parse(
+      [
+        'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes',
+        'img001,2026-05-20 14:01:23,right,127,72,69,complete,0.95,[],openai,gpt-5.4-mini,"provider note, line one',
+        'line two"',
+      ].join('\n'),
+    );
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.imageId).toBe('img001');
+  });
+
   it('fails on duplicate imageId rows', async () => {
     const adapter = new CsvDatasetAdapter();
 
@@ -75,6 +130,14 @@ describe('CsvDatasetAdapter', () => {
     await expect(adapter.parse('imageId,time,hand,systolic,diastolic\nimg001,now,right,127,72')).rejects.toThrow(
       'Missing required CSV header: pulse',
     );
+  });
+
+  it('fails when generated CSV is missing a required core column even with service columns present', async () => {
+    const adapter = new CsvDatasetAdapter();
+
+    await expect(
+      adapter.parse('imageId,time,hand,systolic,diastolic,status,confidence\nimg001,now,right,127,72,complete,0.95'),
+    ).rejects.toThrow('Missing required CSV header: pulse');
   });
 
   it('fails when hand has an unsupported value', async () => {

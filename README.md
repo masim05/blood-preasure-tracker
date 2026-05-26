@@ -4,7 +4,7 @@ This project provides a local CLI for extracting blood-pressure monitor readings
 
 ## Requirements
 
-- Node.js 22.13.1 or newer
+- Node.js 24.x LTS or newer
 - npm 11 or newer
 - `OPENAI_API_KEY` when using the default OpenAI adapter
 
@@ -28,17 +28,27 @@ Predict readings for every image in the input directory:
 npm run cli -- predict --input ./data/eval
 ```
 
+Each predict run also creates or replaces `./data/eval/p.csv` with one CSV row per processed image.
+
 Evaluate predictions against the CSV dataset matched by filename stem:
 
 ```bash
 npm run cli -- eval --input ./data/eval --csv ./data/eval/a.csv
 ```
 
+Generated prediction CSV files can be reused as eval reference data:
+
+```bash
+npm run cli -- eval --input ./data/eval --csv ./data/eval/p.csv
+```
+
 CLI arguments override environment defaults for `--input`, `--csv`, `--provider`, and `--model`.
 
 ## Output
 
-- `predict` emits one JSONL `prediction` record per image.
+- `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
+- Generated `p.csv` files use the fixed header `imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes`.
+- Missing prediction values are empty CSV cells; `uncertainFields` is encoded as a JSON array string in one CSV cell.
 - `eval` emits one JSONL `comparison` record per image or unmatched row, followed by one `summary` record.
 - `time` is read only from embedded image metadata, using `DateTimeOriginal`, then `CreateDate`, then generic `DateTime`/`ModifyDate` parser output.
 - Metadata timestamps are emitted as `YYYY-MM-DD HH:mm:ss`, for example `2026-05-19 06:05:20`.
@@ -48,7 +58,8 @@ CLI arguments override environment defaults for `--input`, `--csv`, `--provider`
 
 - Input images are read from a directory such as `data/eval/`.
 - Supported image formats are `.jpg`, `.jpeg`, `.png`, and `.webp`.
-- The CSV must include `imageId,time,hand,systolic,diastolic,pulse` headers.
+- Eval CSV files must include `imageId,time,hand,systolic,diastolic,pulse` headers.
+- Eval ignores additional columns such as generated `p.csv` service fields: `status`, `confidence`, `uncertainFields`, `provider`, `model`, and `rawNotes`.
 - `imageId` must uniquely match the image filename stem.
 - Duplicate `imageId` values or duplicate normalized filename stems are rejected.
 

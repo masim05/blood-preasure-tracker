@@ -3,6 +3,7 @@ import type { ImageMetadataPort } from '../../../src/application/ports/image-met
 import type { ImageSourcePort } from '../../../src/application/ports/image-source.port';
 import type { LlmProviderPort } from '../../../src/application/ports/llm-provider.port';
 import type { OutputWriterPort } from '../../../src/application/ports/output-writer.port';
+import type { PredictionCsvWriterPort } from '../../../src/application/ports/prediction-csv-writer.port';
 
 describe('PredictImagesUseCase', () => {
   it('writes one prediction record per image using the selected provider and model', async () => {
@@ -41,8 +42,9 @@ describe('PredictImagesUseCase', () => {
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
     };
+    const predictionCsvWriter = createPredictionCsvWriter();
 
-    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter);
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
 
     await useCase.execute({
       inputDirectory: 'data/eval',
@@ -50,6 +52,7 @@ describe('PredictImagesUseCase', () => {
     });
 
     expect(imageSource.load).toHaveBeenCalledWith('data/eval');
+    expect(predictionCsvWriter.open).toHaveBeenCalledWith('data/eval');
     expect(imageMetadata.extractTimestamp).toHaveBeenCalledTimes(1);
     expect(llmProvider.infer).toHaveBeenCalledTimes(1);
     expect((imageMetadata.extractTimestamp as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
@@ -63,6 +66,13 @@ describe('PredictImagesUseCase', () => {
         uncertainFields: [],
       }),
     );
+    expect(predictionCsvWriter.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageId: 'img001',
+        status: 'complete',
+      }),
+    );
+    expect(predictionCsvWriter.close).toHaveBeenCalledTimes(1);
   });
 
   it('keeps null metadata time uncertain without provider fallback', async () => {
@@ -101,8 +111,9 @@ describe('PredictImagesUseCase', () => {
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
     };
+    const predictionCsvWriter = createPredictionCsvWriter();
 
-    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter);
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
 
     await useCase.execute({
       inputDirectory: 'data/eval',
@@ -110,6 +121,13 @@ describe('PredictImagesUseCase', () => {
     });
 
     expect(outputWriter.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        time: null,
+        status: 'partial',
+        uncertainFields: ['time'],
+      }),
+    );
+    expect(predictionCsvWriter.write).toHaveBeenCalledWith(
       expect.objectContaining({
         time: null,
         status: 'partial',
@@ -173,7 +191,8 @@ describe('PredictImagesUseCase', () => {
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
     };
-    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter);
+    const predictionCsvWriter = createPredictionCsvWriter();
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
 
     await useCase.execute({
       inputDirectory: 'data/eval',
@@ -198,6 +217,22 @@ describe('PredictImagesUseCase', () => {
         status: 'complete',
       }),
     );
+    expect(predictionCsvWriter.write).toHaveBeenCalledTimes(2);
+    expect(predictionCsvWriter.write).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        imageId: 'img001',
+        status: 'error',
+      }),
+    );
+    expect(predictionCsvWriter.write).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        imageId: 'img002',
+        status: 'complete',
+      }),
+    );
+    expect(predictionCsvWriter.close).toHaveBeenCalledTimes(1);
   });
 
   it('preserves metadata time when provider inference fails', async () => {
@@ -228,7 +263,8 @@ describe('PredictImagesUseCase', () => {
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
     };
-    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter);
+    const predictionCsvWriter = createPredictionCsvWriter();
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
 
     await useCase.execute({
       inputDirectory: 'data/eval',
@@ -243,4 +279,253 @@ describe('PredictImagesUseCase', () => {
       }),
     );
   });
+
+  it('creates and closes a CSV artifact even when the input directory has no images', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn(),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn(),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter();
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await useCase.execute({
+      inputDirectory: 'data/empty',
+      model: 'gpt-5.4-mini',
+    });
+
+    expect(predictionCsvWriter.open).toHaveBeenCalledWith('data/empty');
+    expect(predictionCsvWriter.write).not.toHaveBeenCalled();
+    expect(predictionCsvWriter.close).toHaveBeenCalledTimes(1);
+    expect(outputWriter.write).not.toHaveBeenCalled();
+  });
+
+  it('reports CSV open failures clearly before processing images', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn(),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn(),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter({
+      open: jest.fn().mockRejectedValue(new Error('Failed to write prediction CSV at data/eval/p.csv: denied')),
+    });
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await expect(
+      useCase.execute({
+        inputDirectory: 'data/eval',
+        model: 'gpt-5.4-mini',
+      }),
+    ).rejects.toThrow('Failed to write prediction CSV at data/eval/p.csv: denied');
+
+    expect(imageSource.load).not.toHaveBeenCalled();
+    expect(predictionCsvWriter.close).not.toHaveBeenCalled();
+  });
+
+  it('keeps JSONL output before CSV row writing for existing consumers', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: Buffer.from('test'),
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn().mockResolvedValue({
+        hand: 'right',
+        systolic: 127,
+        diastolic: 72,
+        pulse: 69,
+        confidence: 0.95,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter();
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await useCase.execute({
+      inputDirectory: 'data/eval',
+      model: 'gpt-5.4-mini',
+    });
+
+    expect((outputWriter.write as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+      (predictionCsvWriter.write as jest.Mock).mock.invocationCallOrder[0],
+    );
+    expect(outputWriter.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'prediction',
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+      }),
+    );
+  });
+
+  it('propagates close failures when processing otherwise succeeds', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn(),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn(),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter({
+      close: jest.fn().mockRejectedValue(new Error('close failed')),
+    });
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await expect(
+      useCase.execute({
+        inputDirectory: 'data/empty',
+        model: 'gpt-5.4-mini',
+      }),
+    ).rejects.toThrow('close failed');
+  });
+
+  it('preserves the primary processing error when close also fails', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: Buffer.from('test'),
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn().mockResolvedValue({
+        hand: 'right',
+        systolic: 127,
+        diastolic: 72,
+        pulse: 69,
+        confidence: 0.95,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockRejectedValue(new Error('stdout failed')),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter({
+      close: jest.fn().mockRejectedValue(new Error('close failed')),
+    });
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await expect(
+      useCase.execute({
+        inputDirectory: 'data/eval',
+        model: 'gpt-5.4-mini',
+      }),
+    ).rejects.toThrow('stdout failed');
+
+    expect(predictionCsvWriter.write).not.toHaveBeenCalled();
+  });
+
+  it('emits an error row when metadata extraction fails', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: Buffer.from('test'),
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockRejectedValue(new Error('metadata failed')),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn(),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter();
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await useCase.execute({
+      inputDirectory: 'data/eval',
+      model: 'gpt-5.4-mini',
+    });
+
+    expect(llmProvider.infer).not.toHaveBeenCalled();
+    expect(outputWriter.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageId: 'img001',
+        status: 'error',
+        uncertainFields: ['time'],
+        rawNotes: 'metadata failed',
+      }),
+    );
+    expect(predictionCsvWriter.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageId: 'img001',
+        status: 'error',
+      }),
+    );
+  });
 });
+
+function createPredictionCsvWriter(
+  overrides: Partial<PredictionCsvWriterPort> = {},
+): jest.Mocked<PredictionCsvWriterPort> {
+  return {
+    open: jest.fn().mockResolvedValue(undefined),
+    write: jest.fn().mockResolvedValue(undefined),
+    close: jest.fn().mockResolvedValue(undefined),
+    ...overrides,
+  } as jest.Mocked<PredictionCsvWriterPort>;
+}

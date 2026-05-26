@@ -10,6 +10,7 @@ import { HelpRenderer } from './adapters/inbound/cli/help-renderer';
 import { CsvDatasetAdapter } from './adapters/outbound/filesystem/csv-dataset.adapter';
 import { ImageDirectoryAdapter } from './adapters/outbound/filesystem/image-directory.adapter';
 import { ImageMetadataAdapter } from './adapters/outbound/filesystem/image-metadata.adapter';
+import { PredictionCsvFileWriter } from './adapters/outbound/filesystem/prediction-csv.writer';
 import { OpenAiVisionAdapter } from './adapters/outbound/llm/openai-vision.adapter';
 import { ModelRegistry } from './adapters/outbound/llm/model-registry';
 import { EvaluateImagesUseCase } from './application/use-cases/evaluate-images.use-case';
@@ -30,6 +31,7 @@ type CliDependencies = {
   imageDirectoryAdapter: ImageDirectoryAdapter;
   imageMetadataAdapter: ImageMetadataAdapter;
   evaluationDataset: CsvDatasetAdapter;
+  predictionCsvWriter: PredictionCsvFileWriter;
   helpRenderer: HelpRenderer;
 };
 
@@ -50,6 +52,7 @@ export async function runCli(
       imageDirectoryAdapter: app.get(ImageDirectoryAdapter),
       imageMetadataAdapter: app.get(ImageMetadataAdapter),
       evaluationDataset: new CsvDatasetAdapter(),
+      predictionCsvWriter: app.get(PredictionCsvFileWriter),
       helpRenderer: new HelpRenderer(),
     });
   } catch (error) {
@@ -116,6 +119,7 @@ function createCliDependencies(): CliDependencies {
     imageDirectoryAdapter: new ImageDirectoryAdapter(),
     imageMetadataAdapter: new ImageMetadataAdapter(),
     evaluationDataset: new CsvDatasetAdapter(),
+    predictionCsvWriter: new PredictionCsvFileWriter(),
     helpRenderer: new HelpRenderer(),
   };
 }
@@ -133,6 +137,7 @@ async function executePredictCommand(
     dependencies.imageMetadataAdapter,
     providerAdapter,
     outputWriter,
+    dependencies.predictionCsvWriter,
   );
 
   await predictImagesUseCase.execute({
