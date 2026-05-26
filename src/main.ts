@@ -17,6 +17,7 @@ import { EvaluateImagesUseCase } from './application/use-cases/evaluate-images.u
 import { ListModelsUseCase } from './application/use-cases/list-models.use-case';
 import { PredictImagesUseCase } from './application/use-cases/predict-images.use-case';
 import { AppModule } from './app.module';
+import type { PredictionCsvWriterPort } from './application/ports/prediction-csv-writer.port';
 import {
   CliConfigService,
   type CliConfig,
@@ -31,7 +32,7 @@ type CliDependencies = {
   imageDirectoryAdapter: ImageDirectoryAdapter;
   imageMetadataAdapter: ImageMetadataAdapter;
   evaluationDataset: CsvDatasetAdapter;
-  predictionCsvWriter: PredictionCsvFileWriter;
+  predictionCsvWriterFactory: () => PredictionCsvWriterPort;
   helpRenderer: HelpRenderer;
 };
 
@@ -52,7 +53,7 @@ export async function runCli(
       imageDirectoryAdapter: app.get(ImageDirectoryAdapter),
       imageMetadataAdapter: app.get(ImageMetadataAdapter),
       evaluationDataset: new CsvDatasetAdapter(),
-      predictionCsvWriter: app.get(PredictionCsvFileWriter),
+      predictionCsvWriterFactory: () => new PredictionCsvFileWriter(),
       helpRenderer: new HelpRenderer(),
     });
   } catch (error) {
@@ -119,7 +120,7 @@ function createCliDependencies(): CliDependencies {
     imageDirectoryAdapter: new ImageDirectoryAdapter(),
     imageMetadataAdapter: new ImageMetadataAdapter(),
     evaluationDataset: new CsvDatasetAdapter(),
-    predictionCsvWriter: new PredictionCsvFileWriter(),
+    predictionCsvWriterFactory: () => new PredictionCsvFileWriter(),
     helpRenderer: new HelpRenderer(),
   };
 }
@@ -137,7 +138,7 @@ async function executePredictCommand(
     dependencies.imageMetadataAdapter,
     providerAdapter,
     outputWriter,
-    dependencies.predictionCsvWriter,
+    dependencies.predictionCsvWriterFactory(),
   );
 
   await predictImagesUseCase.execute({

@@ -92,11 +92,11 @@ describe('main entrypoint', () => {
         evaluationDataset: {
           load: jest.fn().mockResolvedValue([]),
         } as never,
-        predictionCsvWriter: {
+        predictionCsvWriterFactory: () => ({
           open: jest.fn().mockResolvedValue(undefined),
           write: jest.fn().mockResolvedValue(undefined),
           close: jest.fn().mockResolvedValue(undefined),
-        } as never,
+        }) as never,
         helpRenderer: {
           render: () => 'help',
         } as never,
@@ -168,11 +168,11 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
-          predictionCsvWriter: {
+          predictionCsvWriterFactory: () => ({
             open: jest.fn().mockResolvedValue(undefined),
             write: jest.fn().mockResolvedValue(undefined),
             close: jest.fn().mockResolvedValue(undefined),
-          } as never,
+          }) as never,
           helpRenderer: {
             render: () => 'help',
           } as never,
@@ -220,11 +220,11 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
-          predictionCsvWriter: {
+          predictionCsvWriterFactory: () => ({
             open: jest.fn().mockRejectedValue(new Error('Failed to write prediction CSV at data/eval/p.csv: denied')),
             write: jest.fn().mockResolvedValue(undefined),
             close: jest.fn().mockResolvedValue(undefined),
-          } as never,
+          }) as never,
           helpRenderer: {
             render: () => 'help',
           } as never,
@@ -279,11 +279,11 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
-          predictionCsvWriter: {
+          predictionCsvWriterFactory: () => ({
             open: jest.fn().mockResolvedValue(undefined),
             write: jest.fn().mockResolvedValue(undefined),
             close: jest.fn().mockResolvedValue(undefined),
-          } as never,
+          }) as never,
           helpRenderer: {
             render: () => 'help',
           } as never,

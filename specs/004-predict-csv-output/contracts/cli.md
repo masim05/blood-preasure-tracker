@@ -37,6 +37,7 @@ imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,pro
 - Null or missing values are written as empty cells.
 - `uncertainFields` is written as a JSON array string in one cell, then CSV-escaped when necessary.
 - Values containing commas, quotes, carriage returns, or line feeds are escaped using standard CSV quoting.
+- Error rows remain valid `p.csv` rows. When used with `eval --csv`, empty core reading cells from error rows are treated as null reference values and service columns are ignored.
 
 ### Example
 
