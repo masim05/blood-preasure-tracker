@@ -28,7 +28,7 @@ Predict readings for every image in the input directory:
 npm run cli -- predict --input ./data/eval
 ```
 
-Each predict run also creates or replaces `./data/eval/p.csv` with one CSV row per processed image.
+Each predict run also creates or replaces `./data/eval/p.csv` with one CSV row per processed image. The generated file is overwritten on every predict run for that input directory.
 
 Evaluate predictions against the CSV dataset matched by filename stem:
 

@@ -50,6 +50,17 @@ describe('PredictionCsvFileWriter', () => {
     await expect(writer.write(createReading())).rejects.toThrow('Prediction CSV writer is not open');
   });
 
+  it('rejects double-open on the same writer instance', async () => {
+    const directory = mkdtempSync(path.join(tmpdir(), 'bp-predict-double-open-'));
+    const writer = new PredictionCsvFileWriter();
+
+    await writer.open(directory);
+
+    await expect(writer.open(directory)).rejects.toThrow('Prediction CSV writer is already open');
+
+    await writer.close();
+  });
+
   it('waits for backpressure drain before resolving writes', async () => {
     const chunks: string[] = [];
     const stream = new Writable({
@@ -65,6 +76,10 @@ describe('PredictionCsvFileWriter', () => {
     await writer.write(createReading());
     await writer.close();
 
+    expect(chunks[0]).toBe(
+      'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes\n',
+    );
+    expect(chunks[1]).toContain('img001,2026-05-20 14:01:23,right,127,72,69');
     expect(chunks.join('')).toContain('img001,2026-05-20 14:01:23,right,127,72,69');
   });
 
@@ -93,6 +108,20 @@ describe('PredictionCsvFileWriter', () => {
     await writer.open('/tmp/images');
 
     await expect(writer.close()).rejects.toThrow('Failed to close prediction CSV at /tmp/images/p.csv: close failed');
+  });
+
+  it('uses the write callback error when backpressure is active', async () => {
+    const stream = new Writable({
+      highWaterMark: 1,
+      write(_chunk, _encoding, callback) {
+        callback(new Error('callback failed'));
+      },
+    });
+    const writer = new PredictionCsvFileWriter(() => stream);
+
+    await expect(writer.open('/tmp/images')).rejects.toThrow(
+      'Failed to write prediction CSV at /tmp/images/p.csv: callback failed',
+    );
   });
 });
 

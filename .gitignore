@@ -1,6 +1,8 @@
 # Data
 data
 tmp
+p.csv
+**/p.csv
 
 # OS/editor noise
 .DS_Store

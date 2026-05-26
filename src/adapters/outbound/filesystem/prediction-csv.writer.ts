@@ -17,6 +17,10 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
   constructor(private readonly streamFactory: CreateWriteStream = (filePath) => createWriteStream(filePath, { flags: 'w' })) {}
 
   async open(inputDirectory: string): Promise<void> {
+    if (this.stream) {
+      throw new Error('Prediction CSV writer is already open');
+    }
+
     this.csvPath = path.join(inputDirectory, 'p.csv');
     this.stream = this.streamFactory(this.csvPath);
 
@@ -87,7 +91,15 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
       };
 
       stream.once('error', onError);
-      const canContinue = stream.write(chunk, () => {
+      const canContinue = stream.write(chunk, (error?: Error | null) => {
+        if (error) {
+          stream.once('error', () => undefined);
+          settle(() => {
+            reject(this.wrapError('write', error));
+          });
+          return;
+        }
+
         if (canContinue) {
           settle(resolve);
         }
