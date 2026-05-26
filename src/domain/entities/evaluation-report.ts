@@ -12,6 +12,28 @@ export type EvaluationFieldResults = {
   pulse: FieldResult;
 };
 
+export type AccuracyTargetField = 'hand' | 'systolic' | 'diastolic' | 'pulse';
+
+export type FieldAccuracyMetric = {
+  field: AccuracyTargetField;
+  correct: number;
+  total: number;
+  ratio: number;
+};
+
+export type ParameterThresholdMetric = {
+  threshold: 2 | 3 | 4;
+  correct: number;
+  total: number;
+  ratio: number;
+};
+
+export type AccuracySummary = {
+  comparableTotal: number;
+  fields: FieldAccuracyMetric[];
+  thresholds: ParameterThresholdMetric[];
+};
+
 export type EvaluationComparison = {
   imageId: string;
   matchStatus: MatchStatus;
@@ -41,6 +63,9 @@ export const EMPTY_FIELD_RESULTS: EvaluationFieldResults = {
   diastolic: 'missing',
   pulse: 'missing',
 };
+
+const accuracyTargetFields: AccuracyTargetField[] = ['hand', 'systolic', 'diastolic', 'pulse'];
+const accuracyThresholds: Array<2 | 3 | 4> = [2, 3, 4];
 
 export class EvaluationReport {
   constructor(
@@ -72,7 +97,68 @@ export class EvaluationReport {
     };
   }
 
+  toAccuracySummary(): AccuracySummary {
+    const comparableComparisons = this.comparisons.filter(
+      (comparison) => comparison.prediction !== null
+        && comparison.prediction.status !== 'error'
+        && comparison.groundTruth !== null,
+    );
+    const comparableTotal = comparableComparisons.length;
+
+    return {
+      comparableTotal,
+      fields: accuracyTargetFields.map((field) => {
+        const correct = comparableComparisons.filter(
+          (comparison) => comparison.fieldResults[field] === 'match',
+        ).length;
+
+        return createFieldMetric(field, correct, comparableTotal);
+      }),
+      thresholds: accuracyThresholds.map((threshold) => {
+        const correct = comparableComparisons.filter(
+          (comparison) => countCorrectTargetFields(comparison.fieldResults) >= threshold,
+        ).length;
+
+        return createThresholdMetric(threshold, correct, comparableTotal);
+      }),
+    };
+  }
+
   private countByStatus(status: MatchStatus): number {
     return this.comparisons.filter((comparison) => comparison.matchStatus === status).length;
   }
+}
+
+function createFieldMetric(
+  field: AccuracyTargetField,
+  correct: number,
+  total: number,
+): FieldAccuracyMetric {
+  return {
+    field,
+    correct,
+    total,
+    ratio: calculateRatio(correct, total),
+  };
+}
+
+function createThresholdMetric(
+  threshold: 2 | 3 | 4,
+  correct: number,
+  total: number,
+): ParameterThresholdMetric {
+  return {
+    threshold,
+    correct,
+    total,
+    ratio: calculateRatio(correct, total),
+  };
+}
+
+function countCorrectTargetFields(fieldResults: EvaluationFieldResults): number {
+  return accuracyTargetFields.filter((field) => fieldResults[field] === 'match').length;
+}
+
+function calculateRatio(correct: number, total: number): number {
+  return total === 0 ? 0 : (correct / total) * 100;
 }

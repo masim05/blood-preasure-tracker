@@ -9,30 +9,49 @@ export class JsonlOutputWriter implements OutputWriterPort {
   constructor(private readonly output: Writable = process.stdout) {}
 
   async write(record: unknown): Promise<void> {
-    const accepted = this.output.write(`${JSON.stringify(record)}\n`);
-
-    if (!accepted) {
-      await waitForDrain(this.output);
-    }
+    await this.writeChunk(`${JSON.stringify(record)}\n`);
   }
-}
 
-function waitForDrain(output: Writable): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const cleanup = (): void => {
-      output.off('drain', onDrain);
-      output.off('error', onError);
-    };
-    const onDrain = (): void => {
-      cleanup();
-      resolve();
-    };
-    const onError = (error: unknown): void => {
-      cleanup();
-      reject(error instanceof Error ? error : new Error(String(error)));
-    };
+  async writeText(text: string): Promise<void> {
+    await this.writeChunk(text);
+  }
 
-    output.once('drain', onDrain);
-    output.once('error', onError);
-  });
+  private async writeChunk(chunk: string): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      let settled = false;
+
+      const settle = (error?: unknown): void => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        cleanup();
+
+        if (error) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+          return;
+        }
+
+        resolve();
+      };
+
+      const cleanup = (): void => {
+        this.output.off('error', onError);
+      };
+      const onError = (error: unknown): void => {
+        settle(error);
+      };
+
+      this.output.once('error', onError);
+
+      try {
+        this.output.write(chunk, (error?: Error | null) => {
+          settle(error ?? undefined);
+        });
+      } catch (error) {
+        settle(error);
+      }
+    });
+  }
 }

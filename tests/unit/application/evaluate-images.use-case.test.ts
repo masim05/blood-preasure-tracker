@@ -53,6 +53,7 @@ describe('EvaluateImagesUseCase', () => {
     };
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
+      writeText: jest.fn().mockResolvedValue(undefined),
     };
 
     const useCase = new EvaluateImagesUseCase(
@@ -70,6 +71,16 @@ describe('EvaluateImagesUseCase', () => {
     });
 
     expect(outputWriter.write).toHaveBeenCalledTimes(2);
+    expect(outputWriter.writeText).toHaveBeenCalledWith([
+      'hand:             1/1 (100.0%)',
+      'systolic:         1/1 (100.0%)',
+      'diastolic:        1/1 (100.0%)',
+      'pulse:            1/1 (100.0%)',
+      '2 params correct: 1/1 (100.0%)',
+      '3 params correct: 1/1 (100.0%)',
+      '4 params correct: 1/1 (100.0%)',
+      '',
+    ].join('\n'));
     expect(outputWriter.write).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
@@ -153,6 +164,7 @@ describe('EvaluateImagesUseCase', () => {
     };
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
+      writeText: jest.fn().mockResolvedValue(undefined),
     };
     const useCase = new EvaluateImagesUseCase(
       imageSource,
@@ -189,6 +201,7 @@ describe('EvaluateImagesUseCase', () => {
         matchedRecords: 1,
       }),
     );
+    expect(outputWriter.writeText).toHaveBeenCalledTimes(1);
   });
 
   it('preserves metadata time in error comparisons when provider inference fails', async () => {
@@ -230,6 +243,7 @@ describe('EvaluateImagesUseCase', () => {
     };
     const outputWriter: OutputWriterPort = {
       write: jest.fn().mockResolvedValue(undefined),
+      writeText: jest.fn().mockResolvedValue(undefined),
     };
     const useCase = new EvaluateImagesUseCase(
       imageSource,
@@ -255,5 +269,77 @@ describe('EvaluateImagesUseCase', () => {
         }),
       }),
     );
+  });
+
+  it('writes comparison records, summary record, and accuracy text in order', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: Buffer.from('test'),
+        },
+      ]),
+    };
+    const dataset: EvaluationDatasetPort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          time: '2026-05-20 14:01:23',
+          hand: 'left',
+          systolic: 127,
+          diastolic: 70,
+          pulse: 69,
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn().mockResolvedValue({
+        hand: 'right',
+        systolic: 127,
+        diastolic: 72,
+        pulse: 69,
+        confidence: 0.95,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+    const callOrder: string[] = [];
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockImplementation(async (record: { type: string }) => {
+        callOrder.push(record.type);
+      }),
+      writeText: jest.fn().mockImplementation(async () => {
+        callOrder.push('text');
+      }),
+    };
+    const useCase = new EvaluateImagesUseCase(
+      imageSource,
+      dataset,
+      imageMetadata,
+      llmProvider,
+      outputWriter,
+    );
+
+    await useCase.execute({
+      inputDirectory: 'data/eval',
+      evaluationCsvPath: 'data/eval/a.csv',
+      model: 'gpt-5.4-mini',
+    });
+
+    expect(callOrder).toEqual(['comparison', 'summary', 'text']);
+    expect(outputWriter.writeText).toHaveBeenCalledWith(expect.stringContaining('hand:             0/1 (  0.0%)'));
   });
 });
