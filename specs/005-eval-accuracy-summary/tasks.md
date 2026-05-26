@@ -128,7 +128,7 @@
 - [X] T035 Run full test suite from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
 - [X] T036 Run coverage gate from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
 - [X] T037 Run lint from tmp/005-eval-accuracy-summary using package.json and eslint.config.js
-- [ ] T038 Commit implementation changes from tmp/005-eval-accuracy-summary on branch 005-eval-accuracy-summary
+- [X] T038 Commit implementation changes from tmp/005-eval-accuracy-summary on branch 005-eval-accuracy-summary
 - [ ] T039 Push branch 005-eval-accuracy-summary from tmp/005-eval-accuracy-summary to origin
 - [ ] T040 Create PR/MR from branch 005-eval-accuracy-summary to main using specs/005-eval-accuracy-summary/plan.md and specs/005-eval-accuracy-summary/tasks.md for description context
 
