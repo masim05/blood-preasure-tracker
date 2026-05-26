@@ -3,6 +3,7 @@ import type { ImageMetadataPort, TimestampExtractionResult } from '../ports/imag
 import type { SourceImage } from '../ports/image-source.port';
 import type { LlmProviderPort, LlmProviderResponse } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
+import type { PredictionCsvWriterPort } from '../ports/prediction-csv-writer.port';
 import { PredictedReading } from '../../domain/entities/predicted-reading';
 import { deriveReadingStatus } from '../../domain/services/uncertainty-policy';
 
@@ -17,18 +18,41 @@ export class PredictImagesUseCase {
     private readonly imageMetadata: ImageMetadataPort,
     private readonly llmProvider: LlmProviderPort,
     private readonly outputWriter: OutputWriterPort,
+    private readonly predictionCsvWriter: PredictionCsvWriterPort,
   ) {}
 
   async execute(command: PredictImagesCommand): Promise<void> {
-    const images = await this.imageSource.load(command.inputDirectory);
+    let caughtError: unknown = null;
+    let opened = false;
 
-    for (const image of images) {
-      const reading = await this.predictImage(image, command.model);
+    try {
+      await this.predictionCsvWriter.open(command.inputDirectory);
+      opened = true;
 
-      await this.outputWriter.write({
-        type: 'prediction',
-        ...reading.toJSON(),
-      });
+      const images = await this.imageSource.load(command.inputDirectory);
+
+      for (const image of images) {
+        const reading = await this.predictImage(image, command.model);
+
+        await this.outputWriter.write({
+          type: 'prediction',
+          ...reading.toJSON(),
+        });
+        await this.predictionCsvWriter.write(reading);
+      }
+    } catch (error) {
+      caughtError = error;
+      throw error;
+    } finally {
+      if (opened) {
+        try {
+          await this.predictionCsvWriter.close();
+        } catch (closeError) {
+          if (!caughtError) {
+            throw closeError;
+          }
+        }
+      }
     }
   }
 

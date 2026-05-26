@@ -48,6 +48,52 @@ describe('CLI integration', () => {
     expect(stdout).toContain('"model":"gpt-5.4-mini"');
   });
 
+  it('creates p.csv with prediction rows while preserving JSONL stdout', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-predict-csv-'));
+    const csvPath = path.join(fixtureDir, 'p.csv');
+    writeFileSync(path.join(fixtureDir, 'img001.jpg'), Buffer.from('fixture-image'));
+    writeFileSync(csvPath, 'stale\n');
+
+    const exitCode = await runCliWithDependencies(
+      ['predict', '--input', fixtureDir],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain('"type":"prediction"');
+    expect(stdout).toContain('"imageId":"img001"');
+    expect(readFileSync(csvPath, 'utf8')).toBe(
+      [
+        'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes',
+        'img001,,right,127,72,69,partial,0.95,"[""time""]",openai,gpt-5.4-mini,',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('creates a header-only p.csv for an empty input directory', async () => {
+    const output = new PassThrough();
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-empty-csv-'));
+
+    const exitCode = await runCliWithDependencies(
+      ['predict', '--input', fixtureDir],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    expect(exitCode).toBe(0);
+    expect(readFileSync(path.join(fixtureDir, 'p.csv'), 'utf8')).toBe(
+      'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes\n',
+    );
+  });
+
   it('emits metadata-derived time for the reported JPEG fixture', async () => {
     const output = new PassThrough();
     let stdout = '';
@@ -129,6 +175,35 @@ describe('CLI integration', () => {
     expect(exitCode).toBe(0);
     expect(stdout).toContain('"type":"comparison"');
     expect(stdout).toContain('"type":"summary"');
+  });
+
+  it('accepts a predict-generated p.csv as eval reference data', async () => {
+    const predictOutput = new PassThrough();
+    const evalOutput = new PassThrough();
+    let stdout = '';
+    evalOutput.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-round-trip-'));
+    writeFileSync(path.join(fixtureDir, 'img001.jpg'), Buffer.from('fixture-image'));
+
+    const predictExitCode = await runCliWithDependencies(
+      ['predict', '--input', fixtureDir],
+      { OPENAI_API_KEY: 'test-key' },
+      predictOutput,
+    );
+    const evalExitCode = await runCliWithDependencies(
+      ['eval', '--input', fixtureDir, '--csv', path.join(fixtureDir, 'p.csv')],
+      { OPENAI_API_KEY: 'test-key' },
+      evalOutput,
+    );
+
+    expect(predictExitCode).toBe(0);
+    expect(evalExitCode).toBe(0);
+    expect(stdout).toContain('"type":"comparison"');
+    expect(stdout).toContain('"type":"summary"');
+    expect(stdout).toContain('"groundTruth":{"imageId":"img001"');
   });
 
   it('matches eval CSV time against metadata-derived time', async () => {

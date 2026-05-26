@@ -1,6 +1,16 @@
 # Data
 data
 tmp
+p.csv
+**/p.csv
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
 
 # Logs
 logs
@@ -84,6 +94,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
+build/
 dist
 .output
 

@@ -18,23 +18,20 @@ export class CsvDatasetAdapter implements EvaluationDatasetPort {
   }
 
   async parse(content: string): Promise<GroundTruthDatasetRow[]> {
-    const lines = content
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
+    const lines = parseCsvRows(content).filter((line) => line.some((value) => value.trim().length > 0));
 
     if (lines.length === 0) {
       return [];
     }
 
-    const headers = splitCsvLine(lines[0]!);
+    const headers = lines[0]!.map((value) => value.trim());
     validateHeaders(headers);
     const headerIndex = createHeaderIndex(headers);
     const records: GroundTruthDatasetRow[] = [];
     const seenImageIds = new Set<string>();
 
     for (const line of lines.slice(1)) {
-      const columns = splitCsvLine(line);
+      const columns = line.map((value) => value.trim());
       const imageId = normalizeStem(columns[headerIndex.imageId] ?? '');
       if (seenImageIds.has(imageId)) {
         throw new Error(`Duplicate imageId: ${imageId}`);
@@ -58,8 +55,53 @@ export class CsvDatasetAdapter implements EvaluationDatasetPort {
   }
 }
 
-function splitCsvLine(line: string): string[] {
-  return line.split(',').map((value) => value.trim());
+function parseCsvRows(content: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let index = 0; index < content.length; index += 1) {
+    const character = content[index]!;
+    const nextCharacter = content[index + 1];
+
+    if (character === '"') {
+      if (inQuotes && nextCharacter === '"') {
+        cell += '"';
+        index += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (character === ',' && !inQuotes) {
+      row.push(cell);
+      cell = '';
+      continue;
+    }
+
+    if ((character === '\n' || character === '\r') && !inQuotes) {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+
+      if (character === '\r' && nextCharacter === '\n') {
+        index += 1;
+      }
+      continue;
+    }
+
+    cell += character;
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
 }
 
 function validateHeaders(headers: string[]): void {

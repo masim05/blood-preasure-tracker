@@ -92,6 +92,11 @@ describe('main entrypoint', () => {
         evaluationDataset: {
           load: jest.fn().mockResolvedValue([]),
         } as never,
+        predictionCsvWriterFactory: () => ({
+          open: jest.fn().mockResolvedValue(undefined),
+          write: jest.fn().mockResolvedValue(undefined),
+          close: jest.fn().mockResolvedValue(undefined),
+        }) as never,
         helpRenderer: {
           render: () => 'help',
         } as never,
@@ -163,12 +168,69 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
+          predictionCsvWriterFactory: () => ({
+            open: jest.fn().mockResolvedValue(undefined),
+            write: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined),
+          }) as never,
           helpRenderer: {
             render: () => 'help',
           } as never,
         },
       ),
     ).rejects.toThrow('OPENAI_API_KEY is required');
+  });
+
+  it('surfaces prediction CSV write failures from the CLI command path', async () => {
+    await expect(
+      runCliWithDependencies(
+        ['predict'],
+        { OPENAI_API_KEY: 'test-key' },
+        new PassThrough(),
+        {
+          cliConfigService: {
+            resolveFromEnvironment: () => ({
+              command: 'predict',
+              helpRequested: false,
+              inputDirectory: 'data/eval',
+              evaluationCsvPath: 'data/eval/a.csv',
+              provider: 'openai',
+              model: 'gpt-5.4-mini',
+            }),
+          } as never,
+          envConfigService: {
+            load: () => ({
+              openAiApiKey: 'test-key',
+              inputDirectory: 'data/eval',
+              evaluationCsvPath: 'data/eval/a.csv',
+              provider: 'openai',
+              model: 'gpt-5.4-mini',
+            }),
+          } as never,
+          modelRegistry: {
+            list: () => [],
+            getDefaultModel: () => 'unused',
+          } as never,
+          imageDirectoryAdapter: {
+            load: jest.fn().mockResolvedValue([]),
+          } as never,
+          imageMetadataAdapter: {
+            extractTimestamp: jest.fn(),
+          } as never,
+          evaluationDataset: {
+            load: jest.fn().mockResolvedValue([]),
+          } as never,
+          predictionCsvWriterFactory: () => ({
+            open: jest.fn().mockRejectedValue(new Error('Failed to write prediction CSV at data/eval/p.csv: denied')),
+            write: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined),
+          }) as never,
+          helpRenderer: {
+            render: () => 'help',
+          } as never,
+        },
+      ),
+    ).rejects.toThrow('Failed to write prediction CSV at data/eval/p.csv: denied');
   });
 
   it('fails when an unsupported provider is selected', async () => {
@@ -217,6 +279,11 @@ describe('main entrypoint', () => {
           evaluationDataset: {
             load: jest.fn().mockResolvedValue([]),
           } as never,
+          predictionCsvWriterFactory: () => ({
+            open: jest.fn().mockResolvedValue(undefined),
+            write: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined),
+          }) as never,
           helpRenderer: {
             render: () => 'help',
           } as never,
