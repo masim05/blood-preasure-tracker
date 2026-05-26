@@ -8,6 +8,8 @@
 
 Replace the older LLM-based extraction direction with a fully local CLI pipeline: load images from a local directory, extract `time` from image metadata, derive monitor values offline with local OCR plus deterministic parsing, and emit JSONL prediction/evaluation output matched to CSV ground truth by filename stem.
 
+> Superseded note: This early `001` plan was replaced by the later provider-backed extraction design. The current implementation uses OpenAI for monitor value extraction and embedded metadata only for `time`; see `specs/003-fix-time-extraction/plan.md` for the active timestamp behavior.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.8 on Node.js 22.13.1 LTS

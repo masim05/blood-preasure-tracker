@@ -25,6 +25,12 @@ export class CliConfigService {
     const parsedArgs = this.parser.parse(argv);
     const envConfig = this.envConfigService.load(env);
 
+    return this.resolveFromEnvironment(parsedArgs, envConfig);
+  }
+
+  resolveFromEnvironment(argv: string[] | ParsedCliArgs, envConfig: EnvironmentConfig): CliConfig {
+    const parsedArgs = Array.isArray(argv) ? this.parser.parse(argv) : argv;
+
     return {
       command: resolveCommand(parsedArgs),
       helpRequested: parsedArgs.help,

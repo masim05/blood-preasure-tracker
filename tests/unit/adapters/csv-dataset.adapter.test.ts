@@ -93,6 +93,14 @@ describe('CsvDatasetAdapter', () => {
     ).rejects.toThrow('Invalid numeric value: nope');
   });
 
+  it('fails when a numeric field has trailing non-numeric text', async () => {
+    const adapter = new CsvDatasetAdapter();
+
+    await expect(
+      adapter.parse('imageId,time,hand,systolic,diastolic,pulse\nimg001,now,right,127abc,72,69'),
+    ).rejects.toThrow('Invalid numeric value: 127abc');
+  });
+
   it('keeps blank optional fields as null', async () => {
     const adapter = new CsvDatasetAdapter();
 

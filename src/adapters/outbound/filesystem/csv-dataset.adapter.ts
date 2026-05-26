@@ -102,12 +102,11 @@ function nullableNumber(value: string | undefined): number | null {
     return null;
   }
 
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed)) {
+  if (!/^-?\d+$/.test(value)) {
     throw new Error(`Invalid numeric value: ${value}`);
   }
 
-  return parsed;
+  return Number(value);
 }
 
 function normalizeStem(imageId: string): string {

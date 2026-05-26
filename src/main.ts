@@ -68,7 +68,7 @@ export async function runCliWithDependencies(
   dependencies: CliDependencies = createCliDependencies(),
 ): Promise<number> {
   const envConfig = dependencies.envConfigService.load(env);
-  const cliConfig = dependencies.cliConfigService.resolve(argv, env);
+  const cliConfig = dependencies.cliConfigService.resolveFromEnvironment(argv, envConfig);
 
   if (cliConfig.command !== 'help') {
     validateProviderConfig(cliConfig, envConfig);

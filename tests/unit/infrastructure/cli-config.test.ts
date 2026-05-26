@@ -63,6 +63,26 @@ describe('CliConfigService', () => {
       process.argv = previousArgv;
     }
   });
+
+  it('resolves from an already-loaded environment config', () => {
+    const service = new CliConfigService(new CliParser(), new EnvConfigService());
+
+    expect(
+      service.resolveFromEnvironment(['predict', '--input', './images'], {
+        openAiApiKey: 'test-key',
+        inputDirectory: './env-images',
+        evaluationCsvPath: './env.csv',
+        provider: 'openai',
+        model: 'env-model',
+      }),
+    ).toMatchObject({
+      command: 'predict',
+      inputDirectory: './images',
+      evaluationCsvPath: './env.csv',
+      provider: 'openai',
+      model: 'env-model',
+    });
+  });
 });
 
 describe('validateProviderConfig', () => {

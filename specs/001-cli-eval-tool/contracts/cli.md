@@ -91,8 +91,7 @@ The final line of an eval run is a summary record:
   "mismatchedRecords": 1,
   "predictionMissing": 0,
   "groundTruthMissing": 1,
-  "errorCount": 0,
-  "metadataMissingCount": 2
+  "errorCount": 0
 }
 ```
 
@@ -110,4 +109,6 @@ Help output must include:
 - default directories and CSV path
 - `.env`-backed local configuration behavior
 - the fact that `time` is extracted from image metadata
-- no requirement for provider credentials, model selection, or external API setup
+- OpenAI provider credential and model selection behavior
+
+> Note: This `001` contract is historical. The implemented CLI behavior is the provider-backed workflow refined in later specs, with `OPENAI_API_KEY` required for the default OpenAI provider and no `metadataMissingCount` summary field.

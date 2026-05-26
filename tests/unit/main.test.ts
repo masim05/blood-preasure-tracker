@@ -36,6 +36,13 @@ describe('main entrypoint', () => {
     const output = new PassThrough();
     let stdout = '';
     const getDefaultModel = jest.fn().mockReturnValue('registry-default-model');
+    const loadEnv = jest.fn().mockReturnValue({
+      openAiApiKey: 'test-key',
+      inputDirectory: 'data/eval',
+      evaluationCsvPath: 'data/eval/a.csv',
+      provider: 'openai',
+      model: 'env-model',
+    });
     output.on('data', (chunk: Buffer) => {
       stdout += chunk.toString('utf8');
     });
@@ -46,7 +53,7 @@ describe('main entrypoint', () => {
       output,
       {
         cliConfigService: {
-          resolve: () => ({
+          resolveFromEnvironment: () => ({
             command: 'predict',
             helpRequested: false,
             inputDirectory: 'data/eval',
@@ -56,13 +63,7 @@ describe('main entrypoint', () => {
           }),
         } as never,
         envConfigService: {
-          load: () => ({
-            openAiApiKey: 'test-key',
-            inputDirectory: 'data/eval',
-            evaluationCsvPath: 'data/eval/a.csv',
-            provider: 'openai',
-            model: 'env-model',
-          }),
+          load: loadEnv,
         } as never,
         modelRegistry: {
           list: () => [],
@@ -100,6 +101,7 @@ describe('main entrypoint', () => {
     expect(exitCode).toBe(0);
     expect(stdout).toContain('"model":"resolved-model"');
     expect(getDefaultModel).not.toHaveBeenCalled();
+    expect(loadEnv).toHaveBeenCalledTimes(1);
   });
 
   it('returns 1 when the Nest bootstrap path throws', async () => {
@@ -123,7 +125,7 @@ describe('main entrypoint', () => {
         new PassThrough(),
         {
           cliConfigService: {
-            resolve: () => ({
+            resolveFromEnvironment: () => ({
               command: 'predict',
               helpRequested: false,
               inputDirectory: 'data/eval',
@@ -177,7 +179,7 @@ describe('main entrypoint', () => {
         new PassThrough(),
         {
           cliConfigService: {
-            resolve: () => ({
+            resolveFromEnvironment: () => ({
               command: 'predict',
               helpRequested: false,
               inputDirectory: 'data/eval',
