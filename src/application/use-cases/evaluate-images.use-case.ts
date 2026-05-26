@@ -1,8 +1,8 @@
 import type { EvaluationDatasetPort } from '../ports/evaluation-dataset.port';
-import type { ImageMetadataPort } from '../ports/image-metadata.port';
+import type { ImageMetadataPort, TimestampExtractionResult } from '../ports/image-metadata.port';
 import type { ImageSourcePort } from '../ports/image-source.port';
 import type { SourceImage } from '../ports/image-source.port';
-import type { LlmProviderPort } from '../ports/llm-provider.port';
+import type { LlmProviderPort, LlmProviderResponse } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import { EvaluationReport } from '../../domain/entities/evaluation-report';
 import { PredictedReading } from '../../domain/entities/predicted-reading';
@@ -51,18 +51,25 @@ export class EvaluateImagesUseCase {
 
   private async evaluateImage(image: SourceImage, model: string): Promise<PredictedReading> {
     try {
-      const inference = await this.llmProvider.infer({
-        imageId: image.imageId,
-        imagePath: image.imagePath,
-        contentType: image.contentType,
-        data: image.data,
-        model,
-      });
       const metadata = await this.imageMetadata.extractTimestamp({
         imageId: image.imageId,
         imagePath: image.imagePath,
         data: image.data,
       });
+      let inference: LlmProviderResponse;
+
+      try {
+        inference = await this.llmProvider.infer({
+          imageId: image.imageId,
+          imagePath: image.imagePath,
+          contentType: image.contentType,
+          data: image.data,
+          model,
+        });
+      } catch (error) {
+        return this.createErrorReading(image, model, error, metadata);
+      }
+
       const uncertainFields = metadata.time === null
         ? [...new Set([...inference.uncertainFields, 'time'])]
         : [...inference.uncertainFields];
@@ -90,25 +97,34 @@ export class EvaluateImagesUseCase {
         rawNotes: inference.rawNotes,
       });
     } catch (error) {
-      return this.createErrorReading(image, model, error);
+      return this.createErrorReading(image, model, error, null);
     }
   }
 
-  private createErrorReading(image: SourceImage, model: string, error: unknown): PredictedReading {
+  private createErrorReading(
+    image: SourceImage,
+    model: string,
+    error: unknown,
+    metadata: TimestampExtractionResult | null,
+  ): PredictedReading {
     return new PredictedReading({
       imageId: image.imageId,
       imagePath: image.imagePath,
-      time: null,
+      time: metadata?.time ?? null,
       hand: null,
       systolic: null,
       diastolic: null,
       pulse: null,
       confidence: null,
       status: 'error',
-      uncertainFields: [],
+      uncertainFields: metadata?.time ? [] : ['time'],
       provider: this.llmProvider.provider,
       model,
-      rawNotes: error instanceof Error ? error.message : 'Unknown image processing error',
+      rawNotes: unwrapErrorMessage(error),
     });
   }
+}
+
+function unwrapErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown image processing error';
 }

@@ -62,18 +62,18 @@ describe('OpenAiVisionAdapter', () => {
       model: '',
     });
 
-    expect(create).toHaveBeenCalledWith(
+    const request = create.mock.calls[0]?.[0] as {
+      text: { format: { schema: { properties: Record<string, unknown>; required: string[] } } };
+    };
+    const schema = request.text.format.schema;
+
+    expect(schema.properties).toEqual(
       expect.objectContaining({
-        text: expect.objectContaining({
-          format: expect.objectContaining({
-            schema: expect.objectContaining({
-              properties: expect.not.objectContaining({ time: expect.anything() }),
-              required: expect.not.arrayContaining(['time']),
-            }),
-          }),
-        }),
+        hand: { enum: ['left', 'right', 'unknown', null] },
       }),
     );
+    expect(schema.properties).not.toHaveProperty('time');
+    expect(schema.required).not.toContain('time');
   });
 
   it('returns a safe uncertain response when provider output is not JSON', async () => {

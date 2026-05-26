@@ -27,6 +27,7 @@ export function selectMetadataTimestamp(tags: Record<string, unknown>): Timestam
 
 export function normalizeMetadataTimestamp(value: unknown): string | null {
   if (typeof value === 'number' && Number.isFinite(value)) {
+    // exif-parser 0.1.12 exposes EXIF date tags as epoch seconds that preserve the camera wall-clock value when formatted in UTC.
     return formatDate(new Date(value * 1000));
   }
 

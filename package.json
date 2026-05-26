@@ -19,7 +19,7 @@
   "dependencies": {
     "@nestjs/common": "^11.1.23",
     "@nestjs/core": "^11.1.23",
-    "exif-parser": "^0.1.12",
+    "exif-parser": "0.1.12",
     "openai": "^6.39.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

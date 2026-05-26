@@ -54,7 +54,7 @@ export class OpenAiVisionAdapter implements LlmProviderPort {
             type: 'object',
             additionalProperties: false,
             properties: {
-              hand: { type: ['string', 'null'] },
+              hand: { enum: ['left', 'right', 'unknown', null] },
               systolic: { type: ['number', 'null'] },
               diastolic: { type: ['number', 'null'] },
               pulse: { type: ['number', 'null'] },

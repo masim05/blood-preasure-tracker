@@ -117,14 +117,24 @@ describe('EvaluateImagesUseCase', () => {
       ]),
     };
     const imageMetadata: ImageMetadataPort = {
-      extractTimestamp: jest.fn().mockResolvedValue({
-        imageId: 'img002',
-        imagePath: 'data/eval/img002.jpg',
-        time: '2026-05-20 14:02:23',
-        sourceTag: 'DateTimeOriginal',
-        rawValue: '2026:05:20 14:02:23',
-        issues: [],
-      }),
+      extractTimestamp: jest
+        .fn()
+        .mockResolvedValueOnce({
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          time: null,
+          sourceTag: null,
+          rawValue: null,
+          issues: ['No supported embedded timestamp metadata found'],
+        })
+        .mockResolvedValueOnce({
+          imageId: 'img002',
+          imagePath: 'data/eval/img002.jpg',
+          time: '2026-05-20 14:02:23',
+          sourceTag: 'DateTimeOriginal',
+          rawValue: '2026:05:20 14:02:23',
+          issues: [],
+        }),
     };
     const llmProvider: LlmProviderPort = {
       provider: 'openai',
@@ -162,7 +172,12 @@ describe('EvaluateImagesUseCase', () => {
     expect(outputWriter.write).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        prediction: expect.objectContaining({ status: 'error', rawNotes: 'provider failed' }),
+        prediction: expect.objectContaining({
+          time: null,
+          status: 'error',
+          uncertainFields: ['time'],
+          rawNotes: 'provider failed',
+        }),
         matchStatus: 'mismatch',
       }),
     );
@@ -172,6 +187,72 @@ describe('EvaluateImagesUseCase', () => {
         type: 'summary',
         errorCount: 1,
         matchedRecords: 1,
+      }),
+    );
+  });
+
+  it('preserves metadata time in error comparisons when provider inference fails', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: Buffer.from('test'),
+        },
+      ]),
+    };
+    const dataset: EvaluationDatasetPort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          time: '2026-05-20 14:01:23',
+          hand: 'right',
+          systolic: 127,
+          diastolic: 72,
+          pulse: 69,
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn().mockRejectedValue(new Error('provider failed')),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const useCase = new EvaluateImagesUseCase(
+      imageSource,
+      dataset,
+      imageMetadata,
+      llmProvider,
+      outputWriter,
+    );
+
+    await useCase.execute({
+      inputDirectory: 'data/eval',
+      evaluationCsvPath: 'data/eval/a.csv',
+      model: 'gpt-5.4-mini',
+    });
+
+    expect(outputWriter.write).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        prediction: expect.objectContaining({
+          time: '2026-05-20 14:01:23',
+          status: 'error',
+          uncertainFields: [],
+        }),
       }),
     );
   });
