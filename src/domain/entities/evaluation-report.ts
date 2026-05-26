@@ -99,7 +99,9 @@ export class EvaluationReport {
 
   toAccuracySummary(): AccuracySummary {
     const comparableComparisons = this.comparisons.filter(
-      (comparison) => comparison.prediction !== null && comparison.groundTruth !== null,
+      (comparison) => comparison.prediction !== null
+        && comparison.prediction.status !== 'error'
+        && comparison.groundTruth !== null,
     );
     const comparableTotal = comparableComparisons.length;
 

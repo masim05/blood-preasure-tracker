@@ -48,7 +48,7 @@ export class EvaluateImagesUseCase {
     }
 
     await this.outputWriter.write(evaluationReport.toSummary());
-    await this.outputWriter.writeText?.(
+    await this.outputWriter.writeText(
       formatEvaluationAccuracySummary(evaluationReport.toAccuracySummary()),
     );
   }

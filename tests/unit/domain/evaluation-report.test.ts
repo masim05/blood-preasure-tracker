@@ -160,6 +160,51 @@ describe('EvaluationReport', () => {
     expect(accuracy.fields).toContainEqual({ field: 'systolic', correct: 1, total: 1, ratio: 100 });
   });
 
+  it('excludes errored predictions from accuracy denominators', () => {
+    const comparisons: EvaluationComparison[] = [
+      {
+        imageId: 'errored',
+        matchStatus: 'mismatch',
+        prediction: {
+          ...prediction,
+          imageId: 'errored',
+          hand: null,
+          systolic: null,
+          diastolic: null,
+          pulse: null,
+          status: 'error',
+        },
+        groundTruth: { ...groundTruth, imageId: 'errored' },
+        fieldResults: {
+          time: 'match',
+          hand: 'missing',
+          systolic: 'missing',
+          diastolic: 'missing',
+          pulse: 'missing',
+        },
+        notes: ['provider failed'],
+      },
+      {
+        imageId: 'img002',
+        matchStatus: 'matched',
+        prediction: { ...prediction, imageId: 'img002' },
+        groundTruth: { ...groundTruth, imageId: 'img002' },
+        fieldResults,
+        notes: [],
+      },
+    ];
+
+    const accuracy = new EvaluationReport(comparisons, 2, 'openai', 'gpt-5.4-mini').toAccuracySummary();
+
+    expect(accuracy.comparableTotal).toBe(1);
+    expect(accuracy.fields).toEqual([
+      { field: 'hand', correct: 1, total: 1, ratio: 100 },
+      { field: 'systolic', correct: 1, total: 1, ratio: 100 },
+      { field: 'diastolic', correct: 1, total: 1, ratio: 100 },
+      { field: 'pulse', correct: 1, total: 1, ratio: 100 },
+    ]);
+  });
+
   it('calculates at-least threshold metrics for target parameters', () => {
     const comparisons: EvaluationComparison[] = [
       {

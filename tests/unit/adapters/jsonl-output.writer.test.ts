@@ -18,13 +18,20 @@ describe('JsonlOutputWriter', () => {
   });
 
   it('defaults to process stdout when no stream is provided', async () => {
-    const writeSpy = jest.spyOn(process.stdout, 'write').mockReturnValue(true);
+    const writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation((
+      chunk: string | Uint8Array,
+      callback?: (error?: Error | null) => void,
+    ) => {
+      callback?.();
+
+      return true;
+    });
 
     try {
       const writer = new JsonlOutputWriter();
       await writer.write({ type: 'summary' });
 
-      expect(writeSpy).toHaveBeenCalledWith('{"type":"summary"}\n');
+      expect(writeSpy).toHaveBeenCalledWith('{"type":"summary"}\n', expect.any(Function));
     } finally {
       writeSpy.mockRestore();
     }
@@ -65,7 +72,15 @@ describe('JsonlOutputWriter', () => {
 
   it('waits for drain when stream backpressure is signaled', async () => {
     const output = new EventEmitter() as Writable;
-    output.write = jest.fn().mockReturnValue(false);
+    let writeCallback: ((error?: Error | null) => void) | undefined;
+    output.write = jest.fn().mockImplementation((
+      _chunk: string,
+      callback?: (error?: Error | null) => void,
+    ) => {
+      writeCallback = callback;
+
+      return false;
+    });
     const writer = new JsonlOutputWriter(output);
     let completed = false;
 
@@ -76,18 +91,25 @@ describe('JsonlOutputWriter', () => {
     await Promise.resolve();
     expect(completed).toBe(false);
 
-    output.emit('drain');
+    writeCallback?.();
     await writePromise;
 
     expect(completed).toBe(true);
-    expect(output.listenerCount('drain')).toBe(0);
     expect(output.listenerCount('error')).toBe(0);
-    expect(output.write).toHaveBeenCalledWith('{"type":"prediction"}\n');
+    expect(output.write).toHaveBeenCalledWith('{"type":"prediction"}\n', expect.any(Function));
   });
 
   it('waits for drain when raw text output is backpressured', async () => {
     const output = new EventEmitter() as Writable;
-    output.write = jest.fn().mockReturnValue(false);
+    let writeCallback: ((error?: Error | null) => void) | undefined;
+    output.write = jest.fn().mockImplementation((
+      _chunk: string,
+      callback?: (error?: Error | null) => void,
+    ) => {
+      writeCallback = callback;
+
+      return false;
+    });
     const writer = new JsonlOutputWriter(output);
     let completed = false;
 
@@ -98,13 +120,12 @@ describe('JsonlOutputWriter', () => {
     await Promise.resolve();
     expect(completed).toBe(false);
 
-    output.emit('drain');
+    writeCallback?.();
     await writePromise;
 
     expect(completed).toBe(true);
-    expect(output.listenerCount('drain')).toBe(0);
     expect(output.listenerCount('error')).toBe(0);
-    expect(output.write).toHaveBeenCalledWith('accuracy\n');
+    expect(output.write).toHaveBeenCalledWith('accuracy\n', expect.any(Function));
   });
 
   it('rejects when a backpressured stream emits an error', async () => {
@@ -130,6 +151,22 @@ describe('JsonlOutputWriter', () => {
 
     await expect(writePromise).rejects.toThrow('stream failed');
     expect(output.listenerCount('drain')).toBe(0);
+    expect(output.listenerCount('error')).toBe(0);
+  });
+
+  it('rejects when the stream write callback reports an error', async () => {
+    const output = new EventEmitter() as Writable;
+    output.write = jest.fn().mockImplementation((
+      _chunk: string,
+      callback?: (error?: Error | null) => void,
+    ) => {
+      callback?.(new Error('broken pipe'));
+
+      return true;
+    });
+    const writer = new JsonlOutputWriter(output);
+
+    await expect(writer.write({ type: 'prediction' })).rejects.toThrow('broken pipe');
     expect(output.listenerCount('error')).toBe(0);
   });
 });
