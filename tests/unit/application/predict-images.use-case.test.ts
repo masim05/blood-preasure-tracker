@@ -338,6 +338,35 @@ describe('PredictImagesUseCase', () => {
     expect(predictionCsvWriter.close).not.toHaveBeenCalled();
   });
 
+  it('does not close when CSV open fails after partial allocation', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn(),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn(),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter({
+      open: jest.fn().mockRejectedValue(new Error('Failed to write prediction CSV at data/eval/p.csv: header failed')),
+    });
+    const useCase = new PredictImagesUseCase(imageSource, imageMetadata, llmProvider, outputWriter, predictionCsvWriter);
+
+    await expect(
+      useCase.execute({
+        inputDirectory: 'data/eval',
+        model: 'gpt-5.4-mini',
+      }),
+    ).rejects.toThrow('Failed to write prediction CSV at data/eval/p.csv: header failed');
+
+    expect(predictionCsvWriter.close).not.toHaveBeenCalled();
+  });
+
   it('keeps JSONL output before CSV row writing for existing consumers', async () => {
     const imageSource: ImageSourcePort = {
       load: jest.fn().mockResolvedValue([

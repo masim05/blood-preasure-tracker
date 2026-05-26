@@ -94,6 +94,34 @@ describe('PredictionCsvFileWriter', () => {
     await expect(writer.open('/tmp/images')).rejects.toThrow('Failed to write prediction CSV at /tmp/images/p.csv: disk full');
   });
 
+  it('resets and destroys the stream when the header write fails', async () => {
+    const failedStream = new Writable({
+      write(_chunk, _encoding, callback) {
+        callback(new Error('header failed'));
+      },
+    });
+    const successfulChunks: string[] = [];
+    const successfulStream = new Writable({
+      write(chunk, _encoding, callback) {
+        successfulChunks.push(chunk.toString('utf8'));
+        callback();
+      },
+    });
+    const writer = new PredictionCsvFileWriter(jest.fn().mockReturnValueOnce(failedStream).mockReturnValueOnce(successfulStream));
+
+    await expect(writer.open('/tmp/images')).rejects.toThrow(
+      'Failed to write prediction CSV at /tmp/images/p.csv: header failed',
+    );
+    expect(failedStream.destroyed).toBe(true);
+
+    await writer.open('/tmp/images');
+    await writer.close();
+
+    expect(successfulChunks[0]).toBe(
+      'imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes\n',
+    );
+  });
+
   it('reports close errors with the target CSV path', async () => {
     const stream = new Writable({
       write(_chunk, _encoding, callback) {

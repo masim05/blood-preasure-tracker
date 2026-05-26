@@ -21,10 +21,18 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
       throw new Error('Prediction CSV writer is already open');
     }
 
-    this.csvPath = path.join(inputDirectory, 'p.csv');
-    this.stream = this.streamFactory(this.csvPath);
+    const csvPath = path.join(inputDirectory, 'p.csv');
+    const stream = this.streamFactory(csvPath);
+    this.csvPath = csvPath;
+    this.stream = stream;
 
-    await this.writeChunk(`${formatPredictionCsvHeader()}\n`);
+    try {
+      await this.writeChunk(`${formatPredictionCsvHeader()}\n`);
+    } catch (error) {
+      this.reset();
+      stream.destroy();
+      throw error;
+    }
   }
 
   async write(reading: PredictedReading): Promise<void> {
@@ -37,7 +45,8 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
     }
 
     const stream = this.stream;
-    this.stream = null;
+    const csvPath = this.csvPath;
+    this.reset();
 
     await new Promise<void>((resolve, reject) => {
       const cleanup = (): void => {
@@ -50,7 +59,7 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
       };
       const onError = (error: Error): void => {
         cleanup();
-        reject(this.wrapError('close', error));
+        reject(this.wrapError('close', error, csvPath));
       };
 
       stream.once('finish', onFinish);
@@ -111,9 +120,13 @@ export class PredictionCsvFileWriter implements PredictionCsvWriterPort {
     });
   }
 
-  private wrapError(action: 'write' | 'close', error: Error): Error {
-    const csvPath = this.csvPath ?? 'p.csv';
-    return new Error(`Failed to ${action} prediction CSV at ${csvPath}: ${error.message}`);
+  private wrapError(action: 'write' | 'close', error: Error, csvPath: string | null = this.csvPath): Error {
+    return new Error(`Failed to ${action} prediction CSV at ${csvPath ?? 'p.csv'}: ${error.message}`);
+  }
+
+  private reset(): void {
+    this.stream = null;
+    this.csvPath = null;
   }
 }
 

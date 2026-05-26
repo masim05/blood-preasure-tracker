@@ -22,10 +22,13 @@ export class PredictImagesUseCase {
   ) {}
 
   async execute(command: PredictImagesCommand): Promise<void> {
-    await this.predictionCsvWriter.open(command.inputDirectory);
     let caughtError: unknown = null;
+    let opened = false;
 
     try {
+      await this.predictionCsvWriter.open(command.inputDirectory);
+      opened = true;
+
       const images = await this.imageSource.load(command.inputDirectory);
 
       for (const image of images) {
@@ -41,11 +44,13 @@ export class PredictImagesUseCase {
       caughtError = error;
       throw error;
     } finally {
-      try {
-        await this.predictionCsvWriter.close();
-      } catch (closeError) {
-        if (!caughtError) {
-          throw closeError;
+      if (opened) {
+        try {
+          await this.predictionCsvWriter.close();
+        } catch (closeError) {
+          if (!caughtError) {
+            throw closeError;
+          }
         }
       }
     }
