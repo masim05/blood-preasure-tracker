@@ -1,0 +1,40 @@
+{
+  "name": "blood-pressure-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CLI eval tool for blood pressure monitor image extraction",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13.1"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "cli": "npm run build --silent && node dist/main.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.23",
+    "@nestjs/core": "^11.1.23",
+    "exif-parser": "0.1.12",
+    "openai": "^6.39.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.23",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.15.30",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "eslint": "^9.27.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
