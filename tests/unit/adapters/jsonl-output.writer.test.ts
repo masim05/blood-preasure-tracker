@@ -50,6 +50,19 @@ describe('JsonlOutputWriter', () => {
     );
   });
 
+  it('writes raw text without JSON encoding', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const writer = new JsonlOutputWriter(output);
+    await writer.writeText('hand: 1/1 (100.0%)\n');
+
+    expect(stdout).toBe('hand: 1/1 (100.0%)\n');
+  });
+
   it('waits for drain when stream backpressure is signaled', async () => {
     const output = new EventEmitter() as Writable;
     output.write = jest.fn().mockReturnValue(false);
@@ -72,11 +85,46 @@ describe('JsonlOutputWriter', () => {
     expect(output.write).toHaveBeenCalledWith('{"type":"prediction"}\n');
   });
 
+  it('waits for drain when raw text output is backpressured', async () => {
+    const output = new EventEmitter() as Writable;
+    output.write = jest.fn().mockReturnValue(false);
+    const writer = new JsonlOutputWriter(output);
+    let completed = false;
+
+    const writePromise = writer.writeText('accuracy\n').then(() => {
+      completed = true;
+    });
+
+    await Promise.resolve();
+    expect(completed).toBe(false);
+
+    output.emit('drain');
+    await writePromise;
+
+    expect(completed).toBe(true);
+    expect(output.listenerCount('drain')).toBe(0);
+    expect(output.listenerCount('error')).toBe(0);
+    expect(output.write).toHaveBeenCalledWith('accuracy\n');
+  });
+
   it('rejects when a backpressured stream emits an error', async () => {
     const output = new EventEmitter() as Writable;
     output.write = jest.fn().mockReturnValue(false);
     const writer = new JsonlOutputWriter(output);
     const writePromise = writer.write({ type: 'prediction' });
+
+    output.emit('error', new Error('stream failed'));
+
+    await expect(writePromise).rejects.toThrow('stream failed');
+    expect(output.listenerCount('drain')).toBe(0);
+    expect(output.listenerCount('error')).toBe(0);
+  });
+
+  it('rejects raw text output when a backpressured stream emits an error', async () => {
+    const output = new EventEmitter() as Writable;
+    output.write = jest.fn().mockReturnValue(false);
+    const writer = new JsonlOutputWriter(output);
+    const writePromise = writer.writeText('accuracy\n');
 
     output.emit('error', new Error('stream failed'));
 

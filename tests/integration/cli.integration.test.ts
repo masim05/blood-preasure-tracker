@@ -175,6 +175,13 @@ describe('CLI integration', () => {
     expect(exitCode).toBe(0);
     expect(stdout).toContain('"type":"comparison"');
     expect(stdout).toContain('"type":"summary"');
+    expect(stdout).toContain('hand:             1/1 (100.0%)');
+    expect(stdout).toContain('systolic:         1/1 (100.0%)');
+    expect(stdout).toContain('diastolic:        1/1 (100.0%)');
+    expect(stdout).toContain('pulse:            1/1 (100.0%)');
+    expect(stdout).toContain('2 params correct: 1/1 (100.0%)');
+    expect(stdout).toContain('3 params correct: 1/1 (100.0%)');
+    expect(stdout).toContain('4 params correct: 1/1 (100.0%)');
   });
 
   it('accepts a predict-generated p.csv as eval reference data', async () => {
@@ -203,6 +210,8 @@ describe('CLI integration', () => {
     expect(evalExitCode).toBe(0);
     expect(stdout).toContain('"type":"comparison"');
     expect(stdout).toContain('"type":"summary"');
+    expect(stdout).toContain('hand:             1/1 (100.0%)');
+    expect(stdout).toContain('4 params correct: 1/1 (100.0%)');
     expect(stdout).toContain('"groundTruth":{"imageId":"img001"');
   });
 
@@ -235,6 +244,37 @@ describe('CLI integration', () => {
     expect(exitCode).toBe(0);
     expect(stdout).toContain('"matchStatus":"matched"');
     expect(stdout).toContain('"time":"match"');
+    expect(stdout).toContain('4 params correct: 1/1 (100.0%)');
+  });
+
+  it('keeps eval accuracy summary aligned in quickstart output shape', async () => {
+    const output = new PassThrough();
+    let stdout = '';
+    output.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString('utf8');
+    });
+
+    const fixtureDir = mkdtempSync(path.join(tmpdir(), 'bp-cli-eval-aligned-'));
+    writeFileSync(path.join(fixtureDir, 'img001.jpg'), Buffer.from('fixture-image'));
+    writeFileSync(
+      path.join(fixtureDir, 'a.csv'),
+      ['imageId,time,hand,systolic,diastolic,pulse', 'img001,,left,127,70,69'].join('\n'),
+    );
+
+    const exitCode = await runCliWithDependencies(
+      ['eval', '--input', fixtureDir, '--csv', path.join(fixtureDir, 'a.csv')],
+      { OPENAI_API_KEY: 'test-key' },
+      output,
+    );
+
+    const accuracyLines = stdout
+      .split('\n')
+      .filter((line) => /^(hand|systolic|diastolic|pulse|[234] params correct):/.test(line));
+
+    expect(exitCode).toBe(0);
+    expect(accuracyLines).toHaveLength(7);
+    expect(new Set(accuracyLines.map((line) => line.search(/\d+\/\d+/))).size).toBe(1);
+    expect(new Set(accuracyLines.map((line) => line.indexOf('('))).size).toBe(1);
   });
 
   it('shows the static model catalog in help output', async () => {

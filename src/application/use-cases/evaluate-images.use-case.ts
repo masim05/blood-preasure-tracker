@@ -6,6 +6,7 @@ import type { LlmProviderPort, LlmProviderResponse } from '../ports/llm-provider
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import { EvaluationReport } from '../../domain/entities/evaluation-report';
 import { PredictedReading } from '../../domain/entities/predicted-reading';
+import { formatEvaluationAccuracySummary } from '../../domain/services/evaluation-accuracy-formatter';
 import { EvaluationMatcher } from '../../domain/services/evaluation-matcher';
 import { deriveReadingStatus } from '../../domain/services/uncertainty-policy';
 
@@ -47,6 +48,9 @@ export class EvaluateImagesUseCase {
     }
 
     await this.outputWriter.write(evaluationReport.toSummary());
+    await this.outputWriter.writeText?.(
+      formatEvaluationAccuracySummary(evaluationReport.toAccuracySummary()),
+    );
   }
 
   private async evaluateImage(image: SourceImage, model: string): Promise<PredictedReading> {

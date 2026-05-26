@@ -9,7 +9,15 @@ export class JsonlOutputWriter implements OutputWriterPort {
   constructor(private readonly output: Writable = process.stdout) {}
 
   async write(record: unknown): Promise<void> {
-    const accepted = this.output.write(`${JSON.stringify(record)}\n`);
+    await this.writeChunk(`${JSON.stringify(record)}\n`);
+  }
+
+  async writeText(text: string): Promise<void> {
+    await this.writeChunk(text);
+  }
+
+  private async writeChunk(chunk: string): Promise<void> {
+    const accepted = this.output.write(chunk);
 
     if (!accepted) {
       await waitForDrain(this.output);

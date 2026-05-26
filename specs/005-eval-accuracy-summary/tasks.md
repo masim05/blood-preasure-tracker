@@ -12,10 +12,23 @@
 
 **Purpose**: Prepare the isolated implementation workspace and confirm the repo baseline before feature work.
 
-- [ ] T001 Create implementation worktree for branch 005-eval-accuracy-summary at tmp/005-eval-accuracy-summary
-- [ ] T002 Install dependencies in tmp/005-eval-accuracy-summary with npm ci
-- [ ] T003 [P] Review eval output contract in specs/005-eval-accuracy-summary/contracts/cli.md before coding
-- [ ] T004 [P] Confirm no new runtime dependency is required in package.json
+- [X] T001 Create implementation worktree for branch 005-eval-accuracy-summary at tmp/005-eval-accuracy-summary
+- [X] T002 Install dependencies in tmp/005-eval-accuracy-summary with npm ci
+- [X] T003 [P] Review eval output contract in specs/005-eval-accuracy-summary/contracts/cli.md before coding
+- [X] T004 [P] Confirm no new runtime dependency is required in package.json
+
+## Constitution Check
+
+**Purpose**: Explicit task-list compliance check required by the project constitution.
+
+- [X] Hexagonal boundaries preserved: domain computes accuracy, use case orchestrates output, CLI adapter writes stdout text.
+- [X] Unit test strategy present: output writer, report aggregation, formatter, use case, and CLI integration tests are planned.
+- [X] Coverage policy acknowledged: full validation includes `npm run test:coverage` and changed feature paths target full branch coverage where practical.
+- [X] Additive test evolution respected: existing tests receive additive assertions only.
+- [X] MCP-free implementation: tasks use local repository scripts, npm, Jest, TypeScript, and Node built-ins only.
+- [X] Feature isolation via worktree: implementation is in `tmp/005-eval-accuracy-summary`.
+- [X] Tech stack baseline: Node.js 24.x LTS and NestJS 11 remain the target.
+- [X] Dependency policy: no new third-party runtime dependency is planned.
 
 ---
 
@@ -25,10 +38,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 [P] Add raw text output unit tests in tests/unit/adapters/jsonl-output.writer.test.ts
-- [ ] T006 Extend OutputWriterPort with optional raw text writing in src/application/ports/output-writer.port.ts
-- [ ] T007 Implement backpressure-safe raw text writing in src/adapters/inbound/cli/jsonl-output.writer.ts
-- [ ] T008 Run targeted output writer tests with npm test -- tests/unit/adapters/jsonl-output.writer.test.ts
+- [X] T005 [P] Add raw text output unit tests in tests/unit/adapters/jsonl-output.writer.test.ts
+- [X] T006 Extend OutputWriterPort with optional raw text writing in src/application/ports/output-writer.port.ts
+- [X] T007 Implement backpressure-safe raw text writing in src/adapters/inbound/cli/jsonl-output.writer.ts
+- [X] T008 Run targeted output writer tests with npm test -- tests/unit/adapters/jsonl-output.writer.test.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
@@ -42,17 +55,18 @@
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T009 [P] [US1] Add EvaluationReport per-field accuracy tests in tests/unit/domain/evaluation-report.test.ts
-- [ ] T010 [P] [US1] Add eval use-case output order test for comparison records, summary record, and per-field text in tests/unit/application/evaluate-images.use-case.test.ts
-- [ ] T011 [P] [US1] Add CLI integration assertion for per-field eval accuracy rows in tests/integration/cli.integration.test.ts
+- [X] T009 [P] [US1] Add EvaluationReport per-field accuracy tests in tests/unit/domain/evaluation-report.test.ts
+- [X] T010 [P] [US1] Add EvaluationReport missing-field and unmatched-row denominator tests in tests/unit/domain/evaluation-report.test.ts
+- [X] T011 [P] [US1] Add eval use-case output order test for comparison records, summary record, and per-field text in tests/unit/application/evaluate-images.use-case.test.ts
+- [X] T012 [P] [US1] Add CLI integration assertion for per-field eval accuracy rows in tests/integration/cli.integration.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Add FieldAccuracyMetric and AccuracySummary types in src/domain/entities/evaluation-report.ts
-- [ ] T013 [US1] Implement per-field accuracy summary computation in src/domain/entities/evaluation-report.ts
-- [ ] T014 [US1] Add initial per-field accuracy formatter in src/domain/services/evaluation-accuracy-formatter.ts
-- [ ] T015 [US1] Emit per-field accuracy text after existing eval summary in src/application/use-cases/evaluate-images.use-case.ts
-- [ ] T016 [US1] Run US1 tests with npm test -- tests/unit/domain/evaluation-report.test.ts tests/unit/application/evaluate-images.use-case.test.ts tests/integration/cli.integration.test.ts
+- [X] T013 [US1] Add FieldAccuracyMetric and AccuracySummary types in src/domain/entities/evaluation-report.ts
+- [X] T014 [US1] Implement per-field accuracy summary computation in src/domain/entities/evaluation-report.ts
+- [X] T015 [US1] Add initial per-field accuracy formatter in src/domain/services/evaluation-accuracy-formatter.ts
+- [X] T016 [US1] Emit per-field accuracy text after existing eval summary in src/application/use-cases/evaluate-images.use-case.ts
+- [X] T017 [US1] Run US1 tests with npm test -- tests/unit/domain/evaluation-report.test.ts tests/unit/application/evaluate-images.use-case.test.ts tests/integration/cli.integration.test.ts
 
 **Checkpoint**: User Story 1 is independently functional and testable as the MVP.
 
@@ -66,16 +80,16 @@
 
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T017 [P] [US2] Add threshold metric aggregation tests in tests/unit/domain/evaluation-report.test.ts
-- [ ] T018 [P] [US2] Add formatter tests for threshold rows in tests/unit/domain/evaluation-accuracy-formatter.test.ts
-- [ ] T019 [P] [US2] Add CLI integration assertion for threshold eval accuracy rows in tests/integration/cli.integration.test.ts
+- [X] T018 [P] [US2] Add threshold metric aggregation tests in tests/unit/domain/evaluation-report.test.ts
+- [X] T019 [P] [US2] Add formatter tests for threshold rows in tests/unit/domain/evaluation-accuracy-formatter.test.ts
+- [X] T020 [P] [US2] Add CLI integration assertion for threshold eval accuracy rows in tests/integration/cli.integration.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Add ParameterThresholdMetric type in src/domain/entities/evaluation-report.ts
-- [ ] T021 [US2] Implement at-least-2, at-least-3, and at-least-4 metric computation in src/domain/entities/evaluation-report.ts
-- [ ] T022 [US2] Extend formatter with threshold rows in src/domain/services/evaluation-accuracy-formatter.ts
-- [ ] T023 [US2] Run US2 tests with npm test -- tests/unit/domain/evaluation-report.test.ts tests/unit/domain/evaluation-accuracy-formatter.test.ts tests/integration/cli.integration.test.ts
+- [X] T021 [US2] Add ParameterThresholdMetric type in src/domain/entities/evaluation-report.ts
+- [X] T022 [US2] Implement at-least-2, at-least-3, and at-least-4 metric computation in src/domain/entities/evaluation-report.ts
+- [X] T023 [US2] Extend formatter with threshold rows in src/domain/services/evaluation-accuracy-formatter.ts
+- [X] T024 [US2] Run US2 tests with npm test -- tests/unit/domain/evaluation-report.test.ts tests/unit/domain/evaluation-accuracy-formatter.test.ts tests/integration/cli.integration.test.ts
 
 **Checkpoint**: User Stories 1 and 2 both work independently and together.
 
@@ -89,15 +103,16 @@
 
 ### Tests for User Story 3 (REQUIRED)
 
-- [ ] T024 [P] [US3] Add formatter alignment and one-decimal percentage tests in tests/unit/domain/evaluation-accuracy-formatter.test.ts
-- [ ] T025 [P] [US3] Add zero-comparable-record formatting tests in tests/unit/domain/evaluation-accuracy-formatter.test.ts
-- [ ] T026 [P] [US3] Add quickstart-style eval output shape assertion in tests/integration/cli.integration.test.ts
+- [X] T025 [P] [US3] Add formatter alignment and one-decimal percentage tests in tests/unit/domain/evaluation-accuracy-formatter.test.ts
+- [X] T026 [P] [US3] Add zero-comparable-record formatting tests in tests/unit/domain/evaluation-accuracy-formatter.test.ts
+- [X] T027 [P] [US3] Add maximum 10-line summary cap test in tests/unit/domain/evaluation-accuracy-formatter.test.ts
+- [X] T028 [P] [US3] Add quickstart-style eval output shape assertion in tests/integration/cli.integration.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Finalize fixed-width label, fraction, and percentage formatting in src/domain/services/evaluation-accuracy-formatter.ts
-- [ ] T028 [US3] Ensure zero comparable records render 0/0 and 0.0% in src/domain/services/evaluation-accuracy-formatter.ts
-- [ ] T029 [US3] Run US3 tests with npm test -- tests/unit/domain/evaluation-accuracy-formatter.test.ts tests/integration/cli.integration.test.ts
+- [X] T029 [US3] Finalize fixed-width label, fraction, and percentage formatting in src/domain/services/evaluation-accuracy-formatter.ts
+- [X] T030 [US3] Ensure zero comparable records render 0/0 and 0.0% in src/domain/services/evaluation-accuracy-formatter.ts
+- [X] T031 [US3] Run US3 tests with npm test -- tests/unit/domain/evaluation-accuracy-formatter.test.ts tests/integration/cli.integration.test.ts
 
 **Checkpoint**: All user stories are independently functional and aligned with the CLI contract.
 
@@ -107,15 +122,15 @@
 
 **Purpose**: Documentation, validation, and release hygiene across all stories.
 
-- [ ] T030 [P] Update eval output documentation in README.md
-- [ ] T031 [P] Update quickstart validation notes in specs/005-eval-accuracy-summary/quickstart.md if implementation output differs only in exact counts
-- [ ] T032 Run full build from tmp/005-eval-accuracy-summary using package.json and tsconfig.json
-- [ ] T033 Run full test suite from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
-- [ ] T034 Run coverage gate from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
-- [ ] T035 Run lint from tmp/005-eval-accuracy-summary using package.json and eslint.config.js
-- [ ] T036 Commit implementation changes from tmp/005-eval-accuracy-summary on branch 005-eval-accuracy-summary
-- [ ] T037 Push branch 005-eval-accuracy-summary from tmp/005-eval-accuracy-summary to origin
-- [ ] T038 Create PR/MR from branch 005-eval-accuracy-summary to main using specs/005-eval-accuracy-summary/plan.md and specs/005-eval-accuracy-summary/tasks.md for description context
+- [X] T032 [P] Update eval output documentation in README.md
+- [X] T033 [P] Update quickstart validation notes in specs/005-eval-accuracy-summary/quickstart.md if implementation output differs only in exact counts
+- [X] T034 Run full build from tmp/005-eval-accuracy-summary using package.json and tsconfig.json
+- [X] T035 Run full test suite from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
+- [X] T036 Run coverage gate from tmp/005-eval-accuracy-summary using package.json and jest.config.ts
+- [X] T037 Run lint from tmp/005-eval-accuracy-summary using package.json and eslint.config.js
+- [ ] T038 Commit implementation changes from tmp/005-eval-accuracy-summary on branch 005-eval-accuracy-summary
+- [ ] T039 Push branch 005-eval-accuracy-summary from tmp/005-eval-accuracy-summary to origin
+- [ ] T040 Create PR/MR from branch 005-eval-accuracy-summary to main using specs/005-eval-accuracy-summary/plan.md and specs/005-eval-accuracy-summary/tasks.md for description context
 
 ---
 
