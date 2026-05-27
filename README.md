@@ -70,6 +70,14 @@ The OpenAPI document lives at [docs/openapi.yaml](docs/openapi.yaml). Regenerate
 npm run openapi:generate
 ```
 
+Serve an interactive Swagger UI for the OpenAPI document without starting the main API:
+
+```bash
+npm run openapi:serve
+```
+
+The docs server listens on `http://localhost:3001/` by default, loads [docs/openapi.yaml](docs/openapi.yaml), and supports Swagger UI "Try it out" requests against the API server declared in the OpenAPI `servers` section. The raw YAML remains available at `http://localhost:3001/openapi.yaml`. Set `OPENAPI_DOCS_PORT` to use another port.
+
 ## Output
 
 - `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.

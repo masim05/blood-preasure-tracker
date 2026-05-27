@@ -14,6 +14,7 @@ Requirements:
 - Include all /api/v1 endpoints: signin, login, measurements upload/list/detail/image/save.
 - Include bearer auth security for protected endpoints only.
 - Include request bodies, query/path parameters, response schemas, error schemas, examples, and binary image response content types.
+- Use stable ordering and formatting. If docs/openapi.yaml already satisfies these requirements, leave it unchanged.
 - Keep descriptions aligned with the contract and current controllers.
 - Do not edit source code, package files, tests, or specs.
 - After writing docs/openapi.yaml, briefly report what changed.`;
@@ -27,8 +28,6 @@ const result = spawnSync(
     '--allow-all-paths',
     '--no-ask-user',
     '--silent',
-    '--temperature',
-    '0',
     '--prompt',
     prompt,
   ],
