@@ -14,8 +14,9 @@ Requirements:
 - Include all /api/v1 endpoints: signin, login, measurements upload/list/detail/image/save.
 - Include bearer auth security for protected endpoints only.
 - Include request bodies, query/path parameters, response schemas, error schemas, examples, and binary image response content types.
+- Derive response status codes from current NestJS controller behavior. Bare @Post() handlers without @HttpCode return 201 by default; prefer that runtime behavior over stale contract prose when they conflict.
 - Use stable ordering and formatting. If docs/openapi.yaml already satisfies these requirements, leave it unchanged.
-- Keep descriptions aligned with the contract and current controllers.
+- Keep descriptions aligned with the contract and current controllers. When contract and controllers conflict, current controllers/runtime behavior wins.
 - Do not edit source code, package files, tests, or specs.
 - After writing docs/openapi.yaml, briefly report what changed.`;
 

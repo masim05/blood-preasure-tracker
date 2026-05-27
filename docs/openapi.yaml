@@ -82,7 +82,7 @@ paths:
                   email: user@example.com
                   password: correct horse battery staple
       responses:
-        '200':
+        '201':
           description: User authenticated and bearer token issued.
           content:
             application/json:
@@ -124,8 +124,8 @@ paths:
                   format: binary
                   description: JPEG or PNG image greater than 0 bytes and no more than 10 MB.
       responses:
-        '202':
-          description: Measurement accepted and queued for recognition.
+        '201':
+          description: Measurement created and queued for recognition.
           content:
             application/json:
               schema:
@@ -240,7 +240,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/MeasurementId'
       responses:
-        '200':
+        '201':
           description: Measurement saved.
           content:
             application/json:

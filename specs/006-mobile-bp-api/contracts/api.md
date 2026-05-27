@@ -57,7 +57,7 @@ Authenticates an existing user and returns an access token.
 }
 ```
 
-**Success 200**:
+**Success 201**:
 
 ```json
 {
@@ -84,7 +84,7 @@ Uploads a measurement image, stores the original image, creates a pending measur
 **Request**: `multipart/form-data`
 - `image`: Required JPEG or PNG file, greater than 0 bytes and at most 10 MB.
 
-**Success 202**:
+**Success 201**:
 
 ```json
 {
@@ -194,7 +194,7 @@ Confirms a recognized owned measurement so it appears in default history.
 
 **Auth**: Required.
 
-**Success 200**:
+**Success 201**:
 
 ```json
 {
