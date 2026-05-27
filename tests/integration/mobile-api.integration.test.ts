@@ -471,7 +471,10 @@ function loadTestEnv(): void {
     if (separator === -1) {
       continue;
     }
-    process.env[trimmed.slice(0, separator)] = trimmed.slice(separator + 1);
+    const key = trimmed.slice(0, separator);
+    if (process.env[key] === undefined) {
+      process.env[key] = trimmed.slice(separator + 1);
+    }
   }
 }
 
@@ -505,7 +508,7 @@ async function uploadAndRecognize(fixture: MobileApiFixture, accessToken: string
   const response = await uploadMeasurement(fixture, accessToken);
   const measurementId = readString(response.body.id, 'measurement id');
   const taskId = await queuedTaskId(fixture.pool, measurementId);
-  await fixture.processor.execute({ taskId, model: process.env.CLI_MODEL ?? 'gpt-5.4-mini' });
+  await fixture.processor.execute({ taskId, model: readRequiredEnv('CLI_MODEL') });
 
   return measurementId;
 }
@@ -584,6 +587,15 @@ function expectError(
 function readString(value: unknown, label: string): string {
   if (typeof value !== 'string') {
     throw new Error(`expected ${label}`);
+  }
+
+  return value;
+}
+
+function readRequiredEnv(key: string): string {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is required`);
   }
 
   return value;

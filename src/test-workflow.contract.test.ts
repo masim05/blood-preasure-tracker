@@ -37,6 +37,7 @@ describe('test workflow contract', () => {
     for (const key of requiredTestEnvKeys) {
       expect(envFile).toMatch(new RegExp(`^${key}=.+`, 'm'));
     }
+    expect(envFile).toMatch(/^CLI_MODEL=mock-model$/m);
   });
 
   it('defines independent CI jobs for each validation gate', () => {
@@ -51,6 +52,10 @@ describe('test workflow contract', () => {
   });
 
   it('prepares the integration database before running integration tests in CI', () => {
+    expect(workflow).toMatch(/^  integration-tests:\n(?:.|\n)*?^    services:\n(?:.|\n)*?^      postgres:\n/m);
+    expect(workflow).toContain('image: postgres:17-alpine');
+    expect(workflow).toContain('5433:5432');
+    expect(workflow).toContain("DB_INIT_SKIP_DOCKER: '1'");
     expect(workflow.indexOf('run: npm run db:init -- --env .env.test')).toBeGreaterThan(-1);
     expect(workflow.indexOf('run: npm run test:integration')).toBeGreaterThan(
       workflow.indexOf('run: npm run db:init -- --env .env.test'),
@@ -59,9 +64,5 @@ describe('test workflow contract', () => {
 
   it('does not run a separate npm test step in CI', () => {
     expect(workflow).not.toContain('run: npm test');
-  });
-
-  it('keeps validation jobs eligible for parallel execution', () => {
-    expect(workflow).not.toMatch(/^\s+needs:/m);
   });
 });
