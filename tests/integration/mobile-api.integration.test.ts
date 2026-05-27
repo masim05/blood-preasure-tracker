@@ -89,10 +89,12 @@ describe('mobile API integration flow', () => {
   describe('authenticates bearer token', () => {
     let fixture: MobileApiFixture;
     let response: FetchResponse;
+    let invalidTokenResponse: FetchResponse;
 
     beforeAll(async () => {
       fixture = await createSignedInFixture();
       response = await getJson(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken);
+      invalidTokenResponse = await getJson(fixture.baseUrl, '/api/v1/measurements', 'invalid-token');
     });
 
     afterAll(async () => {
@@ -115,6 +117,14 @@ describe('mobile API integration flow', () => {
 
     it('does not create measurements during authentication', () => {
       expect(fixture.measurements.measurements.size).toBe(0);
+    });
+
+    it('returns the OpenAPI unauthorized response for invalid bearer tokens', () => {
+      expect(invalidTokenResponse.status).toBe(401);
+      expect(invalidTokenResponse.body).toEqual({
+        error: 'unauthorized',
+        message: 'Bearer token is invalid or expired',
+      });
     });
   });
 

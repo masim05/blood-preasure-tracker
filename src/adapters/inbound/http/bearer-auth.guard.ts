@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { AuthenticateBearerTokenUseCase } from '../../../application/use-cases/authenticate-bearer-token.use-case';
+import { toHttpException } from './http-error.mapper';
 
 export type AuthenticatedHttpRequest = {
   headers: Record<string, string | string[] | undefined>;
@@ -21,8 +22,12 @@ export class BearerAuthGuard implements CanActivate {
       throw new UnauthorizedException({ error: 'unauthorized', message: 'Bearer token is required' });
     }
 
-    const user = await this.authenticateBearerToken.execute({ accessToken: token });
-    request.user = user.user;
+    try {
+      const user = await this.authenticateBearerToken.execute({ accessToken: token });
+      request.user = user.user;
+    } catch (error) {
+      throw toHttpException(error);
+    }
 
     return true;
   }
