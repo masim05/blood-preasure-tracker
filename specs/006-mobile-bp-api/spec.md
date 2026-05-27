@@ -17,6 +17,7 @@
 - Q: Which values should recognized measurement data include? -> A: Systolic, diastolic, pulse, arm side, and server current time.
 - Q: How should the mobile API authenticate protected requests? -> A: Signin and login return an expiring bearer access token.
 - Q: Which image uploads should the measurement endpoint accept? -> A: JPEG and PNG images up to 10 MB.
+- Q: How should runtime logging level be selected? -> A: Use `NODE_ENV=production`; otherwise dev.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -108,17 +109,19 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 - Pagination handles empty result sets, final pages, invalid page parameters, and time ranges with no matches.
 - Time filters handle inclusive boundaries consistently and reject invalid ranges where the start is after the end.
 - Uploaded images larger than 10 MB or outside JPEG/PNG format are rejected before background recognition is scheduled.
+- HTTP request logs do not include request bodies, response bodies, bearer tokens, passwords, or image bytes.
 
 ## Architecture & Test Impact *(mandatory)*
 
 - **Ports Affected**: Introduce or extend ports for user account persistence, credential verification, bearer access token issuance and validation, measurement image storage, measurement persistence, and background recognition task scheduling.
 - **Adapters Affected**: Add mobile HTTP API inbound adapter, Postgres-backed persistence adapter, server-side image storage adapter, and recognition task adapter backed by persisted task records for the initial version.
+- **Observability Impact**: Add application logging for the HTTP API, using debug-level request/response-status logs in development and warn-or-higher logging in production.
 - **Boundary Guarantee**: Account, authentication, measurement ownership, recognition state, and history filtering rules stay in application/domain code behind ports; HTTP, storage, and database details remain in adapters.
 - **Node.js Version Baseline**: Latest active LTS, Node.js 24.x as of 2026-05-27.
 - **NestJS Version Baseline**: Latest active LTS major, NestJS 11.
 - **Dependency Selection Rationale**: Prefer official Node.js/NestJS capabilities and maintained Postgres/auth/image upload integrations; any third-party package must be justified by security, maintenance, or standards support.
 - **Existing Test Impact**: Existing CLI prediction/eval behavior should remain unchanged; current tests should need no behavioral rewrites outside shared bootstrap or dependency wiring if the server API is added beside the CLI.
-- **New Test Coverage**: Add unit tests for account rules, authentication outcomes, measurement ownership, recognition state transitions, pagination/time filtering, and validation errors; add integration/contract tests for each requested API operation.
+- **New Test Coverage**: Add unit tests for account rules, authentication outcomes, measurement ownership, recognition state transitions, pagination/time filtering, validation errors, and logging level selection; add integration/contract tests for each requested API operation and HTTP request/status logging behavior.
 - **Coverage Plan**: Preserve CI coverage at `>= 95%`; target full branch coverage for authentication failures, ownership checks, upload validation, empty history, pending recognition, failed recognition, and time-filter boundaries.
 - **Worktree Path**: `tmp/006-mobile-bp-api`.
 
@@ -155,6 +158,9 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 - **FR-027**: Runtime stack MUST target the latest active Node.js LTS and latest active NestJS LTS.
 - **FR-028**: Data storage MUST target the latest supported stable PostgreSQL major.
 - **FR-029**: Dependency decisions MUST prefer official Node.js/NestJS modules; third-party additions require explicit justification.
+- **FR-030**: The API MUST write application logs.
+- **FR-031**: The API MUST use debug-level logging when `NODE_ENV` is not `production` and MUST use warn-or-higher logging when `NODE_ENV=production`.
+- **FR-032**: At debug level, the API MUST log every HTTP request with its response status.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -177,6 +183,7 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 - **SC-006**: Measurement detail responses correctly show pending, recognized, saved, or failed status for 100% of controlled recognition-state test cases.
 - **SC-007**: The history list omits original image binary data for 100% of list responses while detail responses provide an original image link when available.
 - **SC-008**: At least 90% of usability test participants can complete the capture, review, and save workflow without manual reading entry.
+- **SC-009**: In development mode, 100% of HTTP API requests emit a debug log entry containing the request and response status; in production mode, debug HTTP request logs are suppressed while warn-or-higher logs remain enabled.
 
 ## Assumptions
 
