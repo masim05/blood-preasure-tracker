@@ -11,7 +11,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(__dirname, '..');
 const migrationsDirectory = path.join(rootDirectory, 'src/infrastructure/database/migrations');
 const postgresImage = process.env.DB_INIT_POSTGRES_IMAGE ?? 'postgres:17-alpine';
-const skipDockerProvisioning = process.env.DB_INIT_SKIP_DOCKER === '1';
 let envFilePath;
 let databaseUrl;
 let database;
@@ -55,24 +54,16 @@ function loadRuntimeConfig(args) {
 }
 
 async function initDatabase() {
+  ensureDockerAvailable();
   ensureLocalDatabaseHost(database.hostname);
-  if (skipDockerProvisioning) {
-    console.log('Using existing PostgreSQL service because DB_INIT_SKIP_DOCKER=1');
-  } else {
-    ensureDockerAvailable();
-    ensureContainer();
-  }
+  ensureContainer();
   await waitForPostgres(buildConnectionString('postgres'));
   await ensureDatabaseExists();
   await waitForPostgres(databaseUrl);
   await runMigrations(databaseUrl);
 
-  if (skipDockerProvisioning) {
-    console.log(`PostgreSQL service is ready: ${database.hostname}:${database.port}`);
-  } else {
-    console.log(`PostgreSQL container is ready: ${containerName}`);
-    console.log(`PostgreSQL data directory: ${path.relative(rootDirectory, dataDirectory)}`);
-  }
+  console.log(`PostgreSQL container is ready: ${containerName}`);
+  console.log(`PostgreSQL data directory: ${path.relative(rootDirectory, dataDirectory)}`);
   console.log(`Database initialized from ${path.relative(rootDirectory, envFilePath)}`);
 }
 

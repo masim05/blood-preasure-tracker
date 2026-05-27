@@ -72,15 +72,6 @@ The command requires a running Docker daemon, creates or starts a local `postgre
 
 The container and data directory are named `bpt-db-<hash>`, where `<hash>` is a 4-character hash derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
 
-Integration tests use the tracked non-secret `.env.test` file. Prepare the real test database before running them:
-
-```bash
-npm run db:init -- --env .env.test
-npm run test:integration
-```
-
-The mobile API integration suite uses PostgreSQL and filesystem storage from `.env.test`, while replacing only the OpenAI recognition boundary with deterministic test output.
-
 Delete the matching Docker container and local data directory for an env file:
 
 ```bash
@@ -166,9 +157,7 @@ The following commands were validated in this workspace:
 ```bash
 npm run build
 npm run cli -- --help
-npm test                 # unit and contract tests only
-npm run test:coverage    # unit and contract coverage gate
-npm run db:init -- --env .env.test
-npm run test:integration # integration tests only
+npm test
+npm run test:coverage
 npm run lint
 ```

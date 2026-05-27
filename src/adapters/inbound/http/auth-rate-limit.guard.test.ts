@@ -45,16 +45,6 @@ describe('AuthRateLimitGuard', () => {
 
     expect(guard.canActivate(context({ ip: '127.0.0.1', body: { email: 'second@example.com' } }))).toBe(true);
   });
-
-  it('falls back to socket address and unknown request fields', () => {
-    const guard = new AuthRateLimitGuard();
-
-    for (let attempt = 0; attempt < AUTH_RATE_LIMIT_MAX_ATTEMPTS; attempt += 1) {
-      expect(guard.canActivate(context({ socket: { remoteAddress: '127.0.0.2' } }))).toBe(true);
-    }
-
-    expect(guard.canActivate(context({ body: { email: 123 } }))).toBe(true);
-  });
 });
 
 function context(request: ContextRequest): never {

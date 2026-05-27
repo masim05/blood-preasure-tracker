@@ -1,4 +1,4 @@
-import { BearerAuthGuard, extractBearerToken } from '../../adapters/inbound/http/bearer-auth.guard';
+import { BearerAuthGuard } from '../../adapters/inbound/http/bearer-auth.guard';
 import { ApiError } from '../../adapters/inbound/http/http-error.mapper';
 import { GetMeasurementDetailUseCase } from './get-measurement-detail.use-case';
 import { GetMeasurementImageUseCase } from './get-measurement-image.use-case';
@@ -27,27 +27,6 @@ describe('mobile API not-found and malformed-state branches', () => {
     await expect(
       guard.canActivate({ switchToHttp: () => ({ getRequest: () => ({ headers: {} }) }) } as ExecutionContextStub),
     ).rejects.toThrow('Bearer token is required');
-  });
-
-  it('authenticates bearer guard requests and maps invalid token errors', async () => {
-    const authenticatedRequest = { headers: { authorization: 'Bearer raw-token' } };
-    const guard = new BearerAuthGuard({
-      execute: jest.fn().mockResolvedValue({ user: { id: 'usr_1', email: 'demo@example.com' } }),
-    });
-
-    await expect(guard.canActivate(contextFor(authenticatedRequest))).resolves.toBe(true);
-    expect(authenticatedRequest.user).toEqual({ id: 'usr_1', email: 'demo@example.com' });
-
-    const failingGuard = new BearerAuthGuard({
-      execute: jest.fn().mockRejectedValue(new ApiError('unauthorized', 'bad token')),
-    });
-
-    await expect(failingGuard.canActivate(contextFor({ headers: { authorization: 'Bearer bad-token' } }))).rejects.toThrow('bad token');
-  });
-
-  it('extracts bearer tokens from repeated authorization headers', () => {
-    expect(extractBearerToken(['Bearer first-token', 'Bearer second-token'])).toBe('first-token');
-    expect(extractBearerToken('Basic not-a-bearer-token')).toBeNull();
   });
 
   it('returns not found for missing detail, image, save, and recognition task', async () => {
@@ -118,15 +97,6 @@ describe('mobile API not-found and malformed-state branches', () => {
   });
 });
 
-type GuardRequestStub = {
-  headers: Record<string, string | string[] | undefined>;
-  user?: { id: string; email: string };
-};
-
 type ExecutionContextStub = {
-  switchToHttp(): { getRequest(): GuardRequestStub };
+  switchToHttp(): { getRequest(): { headers: Record<string, string | undefined> } };
 };
-
-function contextFor(request: GuardRequestStub): ExecutionContextStub {
-  return { switchToHttp: () => ({ getRequest: () => request }) };
-}

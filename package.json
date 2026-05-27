@@ -15,9 +15,8 @@
     "db:init": "node scripts/db-init.mjs",
     "openapi:generate": "node scripts/generate-openapi-with-copilot.mjs",
     "openapi:serve": "node scripts/serve-openapi-docs.mjs",
-    "test": "jest --runInBand --testPathIgnorePatterns=tests/integration",
-    "test:coverage": "jest --runInBand --coverage --testPathIgnorePatterns=tests/integration",
-    "test:integration": "jest --runInBand --testPathPatterns=tests/integration/.*\\.test\\.ts$",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write ."
