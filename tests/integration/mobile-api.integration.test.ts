@@ -40,26 +40,21 @@ const apiConfig = {
 } as ApiConfigService;
 
 describe('mobile API integration flow', () => {
-  let fixture: MobileApiFixture;
-
-  beforeAll(async () => {
-    fixture = await createMobileApiFixture();
-  });
-
-  afterAll(async () => {
-    await fixture.app.close();
-  });
-
   describe('creates user', () => {
+    let fixture: MobileApiFixture;
     let response: FetchResponse;
 
     beforeAll(async () => {
+      fixture = await createMobileApiFixture();
       response = await postJson(fixture.baseUrl, '/api/v1/signin', {
         email: 'demo@example.com',
         password: 'password123',
       });
-      fixture.accessToken = response.body.accessToken;
-      fixture.userId = response.body.user.id;
+      saveAuthResponse(fixture, response);
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
     });
 
     it('returns HTTP 201', () => {
@@ -85,10 +80,16 @@ describe('mobile API integration flow', () => {
   });
 
   describe('authenticates bearer token', () => {
+    let fixture: MobileApiFixture;
     let response: FetchResponse;
 
     beforeAll(async () => {
+      fixture = await createSignedInFixture();
       response = await getJson(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken);
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
     });
 
     it('returns HTTP 200', () => {
@@ -99,7 +100,7 @@ describe('mobile API integration flow', () => {
       expect(response.body).toEqual({
         items: [],
         page: 1,
-          pageSize: 20,
+        pageSize: 20,
         hasNextPage: false,
         filters: { from: null, to: null },
       });
@@ -111,13 +112,19 @@ describe('mobile API integration flow', () => {
   });
 
   describe('uploads', () => {
+    let fixture: MobileApiFixture;
     let response: FetchResponse;
 
     beforeAll(async () => {
+      fixture = await createSignedInFixture();
       const form = new FormData();
       form.append('image', new Blob([Buffer.from('png')], { type: 'image/png' }), 'bp.png');
       response = await postForm(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken, form);
-      fixture.measurementId = response.body.id;
+      fixture.measurementId = readString(response.body.id, 'measurement id');
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
     });
 
     it('returns HTTP 201', () => {
@@ -146,11 +153,17 @@ describe('mobile API integration flow', () => {
   });
 
   describe('saves', () => {
+    let fixture: MobileApiFixture;
     let response: FetchResponse;
 
     beforeAll(async () => {
+      fixture = await createUploadedFixture();
       await markMeasurementRecognized(fixture);
       response = await postJson(fixture.baseUrl, `/api/v1/measurements/${fixture.measurementId}/save`, {}, fixture.accessToken);
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
     });
 
     it('returns HTTP 201', () => {
@@ -180,10 +193,16 @@ describe('mobile API integration flow', () => {
   });
 
   describe('lists history', () => {
+    let fixture: MobileApiFixture;
     let response: FetchResponse;
 
     beforeAll(async () => {
+      fixture = await createSavedFixture();
       response = await getJson(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken);
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
     });
 
     it('returns HTTP 200', () => {
@@ -194,7 +213,7 @@ describe('mobile API integration flow', () => {
       expect(response.body).toEqual({
         items: [expect.any(Object)],
         page: 1,
-          pageSize: 20,
+        pageSize: 20,
         hasNextPage: false,
         filters: { from: null, to: null },
       });
@@ -283,6 +302,44 @@ async function createMobileApiFixture(): Promise<MobileApiFixture> {
   };
 }
 
+async function createSignedInFixture(): Promise<MobileApiFixture> {
+  const fixture = await createMobileApiFixture();
+  const response = await postJson(fixture.baseUrl, '/api/v1/signin', {
+    email: 'demo@example.com',
+    password: 'password123',
+  });
+  saveAuthResponse(fixture, response);
+
+  return fixture;
+}
+
+async function createUploadedFixture(): Promise<MobileApiFixture> {
+  const fixture = await createSignedInFixture();
+  const form = new FormData();
+  form.append('image', new Blob([Buffer.from('png')], { type: 'image/png' }), 'bp.png');
+  const response = await postForm(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken, form);
+  fixture.measurementId = readString(response.body.id, 'measurement id');
+
+  return fixture;
+}
+
+async function createSavedFixture(): Promise<MobileApiFixture> {
+  const fixture = await createUploadedFixture();
+  await markMeasurementRecognized(fixture);
+  await postJson(fixture.baseUrl, `/api/v1/measurements/${fixture.measurementId}/save`, {}, fixture.accessToken);
+
+  return fixture;
+}
+
+function saveAuthResponse(fixture: MobileApiFixture, response: FetchResponse): void {
+  fixture.accessToken = readString(response.body.accessToken, 'access token');
+  const user = response.body.user;
+  if (!user || typeof user !== 'object' || !('id' in user)) {
+    throw new Error('expected auth response user');
+  }
+  fixture.userId = readString(user.id, 'user id');
+}
+
 async function postJson(
   baseUrl: string,
   pathname: string,
@@ -326,6 +383,14 @@ async function getJson(baseUrl: string, pathname: string, accessToken: string): 
 
 async function parseJsonResponse(response: Response): Promise<FetchResponse> {
   return { status: response.status, body: (await response.json()) as Record<string, unknown> };
+}
+
+function readString(value: unknown, label: string): string {
+  if (typeof value !== 'string') {
+    throw new Error(`expected ${label}`);
+  }
+
+  return value;
 }
 
 async function markMeasurementRecognized(fixture: MobileApiFixture): Promise<void> {
