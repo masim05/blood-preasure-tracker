@@ -67,6 +67,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Initialize integration database
+        run: npm run db:init -- --env .env.test
+
       - name: Integration tests
         run: npm run test:integration
 

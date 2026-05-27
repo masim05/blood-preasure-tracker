@@ -28,15 +28,15 @@
 
 **Purpose**: Confirm the current workflow, real infrastructure, and API contract before changing behavior.
 
-- [ ] T001 Review command requirements in specs/007-rethink-tests/contracts/npm-scripts.md
-- [ ] T002 [P] Review CI job requirements in specs/007-rethink-tests/contracts/ci-workflow.md
-- [ ] T003 [P] Review integration environment requirements in specs/007-rethink-tests/contracts/integration-environment.md
-- [ ] T004 [P] Inspect current npm scripts in package.json
-- [ ] T005 [P] Inspect Jest discovery and coverage settings in jest.config.ts
-- [ ] T006 [P] Inspect current CI workflow structure in .github/workflows/ci.yml
-- [ ] T007 [P] Inspect current mobile API integration suite in tests/integration/mobile-api.integration.test.ts
-- [ ] T008 [P] Inspect implemented mobile API 4xx responses in docs/openapi.yaml
-- [ ] T009 Confirm implementation is running from the dedicated tmp/007-rethink-tests worktree before editing package.json, jest.config.ts, .github/workflows/ci.yml, .env.test, or tests/integration/mobile-api.integration.test.ts
+- [X] T001 Review command requirements in specs/007-rethink-tests/contracts/npm-scripts.md
+- [X] T002 [P] Review CI job requirements in specs/007-rethink-tests/contracts/ci-workflow.md
+- [X] T003 [P] Review integration environment requirements in specs/007-rethink-tests/contracts/integration-environment.md
+- [X] T004 [P] Inspect current npm scripts in package.json
+- [X] T005 [P] Inspect Jest discovery and coverage settings in jest.config.ts
+- [X] T006 [P] Inspect current CI workflow structure in .github/workflows/ci.yml
+- [X] T007 [P] Inspect current mobile API integration suite in tests/integration/mobile-api.integration.test.ts
+- [X] T008 [P] Inspect implemented mobile API 4xx responses in docs/openapi.yaml
+- [X] T009 Confirm implementation is running from the dedicated tmp/007-rethink-tests worktree before editing package.json, jest.config.ts, .github/workflows/ci.yml, .env.test, or tests/integration/mobile-api.integration.test.ts
 
 ---
 
@@ -46,9 +46,9 @@
 
 **CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T010 Create or update src/test-workflow.contract.test.ts as the workflow contract test file
-- [ ] T011 Define expected unit/contract test selection and integration test selection constants in src/test-workflow.contract.test.ts
-- [ ] T012 Confirm integration fixtures and dependencies remain available under tests/fixtures/ and tests/integration/
+- [X] T010 Create or update src/test-workflow.contract.test.ts as the workflow contract test file
+- [X] T011 Define expected unit/contract test selection and integration test selection constants in src/test-workflow.contract.test.ts
+- [X] T012 Confirm integration fixtures and dependencies remain available under tests/fixtures/ and tests/integration/
 
 **Checkpoint**: Workflow contract tests and suite-selection expectations are ready for story implementation.
 
@@ -62,15 +62,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T013 [P] [US1] Add failing workflow contract assertions for `test` and `test:coverage` unit/contract-only selection in src/test-workflow.contract.test.ts
+- [X] T013 [P] [US1] Add failing workflow contract assertions for `test` and `test:coverage` unit/contract-only selection in src/test-workflow.contract.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Update `test` script to exclude integration suites in package.json
-- [ ] T015 [US1] Update `test:coverage` script to exclude integration suites while preserving coverage in package.json
-- [ ] T016 [US1] Adjust production-source coverage collection for unit/contract-only coverage in jest.config.ts
-- [ ] T017 [US1] Run `npm test` and verify 0 integration suites execute for package.json
-- [ ] T018 [US1] Run `npm run test:coverage` and verify 0 integration suites execute while the >=95% coverage gate passes for jest.config.ts
+- [X] T014 [US1] Update `test` script to exclude integration suites in package.json
+- [X] T015 [US1] Update `test:coverage` script to exclude integration suites while preserving coverage in package.json
+- [X] T016 [US1] Adjust production-source coverage collection for unit/contract-only coverage in jest.config.ts
+- [X] T017 [US1] Run `npm test` and verify 0 integration suites execute for package.json
+- [X] T018 [US1] Run `npm run test:coverage` and verify 0 integration suites execute while the >=95% coverage gate passes for jest.config.ts
 
 **Checkpoint**: User Story 1 is independently functional; local fast and coverage commands exclude integration tests without requiring real-DB integration rewiring.
 
@@ -84,39 +84,39 @@
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add failing workflow contract assertions for `test:integration` integration-only script selection in src/test-workflow.contract.test.ts
-- [ ] T020 [P] [US2] Add `.env.test` file presence and required-key assertions to src/test-workflow.contract.test.ts
-- [ ] T021 [P] [US2] Add failing integration checks for `.env.test` database configuration use in tests/integration/mobile-api.integration.test.ts
-- [ ] T022 [P] [US2] Add failing integration checks that endpoint-level scenarios clean database state before setup in tests/integration/mobile-api.integration.test.ts
-- [ ] T023 [P] [US2] Add failing integration checks that mobile API fixture overrides only OpenAI/LLM_PROVIDER in tests/integration/mobile-api.integration.test.ts
+- [X] T019 [P] [US2] Add failing workflow contract assertions for `test:integration` integration-only script selection in src/test-workflow.contract.test.ts
+- [X] T020 [P] [US2] Add `.env.test` file presence and required-key assertions to src/test-workflow.contract.test.ts
+- [X] T021 [P] [US2] Add failing integration checks for `.env.test` database configuration use in tests/integration/mobile-api.integration.test.ts
+- [X] T022 [P] [US2] Add failing integration checks that endpoint-level scenarios clean database state before setup in tests/integration/mobile-api.integration.test.ts
+- [X] T023 [P] [US2] Add failing integration checks that mobile API fixture overrides only OpenAI/LLM_PROVIDER in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Create tracked non-secret integration defaults in .env.test
-- [ ] T025 [US2] Add `test:integration` npm script selecting tests/integration/**/*.test.ts only in package.json
-- [ ] T026 [US2] Adjust Jest path handling so `npm run test:integration` excludes src/**/*.test.ts in jest.config.ts
-- [ ] T027 [US2] Define integration database cleanup helper for `user_accounts`, `bearer_tokens`, `measurements`, `measurement_images`, and `recognition_tasks` in tests/integration/mobile-api.integration.test.ts
-- [ ] T028 [US2] Define `.env.test` loading helper before creating the mobile API Nest fixture in tests/integration/mobile-api.integration.test.ts
-- [ ] T029 [US2] Define deterministic OpenAI/LLM provider test double for recognition flows in tests/integration/mobile-api.integration.test.ts
-- [ ] T030 [US2] Use real PostgreSQL repositories through ApiModule or production-equivalent providers in tests/integration/mobile-api.integration.test.ts
-- [ ] T031 [US2] Use real filesystem measurement image storage under `.env.test` MEASUREMENT_IMAGE_DIR in tests/integration/mobile-api.integration.test.ts
-- [ ] T032 [US2] Override only the OpenAI/LLM_PROVIDER boundary with deterministic recognition output in tests/integration/mobile-api.integration.test.ts
-- [ ] T033 [US2] Remove in-memory mobile API store fixture usage from tests/integration/mobile-api.integration.test.ts
-- [ ] T034 [US2] Reset relevant PostgreSQL tables before each endpoint-level describe block in tests/integration/mobile-api.integration.test.ts
-- [ ] T035 [US2] Add validation proving endpoint-level scenarios start from empty relevant DB state in tests/integration/mobile-api.integration.test.ts
-- [ ] T036 [US2] Rename happy-path endpoint describe blocks to `<METHOD> <path> - <scenario>` format in tests/integration/mobile-api.integration.test.ts
-- [ ] T037 [US2] Replace in-memory persistence assertions with HTTP response or real database assertions in tests/integration/mobile-api.integration.test.ts
-- [ ] T038 [US2] Compare implemented mobile API 4xx responses against docs/openapi.yaml before adding negative-path scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T039 [US2] Add `POST /api/v1/signin` negative scenarios for 400, 409, and 429 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T040 [US2] Add `POST /api/v1/login` negative scenarios for 400, 401, and 429 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T041 [US2] Add `POST /api/v1/measurements` negative scenarios for 400 and 401 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T042 [US2] Add `GET /api/v1/measurements` negative scenarios for 400 and 401 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T043 [US2] Add `GET /api/v1/measurements/{id}` negative scenarios for 401 and 404 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T044 [US2] Add `POST /api/v1/measurements/{id}/save` negative scenarios for 401, 404, and 409 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T045 [US2] Add `GET /api/v1/measurements/{id}/image` negative scenarios for 401 and 404 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
-- [ ] T046 [US2] Run `npm run db:init -- --env .env.test` and verify migrations prepare the database named by .env.test
-- [ ] T047 [US2] Run `npm run test:integration` and verify only tests/integration suites run for package.json
-- [ ] T048 [US2] Run `npm test` and verify integration suites remain excluded after real-DB integration changes in package.json
+- [X] T024 [US2] Create tracked non-secret integration defaults in .env.test
+- [X] T025 [US2] Add `test:integration` npm script selecting tests/integration/**/*.test.ts only in package.json
+- [X] T026 [US2] Adjust Jest path handling so `npm run test:integration` excludes src/**/*.test.ts in jest.config.ts
+- [X] T027 [US2] Define integration database cleanup helper for `user_accounts`, `bearer_tokens`, `measurements`, `measurement_images`, and `recognition_tasks` in tests/integration/mobile-api.integration.test.ts
+- [X] T028 [US2] Define `.env.test` loading helper before creating the mobile API Nest fixture in tests/integration/mobile-api.integration.test.ts
+- [X] T029 [US2] Define deterministic OpenAI/LLM provider test double for recognition flows in tests/integration/mobile-api.integration.test.ts
+- [X] T030 [US2] Use real PostgreSQL repositories through ApiModule or production-equivalent providers in tests/integration/mobile-api.integration.test.ts
+- [X] T031 [US2] Use real filesystem measurement image storage under `.env.test` MEASUREMENT_IMAGE_DIR in tests/integration/mobile-api.integration.test.ts
+- [X] T032 [US2] Override only the OpenAI/LLM_PROVIDER boundary with deterministic recognition output in tests/integration/mobile-api.integration.test.ts
+- [X] T033 [US2] Remove in-memory mobile API store fixture usage from tests/integration/mobile-api.integration.test.ts
+- [X] T034 [US2] Reset relevant PostgreSQL tables before each endpoint-level describe block in tests/integration/mobile-api.integration.test.ts
+- [X] T035 [US2] Add validation proving endpoint-level scenarios start from empty relevant DB state in tests/integration/mobile-api.integration.test.ts
+- [X] T036 [US2] Rename happy-path endpoint describe blocks to `<METHOD> <path> - <scenario>` format in tests/integration/mobile-api.integration.test.ts
+- [X] T037 [US2] Replace in-memory persistence assertions with HTTP response or real database assertions in tests/integration/mobile-api.integration.test.ts
+- [X] T038 [US2] Compare implemented mobile API 4xx responses against docs/openapi.yaml before adding negative-path scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T039 [US2] Add `POST /api/v1/signin` negative scenarios for 400, 409, and 429 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T040 [US2] Add `POST /api/v1/login` negative scenarios for 400, 401, and 429 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T041 [US2] Add `POST /api/v1/measurements` negative scenarios for 400 and 401 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T042 [US2] Add `GET /api/v1/measurements` negative scenarios for 400 and 401 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T043 [US2] Add `GET /api/v1/measurements/{id}` negative scenarios for 401 and 404 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T044 [US2] Add `POST /api/v1/measurements/{id}/save` negative scenarios for 401, 404, and 409 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T045 [US2] Add `GET /api/v1/measurements/{id}/image` negative scenarios for 401 and 404 OpenAPI responses in tests/integration/mobile-api.integration.test.ts
+- [X] T046 [US2] Run `npm run db:init -- --env .env.test` and verify migrations prepare the database named by .env.test
+- [X] T047 [US2] Run `npm run test:integration` and verify only tests/integration suites run for package.json
+- [X] T048 [US2] Run `npm test` and verify integration suites remain excluded after real-DB integration changes in package.json
 
 **Checkpoint**: User Story 2 is independently functional; integration tests have a dedicated command and use the real DB-backed API with OpenAI mocked only.
 
@@ -130,17 +130,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T049 [P] [US3] Add failing workflow contract assertions for four independent CI jobs and no CI `npm test` step in src/test-workflow.contract.test.ts
-- [ ] T050 [P] [US3] Add failing workflow contract assertion that integration CI runs `npm run db:init -- --env .env.test` before `npm run test:integration` in src/test-workflow.contract.test.ts
+- [X] T049 [P] [US3] Add failing workflow contract assertions for four independent CI jobs and no CI `npm test` step in src/test-workflow.contract.test.ts
+- [X] T050 [P] [US3] Add failing workflow contract assertion that integration CI runs `npm run db:init -- --env .env.test` before `npm run test:integration` in src/test-workflow.contract.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T051 [US3] Replace the single serial CI job with a `build` job running `npm run build` in .github/workflows/ci.yml
-- [ ] T052 [P] [US3] Add a `unit-contract-coverage` job running `npm run test:coverage` in .github/workflows/ci.yml
-- [ ] T053 [P] [US3] Add an `integration-tests` job running `npm run db:init -- --env .env.test` then `npm run test:integration` in .github/workflows/ci.yml
-- [ ] T054 [P] [US3] Add a `lint` job running `npm run lint` in .github/workflows/ci.yml
-- [ ] T055 [US3] Remove the redundant CI `npm test` step from .github/workflows/ci.yml
-- [ ] T056 [US3] Verify CI jobs have no `needs` dependencies in .github/workflows/ci.yml
+- [X] T051 [US3] Replace the single serial CI job with a `build` job running `npm run build` in .github/workflows/ci.yml
+- [X] T052 [P] [US3] Add a `unit-contract-coverage` job running `npm run test:coverage` in .github/workflows/ci.yml
+- [X] T053 [P] [US3] Add an `integration-tests` job running `npm run db:init -- --env .env.test` then `npm run test:integration` in .github/workflows/ci.yml
+- [X] T054 [P] [US3] Add a `lint` job running `npm run lint` in .github/workflows/ci.yml
+- [X] T055 [US3] Remove the redundant CI `npm test` step from .github/workflows/ci.yml
+- [X] T056 [US3] Verify CI jobs have no `needs` dependencies in .github/workflows/ci.yml
 
 **Checkpoint**: User Story 3 is independently functional; CI exposes separate parallel validation jobs and prepares the integration database.
 
@@ -150,16 +150,16 @@
 
 **Purpose**: Validate the full workflow and update contributor-facing documentation.
 
-- [ ] T057 [P] Update test command and integration database setup documentation in README.md
-- [ ] T058 [P] Confirm quickstart validation steps remain accurate in specs/007-rethink-tests/quickstart.md
-- [ ] T059 Run `npm run build` to verify production build remains unchanged for package.json
-- [ ] T060 Run `npm test` to verify unit/contract-only fast tests and workflow contract tests pass for package.json
-- [ ] T061 Run `npm run test:coverage` to verify unit/contract coverage passes the >=95% threshold for jest.config.ts
-- [ ] T062 Run `npm run db:init -- --env .env.test` to verify real test database setup for .env.test
-- [ ] T063 Run `npm run test:integration -- --verbose` to verify real-DB integration tests pass for tests/integration/mobile-api.integration.test.ts
-- [ ] T064 Run `npm run lint` to verify TypeScript, test, and workflow changes are lint-clean for eslint.config.js
-- [ ] T065 Run `git diff --check` to verify whitespace in package.json, jest.config.ts, .github/workflows/ci.yml, .env.test, README.md, src/test-workflow.contract.test.ts, and tests/integration/mobile-api.integration.test.ts
-- [ ] T066 Inspect `git diff -- package.json jest.config.ts .github/workflows/ci.yml .env.test README.md src/test-workflow.contract.test.ts tests/integration/mobile-api.integration.test.ts` and confirm product business logic did not change outside required test infrastructure
+- [X] T057 [P] Update test command and integration database setup documentation in README.md
+- [X] T058 [P] Confirm quickstart validation steps remain accurate in specs/007-rethink-tests/quickstart.md
+- [X] T059 Run `npm run build` to verify production build remains unchanged for package.json
+- [X] T060 Run `npm test` to verify unit/contract-only fast tests and workflow contract tests pass for package.json
+- [X] T061 Run `npm run test:coverage` to verify unit/contract coverage passes the >=95% threshold for jest.config.ts
+- [X] T062 Run `npm run db:init -- --env .env.test` to verify real test database setup for .env.test
+- [X] T063 Run `npm run test:integration -- --verbose` to verify real-DB integration tests pass for tests/integration/mobile-api.integration.test.ts
+- [X] T064 Run `npm run lint` to verify TypeScript, test, and workflow changes are lint-clean for eslint.config.js
+- [X] T065 Run `git diff --check` to verify whitespace in package.json, jest.config.ts, .github/workflows/ci.yml, .env.test, README.md, src/test-workflow.contract.test.ts, and tests/integration/mobile-api.integration.test.ts
+- [X] T066 Inspect `git diff -- package.json jest.config.ts .github/workflows/ci.yml .env.test README.md src/test-workflow.contract.test.ts tests/integration/mobile-api.integration.test.ts` and confirm product business logic did not change outside required test infrastructure
 
 ---
 
