@@ -25,10 +25,13 @@ export type HttpLoggingResponse = {
 
 @Injectable()
 export class HttpRequestLoggingMiddleware {
-  private readonly logger: DebugLogger;
+  private logger: DebugLogger = new Logger('HttpRequest');
 
-  constructor(logger: DebugLogger = new Logger('HttpRequest')) {
-    this.logger = logger;
+  static withLogger(logger: DebugLogger): HttpRequestLoggingMiddleware {
+    const middleware = new HttpRequestLoggingMiddleware();
+    middleware.logger = logger;
+
+    return middleware;
   }
 
   use(request: HttpLoggingRequest, response: HttpLoggingResponse, next: () => void): void {

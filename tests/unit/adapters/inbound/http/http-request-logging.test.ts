@@ -62,7 +62,7 @@ describe('HTTP request logging', () => {
 
   it('logs when the response finishes', () => {
     const logger = { debug: jest.fn<void, [string]>() };
-    const middleware = new HttpRequestLoggingMiddleware(logger);
+    const middleware = HttpRequestLoggingMiddleware.withLogger(logger);
     const response = new EventEmitter() as EventEmitter & { statusCode: number };
     response.statusCode = 404;
 

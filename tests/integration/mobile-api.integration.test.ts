@@ -362,7 +362,7 @@ async function createMobileApiFixture(env: NodeJS.ProcessEnv = { NODE_ENV: 'deve
   const app = moduleRef.createNestApplication({ logger: false });
   const logging = loadApiLoggingConfig(env);
   if (logging.debugHttpRequests) {
-    const requestLogging = new HttpRequestLoggingMiddleware({
+    const requestLogging = HttpRequestLoggingMiddleware.withLogger({
       debug: (message: string): void => {
         requestLogs.push(JSON.parse(message) as HttpRequestLogEntry);
       },
