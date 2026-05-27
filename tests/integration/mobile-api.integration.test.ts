@@ -36,8 +36,8 @@ import {
   InMemoryUserStore,
   SimplePasswordHasher,
   StaticTokenGenerator,
-} from '../helpers/mobile-api-fakes';
-import { pngBytes } from '../helpers/image-bytes';
+} from '../../src/test-support/mobile-api-fakes';
+import { pngBytes } from '../../src/test-support/image-bytes';
 
 const apiConfig = {
   load: () => ({
