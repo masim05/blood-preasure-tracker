@@ -142,3 +142,53 @@ Represents a paginated list response for saved measurements.
 - Time filters apply to server-assigned `measurementTime`.
 - Invalid ranges where `from` is after `to` are rejected.
 - Empty results return a valid empty page.
+
+## RuntimeLoggingConfiguration
+
+Represents the API process logging mode derived from runtime environment.
+
+**Fields**:
+- `nodeEnv`: Raw `NODE_ENV` value, which may be unset.
+- `mode`: `production` only when `nodeEnv` is exactly `production`; otherwise `development`.
+- `enabledLevels`: Effective application log levels for the NestJS runtime.
+
+**Validation rules**:
+- `NODE_ENV=production` enables warn-or-higher logging only.
+- Unset `NODE_ENV` or any value other than `production` enables debug-level logging.
+- The mapping is deterministic and does not depend on database state, request data, or external services.
+
+**Relationships**:
+- Applies process-wide to application logs and HTTP request log emission.
+
+## HttpRequestLogEntry
+
+Represents one debug-level operational log emitted after an HTTP request completes.
+
+**Fields**:
+- `level`: Always `debug` for request/status entries.
+- `method`: HTTP method.
+- `path`: Request URL or route path without request body data.
+- `statusCode`: HTTP response status code.
+- `durationMs`: Elapsed request time in milliseconds.
+- `timestamp`: Log emission timestamp supplied by the runtime logger.
+
+**Validation rules**:
+- Emitted for every HTTP API request when debug logging is enabled.
+- Suppressed when production logging allows only warn-or-higher levels.
+- Must not include request bodies, response bodies, bearer tokens, cookies, passwords, multipart payloads, or image bytes.
+
+**Relationships**:
+- Observes HTTP adapter traffic only; it is not a persisted domain entity and has no relationship to mobile API database tables.
+
+## ApplicationLogSink
+
+Represents the runtime destination for application logs.
+
+**Fields**:
+- `levels`: Active levels accepted by the sink.
+- `writer`: Process/runtime logger used by NestJS.
+
+**Validation rules**:
+- Accepts debug request/status entries only in development mode.
+- Accepts warnings and errors in production mode.
+- Does not write logs to PostgreSQL as part of this feature.

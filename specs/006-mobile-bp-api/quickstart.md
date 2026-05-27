@@ -15,8 +15,11 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/blood_pressure_tracker
 API_PORT=3000
 MEASUREMENT_IMAGE_DIR=./tmp/measurement-images
 ACCESS_TOKEN_TTL_SECONDS=3600
+NODE_ENV=development
 OPENAI_API_KEY=...
 ```
+
+`NODE_ENV=production` selects production logging, where debug request logs are suppressed and warn-or-higher logs remain enabled. Any other value, including an unset `NODE_ENV`, selects development logging with debug HTTP request/status entries.
 
 ## Install And Validate
 
@@ -30,11 +33,13 @@ npm run lint
 
 ## Local Database
 
-Start a local PostgreSQL instance using the latest supported major selected during implementation. Create the application database and run migrations/schema setup once migration scripts exist.
+Start a local PostgreSQL instance using the project database helper, which reads `DATABASE_URL` from `.env` by default and applies migrations.
 
 ```bash
-createdb blood_pressure_tracker
+npm run db:init
 ```
+
+Use `npm run db:clean -- --env .env.example` to remove the matching local Docker container and data directory for an env file.
 
 ## API Smoke Flow
 
@@ -58,7 +63,7 @@ curl -sS -X POST http://localhost:3000/api/v1/login \
   -d '{"email":"demo@example.com","password":"correct horse battery staple"}'
 ```
 
-Expected: `200` with an expiring bearer access token.
+Expected: `201` with an expiring bearer access token.
 
 ### 3. Upload Measurement Image
 
@@ -69,7 +74,7 @@ curl -sS -X POST http://localhost:3000/api/v1/measurements \
   -F 'image=@tests/fixtures/images/sample.jpg;type=image/jpeg'
 ```
 
-Expected: `202` with measurement id, `pending` status, and server-assigned measurement time.
+Expected: `201` with measurement id, `pending` status, and server-assigned measurement time.
 
 ### 4. Fetch Measurement Detail
 
@@ -97,7 +102,7 @@ curl -sS -X POST http://localhost:3000/api/v1/measurements/<id>/save \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Expected: `200` with `saved` status when the measurement is recognized and owned by the authenticated user.
+Expected: `201` with `saved` status when the measurement is recognized and owned by the authenticated user.
 
 ### 7. Browse History
 
@@ -116,6 +121,24 @@ Expected: Saved measurements for the authenticated user only, no original image 
 - Saving another user's measurement returns `404`.
 - Saving a pending or failed measurement returns `409`.
 - History excludes pending, failed, and unconfirmed recognized measurements.
+
+## Logging Checks
+
+Run the API in development mode and submit any API request:
+
+```bash
+NODE_ENV=development npm run api
+```
+
+Expected: each HTTP request emits a debug log entry with request method, path, response status, and elapsed time. The log entry does not include request bodies, response bodies, bearer tokens, passwords, multipart payloads, or image bytes.
+
+Run the API in production mode:
+
+```bash
+NODE_ENV=production npm run api
+```
+
+Expected: debug HTTP request logs are suppressed; warning and error logs remain enabled.
 
 ## Regression Checks
 

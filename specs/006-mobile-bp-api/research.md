@@ -53,3 +53,21 @@
 **Rationale**: The clarification says time is now. Assigning measurement time when the image is accepted creates a deterministic filter field and avoids relying on EXIF or provider recognition for mobile history ordering.
 
 **Alternatives considered**: Extracting image metadata time was rejected by clarification. Letting users enter measurement time was rejected because manual entry is out of scope for the fast photo workflow.
+
+## Decision: Use official NestJS logging for API runtime logs
+
+**Rationale**: The clarified requirement needs environment-based log levels and debug HTTP request/status logs, not advanced log routing or external aggregation. NestJS already provides configurable log levels and logger integration, and a small HTTP middleware or interceptor can emit request completion records without adding dependencies or crossing domain boundaries.
+
+**Alternatives considered**: A third-party structured logger was rejected because the current requirement can be satisfied with official NestJS/Node.js facilities and the constitution prefers official modules. Persisting logs in PostgreSQL was rejected because logs are operational output, not mobile API domain data. Logging inside controllers/use cases was rejected because it would duplicate cross-cutting HTTP behavior and leak transport concerns into application flows.
+
+## Decision: Derive logging mode solely from `NODE_ENV`
+
+**Rationale**: The clarification defines production as `NODE_ENV=production` and development as any other value or an unset value. Keeping this mapping in one bootstrap/config helper makes behavior explicit, testable, and consistent across local development, tests, and deployed runtime.
+
+**Alternatives considered**: Adding a separate `LOG_LEVEL` override was rejected because it is not specified and could weaken the explicit dev/prod requirement. Treating `NODE_ENV=test` as production-like was rejected because the clarification says only `production` selects production logging.
+
+## Decision: Log minimal HTTP metadata at debug level
+
+**Rationale**: Debug request logs should prove each HTTP request completed and show the response status while protecting health-related content and credentials. Method, path or URL, response status, and elapsed time are enough for development troubleshooting without recording bodies, bearer tokens, passwords, multipart payloads, or image bytes.
+
+**Alternatives considered**: Full request/response logging was rejected because it would expose sensitive credentials, health data, and uploaded images. Logging only failed requests was rejected because the requirement says every HTTP request should be logged at debug level in development. Access-log persistence was rejected because no durable audit log is requested.
