@@ -54,6 +54,28 @@ Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOK
 npm run api
 ```
 
+Create the local Docker PostgreSQL database from `DATABASE_URL` and run project migrations:
+
+```bash
+npm run db:init
+```
+
+By default this reads `.env`. Use `-e` or `--env` to choose another env file:
+
+```bash
+npm run db:init -- --env .env.example
+```
+
+The command requires a running Docker daemon, creates or starts a local `postgres:17-alpine` container, creates the database named in `DATABASE_URL`, and applies SQL migrations from `src/infrastructure/database/migrations`. Set `DB_INIT_POSTGRES_IMAGE` to use another Postgres image.
+
+The container and data directory are named `bpt-db-<hash>`, where the hash is derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
+
+Delete the matching Docker container and local data directory for an env file:
+
+```bash
+npm run db:clean -- --env .env.example
+```
+
 Primary endpoints:
 
 - `POST /api/v1/signin` creates an account and returns an expiring bearer token.
