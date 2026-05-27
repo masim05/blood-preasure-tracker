@@ -16,6 +16,8 @@ let databaseUrl;
 let database;
 let containerName;
 let dataDirectory;
+let legacyContainerName;
+let legacyDataDirectory;
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   runDbCommand('init', process.argv.slice(2)).catch((error) => {
@@ -43,9 +45,12 @@ function loadRuntimeConfig(args) {
   const env = readEnvFile(envFilePath);
   databaseUrl = readRequired(env, 'DATABASE_URL', envFilePath);
   database = parseDatabaseUrl(databaseUrl);
-  const identity = createHash('sha256').update(databaseUrl).update('\0').update(rootDirectory).digest('hex').slice(0, 16);
+  const fullIdentity = createHash('sha256').update(databaseUrl).update('\0').update(rootDirectory).digest('hex');
+  const identity = fullIdentity.slice(0, 4);
   containerName = `bpt-db-${identity}`;
   dataDirectory = path.join(rootDirectory, 'data', containerName);
+  legacyContainerName = `bpt-db-${fullIdentity.slice(0, 16)}`;
+  legacyDataDirectory = path.join(rootDirectory, 'data', legacyContainerName);
 }
 
 async function initDatabase() {
@@ -64,16 +69,24 @@ async function initDatabase() {
 
 function cleanDatabase() {
   ensureDockerAvailable();
-  const existing = spawnSync('docker', ['container', 'inspect', containerName], { encoding: 'utf8' });
+  for (const name of new Set([containerName, legacyContainerName])) {
+    removeContainer(name);
+  }
+  for (const directory of new Set([dataDirectory, legacyDataDirectory])) {
+    rmSync(directory, { recursive: true, force: true });
+    console.log(`Removed PostgreSQL data directory: ${path.relative(rootDirectory, directory)}`);
+  }
+}
+
+function removeContainer(name) {
+  const existing = spawnSync('docker', ['container', 'inspect', name], { encoding: 'utf8' });
   if (existing.status === 0) {
-    runDocker(['rm', '--force', containerName], `Failed to remove container ${containerName}`);
-    console.log(`Removed PostgreSQL container: ${containerName}`);
-  } else {
-    console.log(`PostgreSQL container was not present: ${containerName}`);
+    runDocker(['rm', '--force', name], `Failed to remove container ${name}`);
+    console.log(`Removed PostgreSQL container: ${name}`);
+    return;
   }
 
-  rmSync(dataDirectory, { recursive: true, force: true });
-  console.log(`Removed PostgreSQL data directory: ${path.relative(rootDirectory, dataDirectory)}`);
+  console.log(`PostgreSQL container was not present: ${name}`);
 }
 
 function parseEnvFileArgument(args) {

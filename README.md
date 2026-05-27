@@ -68,7 +68,7 @@ npm run db:init -- --env .env.example
 
 The command requires a running Docker daemon, creates or starts a local `postgres:17-alpine` container, creates the database named in `DATABASE_URL`, and applies SQL migrations from `src/infrastructure/database/migrations`. Set `DB_INIT_POSTGRES_IMAGE` to use another Postgres image.
 
-The container and data directory are named `bpt-db-<hash>`, where the hash is derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
+The container and data directory are named `bpt-db-<hash>`, where `<hash>` is a 4-character hash derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
 
 Delete the matching Docker container and local data directory for an env file:
 
