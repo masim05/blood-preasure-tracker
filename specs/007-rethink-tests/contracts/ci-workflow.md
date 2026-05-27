@@ -33,12 +33,16 @@ The workflow continues to run for pull requests targeting `main` and pushes to `
 
 **Command**: `npm run test:integration`
 
+**Preparation Command**: `npm run db:init -- --env .env.test`
+
 **Required behavior**:
 
 - Checks out the repository.
 - Sets up Node.js 24 with npm cache.
 - Installs dependencies with `npm ci`.
+- Initializes the test PostgreSQL database from tracked `.env.test` before running integration suites.
 - Runs integration suites only.
+- Uses a mocked OpenAI boundary and real database-backed mobile API infrastructure.
 
 ### Lint
 

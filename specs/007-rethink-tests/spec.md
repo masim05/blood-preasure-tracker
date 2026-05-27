@@ -13,6 +13,8 @@
 ### Session 2026-05-28
 
 - Q: Which command should represent the unit/contract CI job? → A: `npm run test:coverage`
+- Q: How should integration tests isolate real database state? → A: Reset relevant DB data before each endpoint-level scenario; tests must be independent.
+- Q: Which negative-path responses should mobile API integration tests cover? → A: All documented 4xx responses for implemented mobile API endpoints.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -42,7 +44,8 @@ As a developer, I want a dedicated integration test command so I can run slower 
 **Acceptance Scenarios**:
 
 1. **Given** the repository has integration tests and non-integration tests, **When** a developer runs the integration test command, **Then** only integration tests are executed.
-2. **Given** no integration-specific environment is required for an integration test, **When** the integration command runs, **Then** it completes with the same pass/fail behavior that the previous full-suite command provided for those tests.
+2. **Given** `.env.test` contains test database credentials, **When** a developer runs `npm run db:init -- --env .env.test` followed by `npm run test:integration`, **Then** integration tests use the real test database and mock only OpenAI.
+3. **Given** endpoint-level integration scenarios share the same test database, **When** each scenario starts, **Then** relevant database state is reset so scenarios remain independent and order-insensitive.
 
 ---
 
@@ -65,17 +68,22 @@ As a contributor, I want build, lint, unit/contract coverage, and integration te
 - If the fast test command passes but integration tests fail, CI must show the integration job failure separately without hiding the successful fast-test result.
 - If integration tests share fixtures or helper files, those dependencies may remain available to integration tests without being treated as integration test suites themselves.
 - If coverage thresholds fail, the coverage command must fail even though the non-coverage unit and contract command would otherwise pass.
+- If an integration scenario writes database state, later endpoint-level scenarios must not depend on that state unless they create it explicitly in their own setup.
+- If OpenAI recognition is needed during integration tests, only the OpenAI boundary may be mocked; database, password hashing, bearer token storage, measurement storage, image storage, and request handling must use real application infrastructure configured through `.env.test`.
 
 ## Architecture & Test Impact *(mandatory)*
 
 - **Ports Affected**: N/A.
 - **Adapters Affected**: N/A.
-- **Boundary Guarantee**: The change is limited to test command selection and CI workflow orchestration; domain logic and adapter behavior remain unchanged.
+- **Boundary Guarantee**: The change is limited to test command selection, CI workflow orchestration, and integration-test infrastructure/coverage; domain logic and production adapter behavior remain unchanged.
 - **Node.js Version Baseline**: Existing project baseline remains the repository-defined Node.js version.
 - **NestJS Version Baseline**: Existing project baseline remains unchanged.
 - **Dependency Selection Rationale**: No new runtime or test dependencies are expected; existing project tooling should be used.
-- **Existing Test Impact**: Existing tests keep the same assertions and behavior; only command grouping, discovery, and CI orchestration change.
-- **New Test Coverage**: Add workflow contract tests that validate npm script selection and CI job structure. No product behavior assertions are added or changed because this feature changes developer workflow only.
+- **Existing Test Impact**: Existing unit and contract test assertions keep the same behavior. Mobile API integration tests may be rewired to real infrastructure, renamed for endpoint clarity, and expanded with requirement-driven endpoint assertions.
+- **New Test Coverage**: Add workflow contract tests that validate npm script selection and CI job structure. Add mobile API integration scenarios for real-DB setup, endpoint independence, OpenAI-only mocking, endpoint describe naming, and all documented OpenAPI 4xx responses for implemented mobile API endpoints.
+- **Integration Test Environment**: Add and git-track `.env.test`; integration tests load credentials from this file and are prepared with `npm run db:init -- --env .env.test` before `npm run test:integration`.
+- **Integration Test Isolation**: Integration tests that exercise endpoint behavior reset relevant real database state before each endpoint-level scenario so scenarios are independent.
+- **Integration Mocking Boundary**: Integration tests mock OpenAI only; all other dependencies use real project infrastructure and configuration.
 - **Coverage Plan**: Preserve the existing coverage threshold for unit and contract tests. Integration tests run separately and are not required to contribute to coverage metrics unless already included by project policy.
 - **Worktree Path**: Implementation MUST occur in the dedicated feature worktree `tmp/007-rethink-tests`.
 
@@ -95,6 +103,12 @@ As a contributor, I want build, lint, unit/contract coverage, and integration te
 - **FR-010**: Integration test dependencies and fixtures may remain outside colocated source tests when they are used by integration tests.
 - **FR-011**: The revised commands MUST be documented through the project command surface used by contributors.
 - **FR-012**: The feature MUST add workflow contract tests that verify npm script category selection and CI job structure without changing existing test assertions.
+- **FR-013**: The repository MUST include a git-tracked `.env.test` file containing non-secret test defaults, including the test `DATABASE_URL` used by integration tests.
+- **FR-014**: Mobile API integration tests MUST load database credentials from `.env.test` and run against the real PostgreSQL-backed repositories after `npm run db:init -- --env .env.test`.
+- **FR-015**: Mobile API integration tests MUST mock only OpenAI; in-memory stores or fake application infrastructure MUST NOT replace database, storage, auth, hashing, or request handling dependencies.
+- **FR-016**: Each endpoint-level integration `describe` block MUST use the specific format `<METHOD> <path> - <scenario>`, for example `POST /api/v1/signin - happy path`.
+- **FR-017**: Endpoint-level integration tests MUST reset relevant database state before each scenario so tests are independent and do not rely on execution order.
+- **FR-018**: Mobile API integration tests MUST include endpoint scenarios for every documented 4xx response on implemented mobile API endpoints, using the OpenAPI document as the reference.
 
 ## Success Criteria *(mandatory)*
 
@@ -107,6 +121,10 @@ As a contributor, I want build, lint, unit/contract coverage, and integration te
 - **SC-005**: A failure in one CI job can be identified from the job name without reading logs from other jobs.
 - **SC-006**: No product source files change except where necessary to keep test discovery or command configuration valid.
 - **SC-007**: Workflow contract tests fail before implementation and pass after npm script and CI workflow changes are complete.
+- **SC-008**: Running `npm run db:init -- --env .env.test` followed by `npm run test:integration` succeeds using a real test database and mocked OpenAI only.
+- **SC-009**: Reordering endpoint-level mobile API integration scenarios does not change pass/fail outcomes because each scenario sets up its own required state.
+- **SC-010**: Endpoint-level mobile API integration `describe` names identify the HTTP method, path, and scenario outcome without reading nested test names.
+- **SC-011**: Negative-path integration tests cover all documented 4xx OpenAPI responses for implemented mobile API endpoints.
 
 ## Assumptions
 
@@ -114,3 +132,4 @@ As a contributor, I want build, lint, unit/contract coverage, and integration te
 - The coverage command is the authoritative unit/contract verification gate in CI.
 - Integration tests should remain part of required CI validation even though they are separated from coverage.
 - CI job setup may duplicate dependency installation steps in order to allow jobs to run independently and in parallel.
+- The `.env.test` file contains local test defaults only and must not contain real secrets.

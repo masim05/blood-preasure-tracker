@@ -30,6 +30,11 @@
 
 **Purpose**: Explicit integration verification.
 
+**Preparation**:
+
+- The mobile API integration database must be initialized with `npm run db:init -- --env .env.test` before running this command.
+- `.env.test` must be present in the repository and contain non-secret test defaults.
+
 **Required behavior**:
 
 - Runs Jest against integration suites only.
@@ -37,12 +42,14 @@
 - Excludes colocated unit and contract tests under `src/**/*.test.ts`.
 - Does not collect coverage by default.
 - Fails if any selected integration test fails.
+- Mobile API integration suites load configuration from `.env.test`, use the real PostgreSQL-backed application infrastructure, and mock only OpenAI.
 
 ## Non-Goals
 
 - Do not change test assertions.
 - Do not change product business logic.
 - Do not add new test dependencies.
+- Do not use in-memory stores or fake infrastructure in mobile API integration tests other than the OpenAI boundary test double.
 
 ## Required Workflow Contract Tests
 

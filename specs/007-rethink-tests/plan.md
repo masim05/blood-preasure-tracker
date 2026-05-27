@@ -1,47 +1,42 @@
 # Implementation Plan: Rethink Tests
-
 **Branch**: `007-rethink-tests` | **Date**: 2026-05-28 | **Spec**: [spec.md](spec.md)
-
 **Input**: Feature specification from `/specs/007-rethink-tests/spec.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
-
 ## Summary
-
-Split the repository test workflow so local fast tests and coverage run only colocated unit/contract tests, integration tests run through a dedicated command, and CI reports build, lint, unit/contract coverage, and integration as independent parallel jobs. The implementation will adjust `package.json` scripts, Jest selection in `jest.config.ts`, and `.github/workflows/ci.yml` only; no product behavior or test assertions change.
+Split the test workflow so unit/contract tests run through fast and coverage-gated commands, integration tests run through a dedicated command, and CI reports build, lint, unit/contract coverage, and integration outcomes as independent jobs. Expand the integration suite so mobile API endpoint tests use a tracked `.env.test`, run against the real PostgreSQL-backed application infrastructure after `npm run db:init -- --env .env.test`, mock only OpenAI, reset relevant database state before each endpoint-level scenario, use endpoint-specific `describe` names, and cover every documented 4xx OpenAPI response for implemented mobile API endpoints.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.8 on Node.js 24.x project baseline
+**Language/Version**: TypeScript 5.8 on Node.js >=24.0.0
 
-**Primary Dependencies**: Jest 30, ts-jest 29.4, ESLint 9, GitHub Actions, existing npm scripts
+**Primary Dependencies**: NestJS 11, Jest 30, ts-jest 29.4, pg 8, OpenAI SDK 6
 
-**Storage**: N/A
+**Storage**: PostgreSQL for mobile API integration tests; filesystem-backed measurement image storage configured through `.env.test`; no product schema changes planned
 
-**Testing**: Jest test discovery and coverage commands; CI validation through GitHub Actions workflow structure
+**Testing**: Jest unit/contract suites under `src/**/*.test.ts`; integration suites under `tests/integration/**/*.test.ts`; workflow contract test under `src/test-workflow.contract.test.ts`
 
-**Target Platform**: Local Node.js development and Ubuntu GitHub Actions runners
+**Target Platform**: Local macOS/Linux developer environments and GitHub Actions Ubuntu runners using Node 24
 
-**Project Type**: TypeScript CLI/API repository with colocated unit/contract tests and integration tests under `tests/integration`
+**Project Type**: Node.js CLI plus NestJS HTTP API in a single TypeScript project
 
-**Performance Goals**: Fast local feedback by excluding integration suites from `npm test` and `npm run test:coverage`; CI jobs are eligible to run in parallel rather than serially in one job
+**Performance Goals**: Default `npm test` remains fast by excluding integration suites; CI jobs are eligible to run in parallel for faster PR feedback
 
-**Constraints**: Preserve coverage threshold `>= 95%`; do not change product code, business logic, or test assertions; keep integration tests and integration-only dependencies available under `tests/`
+**Constraints**: Preserve global coverage gate >=95%; do not change product business logic; do not logically rewrite existing unit/contract assertions; integration tests must be independent and order-insensitive; integration tests may mock OpenAI only
 
-**Scale/Scope**: Current repository test suite: colocated `src/**/*.test.ts` unit/contract tests plus `tests/integration/**/*.test.ts` integration suites
+**Scale/Scope**: One repository, one Jest configuration, one GitHub Actions workflow, mobile API integration suite covering implemented endpoints in `docs/openapi.yaml`
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- [x] **Hexagonal boundaries defined**: No domain ports or adapters are introduced or changed; changes are restricted to tooling and CI configuration.
-- [x] **Unit test strategy present**: Add workflow contract tests for npm script selection and CI job structure; existing product tests remain unchanged.
-- [x] **Coverage policy acknowledged**: CI gate remains `>= 95%`; `npm run test:coverage` continues to enforce the gate for unit/contract tests.
-- [x] **Additive test evolution respected**: Existing test assertions remain unchanged; only command selection and CI orchestration change.
-- [x] **MCP-free implementation**: Plan uses local repository scripts and GitHub Actions YAML only; no MCP runtime or tooling dependency.
-- [x] **Feature isolation via worktree**: Implementation must be performed in the dedicated `tmp/007-rethink-tests` worktree on branch `007-rethink-tests`.
-- [x] **Tech stack baseline**: Plan targets the existing Node.js 24 project baseline and existing NestJS 11 dependency baseline.
-- [x] **Dependency policy**: No new dependencies are planned.
+- [X] **Hexagonal boundaries defined**: Domain logic is unchanged. The plan changes test command selection, CI orchestration, and integration-test composition around existing adapters: PostgreSQL repositories, filesystem image storage, node crypto adapters, and an OpenAI test double at the LLM boundary.
+- [X] **Unit test strategy present**: Workflow behavior is covered by `src/test-workflow.contract.test.ts`; mobile API endpoint behavior is covered by integration tests because the changed behavior is integration wiring and endpoint contract validation.
+- [X] **Coverage policy acknowledged**: CI keeps `npm run test:coverage` as the unit/contract gate and preserves the >=95% threshold.
+- [X] **Additive test evolution respected**: Existing tests may be reorganized to use real infrastructure and renamed for endpoint clarity because the spec explicitly changes integration-test requirements; unit/contract assertions remain unchanged.
+- [X] **MCP-free implementation**: Implementation relies on local repository scripts, Jest, Docker/PostgreSQL via `npm run db:init`, and GitHub Actions only.
+- [X] **Feature isolation via worktree**: Implementation must occur in `tmp/007-rethink-tests` on branch `007-rethink-tests`.
+- [X] **Tech stack baseline**: Plan targets repository Node 24 baseline and current NestJS 11 usage.
+- [X] **Dependency policy**: No new runtime dependencies are expected; existing official Node APIs, NestJS testing utilities, `pg`, and Jest mocking are sufficient.
 
 ## Project Structure
 
@@ -49,56 +44,71 @@ Split the repository test workflow so local fast tests and coverage run only col
 
 ```text
 specs/007-rethink-tests/
-├── plan.md
-├── research.md
-├── data-model.md
-├── quickstart.md
-├── contracts/
-│   ├── ci-workflow.md
-│   └── npm-scripts.md
-└── tasks.md             # Created by /speckit.tasks, not /speckit.plan
+|-- plan.md
+|-- research.md
+|-- data-model.md
+|-- quickstart.md
+|-- contracts/
+|   |-- ci-workflow.md
+|   |-- integration-environment.md
+|   `-- npm-scripts.md
+`-- tasks.md
 ```
 
 ### Source Code (repository root)
 
 ```text
-.github/workflows/
-└── ci.yml               # Split serial job into parallel build/lint/coverage/integration jobs
-
-package.json             # Update npm script command surface
-jest.config.ts           # Limit default/coverage discovery to unit and contract tests
-
+.env.test                         # tracked non-secret integration defaults
+.github/workflows/ci.yml          # independent validation jobs
+docs/openapi.yaml                  # source of endpoint 4xx contract coverage
+jest.config.ts                    # test discovery and coverage configuration
+package.json                      # npm test command surface
 src/
-├── **/*.test.ts          # Unit and contract tests included by default and coverage commands
-├── test-workflow.contract.test.ts # New workflow contract tests for scripts and CI
-└── test-support/         # Shared test support excluded from coverage targets
-
+|-- api.module.ts                  # production API wiring reused by integration tests
+|-- adapters/outbound/postgres/    # real PostgreSQL repositories
+|-- adapters/outbound/filesystem/  # real image storage adapter
+`-- test-workflow.contract.test.ts # workflow contract tests
 tests/
-├── fixtures/             # Integration fixtures and assets
-└── integration/          # Integration test suites run only by npm run test:integration
+`-- integration/
+    |-- cli.integration.test.ts
+    `-- mobile-api.integration.test.ts
 ```
 
-**Structure Decision**: Keep unit and contract tests colocated under `src/`; keep integration tests and integration assets under `tests/`; make script-level test selection explicit rather than moving tests again.
+**Structure Decision**: Keep unit and contract tests colocated under `src/`; keep integration suites under `tests/integration/`; add integration helpers inside `tests/integration/` only when shared by integration suites; do not add product modules for test-only behavior.
 
 ## Complexity Tracking
 
-No constitution violations or complexity exceptions are required.
+No constitution violations require complexity justification.
 
 ## Phase 0: Research
 
-See [research.md](research.md).
+Research is captured in [research.md](research.md). All clarifications are resolved:
 
-## Phase 1: Design & Contracts
+- Unit/contract commands use Jest path exclusion for `tests/integration`.
+- Integration command selects `tests/integration/**/*.test.ts` only.
+- CI uses four independent jobs and no redundant `npm test` job.
+- Integration environment uses tracked `.env.test` and `npm run db:init -- --env .env.test`.
+- Mobile API integration tests use real infrastructure except for an OpenAI boundary mock.
+- Endpoint-level scenarios reset real database state before each scenario.
+- Negative-path coverage follows all documented 4xx responses for implemented mobile API endpoints.
 
-See [data-model.md](data-model.md), [contracts/npm-scripts.md](contracts/npm-scripts.md), [contracts/ci-workflow.md](contracts/ci-workflow.md), and [quickstart.md](quickstart.md).
+## Phase 1: Design
+
+Design artifacts are captured in:
+
+- [data-model.md](data-model.md)
+- [contracts/npm-scripts.md](contracts/npm-scripts.md)
+- [contracts/ci-workflow.md](contracts/ci-workflow.md)
+- [contracts/integration-environment.md](contracts/integration-environment.md)
+- [quickstart.md](quickstart.md)
 
 ## Post-Design Constitution Check
 
-- [x] **Hexagonal boundaries defined**: Design artifacts confirm no domain or adapter code changes.
-- [x] **Unit test strategy present**: Command and CI behavior is covered by new workflow contract tests plus command validation.
-- [x] **Coverage policy acknowledged**: Coverage contract preserves the current global threshold.
-- [x] **Additive test evolution respected**: Contracts explicitly forbid logical assertion changes.
-- [x] **MCP-free implementation**: Quickstart uses npm and GitHub Actions only.
-- [x] **Feature isolation via worktree**: Mandatory `tmp/007-rethink-tests` worktree usage is recorded.
-- [x] **Tech stack baseline**: Existing Node/NestJS baselines are retained.
-- [x] **Dependency policy**: No new dependencies.
+- [X] **Hexagonal boundaries defined**: Integration tests will instantiate the real API module or equivalent production provider graph, overriding only the `LLM_PROVIDER` OpenAI boundary with a deterministic test double.
+- [X] **Unit test strategy present**: Workflow contract tests cover command/CI behavior; endpoint behavior is intentionally integration-level because the requirement is real infrastructure validation.
+- [X] **Coverage policy acknowledged**: `npm run test:coverage` remains the CI coverage gate and excludes integration suites.
+- [X] **Additive test evolution respected**: Integration test names, setup, and negative-path additions are requirement-driven; product behavior and unit/contract assertions remain protected.
+- [X] **MCP-free implementation**: No MCP runtime or implementation dependency is introduced.
+- [X] **Feature isolation via worktree**: Coding must continue in `tmp/007-rethink-tests`.
+- [X] **Tech stack baseline**: Node 24 and NestJS 11 remain the baseline.
+- [X] **Dependency policy**: Existing dependencies are sufficient; no third-party additions planned.
