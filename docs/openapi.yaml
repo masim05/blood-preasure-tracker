@@ -63,6 +63,8 @@ paths:
                   value:
                     error: conflict
                     message: Email is already registered
+        '429':
+          $ref: '#/components/responses/RateLimited'
   /api/v1/login:
     post:
       tags:
@@ -101,6 +103,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
   /api/v1/measurements:
     post:
       tags:
@@ -386,6 +390,17 @@ components:
               value:
                 error: not_found
                 message: Measurement was not found
+    RateLimited:
+      description: Too many authentication attempts for the client and email in the current rate-limit window.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            default:
+              value:
+                error: rate_limited
+                message: Too many authentication attempts; try again later
   schemas:
     AuthRequest:
       type: object
@@ -604,6 +619,7 @@ components:
             - unauthorized
             - not_found
             - conflict
+            - rate_limited
         message:
           type: string
           example: Human-readable user-safe message

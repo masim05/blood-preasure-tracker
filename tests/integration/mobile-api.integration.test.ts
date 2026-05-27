@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 
 import { BearerAuthGuard } from '../../src/adapters/inbound/http/bearer-auth.guard';
 import { AuthController } from '../../src/adapters/inbound/http/auth.controller';
+import { AuthRateLimitGuard, clearAuthRateLimitBuckets } from '../../src/adapters/inbound/http/auth-rate-limit.guard';
 import {
   HttpRequestLoggingMiddleware,
   type HttpLoggingRequest,
@@ -320,6 +321,37 @@ describe('mobile API integration flow', () => {
       expect(fixture.requestLogs).toHaveLength(0);
     });
   });
+
+  describe('rate limits authentication attempts', () => {
+    let fixture: MobileApiFixture;
+    let response: FetchResponse;
+
+    beforeAll(async () => {
+      fixture = await createMobileApiFixture();
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        await postJson(fixture.baseUrl, '/api/v1/login', {
+          email: 'limited@example.com',
+          password: 'wrong-password',
+        });
+      }
+      response = await postJson(fixture.baseUrl, '/api/v1/login', {
+        email: 'limited@example.com',
+        password: 'wrong-password',
+      });
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
+    });
+
+    it('returns HTTP 429 with the documented error body', () => {
+      expect(response.status).toBe(429);
+      expect(response.body).toEqual({
+        error: 'rate_limited',
+        message: 'Too many authentication attempts; try again later',
+      });
+    });
+  });
 });
 
 type MobileApiFixture = {
@@ -343,6 +375,7 @@ type FetchResponse = {
 
 async function createMobileApiFixture(env: NodeJS.ProcessEnv = { NODE_ENV: 'development' }): Promise<MobileApiFixture> {
   const users = new InMemoryUserStore();
+  clearAuthRateLimitBuckets();
   const tokens = new InMemoryBearerTokenStore();
   const measurements = new InMemoryMeasurementStore();
   const images = new InMemoryMeasurementImageStore();
@@ -352,6 +385,7 @@ async function createMobileApiFixture(env: NodeJS.ProcessEnv = { NODE_ENV: 'deve
     controllers: [AuthController, MeasurementsController],
     providers: [
       BearerAuthGuard,
+      AuthRateLimitGuard,
       CreateAccountUseCase,
       LoginUserUseCase,
       AuthenticateBearerTokenUseCase,

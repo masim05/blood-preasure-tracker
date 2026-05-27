@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 
 import { AuthController } from './adapters/inbound/http/auth.controller';
+import { AuthRateLimitGuard } from './adapters/inbound/http/auth-rate-limit.guard';
 import { BearerAuthGuard } from './adapters/inbound/http/bearer-auth.guard';
 import { HttpRequestLoggingMiddleware } from './adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from './adapters/inbound/http/measurements.controller';
@@ -39,6 +40,7 @@ import { EnvConfigService } from './infrastructure/config/env-config';
     EnvConfigService,
     ModelRegistry,
     PostgresPool,
+    AuthRateLimitGuard,
     BearerAuthGuard,
     CreateAccountUseCase,
     LoginUserUseCase,

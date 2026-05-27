@@ -18,6 +18,7 @@
 - Q: How should the mobile API authenticate protected requests? -> A: Signin and login return an expiring bearer access token.
 - Q: Which image uploads should the measurement endpoint accept? -> A: JPEG and PNG images up to 10 MB.
 - Q: How should runtime logging level be selected? -> A: Use `NODE_ENV=production`; otherwise dev.
+- Q: How should repeated authentication attempts be controlled? -> A: Rate limit `POST /api/v1/signin` and `POST /api/v1/login` by client and email with `429` responses when the limit is exceeded.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -103,6 +104,7 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 
 - Duplicate registration attempts for the same email are rejected consistently.
 - Login failures do not reveal whether the email exists or the password is wrong.
+- Repeated signin and login attempts for the same client/email are rate limited.
 - Authenticated users can only access their own measurements and original image links.
 - Measurement recognition can remain pending while background work has not completed; result views communicate the pending state without losing the original image.
 - Pending, failed, and unconfirmed recognized measurements do not appear as saved readings in the default history list.
@@ -161,6 +163,7 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 - **FR-030**: The API MUST write application logs.
 - **FR-031**: The API MUST use debug-level logging when `NODE_ENV` is not `production` and MUST use warn-or-higher logging when `NODE_ENV=production`.
 - **FR-032**: At debug level, the API MUST log every HTTP request with its response status.
+- **FR-033**: `POST /api/v1/signin` and `POST /api/v1/login` MUST rate limit repeated authentication attempts by client and email and return a user-safe `429` response when the limit is exceeded.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -195,3 +198,4 @@ A logged-in user can browse saved measurements in a paginated list and filter by
 - Original image links are access-controlled or time-limited so only the owning authenticated user can retrieve them.
 - Recognition work can initially be tracked with durable persisted task records before introducing a dedicated external job queue.
 - Measurement time filtering uses the server-assigned measurement time recorded when the image is accepted.
+- Duplicate account creation intentionally returns a clear `409 conflict` per the current product contract; this is an account-enumeration trade-off mitigated by auth rate limiting and should be revisited if email verification or invitation-based signup is added.

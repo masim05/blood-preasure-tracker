@@ -14,6 +14,8 @@ import { USER_ACCOUNT_STORE } from '../ports/user-account-store.port';
 import type { AuthTokenOutput } from './create-account.use-case';
 import { issueToken } from './create-account.use-case';
 
+const DUMMY_PASSWORD_HASH = 'pbkdf2:sha256:600000:dummy-salt:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
 export type LoginUserInput = {
   email: string;
   password: string;
@@ -34,6 +36,7 @@ export class LoginUserUseCase {
     const email = parseEmail(input.email);
     const user = await this.users.findByEmail(email);
     if (!user) {
+      await this.passwordHasher.verify(input.password, DUMMY_PASSWORD_HASH);
       throw invalidCredentials();
     }
 

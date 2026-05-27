@@ -45,4 +45,20 @@ describe('LoginUserUseCase', () => {
       useCase.execute({ email: 'missing@example.com', password: 'password123', now, tokenTtlSeconds: 1 }),
     ).rejects.toThrow('Invalid email or password');
   });
+
+  it('performs password verification work even when the user does not exist', async () => {
+    const hasher = new SimplePasswordHasher();
+    const verify = jest.spyOn(hasher, 'verify');
+
+    await expect(
+      new LoginUserUseCase(
+        new InMemoryUserStore(),
+        hasher,
+        new InMemoryBearerTokenStore(),
+        new StaticTokenGenerator(),
+      ).execute({ email: 'missing@example.com', password: 'password123', tokenTtlSeconds: 3600, now }),
+    ).rejects.toThrow('Invalid email or password');
+
+    expect(verify).toHaveBeenCalledWith('password123', expect.stringMatching(/^pbkdf2:sha256:600000:/));
+  });
 });
