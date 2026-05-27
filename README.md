@@ -44,6 +44,64 @@ npm run cli -- eval --input ./data/eval --csv ./data/eval/p.csv
 
 CLI arguments override environment defaults for `--input`, `--csv`, `--provider`, and `--model`.
 
+## Mobile API
+
+The mobile API runs beside the CLI as a NestJS HTTP adapter. It supports email account creation, login, bearer-protected measurement image upload, measurement detail and original image retrieval, explicit save confirmation, and saved measurement history.
+
+Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOKEN_TTL_SECONDS`, `API_PORT`, and `OPENAI_API_KEY`:
+
+```bash
+npm run api
+```
+
+API logging uses `NODE_ENV=production` for production mode, where debug request logs are suppressed and warning/error logs remain enabled. Any other `NODE_ENV` value, including unset, uses development mode and logs each HTTP request at debug level with its response status.
+
+Create the local Docker PostgreSQL database from `DATABASE_URL` and run project migrations:
+
+```bash
+npm run db:init
+```
+
+By default this reads `.env`. Use `-e` or `--env` to choose another env file:
+
+```bash
+npm run db:init -- --env .env.example
+```
+
+The command requires a running Docker daemon, creates or starts a local `postgres:17-alpine` container, creates the database named in `DATABASE_URL`, and applies SQL migrations from `src/infrastructure/database/migrations`. Set `DB_INIT_POSTGRES_IMAGE` to use another Postgres image.
+
+The container and data directory are named `bpt-db-<hash>`, where `<hash>` is a 4-character hash derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
+
+Delete the matching Docker container and local data directory for an env file:
+
+```bash
+npm run db:clean -- --env .env.example
+```
+
+Primary endpoints:
+
+- `POST /api/v1/signin` creates an account and returns an expiring bearer token.
+- `POST /api/v1/login` returns an expiring bearer token for an existing user.
+- `POST /api/v1/measurements` accepts an authenticated JPEG/PNG image up to 10 MB and returns a pending measurement id.
+- `GET /api/v1/measurements/<id>` returns owned measurement detail and an `imageUrl`.
+- `GET /api/v1/measurements/<id>/image` returns the owner-protected original image bytes.
+- `POST /api/v1/measurements/<id>/save` saves a recognized measurement into history.
+- `GET /api/v1/measurements` returns saved measurement history without image binary data.
+
+The OpenAPI document lives at [docs/openapi.yaml](docs/openapi.yaml). Regenerate it from the API contract and controllers with the local Copilot CLI:
+
+```bash
+npm run openapi:generate
+```
+
+Serve an interactive Swagger UI for the OpenAPI document without starting the main API:
+
+```bash
+npm run openapi:serve
+```
+
+The docs server listens on `http://localhost:3001/` by default, loads [docs/openapi.yaml](docs/openapi.yaml), and supports Swagger UI "Try it out" requests against the API server declared in the OpenAPI `servers` section. The raw YAML remains available at `http://localhost:3001/openapi.yaml`. Set `OPENAPI_DOCS_PORT` to use another port.
+
 ## Output
 
 - `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
@@ -85,6 +143,11 @@ export CLI_INPUT_DIR="./data/eval"
 export CLI_EVAL_CSV="./data/eval/a.csv"
 export CLI_PROVIDER="openai"
 export CLI_MODEL="gpt-5.4-mini"
+export DATABASE_URL="postgres://postgres:postgres@localhost:5432/blood_pressure_tracker"
+export API_PORT="3000"
+export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
+export ACCESS_TOKEN_TTL_SECONDS="3600"
+export NODE_ENV="development"
 ```
 
 ## Validation
