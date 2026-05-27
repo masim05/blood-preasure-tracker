@@ -14,6 +14,7 @@ import {
   SimplePasswordHasher,
   StaticTokenGenerator,
 } from '../../helpers/mobile-api-fakes';
+import { jpegBytes } from '../../helpers/image-bytes';
 
 void LLM_PROVIDER;
 
@@ -59,7 +60,7 @@ describe('mobile API use-case error branches', () => {
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
-      data: Buffer.from('image'),
+      data: jpegBytes,
       now,
     });
     const provider: LlmProviderPort = {

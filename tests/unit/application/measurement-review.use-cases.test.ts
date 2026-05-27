@@ -12,6 +12,7 @@ import {
   InMemoryMeasurementStore,
   InMemoryRecognitionTaskStore,
 } from '../../helpers/mobile-api-fakes';
+import { jpegBytes, pngBytes } from '../../helpers/image-bytes';
 
 void LLM_PROVIDER;
 
@@ -44,7 +45,7 @@ describe('measurement use cases', () => {
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
-      data: Buffer.from('image'),
+      data: jpegBytes,
       now,
     });
 
@@ -79,7 +80,7 @@ describe('measurement use cases', () => {
       id: 'img_1',
       measurementId: 'msr_1',
       contentType: 'image/png',
-      data: Buffer.from('png'),
+      data: pngBytes,
       originalName: 'bp.png',
       createdAt: now,
     });
@@ -137,7 +138,7 @@ describe('measurement use cases', () => {
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
-      data: Buffer.from('image'),
+      data: jpegBytes,
       now,
     });
     const taskId = [...tasks.tasks.keys()][0];

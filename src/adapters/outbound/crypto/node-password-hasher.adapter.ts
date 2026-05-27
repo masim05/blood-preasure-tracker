@@ -5,7 +5,8 @@ import { promisify } from 'node:util';
 import type { PasswordHasherPort } from '../../../application/ports/password-hasher.port';
 
 const pbkdf2Async = promisify(pbkdf2);
-const ITERATIONS = 120_000;
+const ITERATIONS = 600_000;
+const MAX_VERIFY_ITERATIONS = 1_000_000;
 const KEY_LENGTH = 32;
 const DIGEST = 'sha256';
 
@@ -26,7 +27,7 @@ export class NodePasswordHasherAdapter implements PasswordHasherPort {
 
     const [, digest, iterationsText, salt, expectedText] = parts;
     const iterations = Number(iterationsText);
-    if (!Number.isInteger(iterations) || iterations <= 0) {
+    if (digest !== DIGEST || !Number.isInteger(iterations) || iterations <= 0 || iterations > MAX_VERIFY_ITERATIONS) {
       return false;
     }
 

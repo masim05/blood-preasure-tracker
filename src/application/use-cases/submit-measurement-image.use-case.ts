@@ -35,19 +35,10 @@ export class SubmitMeasurementImageUseCase {
   ) {}
 
   async execute(input: SubmitMeasurementImageInput): Promise<SubmitMeasurementImageOutput> {
-    const contentType = validateUpload(input.contentType, input.data.byteLength);
+    const contentType = validateUpload(input.contentType, input.data);
     const now = input.now ?? new Date();
     const measurementId = `msr_${randomUUID()}`;
     const imageId = `img_${randomUUID()}`;
-
-    const image = await this.images.save({
-      id: imageId,
-      measurementId,
-      contentType,
-      data: input.data,
-      originalName: input.originalName,
-      createdAt: now,
-    });
     const measurement = new Measurement({
       id: measurementId,
       userId: input.userId,
@@ -57,13 +48,21 @@ export class SubmitMeasurementImageUseCase {
       pulse: null,
       armSide: null,
       measurementTime: now,
-      imageId: image.id,
+      imageId,
       recognitionError: null,
       savedAt: null,
       createdAt: now,
       updatedAt: now,
     });
     await this.measurements.save(measurement);
+    await this.images.save({
+      id: imageId,
+      measurementId,
+      contentType,
+      data: input.data,
+      originalName: input.originalName,
+      createdAt: now,
+    });
     await this.recognitionTasks.save(
       new RecognitionTask({
         id: `rct_${randomUUID()}`,
@@ -83,9 +82,9 @@ export class SubmitMeasurementImageUseCase {
   }
 }
 
-function validateUpload(contentType: string, byteSize: number): 'image/jpeg' | 'image/png' {
+function validateUpload(contentType: string, data: Buffer): 'image/jpeg' | 'image/png' {
   try {
-    return validateUploadImage({ contentType, byteSize });
+    return validateUploadImage({ contentType, byteSize: data.byteLength, data });
   } catch (error) {
     throw new ApiError(
       'validation_error',

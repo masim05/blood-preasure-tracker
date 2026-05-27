@@ -36,6 +36,7 @@ import {
   SimplePasswordHasher,
   StaticTokenGenerator,
 } from '../helpers/mobile-api-fakes';
+import { pngBytes } from '../helpers/image-bytes';
 
 const apiConfig = {
   load: () => ({
@@ -135,7 +136,7 @@ describe('mobile API integration flow', () => {
     beforeAll(async () => {
       fixture = await createSignedInFixture();
       const form = new FormData();
-      form.append('image', new Blob([Buffer.from('png')], { type: 'image/png' }), 'bp.png');
+      form.append('image', new Blob([pngBytes], { type: 'image/png' }), 'bp.png');
       response = await postForm(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken, form);
       fixture.measurementId = readString(response.body.id, 'measurement id');
     });
@@ -413,7 +414,7 @@ async function createSignedInFixture(): Promise<MobileApiFixture> {
 async function createUploadedFixture(): Promise<MobileApiFixture> {
   const fixture = await createSignedInFixture();
   const form = new FormData();
-  form.append('image', new Blob([Buffer.from('png')], { type: 'image/png' }), 'bp.png');
+  form.append('image', new Blob([pngBytes], { type: 'image/png' }), 'bp.png');
   const response = await postForm(fixture.baseUrl, '/api/v1/measurements', fixture.accessToken, form);
   fixture.measurementId = readString(response.body.id, 'measurement id');
 

@@ -39,6 +39,6 @@ export function extractBearerToken(value: string | string[] | undefined): string
     return null;
   }
 
-  const match = /^Bearer\s+(.+)$/i.exec(header.trim());
+  const match = /^Bearer\s+([A-Za-z0-9._~+/=-]+)\s*$/i.exec(header.trim());
   return match?.[1] ?? null;
 }

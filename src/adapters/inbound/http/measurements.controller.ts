@@ -20,6 +20,7 @@ import { GetMeasurementImageUseCase } from '../../../application/use-cases/get-m
 import { ListMeasurementsUseCase } from '../../../application/use-cases/list-measurements.use-case';
 import { SaveMeasurementUseCase } from '../../../application/use-cases/save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from '../../../application/use-cases/submit-measurement-image.use-case';
+import { MAX_UPLOAD_BYTES } from '../../../domain/services/upload-image-policy';
 import { BearerAuthGuard, type AuthenticatedHttpRequest } from './bearer-auth.guard';
 import {
   type MeasurementQueryDto,
@@ -40,7 +41,7 @@ export class MeasurementsController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', { limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 } }))
   async upload(
     @Req() request: AuthenticatedHttpRequest,
     @UploadedFile() image?: MeasurementUploadFile,
@@ -105,6 +106,8 @@ export class MeasurementsController {
       });
       response.setHeader('Content-Type', output.image.contentType);
       response.setHeader('Content-Length', String(output.image.byteSize));
+      response.setHeader('Content-Disposition', `attachment; filename="${measurementId}${imageExtension(output.image.contentType)}"`);
+      response.setHeader('X-Content-Type-Options', 'nosniff');
 
       return new StreamableFile(Readable.from(output.data));
     } catch (error) {
@@ -135,4 +138,8 @@ function requireUserId(request: AuthenticatedHttpRequest): string {
   }
 
   return request.user.id;
+}
+
+function imageExtension(contentType: 'image/jpeg' | 'image/png'): string {
+  return contentType === 'image/png' ? '.png' : '.jpg';
 }

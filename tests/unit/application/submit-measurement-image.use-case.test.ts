@@ -4,6 +4,7 @@ import {
   InMemoryMeasurementStore,
   InMemoryRecognitionTaskStore,
 } from '../../helpers/mobile-api-fakes';
+import { pngBytes } from '../../helpers/image-bytes';
 
 const now = new Date('2026-05-27T12:00:00.000Z');
 
@@ -17,7 +18,7 @@ describe('SubmitMeasurementImageUseCase focused coverage', () => {
       userId: 'usr_1',
       contentType: 'image/png',
       originalName: 'reading.png',
-      data: Buffer.from('png'),
+      data: pngBytes,
       now,
     });
 

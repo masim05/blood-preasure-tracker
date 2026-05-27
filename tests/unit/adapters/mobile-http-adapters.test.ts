@@ -9,6 +9,7 @@ describe('mobile HTTP adapter helpers', () => {
   it('extracts bearer tokens from string and array headers', () => {
     expect(extractBearerToken('Bearer abc')).toBe('abc');
     expect(extractBearerToken(['Bearer first', 'Bearer second'])).toBe('first');
+    expect(extractBearerToken('Bearer abc def')).toBeNull();
     expect(extractBearerToken('Basic abc')).toBeNull();
     expect(extractBearerToken(undefined)).toBeNull();
   });

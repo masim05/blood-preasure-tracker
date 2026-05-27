@@ -12,6 +12,7 @@ import { LoginUserUseCase } from '../../src/application/use-cases/login-user.use
 import { SaveMeasurementUseCase } from '../../src/application/use-cases/save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from '../../src/application/use-cases/submit-measurement-image.use-case';
 import { Measurement } from '../../src/domain/entities/measurement';
+import { jpegBytes } from '../helpers/image-bytes';
 import {
   InMemoryBearerTokenStore,
   InMemoryMeasurementImageStore,
@@ -81,8 +82,8 @@ describe('mobile API contract controllers', () => {
     const upload = await controller.upload(request, {
       originalname: 'bp.jpg',
       mimetype: 'image/jpeg',
-      buffer: Buffer.from('image'),
-      size: 5,
+      buffer: jpegBytes,
+      size: jpegBytes.byteLength,
     });
     expect(upload).toMatchObject({ status: 'pending' });
     const measurementId = (upload as { id: string }).id;
@@ -115,6 +116,8 @@ describe('mobile API contract controllers', () => {
     });
     expect(image).toBeInstanceOf(StreamableFile);
     expect(headers.get('Content-Type')).toBe('image/jpeg');
+    expect(headers.get('Content-Disposition')).toBe(`attachment; filename="${measurementId}.jpg"`);
+    expect(headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 
   it('returns expected measurement route errors', async () => {
