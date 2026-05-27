@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 
 import { AuthController } from './adapters/inbound/http/auth.controller';
 import { BearerAuthGuard } from './adapters/inbound/http/bearer-auth.guard';
+import { HttpRequestLoggingMiddleware } from './adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from './adapters/inbound/http/measurements.controller';
 import { NodeBearerTokenAdapter } from './adapters/outbound/crypto/node-bearer-token.adapter';
 import { NodePasswordHasherAdapter } from './adapters/outbound/crypto/node-password-hasher.adapter';
@@ -73,4 +74,8 @@ import { EnvConfigService } from './infrastructure/config/env-config';
   ],
   exports: [ApiConfigService, EnvConfigService, ModelRegistry],
 })
-export class ApiModule {}
+export class ApiModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(HttpRequestLoggingMiddleware).forRoutes('*');
+  }
+}

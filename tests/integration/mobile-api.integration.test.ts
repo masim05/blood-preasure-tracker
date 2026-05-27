@@ -3,8 +3,15 @@ import { Test } from '@nestjs/testing';
 
 import { BearerAuthGuard } from '../../src/adapters/inbound/http/bearer-auth.guard';
 import { AuthController } from '../../src/adapters/inbound/http/auth.controller';
+import {
+  HttpRequestLoggingMiddleware,
+  type HttpLoggingRequest,
+  type HttpLoggingResponse,
+  type HttpRequestLogEntry,
+} from '../../src/adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from '../../src/adapters/inbound/http/measurements.controller';
 import { ApiConfigService } from '../../src/infrastructure/config/api-config';
+import { loadApiLoggingConfig } from '../../src/infrastructure/config/api-logging-config';
 import { BEARER_TOKEN_GENERATOR, BEARER_TOKEN_STORE } from '../../src/application/ports/bearer-token-store.port';
 import { MEASUREMENT_IMAGE_STORE } from '../../src/application/ports/measurement-image-store.port';
 import { MEASUREMENT_STORE } from '../../src/application/ports/measurement-store.port';
@@ -236,6 +243,72 @@ describe('mobile API integration flow', () => {
       expect([...fixture.measurements.measurements.values()].filter((measurement) => measurement.status === 'saved')).toHaveLength(1);
     });
   });
+
+  describe('logs HTTP requests in development', () => {
+    let fixture: MobileApiFixture;
+
+    beforeAll(async () => {
+      fixture = await createUploadedFixture();
+      await markMeasurementRecognized(fixture);
+      await getJson(fixture.baseUrl, `/api/v1/measurements/${fixture.measurementId}`, fixture.accessToken);
+      await getRaw(fixture.baseUrl, `/api/v1/measurements/${fixture.measurementId}/image`, fixture.accessToken);
+      await postJson(fixture.baseUrl, `/api/v1/measurements/${fixture.measurementId}/save`, {}, fixture.accessToken);
+      await getJson(fixture.baseUrl, '/api/v1/measurements?from=2026-05-31T00:00:00.000Z&to=2026-05-01T00:00:00.000Z', fixture.accessToken);
+      await getJson(fixture.baseUrl, '/api/v1/measurements', 'very-secret-token');
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
+    });
+
+    it('logs signin request status', () => {
+      expect(findLog(fixture.requestLogs, 'POST', '/api/v1/signin')?.statusCode).toBe(201);
+    });
+
+    it('logs upload request status', () => {
+      expect(findLog(fixture.requestLogs, 'POST', '/api/v1/measurements')?.statusCode).toBe(201);
+    });
+
+    it('logs detail request status', () => {
+      expect(findLog(fixture.requestLogs, 'GET', `/api/v1/measurements/${fixture.measurementId}`)?.statusCode).toBe(200);
+    });
+
+    it('logs image retrieval request status', () => {
+      expect(findLog(fixture.requestLogs, 'GET', `/api/v1/measurements/${fixture.measurementId}/image`)?.statusCode).toBe(200);
+    });
+
+    it('logs save request status', () => {
+      expect(findLog(fixture.requestLogs, 'POST', `/api/v1/measurements/${fixture.measurementId}/save`)?.statusCode).toBe(201);
+    });
+
+    it('logs invalid history filter status', () => {
+      expect(findLog(fixture.requestLogs, 'GET', '/api/v1/measurements?from=2026-05-31T00:00:00.000Z&to=2026-05-01T00:00:00.000Z')?.statusCode).toBe(400);
+    });
+
+    it('omits credentials, tokens, payloads, image bytes, and readings from logs', () => {
+      expect(JSON.stringify(fixture.requestLogs)).not.toMatch(/password123|very-secret-token|Authorization|Bearer|png|systolic|diastolic|pulse/);
+    });
+  });
+
+  describe('suppresses debug HTTP request logs in production', () => {
+    let fixture: MobileApiFixture;
+
+    beforeAll(async () => {
+      fixture = await createMobileApiFixture({ NODE_ENV: 'production' });
+      await postJson(fixture.baseUrl, '/api/v1/signin', {
+        email: 'prod@example.com',
+        password: 'password123',
+      });
+    });
+
+    afterAll(async () => {
+      await fixture.app.close();
+    });
+
+    it('does not capture debug request logs', () => {
+      expect(fixture.requestLogs).toHaveLength(0);
+    });
+  });
 });
 
 type MobileApiFixture = {
@@ -249,6 +322,7 @@ type MobileApiFixture = {
   accessToken: string;
   userId: string;
   measurementId: string;
+  requestLogs: HttpRequestLogEntry[];
 };
 
 type FetchResponse = {
@@ -256,12 +330,13 @@ type FetchResponse = {
   body: Record<string, unknown>;
 };
 
-async function createMobileApiFixture(): Promise<MobileApiFixture> {
+async function createMobileApiFixture(env: NodeJS.ProcessEnv = { NODE_ENV: 'development' }): Promise<MobileApiFixture> {
   const users = new InMemoryUserStore();
   const tokens = new InMemoryBearerTokenStore();
   const measurements = new InMemoryMeasurementStore();
   const images = new InMemoryMeasurementImageStore();
   const recognitionTasks = new InMemoryRecognitionTaskStore();
+  const requestLogs: HttpRequestLogEntry[] = [];
   const moduleRef = await Test.createTestingModule({
     controllers: [AuthController, MeasurementsController],
     providers: [
@@ -284,7 +359,18 @@ async function createMobileApiFixture(): Promise<MobileApiFixture> {
       { provide: ApiConfigService, useValue: apiConfig },
     ],
   }).compile();
-  const app = moduleRef.createNestApplication();
+  const app = moduleRef.createNestApplication({ logger: false });
+  const logging = loadApiLoggingConfig(env);
+  if (logging.debugHttpRequests) {
+    const requestLogging = new HttpRequestLoggingMiddleware({
+      debug: (message: string): void => {
+        requestLogs.push(JSON.parse(message) as HttpRequestLogEntry);
+      },
+    });
+    app.use((request: HttpLoggingRequest, response: HttpLoggingResponse, next: () => void) => {
+      requestLogging.use(request, response, next);
+    });
+  }
 
   await app.listen(0);
 
@@ -299,6 +385,7 @@ async function createMobileApiFixture(): Promise<MobileApiFixture> {
     accessToken: '',
     userId: '',
     measurementId: '',
+    requestLogs,
   };
 }
 
@@ -381,6 +468,12 @@ async function getJson(baseUrl: string, pathname: string, accessToken: string): 
   );
 }
 
+async function getRaw(baseUrl: string, pathname: string, accessToken: string): Promise<Response> {
+  return fetch(`${baseUrl}${pathname}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
 async function parseJsonResponse(response: Response): Promise<FetchResponse> {
   return { status: response.status, body: (await response.json()) as Record<string, unknown> };
 }
@@ -391,6 +484,10 @@ function readString(value: unknown, label: string): string {
   }
 
   return value;
+}
+
+function findLog(logs: HttpRequestLogEntry[], method: string, path: string): HttpRequestLogEntry | undefined {
+  return logs.find((log) => log.method === method && log.path === path);
 }
 
 async function markMeasurementRecognized(fixture: MobileApiFixture): Promise<void> {

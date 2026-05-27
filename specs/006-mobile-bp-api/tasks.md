@@ -208,13 +208,13 @@
 
 **CRITICAL**: Endpoint-specific logging tests cannot pass until this phase is complete.
 
-- [ ] T072 [P] Add unit tests for `NODE_ENV` logging mode selection in tests/unit/infrastructure/api-logging-config.test.ts
-- [ ] T073 [P] Add unit tests for HTTP request log entry privacy exclusions in tests/unit/adapters/inbound/http/http-request-logging.test.ts
-- [ ] T074 Implement logging level selection helper for production and development modes in src/infrastructure/config/api-logging-config.ts
-- [ ] T075 Implement HTTP request/status logging middleware or interceptor in src/adapters/inbound/http/http-request-logging.ts
-- [ ] T076 Configure Nest application logging with selected log levels in src/api-main.ts
-- [ ] T077 Register HTTP request/status logging for all mobile API routes in src/api.module.ts
-- [ ] T078 Ensure logging implementation excludes request bodies, response bodies, authorization headers, cookies, passwords, multipart payloads, image bytes, and health payloads in src/adapters/inbound/http/http-request-logging.ts
+- [X] T072 [P] Add unit tests for `NODE_ENV` logging mode selection in tests/unit/infrastructure/api-logging-config.test.ts
+- [X] T073 [P] Add unit tests for HTTP request log entry privacy exclusions in tests/unit/adapters/inbound/http/http-request-logging.test.ts
+- [X] T074 Implement logging level selection helper for production and development modes in src/infrastructure/config/api-logging-config.ts
+- [X] T075 Implement HTTP request/status logging middleware or interceptor in src/adapters/inbound/http/http-request-logging.ts
+- [X] T076 Configure Nest application logging with selected log levels in src/api-main.ts
+- [X] T077 Register HTTP request/status logging for all mobile API routes in src/api.module.ts
+- [X] T078 Ensure logging implementation excludes request bodies, response bodies, authorization headers, cookies, passwords, multipart payloads, image bytes, and health payloads in src/adapters/inbound/http/http-request-logging.ts
 
 **Checkpoint**: Logging levels are selected from `NODE_ENV`, Nest logging is enabled, and all HTTP requests can emit privacy-safe debug request/status entries in development mode.
 
@@ -226,9 +226,9 @@
 
 **Independent Test**: Submit valid and invalid `POST /api/v1/signin` requests in development logging mode and verify one debug entry per request with method/path/status and no password or request body data.
 
-- [ ] T079 [P] [US1] Add contract test for development debug logging on successful `POST /api/v1/signin` in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T080 [P] [US1] Add integration test proving signin debug logs omit password and request body data in tests/integration/mobile-api.integration.test.ts
-- [ ] T081 [US1] Verify signin route logs method, path, and `201` status through shared HTTP logging in src/adapters/inbound/http/auth.controller.ts
+- [X] T079 [P] [US1] Add contract test for development debug logging on successful `POST /api/v1/signin` in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T080 [P] [US1] Add integration test proving signin debug logs omit password and request body data in tests/integration/mobile-api.integration.test.ts
+- [X] T081 [US1] Verify signin route logs method, path, and `201` status through shared HTTP logging in src/adapters/inbound/http/auth.controller.ts
 
 ---
 
@@ -238,9 +238,9 @@
 
 **Independent Test**: Submit successful login, failed login, and missing/invalid bearer token requests in development mode; verify debug entries show actual statuses and no credentials or tokens.
 
-- [ ] T082 [P] [US2] Add contract tests for debug logs on successful and failed `POST /api/v1/login` in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T083 [P] [US2] Add integration test proving invalid bearer token debug logs omit the token value in tests/integration/mobile-api.integration.test.ts
-- [ ] T084 [US2] Verify login and bearer guard request outcomes are captured by shared HTTP logging in src/adapters/inbound/http/auth.controller.ts and src/adapters/inbound/http/bearer-auth.guard.ts
+- [X] T082 [P] [US2] Add contract tests for debug logs on successful and failed `POST /api/v1/login` in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T083 [P] [US2] Add integration test proving invalid bearer token debug logs omit the token value in tests/integration/mobile-api.integration.test.ts
+- [X] T084 [US2] Verify login and bearer guard request outcomes are captured by shared HTTP logging in src/adapters/inbound/http/auth.controller.ts and src/adapters/inbound/http/bearer-auth.guard.ts
 
 ---
 
@@ -250,9 +250,9 @@
 
 **Independent Test**: Submit valid and invalid authenticated image uploads in development mode and verify debug entries include method/path/status but exclude multipart content and image bytes.
 
-- [ ] T085 [P] [US3] Add contract test for debug logging on successful `POST /api/v1/measurements` upload in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T086 [P] [US3] Add integration test proving upload debug logs omit multipart payload and image bytes in tests/integration/mobile-api.integration.test.ts
-- [ ] T087 [US3] Verify measurement upload request outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
+- [X] T085 [P] [US3] Add contract test for debug logging on successful `POST /api/v1/measurements` upload in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T086 [P] [US3] Add integration test proving upload debug logs omit multipart payload and image bytes in tests/integration/mobile-api.integration.test.ts
+- [X] T087 [US3] Verify measurement upload request outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
 
 ---
 
@@ -262,9 +262,9 @@
 
 **Independent Test**: Request measurement detail, original image, and save operations in development mode; verify debug logs contain statuses such as `200`, `201`, `404`, and `409` without response bodies, recognized readings, or image bytes.
 
-- [ ] T088 [P] [US4] Add contract tests for debug logs on `GET /api/v1/measurements/<id>`, `GET /api/v1/measurements/<id>/image`, and `POST /api/v1/measurements/<id>/save` in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T089 [P] [US4] Add integration test proving detail, image, and save debug logs omit response bodies, recognized readings, and image bytes in tests/integration/mobile-api.integration.test.ts
-- [ ] T090 [US4] Verify detail, image, and save route outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
+- [X] T088 [P] [US4] Add contract tests for debug logs on `GET /api/v1/measurements/<id>`, `GET /api/v1/measurements/<id>/image`, and `POST /api/v1/measurements/<id>/save` in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T089 [P] [US4] Add integration test proving detail, image, and save debug logs omit response bodies, recognized readings, and image bytes in tests/integration/mobile-api.integration.test.ts
+- [X] T090 [US4] Verify detail, image, and save route outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
 
 ---
 
@@ -274,9 +274,9 @@
 
 **Independent Test**: Request saved measurement history with valid and invalid filters in development mode and verify debug entries include method/path/status while excluding list response bodies.
 
-- [ ] T091 [P] [US5] Add contract test for debug logging on `GET /api/v1/measurements` history requests in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T092 [P] [US5] Add integration test proving history debug logs omit response item data and preserve `400` invalid-filter status logging in tests/integration/mobile-api.integration.test.ts
-- [ ] T093 [US5] Verify history list route outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
+- [X] T091 [P] [US5] Add contract test for debug logging on `GET /api/v1/measurements` history requests in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T092 [P] [US5] Add integration test proving history debug logs omit response item data and preserve `400` invalid-filter status logging in tests/integration/mobile-api.integration.test.ts
+- [X] T093 [US5] Verify history list route outcomes are captured by shared HTTP logging in src/adapters/inbound/http/measurements.controller.ts
 
 ---
 
@@ -284,10 +284,10 @@
 
 **Purpose**: Cross-story production behavior required by FR-031 and SC-009.
 
-- [ ] T094 [P] Add contract test proving `NODE_ENV=production` suppresses debug HTTP request logs in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T095 [P] Add unit or contract test proving warn/error log levels remain enabled when `NODE_ENV=production` in tests/unit/infrastructure/api-logging-config.test.ts
-- [ ] T096 Add integration test covering production logging mode for a representative mobile API request in tests/integration/mobile-api.integration.test.ts
-- [ ] T097 Verify production logging level selection is wired through API bootstrap in src/api-main.ts
+- [X] T094 [P] Add contract test proving `NODE_ENV=production` suppresses debug HTTP request logs in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T095 [P] Add unit or contract test proving warn/error log levels remain enabled when `NODE_ENV=production` in tests/unit/infrastructure/api-logging-config.test.ts
+- [X] T096 Add integration test covering production logging mode for a representative mobile API request in tests/integration/mobile-api.integration.test.ts
+- [X] T097 Verify production logging level selection is wired through API bootstrap in src/api-main.ts
 
 ---
 
@@ -295,14 +295,14 @@
 
 **Purpose**: Documentation, validation, and coverage hardening across logging behavior.
 
-- [ ] T098 [P] Update README mobile API environment section with `NODE_ENV` logging behavior in README.md
-- [ ] T099 [P] Update `.env.example` with optional `NODE_ENV=development` guidance in .env.example
-- [ ] T100 [P] Update quickstart logging checks if implementation details differ from planned commands in specs/006-mobile-bp-api/quickstart.md
-- [ ] T101 Run build validation with `npm run build` and fix TypeScript issues in src/api-main.ts, src/api.module.ts, src/infrastructure/config/api-logging-config.ts, and src/adapters/inbound/http/http-request-logging.ts
-- [ ] T102 Run focused logging tests with `npm test -- mobile-api-logging` and fix failures in tests/contract/mobile-api-logging.contract.test.ts
-- [ ] T103 Run mobile API integration tests with `npm test -- tests/integration/mobile-api.integration.test.ts` and fix logging-related failures in src/adapters/inbound/http/http-request-logging.ts
-- [ ] T104 Run full coverage with `npm run test:coverage` and close coverage gaps in tests/unit/infrastructure/api-logging-config.test.ts and tests/unit/adapters/inbound/http/http-request-logging.test.ts
-- [ ] T105 Run lint validation with `npm run lint` and fix issues in src/ and tests/
+- [X] T098 [P] Update README mobile API environment section with `NODE_ENV` logging behavior in README.md
+- [X] T099 [P] Update `.env.example` with optional `NODE_ENV=development` guidance in .env.example
+- [X] T100 [P] Update quickstart logging checks if implementation details differ from planned commands in specs/006-mobile-bp-api/quickstart.md
+- [X] T101 Run build validation with `npm run build` and fix TypeScript issues in src/api-main.ts, src/api.module.ts, src/infrastructure/config/api-logging-config.ts, and src/adapters/inbound/http/http-request-logging.ts
+- [X] T102 Run focused logging tests with `npm test -- mobile-api-logging` and fix failures in tests/contract/mobile-api-logging.contract.test.ts
+- [X] T103 Run mobile API integration tests with `npm test -- tests/integration/mobile-api.integration.test.ts` and fix logging-related failures in src/adapters/inbound/http/http-request-logging.ts
+- [X] T104 Run full coverage with `npm run test:coverage` and close coverage gaps in tests/unit/infrastructure/api-logging-config.test.ts and tests/unit/adapters/inbound/http/http-request-logging.test.ts
+- [X] T105 Run lint validation with `npm run lint` and fix issues in src/ and tests/
 
 ---
 

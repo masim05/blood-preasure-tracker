@@ -54,6 +54,8 @@ Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOK
 npm run api
 ```
 
+API logging uses `NODE_ENV=production` for production mode, where debug request logs are suppressed and warning/error logs remain enabled. Any other `NODE_ENV` value, including unset, uses development mode and logs each HTTP request at debug level with its response status.
+
 Create the local Docker PostgreSQL database from `DATABASE_URL` and run project migrations:
 
 ```bash
@@ -145,6 +147,7 @@ export DATABASE_URL="postgres://postgres:postgres@localhost:5432/blood_pressure_
 export API_PORT="3000"
 export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
 export ACCESS_TOKEN_TTL_SECONDS="3600"
+export NODE_ENV="development"
 ```
 
 ## Validation
