@@ -80,21 +80,21 @@ After recognition completes, the user can see the recognized blood pressure data
 
 1. **Given** recognition has completed for a measurement, **When** the user opens the measurement result, **Then** the system returns systolic, diastolic, pulse, arm side, the server-assigned measurement time, and a link to the original image.
 2. **Given** the user is dissatisfied with the recognized result, **When** they choose to re-take the photo in the mobile app, **Then** the app can submit a new measurement photo without saving the prior reading as final.
-3. **Given** the user confirms the recognized result, **When** they choose to save it through `POST /api/v1/measurements/<id>/save`, **Then** the measurement is available in their recognized measurement history.
+3. **Given** the user confirms the recognized result, **When** they choose to save it through `POST /api/v1/measurements/<id>/save`, **Then** the measurement is available in their saved measurement history.
 
 ---
 
 ### User Story 5 - Browse Measurement History (Priority: P3)
 
-A logged-in user can browse recognized measurements in a paginated list and filter by time so they can review recent or historical blood pressure readings efficiently.
+A logged-in user can browse saved measurements in a paginated list and filter by time so they can review recent or historical blood pressure readings efficiently.
 
 **Why this priority**: History review supports ongoing tracking, but it depends on account access and completed measurement recognition.
 
-**Independent Test**: Seed multiple recognized measurements for a user, request a paginated history with a time range, and verify only that user's matching recognized measurements are returned without original image payloads.
+**Independent Test**: Seed multiple saved measurements for a user, request a paginated history with a time range, and verify only that user's matching saved measurements are returned without original image payloads.
 
 **Acceptance Scenarios**:
 
-1. **Given** a user has recognized measurements across several dates, **When** they request history with a time filter, **Then** the system returns only matching recognized measurements for that user.
+1. **Given** a user has saved measurements across several dates, **When** they request history with a time filter, **Then** the system returns only matching saved measurements for that user.
 2. **Given** a user requests a history page, **When** more matching records exist than fit in one page, **Then** the system returns pagination information that allows the next page to be requested.
 3. **Given** the history list is returned, **When** the mobile app displays it, **Then** each list item includes recognized measurement data but not the original image binary.
 
@@ -136,7 +136,7 @@ A logged-in user can browse recognized measurements in a paginated list and filt
 - **FR-008**: When a measurement image is accepted, the system MUST store the original image, create a measurement record, return the measurement identifier, and schedule recognition in the background.
 - **FR-009**: The initial background recognition workflow MAY represent queued work as persisted task records as long as accepted measurements can move through pending, recognized, and failed states.
 - **FR-010**: The system MUST reject missing, empty, larger-than-10-MB, or non-JPEG/PNG image uploads without creating a measurement record or scheduling recognition.
-- **FR-011**: The system MUST provide `GET /api/v1/measurements` as an authenticated paginated list of the user's recognized measurements.
+- **FR-011**: The system MUST provide `GET /api/v1/measurements` as an authenticated paginated list of the user's saved measurements.
 - **FR-012**: The measurement list MUST support filtering by measurement time range and MUST exclude original image binary data.
 - **FR-013**: The measurement list MUST return stable pagination information so the mobile app can request additional pages when available.
 - **FR-014**: The system MUST provide `GET /api/v1/measurements/<id>` as an authenticated detail view for a single measurement owned by the user.
@@ -153,7 +153,7 @@ A logged-in user can browse recognized measurements in a paginated list and filt
 - **FR-025**: Each new feature MUST add new tests; existing tests MUST remain unchanged unless the specification documents why a change is required.
 - **FR-026**: Development workflow MUST remain MCP-free and execute in a dedicated feature worktree under `tmp/`.
 - **FR-027**: Runtime stack MUST target the latest active Node.js LTS and latest active NestJS LTS.
-- **FR-028**: Data storage MUST target the latest LTS Postgres release.
+- **FR-028**: Data storage MUST target the latest supported stable PostgreSQL major.
 - **FR-029**: Dependency decisions MUST prefer official Node.js/NestJS modules; third-party additions require explicit justification.
 
 ### Key Entities *(include if feature involves data)*
@@ -163,7 +163,7 @@ A logged-in user can browse recognized measurements in a paginated list and filt
 - **Measurement**: Represents one photo-based blood pressure reading attempt owned by a user, including status, systolic value, diastolic value, pulse value, arm side, server-assigned measurement time, save confirmation state, and image reference.
 - **Measurement Image**: Represents the stored original image submitted for recognition and the access link returned for detail views.
 - **Recognition Task**: Represents queued or completed background work associated with a measurement image, including pending, completed, and failed outcomes.
-- **Measurement History Page**: Represents a paginated slice of recognized measurements plus pagination metadata and applied time filters.
+- **Measurement History Page**: Represents a paginated slice of saved measurements plus pagination metadata and applied time filters.
 
 ## Success Criteria *(mandatory)*
 
@@ -173,7 +173,7 @@ A logged-in user can browse recognized measurements in a paginated list and filt
 - **SC-002**: A registered user can log in and access protected measurement operations with a 100% pass rate in acceptance tests using valid credentials and a valid bearer access token.
 - **SC-003**: 95% of accepted image submissions return a measurement identifier and pending recognition state within 2 seconds under normal single-user use.
 - **SC-004**: 100% of unauthenticated measurement requests and cross-user measurement access attempts are rejected in security-focused acceptance tests.
-- **SC-005**: Users can view a page of recognized measurement history filtered by time in under 2 seconds for histories up to 1,000 recognized measurements.
+- **SC-005**: Users can view a page of saved measurement history filtered by time in under 2 seconds for histories up to 1,000 saved measurements.
 - **SC-006**: Measurement detail responses correctly show pending, recognized, saved, or failed status for 100% of controlled recognition-state test cases.
 - **SC-007**: The history list omits original image binary data for 100% of list responses while detail responses provide an original image link when available.
 - **SC-008**: At least 90% of usability test participants can complete the capture, review, and save workflow without manual reading entry.

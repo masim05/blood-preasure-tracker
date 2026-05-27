@@ -80,7 +80,17 @@ curl -sS http://localhost:3000/api/v1/measurements/<id> \
 
 Expected while pending: status and image link. Expected after recognition: systolic, diastolic, pulse, arm side, measurement time, and image link.
 
-### 5. Save Recognized Measurement
+### 5. Fetch Original Image
+
+```bash
+curl -sS http://localhost:3000/api/v1/measurements/<id>/image \
+  -H "Authorization: Bearer $TOKEN" \
+  -o /tmp/measurement-image.jpg
+```
+
+Expected: `200` with the original JPEG/PNG bytes for an owned measurement.
+
+### 6. Save Recognized Measurement
 
 ```bash
 curl -sS -X POST http://localhost:3000/api/v1/measurements/<id>/save \
@@ -89,7 +99,7 @@ curl -sS -X POST http://localhost:3000/api/v1/measurements/<id>/save \
 
 Expected: `200` with `saved` status when the measurement is recognized and owned by the authenticated user.
 
-### 6. Browse History
+### 7. Browse History
 
 ```bash
 curl -sS 'http://localhost:3000/api/v1/measurements?page=1&pageSize=20&from=2026-05-01T00:00:00.000Z&to=2026-05-31T23:59:59.999Z' \

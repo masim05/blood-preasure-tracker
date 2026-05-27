@@ -8,6 +8,14 @@
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Constitution Check
+
+- [X] Hexagonal boundaries preserved with domain/application rules behind ports and HTTP/Postgres/filesystem/provider logic in adapters.
+- [X] New unit, contract, and integration tests added for feature behavior without rewriting existing CLI tests.
+- [X] Coverage gate maintained at or above 95% globally.
+- [X] Implementation uses local Node.js, npm, TypeScript, Jest, and filesystem tooling only.
+- [X] Node.js 24.x and NestJS 11 baselines remain documented in plan/spec artifacts.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -18,12 +26,12 @@
 
 **Purpose**: Establish API dependencies, bootstrap files, and durable schema scaffolding used by all stories.
 
-- [ ] T001 Update API dependencies and npm scripts for Nest HTTP, Postgres, build, and API start commands in package.json
-- [ ] T002 [P] Add API environment configuration loader for DATABASE_URL, API_PORT, MEASUREMENT_IMAGE_DIR, and ACCESS_TOKEN_TTL_SECONDS in src/infrastructure/config/api-config.ts
-- [ ] T003 [P] Add HTTP server bootstrap entry point that starts Nest on API_PORT in src/api-main.ts
-- [ ] T004 Add API composition module wiring shared providers and future HTTP adapters in src/api.module.ts
-- [ ] T005 [P] Add Postgres schema migration for users, bearer tokens, measurements, measurement images, and recognition tasks in src/infrastructure/database/migrations/001_mobile_api.sql
-- [ ] T006 [P] Add mobile API test fixture image metadata/readme for JPEG/PNG upload tests in tests/fixtures/mobile-api/README.md
+- [X] T001 Update API dependencies and npm scripts for Nest HTTP, Postgres, build, and API start commands in package.json
+- [X] T002 [P] Add API environment configuration loader for DATABASE_URL, API_PORT, MEASUREMENT_IMAGE_DIR, and ACCESS_TOKEN_TTL_SECONDS in src/infrastructure/config/api-config.ts
+- [X] T003 [P] Add HTTP server bootstrap entry point that starts Nest on API_PORT in src/api-main.ts
+- [X] T004 Add API composition module wiring shared providers and future HTTP adapters in src/api.module.ts
+- [X] T005 [P] Add Postgres schema migration for users, bearer tokens, measurements, measurement images, and recognition tasks in src/infrastructure/database/migrations/001_mobile_api.sql
+- [X] T006 [P] Add mobile API test fixture image metadata/readme for JPEG/PNG upload tests in tests/fixtures/mobile-api/README.md
 
 ---
 
@@ -33,33 +41,33 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T007 [P] Create user account domain entity in src/domain/entities/user-account.ts
-- [ ] T008 [P] Create bearer access token domain entity in src/domain/entities/bearer-access-token.ts
-- [ ] T009 [P] Create measurement domain entity with pending, recognizing, recognized, saved, and failed states in src/domain/entities/measurement.ts
-- [ ] T010 [P] Create measurement image domain entity in src/domain/entities/measurement-image.ts
-- [ ] T011 [P] Create recognition task domain entity in src/domain/entities/recognition-task.ts
-- [ ] T012 [P] Implement email normalization policy in src/domain/services/email-normalization.ts
-- [ ] T013 [P] Implement password validation and hashing policy interface helpers in src/domain/services/password-policy.ts
-- [ ] T014 [P] Implement measurement state transition policy in src/domain/services/measurement-state-policy.ts
-- [ ] T015 [P] Implement JPEG/PNG 10 MB upload validation policy in src/domain/services/upload-image-policy.ts
-- [ ] T016 [P] Implement pagination and time-range validation policy in src/domain/services/pagination-policy.ts
-- [ ] T017 [P] Define user account persistence port in src/application/ports/user-account-store.port.ts
-- [ ] T018 [P] Define bearer token persistence port in src/application/ports/bearer-token-store.port.ts
-- [ ] T019 [P] Define password hasher port in src/application/ports/password-hasher.port.ts
-- [ ] T020 [P] Define measurement persistence port in src/application/ports/measurement-store.port.ts
-- [ ] T021 [P] Define measurement image storage port in src/application/ports/measurement-image-store.port.ts
-- [ ] T022 [P] Define recognition task persistence port in src/application/ports/recognition-task-store.port.ts
-- [ ] T023 Implement Node crypto password hasher adapter in src/adapters/outbound/crypto/node-password-hasher.adapter.ts
-- [ ] T024 Implement Node crypto bearer token generator adapter in src/adapters/outbound/crypto/node-bearer-token.adapter.ts
-- [ ] T025 Implement Postgres connection pool adapter in src/adapters/outbound/postgres/postgres-pool.ts
-- [ ] T026 [P] Implement Postgres user account repository in src/adapters/outbound/postgres/user-account.repository.ts
-- [ ] T027 [P] Implement Postgres bearer token repository in src/adapters/outbound/postgres/bearer-token.repository.ts
-- [ ] T028 [P] Implement Postgres measurement repository in src/adapters/outbound/postgres/measurement.repository.ts
-- [ ] T029 [P] Implement Postgres recognition task repository in src/adapters/outbound/postgres/recognition-task.repository.ts
-- [ ] T030 [P] Implement filesystem measurement image storage adapter in src/adapters/outbound/filesystem/measurement-image-storage.adapter.ts
-- [ ] T031 Implement shared HTTP error response mapper in src/adapters/inbound/http/http-error.mapper.ts
-- [ ] T032 Implement bearer auth guard skeleton using token validation use case in src/adapters/inbound/http/bearer-auth.guard.ts
-- [ ] T033 Wire foundational API providers in src/api.module.ts
+- [X] T007 [P] Create user account domain entity in src/domain/entities/user-account.ts
+- [X] T008 [P] Create bearer access token domain entity in src/domain/entities/bearer-access-token.ts
+- [X] T009 [P] Create measurement domain entity with pending, recognizing, recognized, saved, and failed states in src/domain/entities/measurement.ts
+- [X] T010 [P] Create measurement image domain entity in src/domain/entities/measurement-image.ts
+- [X] T011 [P] Create recognition task domain entity in src/domain/entities/recognition-task.ts
+- [X] T012 [P] Implement email normalization policy in src/domain/services/email-normalization.ts
+- [X] T013 [P] Implement password validation and hashing policy interface helpers in src/domain/services/password-policy.ts
+- [X] T014 [P] Implement measurement state transition policy in src/domain/services/measurement-state-policy.ts
+- [X] T015 [P] Implement JPEG/PNG 10 MB upload validation policy in src/domain/services/upload-image-policy.ts
+- [X] T016 [P] Implement pagination and time-range validation policy in src/domain/services/pagination-policy.ts
+- [X] T017 [P] Define user account persistence port in src/application/ports/user-account-store.port.ts
+- [X] T018 [P] Define bearer token persistence port in src/application/ports/bearer-token-store.port.ts
+- [X] T019 [P] Define password hasher port in src/application/ports/password-hasher.port.ts
+- [X] T020 [P] Define measurement persistence port in src/application/ports/measurement-store.port.ts
+- [X] T021 [P] Define measurement image storage port in src/application/ports/measurement-image-store.port.ts
+- [X] T022 [P] Define recognition task persistence port in src/application/ports/recognition-task-store.port.ts
+- [X] T023 Implement Node crypto password hasher adapter in src/adapters/outbound/crypto/node-password-hasher.adapter.ts
+- [X] T024 Implement Node crypto bearer token generator adapter in src/adapters/outbound/crypto/node-bearer-token.adapter.ts
+- [X] T025 Implement Postgres connection pool adapter in src/adapters/outbound/postgres/postgres-pool.ts
+- [X] T026 [P] Implement Postgres user account repository in src/adapters/outbound/postgres/user-account.repository.ts
+- [X] T027 [P] Implement Postgres bearer token repository in src/adapters/outbound/postgres/bearer-token.repository.ts
+- [X] T028 [P] Implement Postgres measurement repository in src/adapters/outbound/postgres/measurement.repository.ts
+- [X] T029 [P] Implement Postgres recognition task repository in src/adapters/outbound/postgres/recognition-task.repository.ts
+- [X] T030 [P] Implement filesystem measurement image storage adapter in src/adapters/outbound/filesystem/measurement-image-storage.adapter.ts
+- [X] T031 Implement shared HTTP error response mapper in src/adapters/inbound/http/http-error.mapper.ts
+- [X] T032 Implement bearer auth guard skeleton using token validation use case in src/adapters/inbound/http/bearer-auth.guard.ts
+- [X] T033 Wire foundational API providers in src/api.module.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel.
 
@@ -73,17 +81,17 @@
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T034 [P] [US1] Add contract tests for `POST /api/v1/signin` success, invalid input, and duplicate email in tests/contract/mobile-api.contract.test.ts
-- [ ] T035 [P] [US1] Add unit tests for email normalization and duplicate account rules in tests/unit/domain/user-account.test.ts
-- [ ] T036 [P] [US1] Add unit tests for create account use case token issuance and password hashing in tests/unit/application/create-account.use-case.test.ts
-- [ ] T037 [P] [US1] Add integration test for signin persistence and bearer token response in tests/integration/mobile-api.integration.test.ts
+- [X] T034 [P] [US1] Add contract tests for `POST /api/v1/signin` success, invalid input, and duplicate email in tests/contract/mobile-api.contract.test.ts
+- [X] T035 [P] [US1] Add unit tests for email normalization and duplicate account rules in tests/unit/domain/user-account.test.ts
+- [X] T036 [P] [US1] Add unit tests for create account use case token issuance and password hashing in tests/unit/application/create-account.use-case.test.ts
+- [X] T037 [P] [US1] Add integration test for signin persistence and bearer token response in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T038 [US1] Implement create account use case in src/application/use-cases/create-account.use-case.ts
-- [ ] T039 [US1] Implement signin request and response DTOs in src/adapters/inbound/http/dto/auth.dto.ts
-- [ ] T040 [US1] Implement `POST /api/v1/signin` route in src/adapters/inbound/http/auth.controller.ts
-- [ ] T041 [US1] Wire create account use case and auth controller providers in src/api.module.ts
+- [X] T038 [US1] Implement create account use case in src/application/use-cases/create-account.use-case.ts
+- [X] T039 [US1] Implement signin request and response DTOs in src/adapters/inbound/http/dto/auth.dto.ts
+- [X] T040 [US1] Implement `POST /api/v1/signin` route in src/adapters/inbound/http/auth.controller.ts
+- [X] T041 [US1] Wire create account use case and auth controller providers in src/api.module.ts
 
 **Checkpoint**: User Story 1 is independently functional and testable as the MVP account creation flow.
 
@@ -97,18 +105,18 @@
 
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T042 [P] [US2] Add contract tests for `POST /api/v1/login` success and credential failures in tests/contract/mobile-api.contract.test.ts
-- [ ] T043 [P] [US2] Add unit tests for login use case credential validation and generic failure behavior in tests/unit/application/login-user.use-case.test.ts
-- [ ] T044 [P] [US2] Add unit tests for bearer token validation, expiry, and revocation behavior in tests/unit/application/authenticate-bearer-token.use-case.test.ts
-- [ ] T045 [P] [US2] Add integration test proving invalid bearer tokens cannot access protected measurement routes in tests/integration/mobile-api.integration.test.ts
+- [X] T042 [P] [US2] Add contract tests for `POST /api/v1/login` success and credential failures in tests/contract/mobile-api.contract.test.ts
+- [X] T043 [P] [US2] Add unit tests for login use case credential validation and generic failure behavior in tests/unit/application/login-user.use-case.test.ts
+- [X] T044 [P] [US2] Add unit tests for bearer token validation, expiry, and revocation behavior in tests/unit/application/authenticate-bearer-token.use-case.test.ts
+- [X] T045 [P] [US2] Add integration test proving invalid bearer tokens cannot access protected measurement routes in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T046 [US2] Implement login use case in src/application/use-cases/login-user.use-case.ts
-- [ ] T047 [US2] Implement bearer token authentication use case in src/application/use-cases/authenticate-bearer-token.use-case.ts
-- [ ] T048 [US2] Add `POST /api/v1/login` route to auth controller in src/adapters/inbound/http/auth.controller.ts
-- [ ] T049 [US2] Complete bearer auth guard token extraction and user context attachment in src/adapters/inbound/http/bearer-auth.guard.ts
-- [ ] T050 [US2] Wire login and bearer authentication providers in src/api.module.ts
+- [X] T046 [US2] Implement login use case in src/application/use-cases/login-user.use-case.ts
+- [X] T047 [US2] Implement bearer token authentication use case in src/application/use-cases/authenticate-bearer-token.use-case.ts
+- [X] T048 [US2] Add `POST /api/v1/login` route to auth controller in src/adapters/inbound/http/auth.controller.ts
+- [X] T049 [US2] Complete bearer auth guard token extraction and user context attachment in src/adapters/inbound/http/bearer-auth.guard.ts
+- [X] T050 [US2] Wire login and bearer authentication providers in src/api.module.ts
 
 **Checkpoint**: User Stories 1 and 2 both work independently and protected routes have concrete authentication behavior.
 
@@ -122,17 +130,17 @@
 
 ### Tests for User Story 3 (REQUIRED)
 
-- [ ] T051 [P] [US3] Add contract tests for `POST /api/v1/measurements` pending success and upload validation failures in tests/contract/mobile-api.contract.test.ts
-- [ ] T052 [P] [US3] Add unit tests for upload image policy covering JPEG, PNG, empty, oversized, and unsupported inputs in tests/unit/domain/upload-image-policy.test.ts
-- [ ] T053 [P] [US3] Add unit tests for submit measurement use case storage, server time, and task scheduling in tests/unit/application/submit-measurement-image.use-case.test.ts
-- [ ] T054 [P] [US3] Add integration test for authenticated upload persistence and task creation in tests/integration/mobile-api.integration.test.ts
+- [X] T051 [P] [US3] Add contract tests for `POST /api/v1/measurements` pending success and upload validation failures in tests/contract/mobile-api.contract.test.ts
+- [X] T052 [P] [US3] Add unit tests for upload image policy covering JPEG, PNG, empty, oversized, and unsupported inputs in tests/unit/domain/upload-image-policy.test.ts
+- [X] T053 [P] [US3] Add unit tests for submit measurement use case storage, server time, and task scheduling in tests/unit/application/submit-measurement-image.use-case.test.ts
+- [X] T054 [P] [US3] Add integration test for authenticated upload persistence and task creation in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T055 [US3] Implement submit measurement image use case in src/application/use-cases/submit-measurement-image.use-case.ts
-- [ ] T056 [US3] Implement measurement upload DTO and multipart mapping in src/adapters/inbound/http/dto/measurement.dto.ts
-- [ ] T057 [US3] Implement authenticated `POST /api/v1/measurements` route in src/adapters/inbound/http/measurements.controller.ts
-- [ ] T058 [US3] Wire measurement controller, upload use case, image storage, and task store providers in src/api.module.ts
+- [X] T055 [US3] Implement submit measurement image use case in src/application/use-cases/submit-measurement-image.use-case.ts
+- [X] T056 [US3] Implement measurement upload DTO and multipart mapping in src/adapters/inbound/http/dto/measurement.dto.ts
+- [X] T057 [US3] Implement authenticated `POST /api/v1/measurements` route in src/adapters/inbound/http/measurements.controller.ts
+- [X] T058 [US3] Wire measurement controller, upload use case, image storage, and task store providers in src/api.module.ts
 
 **Checkpoint**: User Story 3 can be validated independently with an authenticated upload producing a pending measurement.
 
@@ -146,21 +154,21 @@
 
 ### Tests for User Story 4 (REQUIRED)
 
-- [ ] T059 [P] [US4] Add contract tests for `GET /api/v1/measurements/<id>` pending, recognized, failed, and ownership cases in tests/contract/mobile-api.contract.test.ts
-- [ ] T060 [P] [US4] Add contract tests for `POST /api/v1/measurements/<id>/save` success, not-owned, and invalid-state cases in tests/contract/mobile-api.contract.test.ts
-- [ ] T061 [P] [US4] Add unit tests for measurement state policy recognition and save transitions in tests/unit/domain/measurement-state-policy.test.ts
-- [ ] T062 [P] [US4] Add unit tests for detail, save, and recognition task processing use cases in tests/unit/application/measurement-review.use-cases.test.ts
-- [ ] T063 [P] [US4] Add integration test for review, recognition result persistence, and save confirmation in tests/integration/mobile-api.integration.test.ts
+- [X] T059 [P] [US4] Add contract tests for `GET /api/v1/measurements/<id>` pending, recognized, failed, and ownership cases in tests/contract/mobile-api.contract.test.ts
+- [X] T060 [P] [US4] Add contract tests for `POST /api/v1/measurements/<id>/save` success, not-owned, and invalid-state cases in tests/contract/mobile-api.contract.test.ts
+- [X] T061 [P] [US4] Add unit tests for measurement state policy recognition and save transitions in tests/unit/domain/measurement-state-policy.test.ts
+- [X] T062 [P] [US4] Add unit tests for detail, save, and recognition task processing use cases in tests/unit/application/measurement-review.use-cases.test.ts
+- [X] T063 [P] [US4] Add integration test for review, recognition result persistence, and save confirmation in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 4
 
-- [ ] T064 [US4] Implement get measurement detail use case in src/application/use-cases/get-measurement-detail.use-case.ts
-- [ ] T065 [US4] Implement save measurement use case in src/application/use-cases/save-measurement.use-case.ts
-- [ ] T066 [US4] Implement recognition task processing use case that persists systolic, diastolic, pulse, and arm side in src/application/use-cases/process-recognition-task.use-case.ts
-- [ ] T067 [US4] Add detail response DTO mapping for pending, recognized, saved, and failed states in src/adapters/inbound/http/dto/measurement.dto.ts
-- [ ] T068 [US4] Add authenticated `GET /api/v1/measurements/<id>` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
-- [ ] T069 [US4] Add authenticated `POST /api/v1/measurements/<id>/save` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
-- [ ] T070 [US4] Wire detail, save, and recognition processing providers in src/api.module.ts
+- [X] T064 [US4] Implement get measurement detail use case in src/application/use-cases/get-measurement-detail.use-case.ts
+- [X] T065 [US4] Implement save measurement use case in src/application/use-cases/save-measurement.use-case.ts
+- [X] T066 [US4] Implement recognition task processing use case that persists systolic, diastolic, pulse, and arm side in src/application/use-cases/process-recognition-task.use-case.ts
+- [X] T067 [US4] Add detail response DTO mapping for pending, recognized, saved, and failed states in src/adapters/inbound/http/dto/measurement.dto.ts
+- [X] T068 [US4] Add authenticated `GET /api/v1/measurements/<id>` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
+- [X] T069 [US4] Add authenticated `POST /api/v1/measurements/<id>/save` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
+- [X] T070 [US4] Wire detail, save, and recognition processing providers in src/api.module.ts
 
 **Checkpoint**: User Story 4 can be validated independently by retrieving and saving recognized owned measurements.
 
@@ -174,17 +182,17 @@
 
 ### Tests for User Story 5 (REQUIRED)
 
-- [ ] T071 [P] [US5] Add contract tests for `GET /api/v1/measurements` pagination, time filters, empty results, and invalid ranges in tests/contract/mobile-api.contract.test.ts
-- [ ] T072 [P] [US5] Add unit tests for pagination and time-range policy in tests/unit/domain/pagination-policy.test.ts
-- [ ] T073 [P] [US5] Add unit tests for list measurements use case filtering saved-only owned measurements in tests/unit/application/list-measurements.use-case.test.ts
-- [ ] T074 [P] [US5] Add integration test for history list excluding images, pending, failed, unconfirmed, and cross-user measurements in tests/integration/mobile-api.integration.test.ts
+- [X] T071 [P] [US5] Add contract tests for `GET /api/v1/measurements` pagination, time filters, empty results, and invalid ranges in tests/contract/mobile-api.contract.test.ts
+- [X] T072 [P] [US5] Add unit tests for pagination and time-range policy in tests/unit/domain/pagination-policy.test.ts
+- [X] T073 [P] [US5] Add unit tests for list measurements use case filtering saved-only owned measurements in tests/unit/application/list-measurements.use-case.test.ts
+- [X] T074 [P] [US5] Add integration test for history list excluding images, pending, failed, unconfirmed, and cross-user measurements in tests/integration/mobile-api.integration.test.ts
 
 ### Implementation for User Story 5
 
-- [ ] T075 [US5] Implement list measurements use case in src/application/use-cases/list-measurements.use-case.ts
-- [ ] T076 [US5] Add history query DTO and list response DTO mapping in src/adapters/inbound/http/dto/measurement.dto.ts
-- [ ] T077 [US5] Add authenticated `GET /api/v1/measurements` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
-- [ ] T078 [US5] Wire list measurements provider in src/api.module.ts
+- [X] T075 [US5] Implement list measurements use case in src/application/use-cases/list-measurements.use-case.ts
+- [X] T076 [US5] Add history query DTO and list response DTO mapping in src/adapters/inbound/http/dto/measurement.dto.ts
+- [X] T077 [US5] Add authenticated `GET /api/v1/measurements` route to measurements controller in src/adapters/inbound/http/measurements.controller.ts
+- [X] T078 [US5] Wire list measurements provider in src/api.module.ts
 
 **Checkpoint**: User Story 5 can be validated independently with filtered saved history and stable pagination.
 
@@ -194,15 +202,17 @@
 
 **Purpose**: Documentation, security checks, regression validation, and coverage hardening across all user stories.
 
-- [ ] T079 [P] Update README with mobile API setup, environment variables, and smoke flow in README.md
-- [ ] T080 [P] Add API environment examples without secrets in .env.example
-- [ ] T081 [P] Add API quickstart validation notes if implementation choices differ from planning assumptions in specs/006-mobile-bp-api/quickstart.md
-- [ ] T082 Add regression test ensuring existing CLI help/predict/eval bootstrap remains unchanged in tests/integration/cli.integration.test.ts
-- [ ] T083 Run build validation with `npm run build` and fix issues in src/api-main.ts and src/api.module.ts
-- [ ] T084 Run full test coverage with `npm run test:coverage` and close coverage gaps in tests/unit/application/ and tests/unit/domain/
-- [ ] T085 Run lint validation with `npm run lint` and fix issues in src/ and tests/
-- [ ] T086 Review Postgres migration indexes and constraints for ownership, token expiry, and history filter performance in src/infrastructure/database/migrations/001_mobile_api.sql
+- [X] T079 [P] Update README with mobile API setup, environment variables, and smoke flow in README.md
+- [X] T080 [P] Add API environment examples without secrets in .env.example
+- [X] T081 [P] Add API quickstart validation notes if implementation choices differ from planning assumptions in specs/006-mobile-bp-api/quickstart.md
+- [X] T082 Add regression test ensuring existing CLI help/predict/eval bootstrap remains unchanged in tests/integration/cli.integration.test.ts
+- [X] T083 Run build validation with `npm run build` and fix issues in src/api-main.ts and src/api.module.ts
+- [X] T084 Run full test coverage with `npm run test:coverage` and close coverage gaps in tests/unit/application/ and tests/unit/domain/
+- [X] T085 Run lint validation with `npm run lint` and fix issues in src/ and tests/
+- [X] T086 Review Postgres migration indexes and constraints for ownership, token expiry, and history filter performance in src/infrastructure/database/migrations/001_mobile_api.sql
 - [ ] T087 Verify quickstart smoke commands work against the local API server and update specs/006-mobile-bp-api/quickstart.md if needed
+
+   Note: deferred until a local PostgreSQL database is available for the API server; build, lint, contract, integration, and coverage validation passed in this workspace.
 
 ---
 

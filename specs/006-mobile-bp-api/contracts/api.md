@@ -214,6 +214,20 @@ Confirms a recognized owned measurement so it appears in default history.
 - `404` when the measurement does not exist or is not owned by the authenticated user.
 - `409` when the measurement is not in a recognized state.
 
+## GET /api/v1/measurements/<id>/image
+
+Returns the original image binary for an owned measurement.
+
+**Auth**: Required.
+
+**Success 200**:
+- `Content-Type`: `image/jpeg` or `image/png`.
+- Body: original image bytes.
+
+**Failure cases**:
+- `401` for missing, expired, revoked, or invalid bearer token.
+- `404` when the measurement does not exist, is not owned by the authenticated user, or has no stored image.
+
 ## Image Link
 
 Detail responses include an `imageUrl` link to the original image. The implementation must ensure this URL is owner-protected or time-limited. The list endpoint never returns image binary data.

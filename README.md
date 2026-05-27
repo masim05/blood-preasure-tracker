@@ -44,6 +44,26 @@ npm run cli -- eval --input ./data/eval --csv ./data/eval/p.csv
 
 CLI arguments override environment defaults for `--input`, `--csv`, `--provider`, and `--model`.
 
+## Mobile API
+
+The mobile API runs beside the CLI as a NestJS HTTP adapter. It supports email account creation, login, bearer-protected measurement image upload, measurement detail and original image retrieval, explicit save confirmation, and saved measurement history.
+
+Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOKEN_TTL_SECONDS`, `API_PORT`, and `OPENAI_API_KEY`:
+
+```bash
+npm run api
+```
+
+Primary endpoints:
+
+- `POST /api/v1/signin` creates an account and returns an expiring bearer token.
+- `POST /api/v1/login` returns an expiring bearer token for an existing user.
+- `POST /api/v1/measurements` accepts an authenticated JPEG/PNG image up to 10 MB and returns a pending measurement id.
+- `GET /api/v1/measurements/<id>` returns owned measurement detail and an `imageUrl`.
+- `GET /api/v1/measurements/<id>/image` returns the owner-protected original image bytes.
+- `POST /api/v1/measurements/<id>/save` saves a recognized measurement into history.
+- `GET /api/v1/measurements` returns saved measurement history without image binary data.
+
 ## Output
 
 - `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
@@ -85,6 +105,10 @@ export CLI_INPUT_DIR="./data/eval"
 export CLI_EVAL_CSV="./data/eval/a.csv"
 export CLI_PROVIDER="openai"
 export CLI_MODEL="gpt-5.4-mini"
+export DATABASE_URL="postgres://postgres:postgres@localhost:5432/blood_pressure_tracker"
+export API_PORT="3000"
+export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
+export ACCESS_TOKEN_TTL_SECONDS="3600"
 ```
 
 ## Validation
