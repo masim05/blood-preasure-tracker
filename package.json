@@ -11,6 +11,7 @@
     "build": "tsc -p tsconfig.json",
     "api": "npm run build --silent && node dist/api-main.js",
     "cli": "npm run build --silent && node dist/main.js",
+    "openapi:generate": "node scripts/generate-openapi-with-copilot.mjs",
     "test": "jest --runInBand",
     "test:coverage": "jest --runInBand --coverage",
     "lint": "eslint .",

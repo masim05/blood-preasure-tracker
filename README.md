@@ -64,6 +64,12 @@ Primary endpoints:
 - `POST /api/v1/measurements/<id>/save` saves a recognized measurement into history.
 - `GET /api/v1/measurements` returns saved measurement history without image binary data.
 
+The OpenAPI document lives at [docs/openapi.yaml](docs/openapi.yaml). Regenerate it from the API contract and controllers with the local Copilot CLI:
+
+```bash
+npm run openapi:generate
+```
+
 ## Output
 
 - `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
