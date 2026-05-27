@@ -28,12 +28,12 @@
 
 **Purpose**: Confirm the current command, CI, and test layout before changing behavior.
 
-- [ ] T001 Review command requirements in specs/007-rethink-tests/contracts/npm-scripts.md
-- [ ] T002 [P] Review CI job requirements in specs/007-rethink-tests/contracts/ci-workflow.md
-- [ ] T003 [P] Inspect existing npm scripts in package.json
-- [ ] T004 [P] Inspect current Jest discovery and coverage settings in jest.config.ts
-- [ ] T005 [P] Inspect current CI workflow structure in .github/workflows/ci.yml
-- [ ] T006 Confirm implementation is running from the dedicated tmp/007-rethink-tests worktree before editing package.json, jest.config.ts, or .github/workflows/ci.yml
+- [X] T001 Review command requirements in specs/007-rethink-tests/contracts/npm-scripts.md
+- [X] T002 [P] Review CI job requirements in specs/007-rethink-tests/contracts/ci-workflow.md
+- [X] T003 [P] Inspect existing npm scripts in package.json
+- [X] T004 [P] Inspect current Jest discovery and coverage settings in jest.config.ts
+- [X] T005 [P] Inspect current CI workflow structure in .github/workflows/ci.yml
+- [X] T006 Confirm implementation is running from the dedicated tmp/007-rethink-tests worktree before editing package.json, jest.config.ts, or .github/workflows/ci.yml
 
 ---
 
@@ -43,11 +43,11 @@
 
 **CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T007 Define unit/contract test selection as `src/**/*.test.ts` in package.json script commands
-- [ ] T008 Define integration test selection as `tests/integration/**/*.test.ts` in package.json script commands
-- [ ] T009 Ensure coverage collection remains limited to production source files in jest.config.ts
-- [ ] T010 Confirm integration fixtures and dependencies remain available under tests/fixtures/ and tests/integration/
-- [ ] T011 Create failing workflow contract tests for npm script selection and CI job structure in src/test-workflow.contract.test.ts
+- [X] T007 Define unit/contract test selection as `src/**/*.test.ts` in package.json script commands
+- [X] T008 Define integration test selection as `tests/integration/**/*.test.ts` in package.json script commands
+- [X] T009 Ensure coverage collection remains limited to production source files in jest.config.ts
+- [X] T010 Confirm integration fixtures and dependencies remain available under tests/fixtures/ and tests/integration/
+- [X] T011 Create failing workflow contract tests for npm script selection and CI job structure in src/test-workflow.contract.test.ts
 
 **Checkpoint**: Test-suite categories are explicit and ready for story implementation.
 
@@ -61,12 +61,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Add workflow contract assertions for `test` and `test:coverage` unit/contract-only script selection in src/test-workflow.contract.test.ts
-- [ ] T013 [US1] Update `test` script to run unit/contract suites only in package.json
-- [ ] T014 [US1] Update `test:coverage` script to run unit/contract suites only while preserving coverage in package.json
-- [ ] T015 [US1] Adjust Jest roots or path handling as needed for unit/contract command selection in jest.config.ts
-- [ ] T016 [US1] Run `npm test` from package.json and verify output includes 0 integration suites for package.json script behavior
-- [ ] T017 [US1] Run `npm run test:coverage` from package.json and verify output includes 0 integration suites while preserving the >=95% coverage gate
+- [X] T012 [US1] Add workflow contract assertions for `test` and `test:coverage` unit/contract-only script selection in src/test-workflow.contract.test.ts
+- [X] T013 [US1] Update `test` script to run unit/contract suites only in package.json
+- [X] T014 [US1] Update `test:coverage` script to run unit/contract suites only while preserving coverage in package.json
+- [X] T015 [US1] Adjust Jest roots or path handling as needed for unit/contract command selection in jest.config.ts
+- [X] T016 [US1] Run `npm test` from package.json and verify output includes 0 integration suites for package.json script behavior
+- [X] T017 [US1] Run `npm run test:coverage` from package.json and verify output includes 0 integration suites while preserving the >=95% coverage gate
 
 **Checkpoint**: User Story 1 is independently functional; local fast and coverage commands exclude integration tests.
 
@@ -80,11 +80,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Add workflow contract assertions for `test:integration` integration-only script selection in src/test-workflow.contract.test.ts
-- [ ] T019 [US2] Add `test:integration` npm script for `tests/integration/**/*.test.ts` suites in package.json
-- [ ] T020 [US2] Adjust Jest roots or path handling as needed for integration command selection in jest.config.ts
-- [ ] T021 [US2] Run `npm run test:integration` from package.json and verify output includes integration suites only
-- [ ] T022 [US2] Run `npm test` from package.json and verify integration suites remain excluded after adding `test:integration`
+- [X] T018 [US2] Add workflow contract assertions for `test:integration` integration-only script selection in src/test-workflow.contract.test.ts
+- [X] T019 [US2] Add `test:integration` npm script for `tests/integration/**/*.test.ts` suites in package.json
+- [X] T020 [US2] Adjust Jest roots or path handling as needed for integration command selection in jest.config.ts
+- [X] T021 [US2] Run `npm run test:integration` from package.json and verify output includes integration suites only
+- [X] T022 [US2] Run `npm test` from package.json and verify integration suites remain excluded after adding `test:integration`
 
 **Checkpoint**: User Story 2 is independently functional; integration tests have a dedicated command.
 
@@ -98,13 +98,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Add workflow contract assertions for four independent CI jobs and no CI `npm test` step in src/test-workflow.contract.test.ts
-- [ ] T024 [US3] Replace the single serial CI job with a `build` job running `npm run build` in .github/workflows/ci.yml
-- [ ] T025 [P] [US3] Add a `unit-contract-coverage` job running `npm run test:coverage` in .github/workflows/ci.yml
-- [ ] T026 [P] [US3] Add an `integration-tests` job running `npm run test:integration` in .github/workflows/ci.yml
-- [ ] T027 [P] [US3] Add a `lint` job running `npm run lint` in .github/workflows/ci.yml
-- [ ] T028 [US3] Remove the redundant CI `npm test` step from .github/workflows/ci.yml
-- [ ] T029 [US3] Verify CI jobs have no `needs` dependencies so build, lint, unit/contract coverage, and integration can run in parallel in .github/workflows/ci.yml
+- [X] T023 [US3] Add workflow contract assertions for four independent CI jobs and no CI `npm test` step in src/test-workflow.contract.test.ts
+- [X] T024 [US3] Replace the single serial CI job with a `build` job running `npm run build` in .github/workflows/ci.yml
+- [X] T025 [P] [US3] Add a `unit-contract-coverage` job running `npm run test:coverage` in .github/workflows/ci.yml
+- [X] T026 [P] [US3] Add an `integration-tests` job running `npm run test:integration` in .github/workflows/ci.yml
+- [X] T027 [P] [US3] Add a `lint` job running `npm run lint` in .github/workflows/ci.yml
+- [X] T028 [US3] Remove the redundant CI `npm test` step from .github/workflows/ci.yml
+- [X] T029 [US3] Verify CI jobs have no `needs` dependencies so build, lint, unit/contract coverage, and integration can run in parallel in .github/workflows/ci.yml
 
 **Checkpoint**: User Story 3 is independently functional; CI exposes separate parallel validation jobs.
 
@@ -114,14 +114,14 @@
 
 **Purpose**: Validate the full workflow and update contributor-facing command documentation.
 
-- [ ] T030 [P] Update test command documentation in README.md
-- [ ] T031 [P] Confirm quickstart validation steps remain accurate in specs/007-rethink-tests/quickstart.md
-- [ ] T032 Run `npm run build` from package.json to verify production build remains unchanged
-- [ ] T033 Run `npm test` from package.json to verify unit/contract-only fast tests and workflow contract tests pass
-- [ ] T034 Run `npm run test:coverage` from package.json to verify unit/contract coverage passes the >=95% threshold
-- [ ] T035 Run `npm run test:integration` from package.json to verify integration-only tests pass
-- [ ] T036 Run `npm run lint` from package.json to verify configuration and YAML changes are lint-clean
-- [ ] T037 Inspect `git diff -- package.json jest.config.ts .github/workflows/ci.yml README.md src/test-workflow.contract.test.ts` and confirm no product business logic or existing test assertions changed
+- [X] T030 [P] Update test command documentation in README.md
+- [X] T031 [P] Confirm quickstart validation steps remain accurate in specs/007-rethink-tests/quickstart.md
+- [X] T032 Run `npm run build` from package.json to verify production build remains unchanged
+- [X] T033 Run `npm test` from package.json to verify unit/contract-only fast tests and workflow contract tests pass
+- [X] T034 Run `npm run test:coverage` from package.json to verify unit/contract coverage passes the >=95% threshold
+- [X] T035 Run `npm run test:integration` from package.json to verify integration-only tests pass
+- [X] T036 Run `npm run lint` from package.json to verify configuration and YAML changes are lint-clean
+- [X] T037 Inspect `git diff -- package.json jest.config.ts .github/workflows/ci.yml README.md src/test-workflow.contract.test.ts` and confirm no product business logic or existing test assertions changed
 
 ---
 

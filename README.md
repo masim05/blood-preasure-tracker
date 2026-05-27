@@ -157,7 +157,8 @@ The following commands were validated in this workspace:
 ```bash
 npm run build
 npm run cli -- --help
-npm test
-npm run test:coverage
+npm test                 # unit and contract tests only
+npm run test:coverage    # unit and contract coverage gate
+npm run test:integration # integration tests only
 npm run lint
 ```
