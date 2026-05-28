@@ -18,8 +18,8 @@
 
 **Purpose**: Confirm the target scope and current suite inventory before editing.
 
-- [ ] T001 Review feature constraints in specs/008-integration-test-assertions/spec.md and specs/008-integration-test-assertions/plan.md
-- [ ] T002 Inventory all endpoint-level `describe` blocks and existing `it` assertions inside `mobile API integration flow` in tests/integration/mobile-api.integration.test.ts
+- [X] T001 Review feature constraints in specs/008-integration-test-assertions/spec.md and specs/008-integration-test-assertions/plan.md
+- [X] T002 Inventory all endpoint-level `describe` blocks and existing `it` assertions inside `mobile API integration flow` in tests/integration/mobile-api.integration.test.ts
 
 ---
 
@@ -29,9 +29,9 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Define the per-example scenario setup approach for repeated signin, login, measurement upload, recognition, image, save, history, and logging flows in tests/integration/mobile-api.integration.test.ts
-- [ ] T004 Confirm no production source files or test files outside tests/integration/mobile-api.integration.test.ts need edits for this feature in specs/008-integration-test-assertions/quickstart.md
-- [ ] T005 Confirm dedicated worktree isolation is waived and current-checkout implementation is allowed in specs/008-integration-test-assertions/quickstart.md
+- [X] T003 Define the per-example scenario setup approach for repeated signin, login, measurement upload, recognition, image, save, history, and logging flows in tests/integration/mobile-api.integration.test.ts
+- [X] T004 Confirm no production source files or test files outside tests/integration/mobile-api.integration.test.ts need edits for this feature in specs/008-integration-test-assertions/quickstart.md
+- [X] T005 Confirm dedicated worktree isolation is waived and current-checkout implementation is allowed in specs/008-integration-test-assertions/quickstart.md
 
 **Checkpoint**: The implementation path is constrained to isolated examples inside the existing mobile API integration suite.
 
@@ -45,15 +45,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Split the `POST /api/v1/signin` response status and JSON body assertions into focused examples in tests/integration/mobile-api.integration.test.ts
-- [ ] T007 [US1] Split the `POST /api/v1/login` response status and JSON body assertions into focused examples in tests/integration/mobile-api.integration.test.ts
-- [ ] T008 [US1] Split the `GET /api/v1/measurements` response status and JSON body assertions for empty history, invalid token, invalid range, saved history, and debug logging scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T009 [US1] Split the `POST /api/v1/measurements` response status and JSON body assertions for happy path, missing image, and missing bearer token scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T010 [US1] Split the `GET /api/v1/measurements/{id}` response status and JSON body assertions for recognized, missing bearer token, and not found scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T011 [US1] Split the `GET /api/v1/measurements/{id}/image` response status and binary image format assertions for happy path, missing bearer token, and not found scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T012 [US1] Split the `POST /api/v1/measurements/{id}/save` response status and JSON body assertions for happy path, missing bearer token, not found, and pending conflict scenarios in tests/integration/mobile-api.integration.test.ts
-- [ ] T013 [US1] Verify every existing endpoint-level `describe` name remains unchanged after response assertion splitting in tests/integration/mobile-api.integration.test.ts
-- [ ] T014 [US1] Run verbose mobile API integration output validation for response assertion names using tests/integration/mobile-api.integration.test.ts
+- [X] T006 [US1] Split the `POST /api/v1/signin` response status and JSON body assertions into focused examples in tests/integration/mobile-api.integration.test.ts
+- [X] T007 [US1] Split the `POST /api/v1/login` response status and JSON body assertions into focused examples in tests/integration/mobile-api.integration.test.ts
+- [X] T008 [US1] Split the `GET /api/v1/measurements` response status and JSON body assertions for empty history, invalid token, invalid range, saved history, and debug logging scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T009 [US1] Split the `POST /api/v1/measurements` response status and JSON body assertions for happy path, missing image, and missing bearer token scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T010 [US1] Split the `GET /api/v1/measurements/{id}` response status and JSON body assertions for recognized, missing bearer token, and not found scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T011 [US1] Split the `GET /api/v1/measurements/{id}/image` response status and binary image format assertions for happy path, missing bearer token, and not found scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T012 [US1] Split the `POST /api/v1/measurements/{id}/save` response status and JSON body assertions for happy path, missing bearer token, not found, and pending conflict scenarios in tests/integration/mobile-api.integration.test.ts
+- [X] T013 [US1] Verify every existing endpoint-level `describe` name remains unchanged after response assertion splitting in tests/integration/mobile-api.integration.test.ts
+- [X] T014 [US1] Run verbose mobile API integration output validation for response assertion names using tests/integration/mobile-api.integration.test.ts
 
 **Checkpoint**: User Story 1 is complete when response status and response format failures are identifiable from Jest example names for all endpoint-level scenarios.
 
@@ -67,17 +67,17 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Split `POST /api/v1/signin - happy path` user account and bearer token PostgreSQL assertions into separate examples in tests/integration/mobile-api.integration.test.ts
-- [ ] T016 [US2] Split `POST /api/v1/login - happy path` bearer token PostgreSQL assertion into a separate example in tests/integration/mobile-api.integration.test.ts
-- [ ] T017 [US2] Split `GET /api/v1/measurements - happy path empty history` PostgreSQL empty-history assertion into a separate example in tests/integration/mobile-api.integration.test.ts
-- [ ] T018 [US2] Split `POST /api/v1/measurements - happy path` measurement, image, recognition task, pending status, and OpenAI-not-called assertions into separate examples in tests/integration/mobile-api.integration.test.ts
-- [ ] T019 [US2] Split `GET /api/v1/measurements/{id} - happy path recognized measurement` OpenAI-call assertion into a separate example in tests/integration/mobile-api.integration.test.ts
-- [ ] T020 [US2] Split `GET /api/v1/measurements/{id}/image - happy path` filesystem-backed image byte assertion into a separate example in tests/integration/mobile-api.integration.test.ts
-- [ ] T021 [US2] Split `POST /api/v1/measurements/{id}/save - happy path` saved-status PostgreSQL assertion into a separate example in tests/integration/mobile-api.integration.test.ts
-- [ ] T022 [US2] Split `GET /api/v1/measurements - happy path saved history` no-image-bytes response-side assertion into a separately named example in tests/integration/mobile-api.integration.test.ts
-- [ ] T023 [US2] Split `GET /api/v1/measurements - debug logging` request log status and redaction assertions into separate examples in tests/integration/mobile-api.integration.test.ts
-- [ ] T024 [US2] Verify response-only negative scenarios do not add unrelated persistence assertions in tests/integration/mobile-api.integration.test.ts
-- [ ] T025 [US2] Run verbose mobile API integration output validation for persistence and side-effect assertion names using tests/integration/mobile-api.integration.test.ts
+- [X] T015 [US2] Split `POST /api/v1/signin - happy path` user account and bearer token PostgreSQL assertions into separate examples in tests/integration/mobile-api.integration.test.ts
+- [X] T016 [US2] Split `POST /api/v1/login - happy path` bearer token PostgreSQL assertion into a separate example in tests/integration/mobile-api.integration.test.ts
+- [X] T017 [US2] Split `GET /api/v1/measurements - happy path empty history` PostgreSQL empty-history assertion into a separate example in tests/integration/mobile-api.integration.test.ts
+- [X] T018 [US2] Split `POST /api/v1/measurements - happy path` measurement, image, recognition task, pending status, and OpenAI-not-called assertions into separate examples in tests/integration/mobile-api.integration.test.ts
+- [X] T019 [US2] Split `GET /api/v1/measurements/{id} - happy path recognized measurement` OpenAI-call assertion into a separate example in tests/integration/mobile-api.integration.test.ts
+- [X] T020 [US2] Split `GET /api/v1/measurements/{id}/image - happy path` filesystem-backed image byte assertion into a separate example in tests/integration/mobile-api.integration.test.ts
+- [X] T021 [US2] Split `POST /api/v1/measurements/{id}/save - happy path` saved-status PostgreSQL assertion into a separate example in tests/integration/mobile-api.integration.test.ts
+- [X] T022 [US2] Split `GET /api/v1/measurements - happy path saved history` no-image-bytes response-side assertion into a separately named example in tests/integration/mobile-api.integration.test.ts
+- [X] T023 [US2] Split `GET /api/v1/measurements - debug logging` request log status and redaction assertions into separate examples in tests/integration/mobile-api.integration.test.ts
+- [X] T024 [US2] Verify response-only negative scenarios do not add unrelated persistence assertions in tests/integration/mobile-api.integration.test.ts
+- [X] T025 [US2] Run verbose mobile API integration output validation for persistence and side-effect assertion names using tests/integration/mobile-api.integration.test.ts
 
 **Checkpoint**: User Story 2 is complete when infrastructure side-effect failures are identifiable separately from response contract failures.
 
@@ -91,11 +91,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Inspect the implementation diff and confirm no production files under src/ changed for this maintenance change in specs/008-integration-test-assertions/quickstart.md
-- [ ] T027 [US3] Inspect the implementation diff and confirm no new test files or existing test files outside tests/integration/mobile-api.integration.test.ts changed for this maintenance change in specs/008-integration-test-assertions/quickstart.md
-- [ ] T028 [US3] Run `npm run db:init -- --env .env.test` before integration validation for tests/integration/mobile-api.integration.test.ts
-- [ ] T029 [US3] Run `npm run test:integration -- --runTestsByPath tests/integration/mobile-api.integration.test.ts --verbose` and verify all split assertions pass in tests/integration/mobile-api.integration.test.ts
-- [ ] T030 [US3] Run `npm run lint` and resolve lint issues only in tests/integration/mobile-api.integration.test.ts if any are introduced
+- [X] T026 [US3] Inspect the implementation diff and confirm no production files under src/ changed for this maintenance change in specs/008-integration-test-assertions/quickstart.md
+- [X] T027 [US3] Inspect the implementation diff and confirm no new test files or existing test files outside tests/integration/mobile-api.integration.test.ts changed for this maintenance change in specs/008-integration-test-assertions/quickstart.md
+- [X] T028 [US3] Run `npm run db:init -- --env .env.test` before integration validation for tests/integration/mobile-api.integration.test.ts
+- [X] T029 [US3] Run `npm run test:integration -- --runTestsByPath tests/integration/mobile-api.integration.test.ts --verbose` and verify all split assertions pass in tests/integration/mobile-api.integration.test.ts
+- [X] T030 [US3] Run `npm run lint` and resolve lint issues only in tests/integration/mobile-api.integration.test.ts if any are introduced
 
 **Checkpoint**: User Story 3 is complete when validation passes and the diff is scoped to the requested test-only restructuring.
 
@@ -105,8 +105,8 @@
 
 **Purpose**: Final consistency checks across all stories.
 
-- [ ] T031 Confirm all tasks and generated artifacts remain consistent with specs/008-integration-test-assertions/contracts/mobile-api-integration-output.md
-- [ ] T032 Confirm `git diff --stat` shows only allowed implementation files plus Spec Kit artifacts for specs/008-integration-test-assertions/tasks.md
+- [X] T031 Confirm all tasks and generated artifacts remain consistent with specs/008-integration-test-assertions/contracts/mobile-api-integration-output.md
+- [X] T032 Confirm `git diff --stat` shows only allowed implementation files plus Spec Kit artifacts for specs/008-integration-test-assertions/tasks.md
 
 ---
 
