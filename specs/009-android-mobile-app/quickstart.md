@@ -7,10 +7,11 @@ This quickstart validates the plan for the Android app feature. Implementation c
 ## Prerequisites
 
 - Android Studio installed with Android SDK.
-- JDK compatible with the selected Android Gradle Plugin.
+- Android Studio bundled JDK/JBR or another JDK compatible with Android Gradle Plugin 8.7.3.
 - Node.js latest active LTS for running the existing API.
 - Project dependencies installed with `npm install` at repository root.
 - Local API environment configured as documented in the repository README.
+- Implementation work performed from `tmp/009-android-mobile-app` or with an explicit maintainer waiver for worktree isolation.
 
 ## 1. Start Existing API
 
@@ -30,14 +31,14 @@ Open this directory in Android Studio:
 mobile/android
 ```
 
-The initial scaffold must build and run as a hello world app before user-story implementation proceeds.
+The initial scaffold must build and run before user-story implementation proceeds.
 
 ## 3. Build Android App
 
 From `mobile/android`:
 
 ```bash
-./gradlew :app:assembleDebug
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew :app:assembleDebug
 ```
 
 ## 4. Run Unit Tests And Coverage
@@ -45,8 +46,8 @@ From `mobile/android`:
 From `mobile/android`:
 
 ```bash
-./gradlew :app:testDebugUnitTest
-./gradlew :app:androidCoverageVerify
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew :app:testDebugUnitTest
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew :app:androidCoverageVerify
 ```
 
 The Android unit coverage gate is `>= 95%` for implemented mobile code.
@@ -56,24 +57,29 @@ The Android unit coverage gate is `>= 95%` for implemented mobile code.
 Start an emulator/device, install the debug app, then run the in-scope flows from `mobile/android`:
 
 ```bash
-maestro test maestro/us1-signin.yaml
-maestro test maestro/us2-guide.yaml
-maestro test maestro/us3-login.yaml
-maestro test maestro/us4-capture-or-history.yaml
-maestro test maestro/us5-history-filter.yaml
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew :app:installDebug
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us1-signin.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us2-guide.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us3-login.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us4-capture-or-history.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us5-history-filter.yaml
 ```
 
 No US6 flow is required for this feature because measurement detail, image review, value override, and reviewed save are deferred.
 
 ## 6. Manual Smoke Checklist
 
-- App opens and displays hello world scaffold before full implementation.
-- Signin creates an account and navigates to the guide.
+- App opens and displays the combined Login/New Account auth screen.
+- New Account mode creates an account and navigates to the guide.
 - Signin and login password fields use Android standard password masking behavior.
 - Guide shows placeholder text asking for a clear picture with tonometer and arm.
-- Login authenticates an existing user and navigates to the measurement action screen.
-- Measurement action screen opens camera capture and history paths.
+- Guide Next opens the camera screen.
+- Login mode authenticates an existing user and navigates directly to the camera screen.
+- Camera screen provides image capture/upload and History actions.
+- Successful upload opens history.
 - History shows saved measurement rows in vertically aligned columns.
 - History applies date filters through date selector controls rather than free-text inputs.
+- Tapping a history row does not open measurement detail in this feature.
 - API errors and network failures are visible to the user on the current screen.
-- No files outside `mobile/android` are changed during implementation.
+- Android screens use Jetpack Compose Material 3 layouts and localized visible strings.
+- No files outside `mobile/android` are changed during implementation, except Spec Kit planning artifacts when running planning commands.

@@ -8,9 +8,7 @@
 
 ## Summary
 
-Build and maintain a Kotlin Android app under `mobile/android` that can be opened in Android Studio, starts from a buildable hello world scaffold, and implements the five in-scope user stories: account creation, guide, login, capture/history choice, and saved-measurement history with date filtering. The app consumes the existing Mobile API described by `docs/openapi.yaml`, displays every API error to the user, localizes every visible string, includes a happy-path Maestro flow for US1-US5, and enforces 95% Android unit-test coverage for implemented mobile code.
-
-This planning refresh incorporates the clarified UX requirements: password fields use Android standard password masking with brief last-character reveal; history date filters use date selector controls rather than free-text inputs; and history rows render in vertically aligned table columns for scanning.
+Update the Android app under `mobile/android` to match the clarified customer journey and official Android layout direction. The app will use Jetpack Compose Material 3 for the five-screen journey: one combined Login/New Account auth screen, guide screen, camera screen, history screen, and future measurement screen placeholder scope. In this feature, measurement detail remains deferred, so history rows remain non-clickable while the future `4 -> 5` transition is documented as out of scope. Successful New Account routes to Guide; Guide Next routes to Camera; successful Login routes to Camera; Camera History opens History; successful upload opens History. The app continues to consume the existing Mobile API described by `docs/openapi.yaml`, display every API error to users, localize visible strings, maintain happy-path Maestro flows for US1-US5, and enforce Android unit coverage `>= 95%`.
 
 ## Technical Context
 
@@ -18,7 +16,7 @@ This planning refresh incorporates the clarified UX requirements: password field
 
 **Android Language/Version**: Kotlin 2.0.21 pinned in `mobile/android/gradle/libs.versions.toml`. Kotlin does not publish a conventional LTS track, so this plan treats the constitution's Kotlin LTS requirement as the project-approved latest stable Android-compatible Kotlin baseline already pinned for the module.
 
-**Primary Dependencies**: Android Gradle Plugin 8.7.3, Android platform Views/widgets, JUnit 4.13.2, JaCoCo 0.8.12, Maestro CLI, Android SDK/emulator. The implemented HTTP adapter uses Android/Java platform networking (`HttpURLConnection`) to avoid adding dependencies outside the mobile module.
+**Primary Dependencies**: Android Gradle Plugin 8.7.3, Jetpack Compose UI, Jetpack Compose Material 3, AndroidX Activity Compose, AndroidX Compose Material Icons as needed for standard controls, JUnit 4.13.2, JaCoCo 0.8.12, Maestro CLI, Android SDK/emulator. The HTTP adapter continues to use Android/Java platform networking (`HttpURLConnection`) to avoid API-client dependency churn.
 
 **Storage**: In-memory session store for the current feature. No local database is introduced. Persisted session storage can be added later under the same session port if needed.
 
@@ -30,38 +28,38 @@ This planning refresh incorporates the clarified UX requirements: password field
 
 **Android Source Root**: `mobile/android`.
 
-**Performance Goals**: Auth and history screens should render within 1 second after local API response; history date-selector changes should keep selected filter state visible; camera/upload starts from a single primary action on the measurement action screen.
+**Performance Goals**: Auth, guide, camera, and history screens should render within 1 second after local state/API response. A returning user should reach the camera screen within 2 minutes during local validation. Date filtering should require no more than 3 user actions after reaching history.
 
-**Constraints**: All implementation changes must stay under `mobile/android`; no API code, API tests, backend tests, or OpenAPI document changes. Every API error response message must be shown in the current screen UI, with a clear fallback for network/malformed responses. US6 detail/review/override/save remains deferred.
+**Constraints**: All implementation changes must stay under `mobile/android`; no API code, API tests, backend tests, or OpenAPI document changes. Every API error response message must be shown in the current screen UI, with a clear fallback for network/malformed responses. US6 measurement detail/review/override/save remains deferred.
 
-**API Error UX**: `ApiErrorMapper` converts API `message` values and network/timeout/parse/unexpected failures into visible screen state. Auth, upload, and history screens must preserve retry/navigation paths when displaying errors.
+**API Error UX**: `ApiErrorMapper` converts API `message` values and network/timeout/parse/unexpected failures into visible Compose screen state. Auth, upload, and history screens preserve retry/navigation paths when displaying errors.
 
-**Localization**: Every visible Android text value is defined in localized string resources or an equivalent localization mechanism. Kotlin code, XML resources, tests, and Maestro flows must avoid hardcoded visible user-facing text; Maestro should prefer stable resource IDs.
+**Localization**: Every visible Android text value is defined in localized string resources or an equivalent localization mechanism used by Compose. Kotlin code, XML resources, tests, and Maestro flows avoid hardcoded visible user-facing text; Maestro prefers stable resource IDs/content descriptions.
 
-**Scale/Scope**: Five user stories, one Android app module, one HTTP API client boundary, one session store, one camera/upload path, and one history table screen with date selector filters. Measurement detail, image review, override, and reviewed save are out of scope.
+**Scale/Scope**: Five in-scope user stories, one Android app module, one HTTP API client boundary, one session store, one camera/upload path, one combined auth screen, one guide screen, one camera screen, and one history table screen with date selector filters. Measurement detail, image review, override, and reviewed save are out of scope.
 
-**Maestro Coverage**: One happy-path Maestro flow each for US1, US2, US3, US4, and US5 under `mobile/android/maestro`. US5 flow must cover date filter selection/application and a visible saved measurement row; US6 has no flow because it is deferred.
+**Maestro Coverage**: One happy-path Maestro flow each for US1, US2, US3, US4, and US5 under `mobile/android/maestro`. Flows must be updated for the combined auth screen, camera-first destination, and Compose-accessible selectors. US6 has no flow because it is deferred.
 
-**Mobile Unit Coverage**: Android unit coverage must be `>= 95%` in CI for implemented mobile code. Activity UI rendering is validated through Maestro; pure Kotlin and adapter behavior are validated with JUnit/Jacoco.
+**Mobile Unit Coverage**: Android unit coverage must be `>= 95%` in CI for implemented mobile code. Compose UI rendering is validated through Maestro; pure Kotlin and adapter behavior are validated with JUnit/Jacoco.
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- [x] **Hexagonal boundaries defined**: Mobile domain/app state depends on interfaces for auth, session storage, measurement upload, history retrieval, and camera/image capture; Android framework, HTTP, and camera implementations are adapters under `mobile/android`.
+- [x] **Hexagonal boundaries defined**: Mobile domain/app state depends on interfaces for auth, session storage, measurement upload, history retrieval, and camera/image capture; Compose UI, HTTP, and camera implementations are adapters under `mobile/android`.
 - [x] **Unit test strategy present**: Unit tests cover validation, flows, API error mapping, session behavior, HTTP auth/history/upload parsing, capture decisions, and history filter behavior.
-- [x] **Coverage policy acknowledged**: Android unit coverage gate is `>= 95%`; pure Kotlin/adapters target full coverage where practical, with Activity UI covered by Maestro.
+- [x] **Coverage policy acknowledged**: Android unit coverage gate is `>= 95%`; pure Kotlin/adapters target full coverage where practical, with Compose UI covered by Maestro.
 - [x] **Additive test evolution respected**: Existing API/backend tests remain unchanged; all new or changed mobile tests are under `mobile/android`.
 - [x] **MCP-free implementation**: Implementation and validation use Android Studio/Gradle, repository scripts, `npm run api`, local emulator, and Maestro only.
-- [x] **Feature isolation via worktree**: Feature branch is `009-android-mobile-app`; implementation should remain isolated and all generated mobile changes stay under `mobile/android`.
+- [x] **Feature isolation via worktree**: Feature branch is `009-android-mobile-app`; implementation work must be performed from `tmp/009-android-mobile-app` or explicitly waived by maintainers before coding resumes.
 - [x] **Tech stack baseline**: Existing API uses latest active Node.js LTS and NestJS LTS for local validation; Android uses Kotlin 2.0.21 pinned in Gradle.
 - [x] **Android source location**: Mobile app code is under `mobile/android`.
 - [x] **Kotlin LTS baseline**: Kotlin 2.0.21 is treated as the project-approved latest stable Android-compatible baseline because Kotlin has no separate LTS channel.
-- [x] **API errors visible to users**: Shared Android error mapping and screen state are required for every API response error and network fallback.
+- [x] **API errors visible to users**: Shared Android error mapping and Compose screen state are required for every API response error and network fallback.
 - [x] **Localization coverage**: Every visible Android string is required to come from localized resources or an equivalent localization mechanism.
 - [x] **Maestro happy paths**: US1-US5 each have a happy-path Maestro flow.
 - [x] **Android unit coverage**: Android unit tests maintain a `>= 95%` CI gate via `:app:androidCoverageVerify`.
-- [x] **Dependency policy**: Backend dependencies are unchanged. Android dependencies are limited to the Gradle/Android/JUnit/Jacoco/Maestro toolchain and platform APIs.
+- [x] **Dependency policy**: Backend dependencies are unchanged. Android dependency additions are limited to official AndroidX/Jetpack Compose Material 3 UI dependencies required by the clarified layout approach.
 
 ## Project Structure
 
@@ -76,7 +74,7 @@ specs/009-android-mobile-app/
 |-- contracts/
 |   |-- api-client.md
 |   `-- maestro-flows.md
-`-- tasks.md              # Created by /speckit.tasks, not by /speckit.plan
+`-- tasks.md              # Created/updated by /speckit.tasks, not by /speckit.plan
 ```
 
 ### Source Code (repository root)
@@ -96,7 +94,8 @@ mobile/android/
 |       |   |-- kotlin/com/masim05/bloodpressure/mobile/
 |       |   |   |-- MainActivity.kt
 |       |   |   |-- adapters/
-|       |   |   `-- core/
+|       |   |   |-- core/
+|       |   |   `-- ui/              # Compose screens/state adapters
 |       |   `-- res/values/
 |       `-- test/kotlin/com/masim05/bloodpressure/mobile/
 |-- maestro/
@@ -110,21 +109,24 @@ mobile/android/
 `-- README.md
 ```
 
-**Structure Decision**: Use the standalone Android project rooted at `mobile/android`. The project owns its Gradle wrapper/configuration, app module, unit tests, Maestro flows, Android README, and CI helper script. Existing API/backend source, API tests, backend tests, and `docs/openapi.yaml` remain unchanged.
+**Structure Decision**: Use the standalone Android project rooted at `mobile/android`. The project owns its Gradle wrapper/configuration, app module, Compose UI, unit tests, Maestro flows, Android README, and CI helper script. Existing API/backend source, API tests, backend tests, and `docs/openapi.yaml` remain unchanged.
 
 ## Complexity Tracking
 
-No constitution violations are planned. The notable tradeoffs are staying within the existing API contract, deferring US6, and using platform-native Android Views/widgets to keep dependencies minimal while satisfying localization, password masking, date-selector, and table-alignment requirements.
+No constitution violations are planned. The notable tradeoffs are adding official AndroidX Compose Material 3 dependencies to satisfy the clarified layout approach, staying within the existing API contract, deferring US6, and preserving ports/adapters boundaries while moving UI from imperative Android Views to Compose.
 
 ## Phase 0: Research
 
-See [research.md](research.md). All previously unknown technical choices are resolved:
+See [research.md](research.md). All technical choices are resolved:
 
 - Kotlin LTS interpreted as latest stable Android-compatible Kotlin pinned in Gradle.
-- Native Android Views/widgets selected for the current implementation.
-- Platform password masking selected for signin/login password fields.
+- Jetpack Compose Material 3 selected for official-guide screen layouts.
+- Combined auth screen selected with Login/New Account modes or tabs.
+- Camera screen selected as the post-guide/post-login destination.
+- Measurement detail transition remains future scope.
+- Platform password masking selected for auth password fields.
 - Date selector controls selected for history filter input.
-- Vertically aligned native table/list layout selected for history rows.
+- Vertically aligned Compose table/list layout selected for history rows.
 - HTTP/API errors centralized through a shared mapper and visible screen state.
 - API/backend files remain read-only.
 
@@ -132,4 +134,4 @@ See [research.md](research.md). All previously unknown technical choices are res
 
 See [data-model.md](data-model.md), [contracts/api-client.md](contracts/api-client.md), [contracts/maestro-flows.md](contracts/maestro-flows.md), and [quickstart.md](quickstart.md).
 
-Post-design constitution check remains passing: the design keeps mobile code under `mobile/android`, preserves ports/adapters boundaries, localizes visible strings, maps every API failure to visible UI, keeps US1-US5 Maestro happy paths, and maintains the Android `>= 95%` unit coverage gate.
+Post-design constitution check remains passing: the design keeps mobile code under `mobile/android`, preserves ports/adapters boundaries, localizes visible strings, maps every API failure to visible UI, keeps US1-US5 Maestro happy paths, maintains the Android `>= 95%` unit coverage gate, and limits dependency changes to official AndroidX Compose Material 3 UI dependencies required by the clarified layout approach.

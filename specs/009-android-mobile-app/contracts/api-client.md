@@ -8,7 +8,7 @@
 - Authenticated calls send `Authorization: Bearer <accessToken>`.
 - JSON requests use `Content-Type: application/json`.
 - Image upload uses `multipart/form-data` field name `image`.
-- API error bodies follow `{ "error": string, "message": string }` and `message` must be shown to the user.
+- API error bodies follow `{ "error": string, "message": string }` and `message` must be shown to the user on the current Compose screen.
 - Network, timeout, parsing, and unexpected status failures must produce user-visible fallback messages.
 - The Android client must not require API code, API test, backend test, or OpenAPI document changes.
 
@@ -39,6 +39,8 @@
 
 **Handled errors**: 400 validation, 409 duplicate email, 429 rate limit, network/fallback.
 
+**UI contract**: In New Account mode on the combined auth screen, success routes to Guide. Errors remain visible on the auth screen in New Account mode.
+
 ## logIn
 
 **Request**: `POST /api/v1/login`
@@ -53,6 +55,8 @@
 **Success**: HTTP 201 `AuthResponse`
 
 **Handled errors**: 400 validation, 401 unauthorized, 429 rate limit, network/fallback.
+
+**UI contract**: In Login mode on the combined auth screen, success routes to Camera. Errors remain visible on the auth screen in Login mode.
 
 ## uploadMeasurement
 
@@ -74,13 +78,15 @@
 
 **Handled errors**: 400 validation, 401 unauthorized, camera/capture errors, network/fallback.
 
+**UI contract**: Upload starts from the Camera screen. Success opens History. Errors remain visible on the Camera screen with retry/navigation available.
+
 ## listMeasurements
 
 **Request**: `GET /api/v1/measurements?page=<page>&pageSize=<pageSize>&from=<iso>&to=<iso>`
 
 - Authenticated.
 - `from` and `to` are optional inclusive ISO-8601 bounds.
-- Android UI obtains `from` and `to` via date selector controls, not free-text inputs.
+- Android UI obtains `from` and `to` via Compose Material 3 date selector controls, not free-text inputs.
 
 **Success**: HTTP 200 `MeasurementHistoryPage`
 
@@ -110,7 +116,7 @@
 
 **Handled errors**: 400 validation, 401 unauthorized, network/fallback.
 
-**UI contract**: History renders returned items as non-editable, vertically aligned rows with stable columns for measurement time, systolic, diastolic, pulse, arm side, and status.
+**UI contract**: History renders returned items as non-editable, vertically aligned Compose rows with stable columns for measurement time, systolic, diastolic, pulse, arm side, and status. Tapping a row must not open measurement detail in this feature.
 
 ## Deferred API Operations
 
