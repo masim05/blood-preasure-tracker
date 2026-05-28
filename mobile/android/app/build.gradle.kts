@@ -1,0 +1,21 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.masim05.bloodpressure.mobile"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.masim05.bloodpressure.mobile"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1.0"
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
