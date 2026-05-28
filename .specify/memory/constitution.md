@@ -1,23 +1,23 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 1.1.0 -> 1.2.0
 - Modified principles:
-	- II. Coverage-Gated Unit Testing -> II. Coverage-Gated Unit Testing
-	- IV. MCP-Free Development -> IV. MCP-Free Development
+  - II. Coverage-Gated Unit Testing -> II. Coverage-Gated Unit Testing
+  - Engineering Constraints -> Engineering Constraints
 - Added sections:
-	- Tech Stack Baseline
+  - VI. Android Mobile Client Standards
 - Removed sections:
-	- None
+  - None
 - Templates requiring updates:
-	- .specify/templates/plan-template.md: ✅ updated
-	- .specify/templates/spec-template.md: ✅ updated
-	- .specify/templates/tasks-template.md: ✅ updated
-	- .specify/templates/commands/*.md: ⚠ pending (directory not present in this repository)
-	- .specify/extensions/git/commands/speckit.git.feature.md: ✅ updated
-	- .specify/extensions/git/commands/speckit.git.commit.md: ✅ updated
-	- .specify/extensions/git/README.md: ✅ updated
+  - .specify/templates/plan-template.md: ✅ updated
+  - .specify/templates/spec-template.md: ✅ updated
+  - .specify/templates/tasks-template.md: ✅ updated
+  - .specify/templates/commands/*.md: ⚠ pending (directory not present in this repository)
+  - .specify/extensions/git/commands/*.md: ✅ checked, no updates required
+  - .specify/extensions/git/README.md: ✅ checked, no updates required
+  - README.md: ✅ updated
 - Deferred TODOs:
-	- None
+  - None
 -->
 
 # Blood Pressure Tracker Constitution
@@ -37,8 +37,9 @@ infrastructure concerns from leaking into business rules.
 ### II. Coverage-Gated Unit Testing
 
 Unit tests are mandatory for every feature and bug fix. CI MUST enforce a minimum
-overall line coverage gate of 95%. Teams SHOULD drive changed modules and features
-to 100% coverage when practical and justified by risk.
+overall line coverage gate of 95%. Android mobile code MUST also enforce a
+minimum unit-test coverage gate of 95%. Teams SHOULD drive changed modules and
+features to 100% coverage when practical and justified by risk.
 
 Rationale: High automated test confidence is required to ship safely and keep
 regressions detectable early.
@@ -71,12 +72,30 @@ human-readable, and directly traceable to feature intent.
 Rationale: Isolated worktrees reduce cross-feature contamination while clear Git
 history improves review quality and long-term maintainability.
 
+### VI. Android Mobile Client Standards
+
+Android mobile app source code MUST live under `mobile/android`. The Android app
+MUST target the latest active LTS Kotlin release. Every user story implemented in
+the Android app MUST include a passing happy-path Maestro flow. Any API error
+returned to the Android app MUST be shown to the user in the app UI; errors MUST
+NOT be silently swallowed or hidden only in logs.
+
+Rationale: The mobile app is the primary user-facing workflow for blood-pressure
+tracking, so its source location, language baseline, user-visible failure handling,
+and end-to-end happy paths must be predictable and reviewable.
+
 ## Engineering Constraints
 
 - Architecture docs and plans MUST identify the domain ports and concrete adapters
   introduced or changed by the feature.
 - Runtime and toolchain MUST use the latest active LTS release of Node.js.
 - Backend framework baseline MUST be the latest active LTS major of NestJS.
+- Android mobile source MUST be rooted at `mobile/android`.
+- Android mobile implementation MUST target the latest active LTS Kotlin release.
+- Android mobile API clients MUST map every API error response to user-visible UI
+  feedback.
+- Every Android mobile user story MUST have at least one happy-path Maestro flow.
+- Android mobile unit tests MUST meet the 95% coverage CI gate.
 - New dependencies SHOULD use official Node.js or NestJS packages first (for
   example: `node:` built-ins, official `@nestjs/*` packages). Third-party modules
   require a brief justification in the plan when an official option exists.
@@ -98,8 +117,10 @@ history improves review quality and long-term maintainability.
    feasible.
 6. Use meaningful branch names and commit messages that reflect intent and scope.
 7. Verify Node.js LTS and NestJS LTS targets are captured in plan/spec artifacts.
-8. Prefer official Node/NestJS modules before introducing third-party dependencies.
-9. Keep implementation MCP-free; if a process requires MCP, it is non-compliant.
+8. Verify Android plans capture `mobile/android`, Kotlin LTS, API error display,
+   Maestro happy paths, and 95% mobile unit coverage when mobile code is affected.
+9. Prefer official Node/NestJS modules before introducing third-party dependencies.
+10. Keep implementation MCP-free; if a process requires MCP, it is non-compliant.
 
 ## Governance
 
@@ -119,8 +140,8 @@ Compliance review expectations:
 
 - Every plan, specification, and task list MUST include explicit constitution checks.
 - Every pull request review MUST verify architecture boundaries, test additions,
-  coverage policy compliance, worktree usage, MCP-free implementation, and tech
-  stack baseline compliance.
+  coverage policy compliance, worktree usage, MCP-free implementation, tech stack
+  baseline compliance, and Android mobile standards when mobile code is affected.
 - Non-compliance MUST be documented with remediation before merge.
 
-**Version**: 1.1.0 | **Ratified**: 2026-05-24 | **Last Amended**: 2026-05-24
+**Version**: 1.2.0 | **Ratified**: 2026-05-24 | **Last Amended**: 2026-05-28

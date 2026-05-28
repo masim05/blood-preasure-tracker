@@ -10,7 +10,9 @@ description: "Task list template for feature implementation"
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests**: Test tasks are REQUIRED. Every user story MUST include new tests,
-preserve existing tests unless justified, and maintain CI coverage >= 95%.
+preserve existing tests unless justified, and maintain CI coverage >= 95%. Android
+mobile user stories MUST include happy-path Maestro flows and Android unit tests
+that preserve the `>= 95%` coverage gate.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -24,7 +26,7 @@ preserve existing tests unless justified, and maintain CI coverage >= 95%.
 
 - **Single project**: `src/`, `tests/` at repository root
 - **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
+- **Mobile**: backend/API under existing `src/`; Android app under `mobile/android/`
 - Paths shown below assume single project - adjust based on plan.md structure
 
 <!--
@@ -53,8 +55,10 @@ preserve existing tests unless justified, and maintain CI coverage >= 95%.
 - [ ] T001 Create project structure per implementation plan
 - [ ] T002 Initialize Node.js project on latest active LTS and NestJS on latest
   active LTS major
-- [ ] T003 [P] Configure linting and formatting tools
-- [ ] T004 [P] Validate official Node/NestJS modules are used before third-party additions
+- [ ] T003 [P] If Android is affected, create/verify `mobile/android` project structure
+  and latest active LTS Kotlin baseline
+- [ ] T004 [P] Configure linting, formatting, Maestro, and coverage tools
+- [ ] T005 [P] Validate official Node/NestJS modules are used before third-party additions
 
 ---
 
@@ -72,6 +76,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T008 Create base models/entities that all stories depend on
 - [ ] T009 Configure error handling and logging infrastructure
 - [ ] T010 Setup environment configuration management
+- [ ] T011 If Android is affected, implement shared API error-to-user-message handling
+  in mobile/android/[module]
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -87,17 +93,20 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: These tests are mandatory. Write them first and ensure they fail before implementation.**
 
-- [ ] T011 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T012 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T012 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T013 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T014 [P] [US1] Android unit test for [view model/use case] in mobile/android/[module]/src/test/
+- [ ] T015 [P] [US1] Maestro happy-path flow in mobile/android/maestro/[story].yaml
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T014 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T015 [US1] Implement [Service] in src/services/[service].py (depends on T013, T014)
-- [ ] T016 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T017 [US1] Add validation and error handling
-- [ ] T018 [US1] Add logging for user story 1 operations
+- [ ] T016 [P] [US1] Create [Entity1] model in src/models/[entity1].py
+- [ ] T017 [P] [US1] Create [Entity2] model in src/models/[entity2].py
+- [ ] T018 [US1] Implement [Service] in src/services/[service].py (depends on T016, T017)
+- [ ] T019 [US1] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T020 [US1] If Android is affected, implement user-visible API error handling in mobile/android/[module]/src/main/
+- [ ] T021 [US1] Add validation and error handling
+- [ ] T022 [US1] Add logging for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -113,15 +122,18 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T019 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T020 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T023 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T024 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T025 [P] [US2] Android unit test for [view model/use case] in mobile/android/[module]/src/test/
+- [ ] T026 [P] [US2] Maestro happy-path flow in mobile/android/maestro/[story].yaml
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T022 [US2] Implement [Service] in src/services/[service].py
-- [ ] T023 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T024 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T027 [P] [US2] Create [Entity] model in src/models/[entity].py
+- [ ] T028 [US2] Implement [Service] in src/services/[service].py
+- [ ] T029 [US2] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T030 [US2] If Android is affected, implement user-visible API error handling in mobile/android/[module]/src/main/
+- [ ] T031 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -137,14 +149,17 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: These tests are mandatory for new feature behavior.**
 
-- [ ] T025 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T026 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T032 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] T033 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T034 [P] [US3] Android unit test for [view model/use case] in mobile/android/[module]/src/test/
+- [ ] T035 [P] [US3] Maestro happy-path flow in mobile/android/maestro/[story].yaml
 
 ### Implementation for User Story 3
 
-- [ ] T027 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T028 [US3] Implement [Service] in src/services/[service].py
-- [ ] T029 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T036 [P] [US3] Create [Entity] model in src/models/[entity].py
+- [ ] T037 [US3] Implement [Service] in src/services/[service].py
+- [ ] T038 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T039 [US3] If Android is affected, implement user-visible API error handling in mobile/android/[module]/src/main/
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -164,6 +179,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
+- [ ] TXXX Run Android unit coverage and verify `>= 95%` when Android is affected
+- [ ] TXXX Run Maestro happy-path flows when Android is affected
 
 ---
 
@@ -187,6 +204,8 @@ Examples of foundational tasks (adjust based on your project):
 ### Within Each User Story
 
 - Tests MUST be written and FAIL before implementation
+- Android user stories MUST include a Maestro happy-path flow before completion
+- Android unit coverage MUST remain at or above 95%
 - Models before services
 - Services before endpoints
 - Core implementation before integration

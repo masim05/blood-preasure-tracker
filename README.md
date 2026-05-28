@@ -111,6 +111,13 @@ npm run openapi:serve
 
 The docs server listens on `http://localhost:3001/` by default, loads [docs/openapi.yaml](docs/openapi.yaml), and supports Swagger UI "Try it out" requests against the API server declared in the OpenAPI `servers` section. The raw YAML remains available at `http://localhost:3001/openapi.yaml`. Set `OPENAPI_DOCS_PORT` to use another port.
 
+## Android Mobile App
+
+Android mobile app source belongs under `mobile/android`. Android implementation
+must target the latest active LTS Kotlin release. User-facing mobile flows must
+show every API error returned by the API, include a happy-path Maestro flow for
+each user story, and maintain at least 95% Android unit-test coverage in CI.
+
 ## Output
 
 - `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
