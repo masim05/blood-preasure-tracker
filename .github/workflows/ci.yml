@@ -209,6 +209,37 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
+      - name: Prepare Maestro runner
+        run: |
+          cat > /tmp/run-android-maestro.sh <<'SH'
+          set -eu
+
+          run_maestro() {
+            flow="$1"
+            for attempt in 1 2; do
+              echo "Running $flow (attempt $attempt)"
+              if maestro test --no-ansi "$flow"; then
+                return 0
+              fi
+              if [ "$attempt" -eq 2 ]; then
+                return 1
+              fi
+              adb kill-server
+              adb start-server
+              adb wait-for-device
+              adb shell cmd package list packages >/dev/null
+            done
+          }
+
+          run_maestro mobile/android/maestro/us1-signin.yaml
+          run_maestro mobile/android/maestro/us2-guide.yaml
+          run_maestro mobile/android/maestro/us3-login.yaml
+          run_maestro mobile/android/maestro/us4-capture-or-history.yaml
+          run_maestro mobile/android/maestro/us5-history-filter.yaml
+          run_maestro mobile/android/maestro/us6-measurement-detail.yaml
+          SH
+          chmod +x /tmp/run-android-maestro.sh
+
       - name: Start API
         run: |
           set -a
@@ -244,25 +275,4 @@ jobs:
             adb shell settings put global transition_animation_scale 0 || true
             adb shell settings put global animator_duration_scale 0 || true
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
-            run_maestro() {
-              flow="$1"
-              for attempt in 1 2; do
-                echo "Running $flow (attempt $attempt)"
-                if maestro test --no-ansi "$flow"; then
-                  return 0
-                fi
-                if [ "$attempt" -eq 2 ]; then
-                  return 1
-                fi
-                adb kill-server
-                adb start-server
-                adb wait-for-device
-                adb shell cmd package list packages >/dev/null
-              done
-            }
-            run_maestro mobile/android/maestro/us1-signin.yaml
-            run_maestro mobile/android/maestro/us2-guide.yaml
-            run_maestro mobile/android/maestro/us3-login.yaml
-            run_maestro mobile/android/maestro/us4-capture-or-history.yaml
-            run_maestro mobile/android/maestro/us5-history-filter.yaml
-            run_maestro mobile/android/maestro/us6-measurement-detail.yaml
+            /tmp/run-android-maestro.sh
