@@ -46,7 +46,7 @@ From `mobile/android`:
 
 ```bash
 ./gradlew :app:testDebugUnitTest
-./gradlew :app:koverVerify
+./gradlew :app:androidCoverageVerify
 ```
 
 The Android unit coverage gate is `>= 95%` for implemented mobile code.

@@ -112,10 +112,33 @@ jobs:
   android-mobile:
     name: Android Mobile Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blood_pressure_tracker_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install API dependencies
+        run: npm ci
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -126,6 +149,91 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Initialize Android test database
+        env:
+          DB_INIT_SKIP_DOCKER: '1'
+        run: npm run db:init -- --env .env.test
+
+      - name: Seed Maestro accounts
+        run: |
+          node <<'NODE'
+          const { pbkdf2Sync } = require('node:crypto');
+          const { Client } = require('pg');
+
+          const hash = (password) => `pbkdf2:sha256:600000:maestro-salt:${pbkdf2Sync(password, 'maestro-salt', 600000, 32, 'sha256').toString('base64url')}`;
+          const now = new Date().toISOString();
+          const client = new Client({ connectionString: process.env.DATABASE_URL });
+
+          async function upsertUser(id, email) {
+            await client.query(
+              `INSERT INTO user_accounts (id, email, password_hash, created_at, updated_at)
+               VALUES ($1, $2, $3, $4, $4)
+               ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, updated_at = EXCLUDED.updated_at`,
+              [id, email, hash('password123'), now],
+            );
+          }
+
+          async function main() {
+            await client.connect();
+            await upsertUser('usr_maestro_us3', 'us3@example.com');
+            await upsertUser('usr_maestro_us5', 'us5@example.com');
+            await client.query(
+              `INSERT INTO measurements (id, user_id, status, systolic, diastolic, pulse, arm_side, measurement_time, saved_at, created_at, updated_at)
+               VALUES ($1, $2, 'saved', 120, 80, 68, 'left', '2026-05-27T12:00:00.000Z', '2026-05-27T12:05:00.000Z', $3, $3)
+               ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status, systolic = EXCLUDED.systolic, diastolic = EXCLUDED.diastolic, pulse = EXCLUDED.pulse, arm_side = EXCLUDED.arm_side, measurement_time = EXCLUDED.measurement_time, saved_at = EXCLUDED.saved_at, updated_at = EXCLUDED.updated_at`,
+              ['msr_maestro_us5', 'usr_maestro_us5', now],
+            );
+            await client.end();
+          }
+
+          main().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5433/blood_pressure_tracker_test
+
       - name: Android unit tests, coverage, and build
-        run: ./gradlew :app:testDebugUnitTest :app:koverVerify :app:assembleDebug
+        run: ./gradlew :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug
         working-directory: mobile/android
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Start API
+        run: |
+          set -a
+          . ./.env.test
+          set +a
+          npm run api > /tmp/bpt-api.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --silent http://127.0.0.1:3000/api/v1/measurements >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/bpt-api.log
+          exit 1
+
+      - name: Maestro happy paths
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          MAESTRO_CLI_NO_ANALYTICS: '1'
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: false
+          script: |
+            adb wait-for-device
+            adb shell cmd package list packages >/dev/null
+            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            maestro test --no-ansi mobile/android/maestro/us1-signin.yaml
+            maestro test --no-ansi mobile/android/maestro/us2-guide.yaml
+            maestro test --no-ansi mobile/android/maestro/us3-login.yaml
+            maestro test --no-ansi mobile/android/maestro/us4-capture-or-history.yaml
+            maestro test --no-ansi mobile/android/maestro/us5-history-filter.yaml

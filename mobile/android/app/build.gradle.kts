@@ -14,6 +14,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
     }
 
     buildFeatures {
@@ -41,7 +42,6 @@ android {
         }
     }
 }
-
 dependencies {
     testImplementation(libs.junit)
 }
@@ -81,7 +81,7 @@ tasks.register<JacocoReport>("androidUnitCoverageReport") {
     )
 }
 
-tasks.register<JacocoCoverageVerification>("koverVerify") {
+tasks.register<JacocoCoverageVerification>("androidCoverageVerify") {
     dependsOn("testDebugUnitTest")
 
     classDirectories.setFrom(

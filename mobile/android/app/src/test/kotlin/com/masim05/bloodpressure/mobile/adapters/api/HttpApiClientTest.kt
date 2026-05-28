@@ -1,0 +1,250 @@
+package com.masim05.bloodpressure.mobile.adapters.api
+
+import com.masim05.bloodpressure.mobile.core.model.AppResult
+import com.masim05.bloodpressure.mobile.core.model.ArmSide
+import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
+import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
+import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
+import com.masim05.bloodpressure.mobile.core.model.MobileUser
+import com.masim05.bloodpressure.mobile.core.model.Session
+import java.net.ServerSocket
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+class HttpApiClientTest {
+    private lateinit var client: HttpApiClient
+    private lateinit var server: TestHttpServer
+
+    @Before
+    fun setUp() {
+        server = TestHttpServer()
+        client = HttpApiClient(
+            baseUrl = "http://127.0.0.1:${server.port}",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+        )
+    }
+
+    @After
+    fun tearDown() {
+        server.close()
+    }
+
+    @Test
+    fun `signIn posts credentials and parses session`() {
+        server.enqueue(
+            201,
+            """
+                {"accessToken":"token-1","tokenType":"Bearer","expiresAt":"2026-05-27T12:00:00.000Z","user":{"id":"usr_1","email":"user@example.com"}}
+            """.trimIndent(),
+        )
+
+        val result = client.signIn("user@example.com", "password123")
+        val session = (result as AppResult.Success).value
+
+        assertEquals("token-1", session.accessToken)
+        assertEquals("usr_1", session.user.id)
+        assertTrue(server.request.body.contains("\"email\":\"user@example.com\""))
+    }
+
+    @Test
+    fun `signIn defaults token type and maps malformed success to parse error`() {
+        server.enqueue(
+            201,
+            """
+            {"accessToken":"token-1","expiresAt":"2026-05-27T12:00:00.000Z","user":{"id":"usr_1","email":"user@example.com"}}
+            """.trimIndent(),
+        )
+
+        val result = client.signIn("quoted\\user@example.com", "pass\"word123")
+        val session = (result as AppResult.Success).value
+
+        assertEquals("Bearer", session.tokenType)
+        assertTrue(server.request.body.contains("quoted\\\\user@example.com"))
+        assertTrue(server.request.body.contains("pass\\\"word123"))
+
+        server.close()
+        server = TestHttpServer()
+        client = HttpApiClient("http://127.0.0.1:${server.port}", "Unexpected API error", "Network error", "Timeout", "Parse error")
+        server.enqueue(201, "{}")
+
+        val malformed = client.signIn("user@example.com", "password123") as AppResult.Failure
+
+        assertEquals("Parse error", malformed.error.message)
+    }
+
+    @Test
+    fun `logIn surfaces API message on unauthorized response`() {
+        server.enqueue(401, "{\"error\":\"unauthorized\",\"message\":\"Invalid credentials\"}")
+
+        val result = client.logIn("user@example.com", "password123")
+        val failure = result as AppResult.Failure
+
+        assertEquals("unauthorized", failure.error.code)
+        assertEquals("Invalid credentials", failure.error.message)
+    }
+
+    @Test
+    fun `list sends authorization and filter query then parses saved rows`() {
+        server.enqueue(
+            200,
+            """
+                {"items":[{"id":"msr_1","status":"saved","systolic":120,"diastolic":80,"pulse":68,"armSide":"left","measurementTime":"2026-05-27T12:00:00.000Z","savedAt":"2026-05-27T12:05:00.000Z"}],"page":1,"pageSize":20,"total":1}
+            """.trimIndent(),
+        )
+
+        val result = client.list(session(), HistoryFilter(from = "2026-05-01", to = "2026-05-31"))
+        val measurements = (result as AppResult.Success).value
+
+        assertEquals("Bearer token-1", server.request.authorization)
+        assertTrue(server.request.query.contains("from=2026-05-01"))
+        assertTrue(server.request.query.contains("to=2026-05-31"))
+        assertEquals(MeasurementStatus.Saved, measurements.single().status)
+        assertEquals(ArmSide.Left, measurements.single().armSide)
+    }
+
+    @Test
+    fun `upload sends multipart image with authorization`() {
+        server.enqueue(201, "{\"id\":\"msr_1\",\"status\":\"pending\",\"measurementTime\":\"2026-05-27T12:00:00.000Z\"}")
+
+        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val id = (result as AppResult.Success).value
+
+        assertEquals("msr_1", id)
+        assertEquals("Bearer token-1", server.request.authorization)
+        assertTrue(server.request.contentType.startsWith("multipart/form-data"))
+        assertTrue(server.request.body.contains("filename=\"measurement.png\""))
+    }
+
+    @Test
+    fun `upload surfaces API validation failure`() {
+        server.enqueue(400, "{\"error\":\"validation_error\",\"message\":\"Image is required\"}")
+
+        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val failure = result as AppResult.Failure
+
+        assertEquals("validation_error", failure.error.code)
+        assertEquals("Image is required", failure.error.message)
+    }
+
+    @Test
+    fun `list supports empty filters and pending or failed rows`() {
+        server.enqueue(
+            200,
+            """
+            {"items":[{"id":"msr_1","status":"failed","armSide":"right"},{"id":"msr_2","status":"pending"}],"page":1,"pageSize":20,"total":2}
+            """.trimIndent(),
+        )
+
+        val result = client.list(session(), HistoryFilter())
+        val measurements = (result as AppResult.Success).value
+
+        assertEquals("page=1&pageSize=20", server.request.query)
+        assertEquals(MeasurementStatus.Failed, measurements.first().status)
+        assertEquals(ArmSide.Right, measurements.first().armSide)
+        assertEquals(MeasurementStatus.Pending, measurements.last().status)
+        assertEquals(ArmSide.Unknown, measurements.last().armSide)
+        assertEquals(0, measurements.last().systolic)
+    }
+
+    @Test
+    fun `list surfaces API failure`() {
+        server.enqueue(401, "{\"error\":\"unauthorized\",\"message\":\"Missing bearer token\"}")
+
+        val result = client.list(session(), HistoryFilter())
+        val failure = result as AppResult.Failure
+
+        assertEquals("unauthorized", failure.error.code)
+        assertEquals("Missing bearer token", failure.error.message)
+    }
+
+    private fun session(): Session = Session(
+        accessToken = "token-1",
+        tokenType = "Bearer",
+        expiresAt = "2026-05-27T12:00:00.000Z",
+        user = MobileUser("usr_1", "user@example.com"),
+    )
+
+    private data class RecordedRequest(
+        val body: String,
+        val authorization: String,
+        val contentType: String,
+        val query: String,
+    )
+
+    private class TestHttpServer : AutoCloseable {
+        private val socket = ServerSocket(0)
+        private val latch = CountDownLatch(1)
+        private var status = 200
+        private var body = "{}"
+        lateinit var request: RecordedRequest
+            private set
+
+        val port: Int = socket.localPort
+
+        fun enqueue(status: Int, body: String) {
+            this.status = status
+            this.body = body
+            Thread {
+                socket.accept().use { connection ->
+                    val input = connection.getInputStream()
+                    val headerBytes = mutableListOf<Byte>()
+                    while (!headerBytes.endsWithHeaderTerminator()) {
+                        headerBytes += input.read().toByte()
+                    }
+                    val headerText = headerBytes.toByteArray().toString(Charsets.ISO_8859_1)
+                    val headerLines = headerText.split("\r\n")
+                    val requestLine = headerLines.first()
+                    val headers = mutableMapOf<String, String>()
+                    var contentLength = 0
+                    headerLines.drop(1).forEach { line ->
+                        val separator = line.indexOf(':')
+                        if (separator > 0) {
+                            val name = line.substring(0, separator)
+                            val value = line.substring(separator + 1).trim()
+                            headers[name] = value
+                            if (name.equals("Content-Length", ignoreCase = true)) contentLength = value.toInt()
+                        }
+                    }
+                    val requestBody = ByteArray(contentLength).let { bytes ->
+                        var offset = 0
+                        while (offset < contentLength) {
+                            val read = input.read(bytes, offset, contentLength - offset)
+                            if (read < 0) break
+                            offset += read
+                        }
+                        bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
+                    }
+                    request = RecordedRequest(
+                        body = requestBody,
+                        authorization = headers["Authorization"].orEmpty(),
+                        contentType = headers["Content-Type"].orEmpty(),
+                        query = requestLine.substringAfter('?').substringBefore(' '),
+                    )
+                    val responseBytes = body.toByteArray()
+                    connection.getOutputStream().use { output ->
+                        output.write("HTTP/1.1 $status OK\r\nContent-Length: ${responseBytes.size}\r\nConnection: close\r\n\r\n".toByteArray())
+                        output.write(responseBytes)
+                    }
+                    latch.countDown()
+                }
+            }.start()
+        }
+
+        private fun MutableList<Byte>.endsWithHeaderTerminator(): Boolean =
+            size >= 4 && this[size - 4] == '\r'.code.toByte() && this[size - 3] == '\n'.code.toByte() &&
+                this[size - 2] == '\r'.code.toByte() && this[size - 1] == '\n'.code.toByte()
+
+        override fun close() {
+            latch.await(1, TimeUnit.SECONDS)
+            socket.close()
+        }
+    }
+}

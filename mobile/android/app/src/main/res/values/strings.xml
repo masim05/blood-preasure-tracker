@@ -27,6 +27,13 @@
     <string name="history_empty">No saved measurements match the selected filter.</string>
     <string name="history_columns">Time | SYS | DIA | Pulse | Arm | Status</string>
     <string name="history_sample_row">2026-05-27 12:00 | 120 | 80 | 68 | left | saved</string>
+    <string name="history_row_format">%1$s | %2$d | %3$d | %4$d | %5$s | %6$s</string>
+    <string name="arm_left">left</string>
+    <string name="arm_right">right</string>
+    <string name="arm_unknown">unknown</string>
+    <string name="measurement_status_saved">saved</string>
+    <string name="measurement_status_pending">pending</string>
+    <string name="measurement_status_failed">failed</string>
     <string name="history_return">Back to actions</string>
     <string name="error_region_label">Error message</string>
     <string name="error_invalid_email">Enter a valid email address.</string>
@@ -40,6 +47,7 @@
     <string name="status_loading">Loading</string>
     <string name="status_signed_in">Signed in.</string>
     <string name="status_logged_in">Logged in.</string>
+    <string name="status_upload_complete">Measurement image uploaded.</string>
     <string name="a11y_signin_email">Signin email input</string>
     <string name="a11y_signin_password">Signin password input</string>
     <string name="a11y_login_email">Login email input</string>

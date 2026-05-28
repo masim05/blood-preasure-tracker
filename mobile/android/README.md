@@ -27,7 +27,7 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/a
 Run Android unit tests and the 95% coverage gate from the repository root:
 
 ```bash
-JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:koverVerify
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:androidCoverageVerify
 ```
 
 Run the Android-only validation script from `mobile/android`:
@@ -38,7 +38,7 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" scripts/
 
 ## Maestro
 
-The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable resource IDs instead of visible text selectors. Install the debug app on an emulator, then run:
+The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable resource IDs instead of visible text selectors. Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
 
 ```bash
 maestro test maestro/us1-signin.yaml

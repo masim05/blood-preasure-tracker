@@ -3,15 +3,17 @@ appId: com.masim05.bloodpressure.mobile
 - launchApp:
     clearState: true
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_email
-- inputText: us5-${MAESTRO_TIMESTAMP}@example.com
+    id: com.masim05.bloodpressure.mobile:id/signin_to_login
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_password
+    id: com.masim05.bloodpressure.mobile:id/login_email
+- inputText: us5@example.com
+- tapOn:
+    id: com.masim05.bloodpressure.mobile:id/login_password
 - inputText: password123
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_submit
-- tapOn:
-    id: com.masim05.bloodpressure.mobile:id/guide_continue
+    id: com.masim05.bloodpressure.mobile:id/login_submit
+- assertVisible:
+    id: com.masim05.bloodpressure.mobile:id/actions_history
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/actions_history
 - tapOn:
@@ -23,6 +25,6 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/history_apply_filter
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/history_apply_filter
+    text: .*120.*80.*68.*
 - assertNotVisible:
     id: com.masim05.bloodpressure.mobile:id/capture_open_camera

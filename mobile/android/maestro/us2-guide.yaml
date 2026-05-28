@@ -4,7 +4,7 @@ appId: com.masim05.bloodpressure.mobile
     clearState: true
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/signin_email
-- inputText: us2-${MAESTRO_TIMESTAMP}@example.com
+- inputRandomEmail
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/signin_password
 - inputText: password123

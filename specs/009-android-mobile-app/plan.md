@@ -20,7 +20,7 @@ Build a Kotlin Android app under `mobile/android` that can be opened in Android 
 
 **Storage**: Android DataStore for bearer session/token metadata. No local database in this feature.
 
-**Testing**: JUnit/Kotlin unit tests for view models, validators, API error mapping, navigation decisions, session state, and history filtering; JaCoCo/Kover coverage gate at `>= 95%`; Maestro happy-path flows for US1-US5.
+**Testing**: JUnit/Kotlin unit tests for view models, validators, API error mapping, navigation decisions, session state, and history filtering; JaCoCo coverage gate at `>= 95%`; Maestro happy-path flows for US1-US5.
 
 **Target Platform**: Android mobile app opened, built, and run from Android Studio; local validation uses the existing API at `http://localhost:3000` started separately with `npm run api`.
 

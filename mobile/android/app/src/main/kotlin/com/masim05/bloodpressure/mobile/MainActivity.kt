@@ -2,9 +2,7 @@ package com.masim05.bloodpressure.mobile
 
 import android.app.Activity
 import android.graphics.Color
-import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -13,30 +11,36 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import com.masim05.bloodpressure.mobile.adapters.api.HttpApiClient
+import com.masim05.bloodpressure.mobile.adapters.camera.GeneratedCameraGateway
+import com.masim05.bloodpressure.mobile.adapters.session.InMemorySessionStore
 import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
+import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
 import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
 import com.masim05.bloodpressure.mobile.core.flow.HistoryFlow
 import com.masim05.bloodpressure.mobile.core.flow.MeasurementActionFlow
-import com.masim05.bloodpressure.mobile.core.model.ApiError
-import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
-import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
-import com.masim05.bloodpressure.mobile.core.model.MobileUser
-import com.masim05.bloodpressure.mobile.core.model.Session
-import com.masim05.bloodpressure.mobile.core.ports.AuthGateway
-import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
-import com.masim05.bloodpressure.mobile.adapters.session.InMemorySessionStore
 
 class MainActivity : Activity() {
     private val sessionStore = InMemorySessionStore()
-    private val authFlow = AuthFlow(DemoAuthGateway(), sessionStore)
+    private val apiClient by lazy {
+        HttpApiClient(
+            baseUrl = BuildConfig.API_BASE_URL,
+            fallbackApiMessage = getString(R.string.error_unexpected),
+            networkMessage = getString(R.string.error_network),
+            timeoutMessage = getString(R.string.error_timeout),
+            parseMessage = getString(R.string.error_parse),
+        )
+    }
+    private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }
     private val guideFlow = GuideFlow(sessionStore)
     private val actionFlow = MeasurementActionFlow(sessionStore)
-    private val historyFlow = HistoryFlow(sessionStore, DemoHistoryGateway())
+    private val captureFlow by lazy { CaptureFlow(sessionStore, GeneratedCameraGateway(), apiClient) }
+    private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,10 +52,17 @@ class MainActivity : Activity() {
         val email = editText(R.id.signin_email, R.string.signin_email_hint, R.string.a11y_signin_email)
         val password = editText(R.id.signin_password, R.string.signin_password_hint, R.string.a11y_signin_password)
         val submit = button(R.id.signin_submit, R.string.signin_submit) {
-            val state = authFlow.signIn(email.text.toString(), password.text.toString())
-            state.validationError?.let { error.setText(messageFor(it)) }
-            state.error?.let { error.text = it.message }
-            if (state.validationError == null && state.error == null) showGuide()
+            val emailValue = email.text.toString()
+            val passwordValue = password.text.toString()
+            error.setText(R.string.status_loading)
+            runInBackground {
+                val state = authFlow.signIn(emailValue, passwordValue)
+                runOnUiThread {
+                    state.validationError?.let { error.setText(messageFor(it)) }
+                    state.error?.let { error.text = it.message }
+                    if (state.validationError == null && state.error == null) showGuide()
+                }
+            }
         }
         val login = button(R.id.signin_to_login, R.string.signin_to_login) { showLogin() }
         setContent(screen(R.string.signin_title, error, email, password, submit, login))
@@ -62,10 +73,17 @@ class MainActivity : Activity() {
         val email = editText(R.id.login_email, R.string.signin_email_hint, R.string.a11y_login_email)
         val password = editText(R.id.login_password, R.string.signin_password_hint, R.string.a11y_login_password)
         val submit = button(R.id.login_submit, R.string.login_submit) {
-            val state = authFlow.logIn(email.text.toString(), password.text.toString())
-            state.validationError?.let { error.setText(messageFor(it)) }
-            state.error?.let { error.text = it.message }
-            if (state.validationError == null && state.error == null) showActions()
+            val emailValue = email.text.toString()
+            val passwordValue = password.text.toString()
+            error.setText(R.string.status_loading)
+            runInBackground {
+                val state = authFlow.logIn(emailValue, passwordValue)
+                runOnUiThread {
+                    state.validationError?.let { error.setText(messageFor(it)) }
+                    state.error?.let { error.text = it.message }
+                    if (state.validationError == null && state.error == null) showActions()
+                }
+            }
         }
         val signin = button(R.id.login_to_signin, R.string.login_to_signin) { showSignIn() }
         setContent(screen(R.string.login_title, error, email, password, submit, signin))
@@ -100,13 +118,23 @@ class MainActivity : Activity() {
             showSignIn()
             return
         }
+        val error = errorView()
         val copy = body(R.string.capture_copy)
         val openCamera = button(R.id.capture_open_camera, R.string.capture_open_camera) {
-            runCatching { startActivity(Intent(MediaStore.ACTION_IMAGE_CAPTURE)) }
-                .onFailure { showActions() }
+            error.setText(R.string.status_loading)
+            runInBackground {
+                val state = captureFlow.captureAndUpload()
+                runOnUiThread {
+                    state.validationError?.let { error.setText(messageFor(it)) }
+                    state.error?.let { error.text = it.message }
+                    if (state.validationError == null && state.error == null) {
+                        error.setText(R.string.status_upload_complete)
+                    }
+                }
+            }
         }
         val back = button(R.id.capture_back, R.string.capture_back) { showActions() }
-        setContent(screen(R.string.capture_title, errorView(), copy, openCamera, back))
+        setContent(screen(R.string.capture_title, error, copy, openCamera, back))
     }
 
     private fun showHistory(filter: HistoryFilter = HistoryFilter()) {
@@ -117,20 +145,26 @@ class MainActivity : Activity() {
         to.setText(filter.to)
         val columns = body(R.string.history_columns)
         val rows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        val state = historyFlow.load(filter)
-        state.validationError?.let { error.setText(messageFor(it)) }
-        state.error?.let { error.text = it.message }
-        if (state.measurements.isEmpty()) {
-            rows.addView(body(R.string.history_empty))
-        } else {
-            state.measurements.forEach { rows.addView(TextView(this).apply { text = formatMeasurement(it) }) }
-        }
+        rows.addView(body(R.string.status_loading))
         val apply = button(R.id.history_apply_filter, R.string.history_apply_filter) {
             showHistory(HistoryFilter(from.text.toString(), to.text.toString()))
         }
         val clear = button(R.id.history_clear_filter, R.string.history_clear_filter) { showHistory() }
         val back = button(R.id.history_return, R.string.history_return) { showActions() }
         setContent(screen(R.string.history_title, error, from, to, apply, clear, columns, rows, back))
+        runInBackground {
+            val state = historyFlow.load(filter)
+            runOnUiThread {
+                rows.removeAllViews()
+                state.validationError?.let { error.setText(messageFor(it)) }
+                state.error?.let { error.text = it.message }
+                if (state.measurements.isEmpty()) {
+                    rows.addView(body(R.string.history_empty))
+                } else {
+                    state.measurements.forEach { rows.addView(TextView(this).apply { text = formatMeasurement(it) }) }
+                }
+            }
+        }
     }
 
     private fun setContent(content: LinearLayout) {
@@ -204,44 +238,38 @@ class MainActivity : Activity() {
         ValidationError.DeferredDetail -> R.string.error_unexpected
     }
 
-    private fun formatMeasurement(measurement: Measurement): String = getString(
-        R.string.history_sample_row,
-    ).takeIf { measurement.id == "sample" } ?: measurement.toString()
-
-    private class DemoAuthGateway : AuthGateway {
-        override fun signIn(email: String, password: String): AppResult<Session> = success(email)
-        override fun logIn(email: String, password: String): AppResult<Session> = success(email)
-
-        private fun success(email: String): AppResult<Session> = AppResult.Success(
-            Session(
-                accessToken = "demo-token",
-                tokenType = "Bearer",
-                expiresAt = "2026-12-31T00:00:00.000Z",
-                user = MobileUser(id = "usr_demo", email = email),
-            ),
-        )
+    private fun body(text: String): TextView = TextView(this).apply {
+        this.text = text
+        setTextColor(Color.rgb(71, 85, 105))
+        textSize = 18f
+        gravity = Gravity.CENTER
+        setPadding(0, 16.dp, 0, 0)
     }
 
-    private class DemoHistoryGateway : HistoryGateway {
-        override fun list(session: Session, filter: HistoryFilter): AppResult<List<Measurement>> {
-            if (session.accessToken.isBlank()) {
-                return AppResult.Failure(ApiError(null, "", ApiErrorSource.Api))
-            }
-            return AppResult.Success(
-                listOf(
-                    Measurement(
-                        id = "sample",
-                        status = MeasurementStatus.Saved,
-                        systolic = 120,
-                        diastolic = 80,
-                        pulse = 68,
-                        armSide = ArmSide.Left,
-                        measurementTime = "2026-05-27T12:00:00.000Z",
-                        savedAt = "2026-05-27T12:05:00.000Z",
-                    ),
-                ),
-            )
-        }
+    private fun formatMeasurement(measurement: Measurement): String = getString(
+        R.string.history_row_format,
+        measurement.measurementTime.ifBlank { measurement.savedAt },
+        measurement.systolic,
+        measurement.diastolic,
+        measurement.pulse,
+        getString(
+            when (measurement.armSide) {
+                ArmSide.Left -> R.string.arm_left
+                ArmSide.Right -> R.string.arm_right
+                ArmSide.Unknown -> R.string.arm_unknown
+            },
+        ),
+        getString(
+            when (measurement.status) {
+                MeasurementStatus.Saved -> R.string.measurement_status_saved
+                MeasurementStatus.Pending -> R.string.measurement_status_pending
+                MeasurementStatus.Failed -> R.string.measurement_status_failed
+            },
+        ),
+    )
+
+    private fun runInBackground(work: () -> Unit) {
+        Thread(work).start()
     }
 
     private val Int.dp: Int

@@ -30,8 +30,8 @@ description: "Task list for Android mobile app implementation"
 **Purpose**: Establish Android-only implementation structure, dependencies, and validation commands without touching API/backend files.
 
 - [ ] T001 Verify the existing Android scaffold builds from `mobile/android` and record the command in `mobile/android/README.md`
-- [ ] T002 [P] Pin Android dependency versions for Compose, Material 3, Navigation, Lifecycle, CameraX, DataStore, coroutines, serialization, OkHttp, JUnit, MockWebServer, Turbine, Kover, and Compose testing in `mobile/android/gradle/libs.versions.toml`
-- [ ] T003 Configure Android application, Kotlin serialization, Compose, unit test, and Kover plugins/dependencies in `mobile/android/app/build.gradle.kts`
+- [ ] T002 [P] Pin Android dependency versions for Compose, Material 3, Navigation, Lifecycle, CameraX, DataStore, coroutines, serialization, OkHttp, JUnit, MockWebServer, Turbine, and Compose testing in `mobile/android/gradle/libs.versions.toml`
+- [ ] T003 Configure Android application, Kotlin serialization, Compose, unit test, and JaCoCo plugins/dependencies in `mobile/android/app/build.gradle.kts`
 - [ ] T004 [P] Configure shared Gradle plugin aliases required by the app module in `mobile/android/build.gradle.kts`
 - [ ] T005 Create production package directories for app, auth, guide, measurement, history, core, data, navigation, and design system code under `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/`
 - [ ] T006 [P] Create unit test package directories for auth, guide, measurement, history, core, data, navigation, and test support under `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/`
@@ -60,7 +60,7 @@ description: "Task list for Android mobile app implementation"
 - [ ] T020 [P] Add session persistence unit tests for storing, loading, expiry, unauthorized clearing, and signed-out state in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/data/session/DataStoreSessionStoreTest.kt`
 - [ ] T021 Implement Compose app shell, Material theme, navigation routes, screen test tags, snackbar/error region, and dependency wiring in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/App.kt`
 - [ ] T022 [P] Add reusable unit test fakes for repositories, session store, camera gateway, clock, dispatchers, and resource text lookup in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/testsupport/TestFakes.kt`
-- [ ] T023 Configure Kover verification for `>= 95%` Android unit line coverage in `mobile/android/app/build.gradle.kts`
+- [ ] T023 Configure JaCoCo verification for `>= 95%` Android unit line coverage in `mobile/android/app/build.gradle.kts`
 
 **Checkpoint**: Foundation ready. User story implementation can proceed after Phase 2 passes unit tests and coverage verification.
 
@@ -201,7 +201,7 @@ description: "Task list for Android mobile app implementation"
 - [ ] T072 [P] Audit Kotlin and Compose code for hardcoded visible strings and move any findings to localized resources in `mobile/android/app/src/main/res/values/strings.xml`
 - [ ] T073 [P] Audit Maestro flows for stable selectors and no hardcoded visible text dependency in `mobile/android/maestro/`
 - [ ] T074 [P] Add or update Android README instructions for API base URL, Android Studio JDK/JBR, build, unit coverage, and Maestro commands in `mobile/android/README.md`
-- [ ] T075 Run Android unit tests and verify `>= 95%` Kover coverage using `./gradlew :app:testDebugUnitTest :app:koverVerify` from `mobile/android`
+- [ ] T075 Run Android unit tests and verify `>= 95%` JaCoCo coverage using `./gradlew :app:testDebugUnitTest :app:androidCoverageVerify` from `mobile/android`
 - [ ] T076 Run all in-scope Maestro happy paths for US1-US5 from `mobile/android/maestro/`
 - [ ] T077 Run Android debug build using `./gradlew :app:assembleDebug` from `mobile/android`
 - [ ] T078 Verify the final feature diff contains implementation changes only under `mobile/android` and this generated plan file at `specs/009-android-mobile-app/tasks.md`
@@ -295,7 +295,7 @@ Task: T065 Add Maestro history filter flow in mobile/android/maestro/us5-history
 1. Complete Phase 1 setup.
 2. Complete Phase 2 foundation.
 3. Complete Phase 3 US1 tests and implementation.
-4. Validate US1 independently with unit tests, Kover, and `mobile/android/maestro/us1-signin.yaml`.
+4. Validate US1 independently with unit tests, JaCoCo, and `mobile/android/maestro/us1-signin.yaml`.
 5. Stop for review before adding lower-priority stories.
 
 ### Incremental Delivery
