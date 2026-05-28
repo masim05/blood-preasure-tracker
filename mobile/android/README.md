@@ -22,4 +22,28 @@ Build from the repository root with the Android Gradle wrapper:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:assembleDebug
 ```
 
-This scaffold intentionally has no tests. User-story implementation will add tests, Maestro flows, and the 95% Android coverage gate later.
+## Test And Coverage
+
+Run Android unit tests and the 95% coverage gate from the repository root:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:koverVerify
+```
+
+Run the Android-only validation script from `mobile/android`:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" scripts/ci.sh
+```
+
+## Maestro
+
+The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable resource IDs instead of visible text selectors. Install the debug app on an emulator, then run:
+
+```bash
+maestro test maestro/us1-signin.yaml
+maestro test maestro/us2-guide.yaml
+maestro test maestro/us3-login.yaml
+maestro test maestro/us4-capture-or-history.yaml
+maestro test maestro/us5-history-filter.yaml
+```

@@ -1,0 +1,14 @@
+appId: com.masim05.bloodpressure.mobile
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: com.masim05.bloodpressure.mobile:id/signin_email
+- inputText: us1-${MAESTRO_TIMESTAMP}@example.com
+- tapOn:
+    id: com.masim05.bloodpressure.mobile:id/signin_password
+- inputText: password123
+- tapOn:
+    id: com.masim05.bloodpressure.mobile:id/signin_submit
+- assertVisible:
+    id: com.masim05.bloodpressure.mobile:id/guide_continue

@@ -108,3 +108,24 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+  android-mobile:
+    name: Android Mobile Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Android unit tests, coverage, and build
+        run: ./gradlew :app:testDebugUnitTest :app:koverVerify :app:assembleDebug
+        working-directory: mobile/android

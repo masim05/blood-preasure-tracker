@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    jacoco
 }
 
 android {
@@ -15,6 +16,16 @@ android {
         versionName = "0.1.0"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -22,5 +33,77 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    testOptions {
+        unitTests.all {
+            it.useJUnit()
+        }
+    }
+}
+
+dependencies {
+    testImplementation(libs.junit)
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val androidCoverageExcludes = listOf(
+    "**/MainActivity*",
+    "**/BuildConfig.*",
+    "**/R.class",
+    "**/R$*.class",
+)
+
+tasks.register<JacocoReport>("androidUnitCoverageReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+            exclude(androidCoverageExcludes)
+        },
+    )
+    sourceDirectories.setFrom(files("src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec",
+            )
+        },
+    )
+}
+
+tasks.register<JacocoCoverageVerification>("koverVerify") {
+    dependsOn("testDebugUnitTest")
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+            exclude(androidCoverageExcludes)
+        },
+    )
+    sourceDirectories.setFrom(files("src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec",
+            )
+        },
+    )
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.95".toBigDecimal()
+            }
+        }
     }
 }
