@@ -5,11 +5,13 @@ import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.ports.AuthGateway
 import com.masim05.bloodpressure.mobile.core.ports.CameraGateway
 import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
+import com.masim05.bloodpressure.mobile.core.ports.MeasurementDetailGateway
 import com.masim05.bloodpressure.mobile.core.ports.MeasurementUploadGateway
 import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
@@ -31,6 +33,7 @@ data class ScreenState(
     val error: ApiError? = null,
     val validationError: ValidationError? = null,
     val measurements: List<Measurement> = emptyList(),
+    val measurementDetail: MeasurementDetail? = null,
     val filter: HistoryFilter = HistoryFilter(),
     val lastUploadId: String? = null,
 )
@@ -116,5 +119,41 @@ class HistoryFlow(
         }
     }
 
-    fun rowOpensDetail(): ValidationResult = Validators.measurementDetailAllowed()
+    fun rowOpensDetail(measurement: Measurement): ScreenState = sessionStore.load()?.let {
+        ScreenState(Route.MeasurementDetail, session = it, measurementDetail = measurement.toDetail())
+    } ?: ScreenState(Route.Auth)
+
+    private fun Measurement.toDetail(): MeasurementDetail = MeasurementDetail(
+        id = id,
+        status = status,
+        systolic = systolic,
+        diastolic = diastolic,
+        pulse = pulse,
+        armSide = armSide,
+        measurementTime = measurementTime,
+        savedAt = savedAt,
+        imageUrl = "",
+        recognitionError = null,
+    )
+}
+
+class MeasurementDetailFlow(
+    private val sessionStore: SessionStore,
+    private val detailGateway: MeasurementDetailGateway,
+) {
+    fun load(measurementId: String): ScreenState {
+        val session = sessionStore.load() ?: return ScreenState(Route.Auth)
+        return when (val detail = detailGateway.get(session, measurementId)) {
+            is AppResult.Success -> ScreenState(Route.MeasurementDetail, session = session, measurementDetail = detail.value)
+            is AppResult.Failure -> ScreenState(Route.MeasurementDetail, session = session, error = detail.error)
+        }
+    }
+
+    fun save(detail: MeasurementDetail): ScreenState {
+        val session = sessionStore.load() ?: return ScreenState(Route.Auth)
+        return when (val saved = detailGateway.save(session, detail)) {
+            is AppResult.Success -> ScreenState(Route.MeasurementDetail, session = session, measurementDetail = saved.value)
+            is AppResult.Failure -> ScreenState(Route.MeasurementDetail, session = session, measurementDetail = detail, error = saved.error)
+        }
+    }
 }

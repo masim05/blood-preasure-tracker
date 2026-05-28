@@ -13,16 +13,19 @@ import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
 import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
 import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
 import com.masim05.bloodpressure.mobile.core.flow.HistoryFlow
+import com.masim05.bloodpressure.mobile.core.flow.MeasurementDetailFlow
 import com.masim05.bloodpressure.mobile.core.flow.Route
 import com.masim05.bloodpressure.mobile.core.flow.ScreenState
 import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
 import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
+import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private val guideFlow = GuideFlow(sessionStore)
     private val captureFlow by lazy { CaptureFlow(sessionStore, GeneratedCameraGateway(), apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
+    private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
     private var uiState by mutableStateOf(MobileUiState())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,9 +72,16 @@ class MainActivity : ComponentActivity() {
                         errorText = uiState.errorText,
                         onApplyFilter = ::openHistory,
                         onClearFilter = { openHistory(HistoryFilter()) },
-                        onBack = ::openCamera,
+                        onMeasurementSelected = { openMeasurementDetail(it.id) },
                     )
-                    Route.MeasurementDetail -> openHistory(uiState.filter)
+                    Route.MeasurementDetail -> MeasurementDetailScreen(
+                        detail = uiState.measurementDetail,
+                        isLoading = uiState.isDetailLoading,
+                        isSaving = uiState.isDetailSaving,
+                        errorText = uiState.errorText,
+                        onBack = { openHistory(uiState.filter) },
+                        onSave = ::saveMeasurementDetail,
+                    )
                 }
             }
         }
@@ -145,6 +156,51 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun openMeasurementDetail(measurementId: String) {
+        uiState = uiState.copy(
+            route = Route.MeasurementDetail,
+            selectedMeasurementId = measurementId,
+            measurementDetail = null,
+            isDetailLoading = true,
+            isDetailSaving = false,
+            errorText = null,
+        )
+        runInBackground {
+            val state = measurementDetailFlow.load(measurementId)
+            runOnUiThread {
+                if (state.route == Route.Auth) {
+                    uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+                } else {
+                    uiState = uiState.copy(
+                        route = Route.MeasurementDetail,
+                        measurementDetail = state.measurementDetail,
+                        isDetailLoading = false,
+                        errorText = state.visibleMessage(),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun saveMeasurementDetail(detail: MeasurementDetail) {
+        uiState = uiState.copy(isDetailSaving = true, errorText = null)
+        runInBackground {
+            val state = measurementDetailFlow.save(detail)
+            runOnUiThread {
+                if (state.route == Route.Auth) {
+                    uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+                } else {
+                    uiState = uiState.copy(
+                        route = Route.MeasurementDetail,
+                        measurementDetail = state.measurementDetail ?: detail,
+                        isDetailSaving = false,
+                        errorText = state.visibleMessage() ?: getString(R.string.detail_save_success),
+                    )
+                }
+            }
+        }
+    }
+
     private fun ScreenState.visibleMessage(): String? = validationError?.let { getString(it.messageRes()) } ?: error?.message
 
     private fun ValidationError.messageRes(): Int = when (this) {
@@ -153,7 +209,6 @@ class MainActivity : ComponentActivity() {
         ValidationError.InvalidImage -> R.string.error_unexpected
         ValidationError.InvalidDate -> R.string.error_invalid_date
         ValidationError.DateOrder -> R.string.error_date_order
-        ValidationError.DeferredDetail -> R.string.error_unexpected
     }
 
     private fun runInBackground(work: () -> Unit) {
@@ -170,4 +225,8 @@ private data class MobileUiState(
     val errorText: String? = null,
     val filter: HistoryFilter = HistoryFilter(),
     val measurements: List<Measurement> = emptyList(),
+    val selectedMeasurementId: String? = null,
+    val measurementDetail: MeasurementDetail? = null,
+    val isDetailLoading: Boolean = false,
+    val isDetailSaving: Boolean = false,
 )

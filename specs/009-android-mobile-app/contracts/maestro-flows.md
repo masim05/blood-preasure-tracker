@@ -70,10 +70,20 @@ Every in-scope Android user story requires one happy-path Maestro flow under `mo
 3. Select a date range using Compose Material 3 date selector controls.
 4. Apply the date range filter.
 5. Verify filtered history state is visible.
-6. Verify rows are displayed as non-editable, vertically aligned history entries.
+6. Tap a measurement row and verify measurement detail opens.
 
-**Pass signal**: Date selector state remains visible and a saved row containing the expected measurement values remains aligned on the history screen. No measurement-detail screen is opened.
+**Pass signal**: Date selector state remains visible, a saved row containing the expected measurement values remains aligned on the history screen, and tapping the row opens measurement detail.
 
-## Deferred
+## US6: `us6-measurement-detail.yaml`
 
-No Maestro flow is required for US6 in this feature because measurement detail, image review, value override, and reviewed save are explicitly deferred.
+**Start**: Authenticated user with saved measurements available.
+
+**Steps**:
+1. Open history screen from camera.
+2. Tap a saved measurement row.
+3. Verify the measurement detail screen opens with image and recognized fields.
+4. Edit a recognized field.
+5. Tap Save.
+6. Tap Back.
+
+**Pass signal**: Measurement detail is visible after row tap, the editable value accepts input, and Back returns to the history screen.

@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,10 +29,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -44,7 +47,16 @@ fun AuthScreen(
 ) {
     var email by remember(mode) { mutableStateOf("") }
     var password by remember(mode) { mutableStateOf("") }
+    var revealPassword by remember(mode) { mutableStateOf(false) }
     val isLogin = mode == AuthMode.Login
+
+    LaunchedEffect(password) {
+        revealPassword = password.isNotEmpty()
+        if (password.isNotEmpty()) {
+            delay(900)
+            revealPassword = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -91,7 +103,7 @@ fun AuthScreen(
             onValueChange = { password = it },
             singleLine = true,
             label = { Text(stringResource(R.string.signin_password_hint)) },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (revealPassword) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
         if (errorText != null) {

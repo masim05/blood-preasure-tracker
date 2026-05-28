@@ -14,7 +14,6 @@ enum class ValidationError {
     InvalidImage,
     InvalidDate,
     DateOrder,
-    DeferredDetail,
 }
 
 object Validators {
@@ -46,6 +45,4 @@ object Validators {
         }
         return ValidationResult.Valid
     }
-
-    fun measurementDetailAllowed(): ValidationResult = ValidationResult.Invalid(ValidationError.DeferredDetail)
 }

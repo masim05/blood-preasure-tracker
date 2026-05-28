@@ -8,7 +8,7 @@
 
 ## Summary
 
-Update the Android app under `mobile/android` to match the clarified customer journey and official Android layout direction. The app will use Jetpack Compose Material 3 for the five-screen journey: one combined Login/New Account auth screen, guide screen, camera screen, history screen, and future measurement screen placeholder scope. In this feature, measurement detail remains deferred, so history rows remain non-clickable while the future `4 -> 5` transition is documented as out of scope. Successful New Account routes to Guide; Guide Next routes to Camera; successful Login routes to Camera; Camera History opens History; successful upload opens History. The app continues to consume the existing Mobile API described by `docs/openapi.yaml`, display every API error to users, localize visible strings, maintain happy-path Maestro flows for US1-US5, and enforce Android unit coverage `>= 95%`.
+Update the Android app under `mobile/android` to match the clarified customer journey and official Android layout direction. The app uses Jetpack Compose Material 3 for the five-screen journey: one combined Login/New Account auth screen, guide screen, camera screen, history screen, and measurement detail screen. Successful New Account routes to Guide; Guide Next routes to Camera; successful Login routes to Camera; Camera History opens History; successful upload opens History; tapping a history row opens Measurement Detail; Back returns to History. The app continues to consume the existing Mobile API described by `docs/openapi.yaml`, display every API error to users, localize visible strings, maintain happy-path Maestro flows for US1-US6, and enforce Android unit coverage `>= 95%`.
 
 ## Technical Context
 
@@ -20,7 +20,7 @@ Update the Android app under `mobile/android` to match the clarified customer jo
 
 **Storage**: In-memory session store for the current feature. No local database is introduced. Persisted session storage can be added later under the same session port if needed.
 
-**Testing**: JUnit 4 unit tests for core flows, validation, API error mapping, HTTP adapter parsing/upload behavior, session store, camera gateway, and domain models; JaCoCo task `:app:androidCoverageVerify` enforces `>= 95%`; Maestro happy-path flows cover US1-US5.
+**Testing**: JUnit 4 unit tests for core flows, validation, API error mapping, HTTP adapter parsing/upload/detail behavior, session store, camera gateway, and domain models; JaCoCo task `:app:androidCoverageVerify` enforces `>= 95%`; Maestro happy-path flows cover US1-US6.
 
 **Target Platform**: Android mobile app opened, built, and run from Android Studio; local validation uses an emulator/device calling the existing API at `http://10.0.2.2:3000`, backed by `npm run api` on the host.
 
@@ -30,15 +30,15 @@ Update the Android app under `mobile/android` to match the clarified customer jo
 
 **Performance Goals**: Auth, guide, camera, and history screens should render within 1 second after local state/API response. A returning user should reach the camera screen within 2 minutes during local validation. Date filtering should require no more than 3 user actions after reaching history.
 
-**Constraints**: All implementation changes must stay under `mobile/android`; no API code, API tests, backend tests, or OpenAPI document changes. Every API error response message must be shown in the current screen UI, with a clear fallback for network/malformed responses. US6 measurement detail/review/override/save remains deferred.
+**Constraints**: All implementation changes must stay under `mobile/android`; no API code, API tests, backend tests, or OpenAPI document changes. Every API error response message must be shown in the current screen UI, with a clear fallback for network/malformed responses. Measurement detail save must stay within the existing OpenAPI save contract.
 
 **API Error UX**: `ApiErrorMapper` converts API `message` values and network/timeout/parse/unexpected failures into visible Compose screen state. Auth, upload, and history screens preserve retry/navigation paths when displaying errors.
 
 **Localization**: Every visible Android text value is defined in localized string resources or an equivalent localization mechanism used by Compose. Kotlin code, XML resources, tests, and Maestro flows avoid hardcoded visible user-facing text; Maestro prefers stable resource IDs/content descriptions.
 
-**Scale/Scope**: Five in-scope user stories, one Android app module, one HTTP API client boundary, one session store, one camera/upload path, one combined auth screen, one guide screen, one camera screen, and one history table screen with date selector filters. Measurement detail, image review, override, and reviewed save are out of scope.
+**Scale/Scope**: Six in-scope user stories, one Android app module, one HTTP API client boundary, one session store, one camera/upload path, one combined auth screen, one guide screen, one camera screen, one history table screen with date selector filters, and one measurement detail screen.
 
-**Maestro Coverage**: One happy-path Maestro flow each for US1, US2, US3, US4, and US5 under `mobile/android/maestro`. Flows must be updated for the combined auth screen, camera-first destination, and Compose-accessible selectors. US6 has no flow because it is deferred.
+**Maestro Coverage**: One happy-path Maestro flow each for US1, US2, US3, US4, US5, and US6 under `mobile/android/maestro`. Flows must be updated for the combined auth screen, camera-first destination, history detail transition, and Compose-accessible selectors.
 
 **Mobile Unit Coverage**: Android unit coverage must be `>= 95%` in CI for implemented mobile code. Compose UI rendering is validated through Maestro; pure Kotlin and adapter behavior are validated with JUnit/Jacoco.
 
@@ -57,7 +57,7 @@ Update the Android app under `mobile/android` to match the clarified customer jo
 - [x] **Kotlin LTS baseline**: Kotlin 2.0.21 is treated as the project-approved latest stable Android-compatible baseline because Kotlin has no separate LTS channel.
 - [x] **API errors visible to users**: Shared Android error mapping and Compose screen state are required for every API response error and network fallback.
 - [x] **Localization coverage**: Every visible Android string is required to come from localized resources or an equivalent localization mechanism.
-- [x] **Maestro happy paths**: US1-US5 each have a happy-path Maestro flow.
+- [x] **Maestro happy paths**: US1-US6 each have a happy-path Maestro flow.
 - [x] **Android unit coverage**: Android unit tests maintain a `>= 95%` CI gate via `:app:androidCoverageVerify`.
 - [x] **Dependency policy**: Backend dependencies are unchanged. Android dependency additions are limited to official AndroidX/Jetpack Compose Material 3 UI dependencies required by the clarified layout approach.
 
@@ -123,7 +123,7 @@ See [research.md](research.md). All technical choices are resolved:
 - Jetpack Compose Material 3 selected for official-guide screen layouts.
 - Combined auth screen selected with Login/New Account modes or tabs.
 - Camera screen selected as the post-guide/post-login destination.
-- Measurement detail transition remains future scope.
+- Measurement detail transition is implemented from history rows with Back returning to history.
 - Platform password masking selected for auth password fields.
 - Date selector controls selected for history filter input.
 - Vertically aligned Compose table/list layout selected for history rows.
@@ -134,4 +134,4 @@ See [research.md](research.md). All technical choices are resolved:
 
 See [data-model.md](data-model.md), [contracts/api-client.md](contracts/api-client.md), [contracts/maestro-flows.md](contracts/maestro-flows.md), and [quickstart.md](quickstart.md).
 
-Post-design constitution check remains passing: the design keeps mobile code under `mobile/android`, preserves ports/adapters boundaries, localizes visible strings, maps every API failure to visible UI, keeps US1-US5 Maestro happy paths, maintains the Android `>= 95%` unit coverage gate, and limits dependency changes to official AndroidX Compose Material 3 UI dependencies required by the clarified layout approach.
+Post-design constitution check remains passing: the design keeps mobile code under `mobile/android`, preserves ports/adapters boundaries, localizes visible strings, maps every API failure to visible UI, keeps US1-US6 Maestro happy paths, maintains the Android `>= 95%` unit coverage gate, and limits dependency changes to official AndroidX Compose Material 3 UI dependencies required by the clarified layout approach.

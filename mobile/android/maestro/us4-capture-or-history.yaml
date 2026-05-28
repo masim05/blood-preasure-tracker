@@ -22,9 +22,3 @@ appId: com.masim05.bloodpressure.mobile
     id: camera_upload
 - assertVisible:
     id: history_apply_filter
-- tapOn:
-    id: history_return
-- tapOn:
-    id: camera_history
-- assertVisible:
-    id: history_apply_filter

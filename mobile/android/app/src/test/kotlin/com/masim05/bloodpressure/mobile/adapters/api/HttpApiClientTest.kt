@@ -3,6 +3,7 @@ package com.masim05.bloodpressure.mobile.adapters.api
 import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
@@ -202,6 +203,105 @@ class HttpApiClientTest {
         assertEquals("Missing bearer token", failure.error.message)
     }
 
+    @Test
+    fun `get measurement detail sends authorization and parses recognized values`() {
+        server.enqueue(
+            200,
+            """
+            {"id":"msr_1","status":"recognized","systolic":120,"diastolic":80,"pulse":68,"armSide":"left","measurementTime":"2026-05-27T12:00:00.000Z","imageUrl":"/api/v1/measurements/msr_1/image"}
+            """.trimIndent(),
+        )
+
+        val result = client.get(session(), "msr_1")
+        val detail = (result as AppResult.Success).value
+
+        assertEquals("Bearer token-1", server.request.authorization)
+        assertEquals("/api/v1/measurements/msr_1", server.request.path)
+        assertEquals(MeasurementStatus.Recognized, detail.status)
+        assertEquals(120, detail.systolic)
+        assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
+    }
+
+    @Test
+    fun `save measurement detail posts save endpoint and preserves image url`() {
+        server.enqueue(
+            201,
+            """
+            {"id":"msr_1","status":"saved","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z","savedAt":"2026-05-27T12:05:00.000Z"}
+            """.trimIndent(),
+        )
+
+        val result = client.save(
+            session(),
+            MeasurementDetail(
+                id = "msr_1",
+                status = MeasurementStatus.Recognized,
+                systolic = 121,
+                diastolic = 81,
+                pulse = 69,
+                armSide = ArmSide.Right,
+                measurementTime = "2026-05-27T12:00:00.000Z",
+                savedAt = null,
+                imageUrl = "/api/v1/measurements/msr_1/image",
+                recognitionError = null,
+            ),
+        )
+        val detail = (result as AppResult.Success).value
+
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals(MeasurementStatus.Saved, detail.status)
+        assertEquals(ArmSide.Right, detail.armSide)
+        assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
+    }
+
+    @Test
+    fun `measurement detail supports pending recognizing failed and API failures`() {
+        server.enqueue(
+            200,
+            """
+            {"id":"msr_2","status":"recognizing","measurementTime":"2026-05-27T12:00:00.000Z","imageUrl":"/image"}
+            """.trimIndent(),
+        )
+        val recognizing = (client.get(session(), "msr_2") as AppResult.Success).value
+        assertEquals(MeasurementStatus.Recognizing, recognizing.status)
+        assertEquals(ArmSide.Unknown, recognizing.armSide)
+        assertEquals(null, recognizing.systolic)
+
+        server.close()
+        server = TestHttpServer()
+        client = HttpApiClient("http://127.0.0.1:${server.port}", "Unexpected API error", "Network error", "Timeout", "Parse error")
+        server.enqueue(404, "{\"error\":\"not_found\",\"message\":\"Measurement not found\"}")
+        val getFailure = client.get(session(), "missing") as AppResult.Failure
+        assertEquals("Measurement not found", getFailure.error.message)
+
+        server.close()
+        server = TestHttpServer()
+        client = HttpApiClient("http://127.0.0.1:${server.port}", "Unexpected API error", "Network error", "Timeout", "Parse error")
+        server.enqueue(409, "{\"error\":\"conflict\",\"message\":\"Measurement must be recognized before it can be saved\"}")
+        val saveFailure = client.save(session(), detailForSave()) as AppResult.Failure
+        assertEquals("conflict", saveFailure.error.code)
+    }
+
+    @Test
+    fun `measurement detail maps closed connections to network errors`() {
+        server.close()
+
+        val getFailure = client.get(session(), "msr_1") as AppResult.Failure
+        val saveFailure = client.save(session(), detailForSave()) as AppResult.Failure
+
+        assertEquals("Network error", getFailure.error.message)
+        assertEquals("Network error", saveFailure.error.message)
+    }
+
+    @Test
+    fun `measurement detail maps malformed success to parse error`() {
+        server.enqueue(200, "{}")
+
+        val result = client.get(session(), "msr_1") as AppResult.Failure
+
+        assertEquals("Parse error", result.error.message)
+    }
+
     private fun session(): Session = Session(
         accessToken = "token-1",
         tokenType = "Bearer",
@@ -209,7 +309,21 @@ class HttpApiClientTest {
         user = MobileUser("usr_1", "user@example.com"),
     )
 
+    private fun detailForSave(): MeasurementDetail = MeasurementDetail(
+        id = "msr_1",
+        status = MeasurementStatus.Recognized,
+        systolic = 121,
+        diastolic = 81,
+        pulse = 69,
+        armSide = ArmSide.Right,
+        measurementTime = "2026-05-27T12:00:00.000Z",
+        savedAt = null,
+        imageUrl = "/api/v1/measurements/msr_1/image",
+        recognitionError = null,
+    )
+
     private data class RecordedRequest(
+        val path: String,
         val body: String,
         val authorization: String,
         val contentType: String,
@@ -260,6 +374,7 @@ class HttpApiClientTest {
                         bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
                     }
                     request = RecordedRequest(
+                        path = requestLine.substringAfter(' ').substringBefore('?').substringBefore(' '),
                         body = requestBody,
                         authorization = headers["Authorization"].orEmpty(),
                         contentType = headers["Content-Type"].orEmpty(),

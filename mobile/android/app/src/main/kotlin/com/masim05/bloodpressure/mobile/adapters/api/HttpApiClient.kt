@@ -4,12 +4,14 @@ import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
 import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.ports.AuthGateway
 import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
+import com.masim05.bloodpressure.mobile.core.ports.MeasurementDetailGateway
 import com.masim05.bloodpressure.mobile.core.ports.MeasurementUploadGateway
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
@@ -24,7 +26,7 @@ class HttpApiClient(
     private val networkMessage: String,
     private val timeoutMessage: String,
     private val parseMessage: String,
-) : AuthGateway, HistoryGateway, MeasurementUploadGateway {
+) : AuthGateway, HistoryGateway, MeasurementUploadGateway, MeasurementDetailGateway {
     override fun signIn(email: String, password: String): AppResult<Session> = authenticate("/api/v1/signin", email, password)
 
     override fun logIn(email: String, password: String): AppResult<Session> = authenticate("/api/v1/login", email, password)
@@ -63,6 +65,25 @@ class HttpApiClient(
         val response = request("/api/v1/measurements?$query", "GET", authorization = session.authorizationHeader)
         if (response.status in 200..299) {
             AppResult.Success(parseMeasurements(response.body))
+        } else {
+            AppResult.Failure(ApiErrorMapper.fromApiBody(response.body, fallbackApiMessage))
+        }
+    }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
+
+    override fun get(session: Session, measurementId: String): AppResult<MeasurementDetail> = runCatching {
+        val response = request("/api/v1/measurements/${urlPath(measurementId)}", "GET", authorization = session.authorizationHeader)
+        if (response.status in 200..299) {
+            AppResult.Success(parseMeasurementDetail(response.body))
+        } else {
+            AppResult.Failure(ApiErrorMapper.fromApiBody(response.body, fallbackApiMessage))
+        }
+    }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
+
+    override fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail> = runCatching {
+        val response = request("/api/v1/measurements/${urlPath(detail.id)}/save", "POST", authorization = session.authorizationHeader)
+        if (response.status in 200..299) {
+            val saved = parseMeasurementDetail(response.body)
+            AppResult.Success(saved.copy(imageUrl = saved.imageUrl.ifBlank { detail.imageUrl }))
         } else {
             AppResult.Failure(ApiErrorMapper.fromApiBody(response.body, fallbackApiMessage))
         }
@@ -116,11 +137,7 @@ class HttpApiClient(
             val status = extractJsonString(item, "status") ?: return@mapNotNull null
             Measurement(
                 id = extractJsonString(item, "id") ?: return@mapNotNull null,
-                status = when (status) {
-                    "saved" -> MeasurementStatus.Saved
-                    "failed" -> MeasurementStatus.Failed
-                    else -> MeasurementStatus.Pending
-                },
+                status = parseStatus(status),
                 systolic = extractJsonInt(item, "systolic") ?: 0,
                 diastolic = extractJsonInt(item, "diastolic") ?: 0,
                 pulse = extractJsonInt(item, "pulse") ?: 0,
@@ -135,6 +152,33 @@ class HttpApiClient(
         }
     }
 
+    private fun parseMeasurementDetail(body: String): MeasurementDetail = MeasurementDetail(
+        id = requireNotNull(extractJsonString(body, "id")),
+        status = parseStatus(extractJsonString(body, "status")),
+        systolic = extractJsonInt(body, "systolic"),
+        diastolic = extractJsonInt(body, "diastolic"),
+        pulse = extractJsonInt(body, "pulse"),
+        armSide = parseArmSide(extractJsonString(body, "armSide")),
+        measurementTime = extractJsonString(body, "measurementTime") ?: "",
+        savedAt = extractJsonString(body, "savedAt"),
+        imageUrl = extractJsonString(body, "imageUrl") ?: "",
+        recognitionError = extractJsonString(body, "recognitionError"),
+    )
+
+    private fun parseStatus(status: String?): MeasurementStatus = when (status) {
+        "recognizing" -> MeasurementStatus.Recognizing
+        "recognized" -> MeasurementStatus.Recognized
+        "saved" -> MeasurementStatus.Saved
+        "failed" -> MeasurementStatus.Failed
+        else -> MeasurementStatus.Pending
+    }
+
+    private fun parseArmSide(value: String?): ArmSide = when (value) {
+        "left" -> ArmSide.Left
+        "right" -> ArmSide.Right
+        else -> ArmSide.Unknown
+    }
+
     private fun extractJsonString(body: String, field: String): String? =
         Regex("\\\"$field\\\"\\s*:\\s*\\\"([^\\\"]*)\\\"").find(body)?.groupValues?.get(1)
 
@@ -143,6 +187,7 @@ class HttpApiClient(
 
     private fun escape(value: String): String = value.replace("\\", "\\\\").replace("\"", "\\\"")
     private fun url(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name())
+    private fun urlPath(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name()).replace("+", "%20")
 
     private data class HttpResponse(val status: Int, val body: String)
 

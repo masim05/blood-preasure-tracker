@@ -18,29 +18,20 @@ appId: com.masim05.bloodpressure.mobile
     id: camera_history
 - tapOn:
     id: camera_history
-- tapOn:
-    id: history_from
-- tapOn:
-    text: OK
-- tapOn:
-    id: history_to
-- tapOn:
-    text: OK
-- tapOn:
-    id: history_apply_filter
 - assertVisible:
-    text: "120"
-- assertVisible:
-    text: "80"
-- assertVisible:
-    text: "68"
+    id: history_row
 - tapOn:
     id: history_row
 - assertVisible:
     id: measurement_detail_screen
+- assertVisible:
+    id: measurement_detail_image
+- tapOn:
+    id: measurement_detail_systolic
+- eraseText
+- inputText: "120"
+- hideKeyboard
 - tapOn:
     id: measurement_detail_back
 - assertVisible:
     id: history_apply_filter
-- assertNotVisible:
-    id: camera_upload

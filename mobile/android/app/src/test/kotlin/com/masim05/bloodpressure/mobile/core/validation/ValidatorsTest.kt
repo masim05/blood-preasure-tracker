@@ -25,11 +25,10 @@ class ValidatorsTest {
     }
 
     @Test
-    fun rejectsInvalidHistoryDatesAndDeferredDetails() {
+    fun rejectsInvalidHistoryDates() {
         assertInvalid(ValidationError.InvalidDate, Validators.historyFilter(HistoryFilter("2026/05/01", "")))
         assertInvalid(ValidationError.InvalidDate, Validators.historyFilter(HistoryFilter("", "2026/05/31")))
         assertInvalid(ValidationError.DateOrder, Validators.historyFilter(HistoryFilter("2026-05-31", "2026-05-01")))
-        assertInvalid(ValidationError.DeferredDetail, Validators.measurementDetailAllowed())
     }
 
     private fun assertInvalid(expected: ValidationError, actual: ValidationResult) {

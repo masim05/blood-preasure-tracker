@@ -44,7 +44,7 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" scripts/
 
 ## Maestro
 
-The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable Compose semantics/resource IDs instead of visible text selectors. Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
+The happy-path flows for US1 through US6 live under `mobile/android/maestro` and use stable Compose semantics/resource IDs instead of visible text selectors. Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
 
 ```bash
 MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us1-signin.yaml
@@ -52,4 +52,5 @@ MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test ma
 MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us3-login.yaml
 MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us4-capture-or-history.yaml
 MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us5-history-filter.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us6-measurement-detail.yaml
 ```

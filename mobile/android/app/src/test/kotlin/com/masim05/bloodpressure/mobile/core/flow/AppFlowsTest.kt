@@ -6,6 +6,7 @@ import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
@@ -13,10 +14,10 @@ import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.ports.AuthGateway
 import com.masim05.bloodpressure.mobile.core.ports.CameraGateway
 import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
+import com.masim05.bloodpressure.mobile.core.ports.MeasurementDetailGateway
 import com.masim05.bloodpressure.mobile.core.ports.MeasurementUploadGateway
 import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
-import com.masim05.bloodpressure.mobile.core.validation.ValidationResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -99,7 +100,7 @@ class AppFlowsTest {
     }
 
     @Test
-    fun historyLoadsFiltersRejectsInvalidDatesAndDefersRows() {
+    fun historyLoadsFiltersRejectsInvalidDatesAndOpensRows() {
         val store = MemoryStore().apply { save(session("user@example.com")) }
         val flow = HistoryFlow(store, HistorySuccess())
 
@@ -111,7 +112,44 @@ class AppFlowsTest {
         val invalid = flow.load(HistoryFilter("2026-05-31", "2026-05-01"))
         assertEquals(ValidationError.DateOrder, invalid.validationError)
 
-        assertTrue(flow.rowOpensDetail() is ValidationResult.Invalid)
+        val detailState = flow.rowOpensDetail(measurement())
+        assertEquals(Route.MeasurementDetail, detailState.route)
+        assertEquals("msr_1", detailState.measurementDetail?.id)
+
+        assertEquals(Route.Auth, HistoryFlow(MemoryStore(), HistorySuccess()).rowOpensDetail(measurement()).route)
+    }
+
+    @Test
+    fun measurementDetailLoadsSavesAndRequiresSession() {
+        assertEquals(Route.Auth, MeasurementDetailFlow(MemoryStore(), DetailSuccess()).load("msr_1").route)
+
+        val store = MemoryStore().apply { save(session("user@example.com")) }
+        val flow = MeasurementDetailFlow(store, DetailSuccess())
+
+        val loaded = flow.load("msr_1")
+        assertEquals(Route.MeasurementDetail, loaded.route)
+        assertEquals(MeasurementStatus.Recognized, loaded.measurementDetail?.status)
+
+        val saved = flow.save(requireNotNull(loaded.measurementDetail))
+        assertEquals(Route.MeasurementDetail, saved.route)
+        assertEquals(MeasurementStatus.Saved, saved.measurementDetail?.status)
+
+        assertEquals(Route.Auth, MeasurementDetailFlow(MemoryStore(), DetailSuccess()).save(detail(MeasurementStatus.Recognized)).route)
+    }
+
+    @Test
+    fun measurementDetailDisplaysApiErrors() {
+        val store = MemoryStore().apply { save(session("user@example.com")) }
+
+        val failure = MeasurementDetailFlow(store, DetailFailure()).load("msr_1")
+
+        assertEquals(Route.MeasurementDetail, failure.route)
+        assertEquals("api message", failure.error?.message)
+
+        val saveFailure = MeasurementDetailFlow(store, DetailFailure()).save(detail(MeasurementStatus.Recognized))
+        assertEquals(Route.MeasurementDetail, saveFailure.route)
+        assertEquals("api message", saveFailure.error?.message)
+        assertEquals("msr_1", saveFailure.measurementDetail?.id)
     }
 
     @Test
@@ -164,9 +202,31 @@ class AppFlowsTest {
         override fun list(session: Session, filter: HistoryFilter): AppResult<List<Measurement>> = AppResult.Failure(apiError())
     }
 
+    private class DetailSuccess : MeasurementDetailGateway {
+        override fun get(session: Session, measurementId: String): AppResult<MeasurementDetail> = AppResult.Success(detail(MeasurementStatus.Recognized))
+        override fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail> = AppResult.Success(detail.copy(status = MeasurementStatus.Saved))
+    }
+
+    private class DetailFailure : MeasurementDetailGateway {
+        override fun get(session: Session, measurementId: String): AppResult<MeasurementDetail> = AppResult.Failure(apiError())
+        override fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail> = AppResult.Failure(apiError())
+    }
+
     companion object {
         private fun session(email: String) = Session("token", "Bearer", "2026-12-31T00:00:00.000Z", MobileUser("usr_1", email))
         private fun apiError() = ApiError("code", "api message", ApiErrorSource.Api)
         private fun measurement() = Measurement("msr_1", MeasurementStatus.Saved, 120, 80, 68, ArmSide.Left, "2026-05-27T12:00:00.000Z", "2026-05-27T12:05:00.000Z")
+        private fun detail(status: MeasurementStatus) = MeasurementDetail(
+            id = "msr_1",
+            status = status,
+            systolic = 120,
+            diastolic = 80,
+            pulse = 68,
+            armSide = ArmSide.Left,
+            measurementTime = "2026-05-27T12:00:00.000Z",
+            savedAt = null,
+            imageUrl = "/api/v1/measurements/msr_1/image",
+            recognitionError = null,
+        )
     }
 }

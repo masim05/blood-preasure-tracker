@@ -41,6 +41,8 @@ enum class ArmSide {
 
 enum class MeasurementStatus {
     Pending,
+    Recognizing,
+    Recognized,
     Saved,
     Failed,
 }
@@ -68,7 +70,18 @@ data class PasswordInput(
     val usesPlatformMasking: Boolean = true,
 )
 
-data object MeasurementDetail
+data class MeasurementDetail(
+    val id: String,
+    val status: MeasurementStatus,
+    val systolic: Int?,
+    val diastolic: Int?,
+    val pulse: Int?,
+    val armSide: ArmSide,
+    val measurementTime: String,
+    val savedAt: String?,
+    val imageUrl: String,
+    val recognitionError: String?,
+)
 
 data class CameraScreenState(
     val session: Session,

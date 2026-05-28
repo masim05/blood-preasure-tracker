@@ -8,13 +8,13 @@ description: "Task list for Android mobile app Compose customer journey implemen
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/api-client.md, contracts/maestro-flows.md, quickstart.md
 
-**Tests**: Required. Each in-scope user story US1-US5 includes Android unit tests and one happy-path Maestro flow. Android unit coverage must verify `>= 95%`.
+**Tests**: Required. Each in-scope user story US1-US6 includes Android unit tests and one happy-path Maestro flow. Android unit coverage must verify `>= 95%`.
 
 **Implementation Boundary**: Application implementation changes for this feature must remain under `mobile/android`. Do not change API code, API tests, backend tests, or `docs/openapi.yaml`. Treat `docs/openapi.yaml` as a read-only API reference.
 
 **Localization**: Every visible Android string or text value must come from localized resources or an equivalent localization mechanism. Hardcoded visible text in Kotlin, XML resources, tests, and Maestro flows is prohibited.
 
-**Deferred Scope**: US6 is deferred. Do not implement measurement detail, image review, value override, reviewed save workflows, or history-row navigation to measurement detail.
+**Measurement Detail Scope**: US6 implements history-row navigation to measurement detail, editable recognized values, Save against the existing API save endpoint, and Back to history. API/backend code remains read-only.
 
 **Organization**: Tasks are grouped by user story so each story can be implemented and tested independently.
 
@@ -38,13 +38,13 @@ description: "Task list for Android mobile app Compose customer journey implemen
 
 **Critical**: No user story is complete until this phase is complete.
 
-- [X] T008 [P] Define AuthMode, AppScreen, CameraScreenState, MobileUser, Session, MeasurementImage, Measurement, HistoryFilter, HistoryTableRow, PasswordInput, MeasurementDetail deferred marker, and ApiError concepts in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt`
-- [X] T009 [P] Add domain model unit tests for auth modes, screen transitions, sessions, measurements, camera state, history filters, password input expectations, and deferred measurement detail in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModelsTest.kt`
+- [X] T008 [P] Define AuthMode, AppScreen, CameraScreenState, MobileUser, Session, MeasurementImage, Measurement, HistoryFilter, HistoryTableRow, PasswordInput, MeasurementDetail, and ApiError concepts in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt`
+- [X] T009 [P] Add domain model unit tests for auth modes, screen transitions, sessions, measurements, camera state, history filters, password input expectations, and measurement detail in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModelsTest.kt`
 - [X] T010 [P] Define auth, session, upload, history, and camera ports in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt`
 - [X] T011 [P] Implement shared email, password, image, and history filter validators in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/validation/Validators.kt`
-- [X] T012 [P] Add validator unit tests for email, password, image metadata, date filter bounds, and deferred measurement detail behavior in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/validation/ValidatorsTest.kt`
-- [X] T013 Implement shared app flow routes for Auth, Guide, Camera, History, upload success-to-history, and deferred detail behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [X] T014 [P] Add app flow unit tests for auth routing, guide-to-camera, login-to-camera, camera history, upload-to-history, and history row non-navigation in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T012 [P] Add validator unit tests for email, password, image metadata, and date filter bounds in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/validation/ValidatorsTest.kt`
+- [X] T013 Implement shared app flow routes for Auth, Guide, Camera, History, upload success-to-history, and measurement detail behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T014 [P] Add app flow unit tests for auth routing, guide-to-camera, login-to-camera, camera history, upload-to-history, and history row detail navigation in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
 - [X] T015 [P] Implement shared API error mapping from API message bodies and network, timeout, parse, and unexpected fallbacks in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapper.kt`
 - [X] T016 [P] Add API error mapper unit tests for API messages and every fallback source in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapperTest.kt`
 - [X] T017 Implement HTTP auth, upload, and history API client behavior against `http://10.0.2.2:3000` in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
@@ -157,13 +157,13 @@ description: "Task list for Android mobile app Compose customer journey implemen
 
 ## Phase 7: User Story 5 - Browse Measurement History (Priority: P5)
 
-**Goal**: An authenticated user sees saved measurement history rows in aligned columns, filters by inclusive date range using Material 3 date selectors, sees empty/error states, and cannot open or edit measurement details.
+**Goal**: An authenticated user sees saved measurement history rows in aligned columns, filters by inclusive date range using Material 3 date selectors, sees empty/error states, and can open a measurement detail from a row.
 
-**Independent Test**: Use seeded saved measurements, open history from camera, select and apply a date range filter, verify aligned row values and selected filters remain visible, and confirm rows are non-clickable.
+**Independent Test**: Use seeded saved measurements, open history from camera, select and apply a date range filter, verify aligned row values and selected filters remain visible, then tap a row and confirm detail opens.
 
 ### Tests for User Story 5 (Required)
 
-- [X] T056 [P] [US5] Add HistoryFlow unit tests for initial load, date selector state, date range validation, from-after-to validation, empty state, pagination state, API error display, network error display, retry, and non-clickable row behavior in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T056 [P] [US5] Add HistoryFlow unit tests for initial load, date selector state, date range validation, from-after-to validation, empty state, pagination state, API error display, network error display, retry, and row-to-detail behavior in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
 - [X] T057 [P] [US5] Add HTTP client unit tests for authenticated `GET /api/v1/measurements` query parameters, inclusive filters, pagination, success mapping, error mapping, and malformed responses in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
 - [X] T058 [P] [US5] Add domain model or formatter unit tests for HistoryTableRow column order, localized value mapping, and aligned row data in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModelsTest.kt`
 - [X] T059 [P] [US5] Add happy-path Maestro history filter flow using stable Compose semantics and seeded measurement data in `mobile/android/maestro/us5-history-filter.yaml`
@@ -172,12 +172,33 @@ description: "Task list for Android mobile app Compose customer journey implemen
 
 - [X] T060 [P] [US5] Add localized history title, table headers, date selector labels, selected date text, apply filter, clear filter, empty state, retry, return, arm labels, and status labels in `mobile/android/app/src/main/res/values/strings.xml`
 - [X] T061 [P] [US5] Add stable Compose semantics for date selector controls and history table columns in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/TestTags.kt`
-- [X] T062 [US5] Implement history flow for session lookup, date filter state, inclusive bounds, validation, API errors, empty state, retry, and non-clickable rows in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T062 [US5] Implement history flow for session lookup, date filter state, inclusive bounds, validation, API errors, empty state, retry, and row-to-detail routing in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
 - [X] T063 [US5] Implement history list API request, query parameters, response parsing, pagination flags, and error mapping in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
-- [X] T064 [US5] Implement Compose Material 3 HistoryScreen with date selectors, apply/clear controls, error/empty states, and return navigation in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
+- [X] T064 [US5] Implement Compose Material 3 HistoryScreen with date selectors, apply/clear controls, error/empty states, and row selection in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
 - [X] T065 [US5] Render history rows as vertically aligned Compose table columns for measurement time, systolic, diastolic, pulse, arm side, and status in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
-- [X] T066 [US5] Ensure history rows have no click navigation and no detail, image review, override, or save affordances in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
-- [X] T067 [US5] Wire HistoryScreen load, filter, retry, clear, and return events in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt`
+- [X] T066 [US5] Ensure history rows open measurement detail and keep row content vertically aligned in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
+- [X] T067 [US5] Wire HistoryScreen load, filter, retry, clear, and row selection events in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt`
+
+---
+
+## Phase 8: User Story 6 - Review Measurement Detail (Priority: P6)
+
+**Goal**: An authenticated user opens measurement detail from history, reviews image and recognized values, edits recognized fields, saves the measurement, and returns to history.
+
+**Independent Test**: Open history with seeded data, tap a measurement row, verify detail fields, edit a value, tap Save, and tap Back to history.
+
+### Tests for User Story 6 (Required)
+
+- [X] T076 [P] [US6] Add MeasurementDetailFlow unit tests for load success, save success, API error display, and missing session routing in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T077 [P] [US6] Add HTTP client unit tests for `GET /api/v1/measurements/{id}` and `POST /api/v1/measurements/{id}/save` success, API failure, malformed response, and network failure in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
+- [X] T078 [P] [US6] Add happy-path Maestro measurement detail flow using stable Compose semantics in `mobile/android/maestro/us6-measurement-detail.yaml`
+
+### Implementation for User Story 6
+
+- [X] T079 [P] [US6] Add localized measurement detail labels, editable value labels, Save, Back, image placeholder, and status strings in `mobile/android/app/src/main/res/values/strings.xml`
+- [X] T080 [US6] Implement measurement detail model, port, flow, HTTP detail load, and save endpoint behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/`
+- [X] T081 [US6] Implement Compose Material 3 MeasurementDetailScreen with image area, recognized/editable values, Save, error state, and Back in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/MeasurementDetailScreen.kt`
+- [X] T082 [US6] Wire history row selection to measurement detail and Back to history in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt`
 
 **Checkpoint**: US5 is independently functional and verifies that measurement detail workflows remain absent.
 

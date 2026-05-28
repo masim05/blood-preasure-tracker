@@ -1,5 +1,6 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -41,7 +43,7 @@ import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
+import java.time.ZoneId
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -52,7 +54,7 @@ fun HistoryScreen(
     errorText: String?,
     onApplyFilter: (HistoryFilter) -> Unit,
     onClearFilter: () -> Unit,
-    onBack: () -> Unit,
+    onMeasurementSelected: (Measurement) -> Unit,
 ) {
     var from by remember(filter) { mutableStateOf(filter.from) }
     var to by remember(filter) { mutableStateOf(filter.to) }
@@ -114,35 +116,26 @@ fun HistoryScreen(
         } else if (measurements.isEmpty()) {
             Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.history_empty))
         } else {
-            HistoryTable(measurements)
-        }
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("history_return"),
-            onClick = onBack,
-        ) {
-            Text(stringResource(R.string.history_return))
+            HistoryTable(measurements, onMeasurementSelected)
         }
     }
 }
 
 @Composable
-private fun HistoryTable(measurements: List<Measurement>) {
+private fun HistoryTable(measurements: List<Measurement>, onMeasurementSelected: (Measurement) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .padding(top = 16.dp)
             .testTag(TestTags.HistoryTable),
     ) {
         item { HistoryHeader() }
-        items(measurements) { measurement -> HistoryRow(measurement) }
+        items(measurements) { measurement -> HistoryRow(measurement, onMeasurementSelected) }
     }
 }
 
 @Composable
 private fun HistoryHeader() {
-    Row(modifier = Modifier.fillMaxWidth()) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         HistoryCell(stringResource(R.string.history_column_time), 2f, true)
         HistoryCell(stringResource(R.string.history_column_systolic), 1f, true)
         HistoryCell(stringResource(R.string.history_column_diastolic), 1f, true)
@@ -153,12 +146,14 @@ private fun HistoryHeader() {
 }
 
 @Composable
-private fun HistoryRow(measurement: Measurement) {
+private fun HistoryRow(measurement: Measurement, onMeasurementSelected: (Measurement) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onMeasurementSelected(measurement) }
             .padding(top = 8.dp)
             .testTag(TestTags.HistoryRow),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         HistoryCell(measurement.measurementTime.ifBlank { measurement.savedAt }, 2f)
         HistoryCell(measurement.systolic.toString(), 1f)
@@ -225,10 +220,10 @@ private fun DateSelectorButton(
 }
 
 private fun String.toDateMillis(): Long? = runCatching {
-    if (isBlank()) null else LocalDate.parse(this).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
+    if (isBlank()) null else LocalDate.parse(this).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }.getOrNull()
 
-private fun Long.toIsoDate(): String = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate().toString()
+private fun Long.toIsoDate(): String = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate().toString()
 
 private fun armLabel(armSide: ArmSide): Int = when (armSide) {
     ArmSide.Left -> R.string.arm_left
@@ -237,6 +232,8 @@ private fun armLabel(armSide: ArmSide): Int = when (armSide) {
 }
 
 private fun statusLabel(status: MeasurementStatus): Int = when (status) {
+    MeasurementStatus.Recognizing -> R.string.measurement_status_recognizing
+    MeasurementStatus.Recognized -> R.string.measurement_status_recognized
     MeasurementStatus.Saved -> R.string.measurement_status_saved
     MeasurementStatus.Pending -> R.string.measurement_status_pending
     MeasurementStatus.Failed -> R.string.measurement_status_failed

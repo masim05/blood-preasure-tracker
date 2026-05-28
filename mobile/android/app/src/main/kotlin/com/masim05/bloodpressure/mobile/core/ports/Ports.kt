@@ -3,6 +3,7 @@ package com.masim05.bloodpressure.mobile.core.ports
 import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
+import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.Session
 
@@ -23,6 +24,11 @@ interface MeasurementUploadGateway {
 
 interface HistoryGateway {
     fun list(session: Session, filter: HistoryFilter): AppResult<List<Measurement>>
+}
+
+interface MeasurementDetailGateway {
+    fun get(session: Session, measurementId: String): AppResult<MeasurementDetail>
+    fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail>
 }
 
 interface CameraGateway {

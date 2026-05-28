@@ -30,17 +30,17 @@
 
 **Alternatives considered**: Keeping a separate action hub was rejected because it introduces an extra screen not present in the clarified journey. Adding both action hub and camera screen was rejected because it would create six screens.
 
-## Decision: Keep measurement detail navigation deferred
+## Decision: Implement measurement detail navigation from history
 
-**Rationale**: The user selected keeping measurement detail out of this feature. History rows remain non-clickable/non-editable, and the future `4 -> 5` history-to-measurement transition remains documented for a later feature.
+**Rationale**: The clarified customer journey requires `4 -> 5` by tapping a measurement line and `5 -> 4` by tapping Back. Implementing the detail route in Android completes that journey while keeping API/backend files read-only.
 
-**Alternatives considered**: Implementing full detail/review/save was rejected because US6 remains deferred. A placeholder detail screen was rejected because it would add user-visible behavior not needed for this feature.
+**Alternatives considered**: Leaving rows without detail navigation was rejected because it violates the clarified journey. Changing backend behavior was rejected because API/backend files remain out of scope.
 
 ## Decision: Use Android standard password masking behavior
 
-**Rationale**: Android password fields conventionally reveal the most recently typed character briefly and then mask it automatically. Compose `PasswordVisualTransformation` and password keyboard options satisfy the clarified requirement without custom timing logic.
+**Rationale**: Android password fields conventionally reveal newly typed characters briefly and then mask them automatically. The Compose auth screen mirrors that behavior with a short reveal timer and password keyboard options.
 
-**Alternatives considered**: Immediate masking was rejected because it is less usable. Custom reveal timers were rejected because they duplicate platform behavior and increase accessibility/test risk.
+**Alternatives considered**: Immediate masking was rejected because it is less usable. A permanent show/hide password toggle was rejected because the requirement asks for automatic hiding after typing.
 
 ## Decision: Use Material 3 date selector controls for history filters
 
@@ -82,9 +82,9 @@
 
 **Rationale**: The user explicitly constrained implementation to `mobile/android` with no API code or API test changes. Planning treats `docs/openapi.yaml` as a read-only behavior reference.
 
-**Alternatives considered**: Expanding API save/detail behavior was rejected because US6 is deferred and backend/API changes are out of scope.
+**Alternatives considered**: Expanding backend save/detail behavior was rejected because backend/API changes are out of scope.
 
-## Decision: Use Maestro for five happy-path flows and unit coverage for behavior
+## Decision: Use Maestro for six happy-path flows and unit coverage for behavior
 
 **Rationale**: The constitution requires a happy-path Maestro flow for each Android user story and 95% Android unit coverage. Maestro covers end-to-end user journeys; unit tests cover deterministic state, validation, adapter parsing, and error mapping.
 

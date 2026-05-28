@@ -265,3 +265,4 @@ jobs:
             run_maestro mobile/android/maestro/us3-login.yaml
             run_maestro mobile/android/maestro/us4-capture-or-history.yaml
             run_maestro mobile/android/maestro/us5-history-filter.yaml
+            run_maestro mobile/android/maestro/us6-measurement-detail.yaml
