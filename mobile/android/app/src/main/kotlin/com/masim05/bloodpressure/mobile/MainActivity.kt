@@ -1,8 +1,11 @@
 package com.masim05.bloodpressure.mobile
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
+import android.text.method.PasswordTransformationMethod
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +27,11 @@ import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class MainActivity : Activity() {
+    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     private val sessionStore = InMemorySessionStore()
     private val apiClient by lazy {
         HttpApiClient(
@@ -50,7 +56,7 @@ class MainActivity : Activity() {
     private fun showSignIn() {
         val error = errorView()
         val email = editText(R.id.signin_email, R.string.signin_email_hint, R.string.a11y_signin_email)
-        val password = editText(R.id.signin_password, R.string.signin_password_hint, R.string.a11y_signin_password)
+        val password = passwordText(R.id.signin_password, R.string.signin_password_hint, R.string.a11y_signin_password)
         val submit = button(R.id.signin_submit, R.string.signin_submit) {
             val emailValue = email.text.toString()
             val passwordValue = password.text.toString()
@@ -71,7 +77,7 @@ class MainActivity : Activity() {
     private fun showLogin() {
         val error = errorView()
         val email = editText(R.id.login_email, R.string.signin_email_hint, R.string.a11y_login_email)
-        val password = editText(R.id.login_password, R.string.signin_password_hint, R.string.a11y_login_password)
+        val password = passwordText(R.id.login_password, R.string.signin_password_hint, R.string.a11y_login_password)
         val submit = button(R.id.login_submit, R.string.login_submit) {
             val emailValue = email.text.toString()
             val passwordValue = password.text.toString()
@@ -139,19 +145,33 @@ class MainActivity : Activity() {
 
     private fun showHistory(filter: HistoryFilter = HistoryFilter()) {
         val error = errorView()
-        val from = editText(R.id.history_from, R.string.history_from_hint, R.string.a11y_history_from)
-        val to = editText(R.id.history_to, R.string.history_to_hint, R.string.a11y_history_to)
-        from.setText(filter.from)
-        to.setText(filter.to)
-        val columns = body(R.string.history_columns)
+        var fromValue = filter.from
+        var toValue = filter.to
+        val from = dateSelector(
+            idValue = R.id.history_from,
+            labelRes = R.string.history_from_hint,
+            selectedFormatRes = R.string.history_from_selected,
+            descriptionRes = R.string.a11y_history_from,
+            initialValue = fromValue,
+            defaultDate = LocalDate.now().withDayOfMonth(1),
+        ) { fromValue = it }
+        val to = dateSelector(
+            idValue = R.id.history_to,
+            labelRes = R.string.history_to_hint,
+            selectedFormatRes = R.string.history_to_selected,
+            descriptionRes = R.string.a11y_history_to,
+            initialValue = toValue,
+            defaultDate = LocalDate.now(),
+        ) { toValue = it }
         val rows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        rows.id = R.id.history_table
         rows.addView(body(R.string.status_loading))
         val apply = button(R.id.history_apply_filter, R.string.history_apply_filter) {
-            showHistory(HistoryFilter(from.text.toString(), to.text.toString()))
+            showHistory(HistoryFilter(fromValue, toValue))
         }
         val clear = button(R.id.history_clear_filter, R.string.history_clear_filter) { showHistory() }
         val back = button(R.id.history_return, R.string.history_return) { showActions() }
-        setContent(screen(R.string.history_title, error, from, to, apply, clear, columns, rows, back))
+        setContent(screen(R.string.history_title, error, from, to, apply, clear, rows, back))
         runInBackground {
             val state = historyFlow.load(filter)
             runOnUiThread {
@@ -161,7 +181,8 @@ class MainActivity : Activity() {
                 if (state.measurements.isEmpty()) {
                     rows.addView(body(R.string.history_empty))
                 } else {
-                    state.measurements.forEach { rows.addView(TextView(this).apply { text = formatMeasurement(it) }) }
+                    rows.addView(historyHeader())
+                    state.measurements.forEach { rows.addView(historyRow(it)) }
                 }
             }
         }
@@ -206,6 +227,46 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun passwordText(idValue: Int, hintRes: Int, descriptionRes: Int): EditText = editText(idValue, hintRes, descriptionRes).apply {
+        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        transformationMethod = PasswordTransformationMethod.getInstance()
+    }
+
+    private fun dateSelector(
+        idValue: Int,
+        labelRes: Int,
+        selectedFormatRes: Int,
+        descriptionRes: Int,
+        initialValue: String,
+        defaultDate: LocalDate,
+        onSelected: (String) -> Unit,
+    ): Button = button(idValue, labelRes) {}.apply {
+        contentDescription = getString(descriptionRes)
+        setDateSelectorText(this, labelRes, selectedFormatRes, initialValue)
+        setOnClickListener {
+            val initialDate = initialValue.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it, dateFormatter) } ?: defaultDate
+            DatePickerDialog(
+                this@MainActivity,
+                { _, year, month, day ->
+                    val selected = LocalDate.of(year, month + 1, day).format(dateFormatter)
+                    onSelected(selected)
+                    setDateSelectorText(this, labelRes, selectedFormatRes, selected)
+                },
+                initialDate.year,
+                initialDate.monthValue - 1,
+                initialDate.dayOfMonth,
+            ).show()
+        }
+    }
+
+    private fun setDateSelectorText(button: Button, labelRes: Int, selectedFormatRes: Int, value: String) {
+        if (value.isBlank()) {
+            button.setText(labelRes)
+        } else {
+            button.text = getString(selectedFormatRes, value)
+        }
+    }
+
     private fun button(idValue: Int, textRes: Int, onClick: () -> Unit): Button = Button(this).apply {
         id = idValue
         setText(textRes)
@@ -246,6 +307,44 @@ class MainActivity : Activity() {
         setPadding(0, 16.dp, 0, 0)
     }
 
+    private fun historyHeader(): LinearLayout = historyRowLayout(
+        R.string.history_column_time,
+        R.string.history_column_systolic,
+        R.string.history_column_diastolic,
+        R.string.history_column_pulse,
+        R.string.history_column_arm,
+        R.string.history_column_status,
+    )
+
+    private fun historyRow(measurement: Measurement): LinearLayout = LinearLayout(this).apply {
+        id = R.id.history_row
+        orientation = LinearLayout.HORIZONTAL
+        setPadding(0, 8.dp, 0, 0)
+        addView(historyCell(R.id.history_time_column, measurement.measurementTime.ifBlank { measurement.savedAt }, 2f))
+        addView(historyCell(R.id.history_systolic_column, measurement.systolic.toString(), 1f))
+        addView(historyCell(R.id.history_diastolic_column, measurement.diastolic.toString(), 1f))
+        addView(historyCell(R.id.history_pulse_column, measurement.pulse.toString(), 1f))
+        addView(historyCell(R.id.history_arm_column, armLabel(measurement.armSide), 1f))
+        addView(historyCell(R.id.history_status_column, statusLabel(measurement.status), 1f))
+    }
+
+    private fun historyRowLayout(vararg labelRes: Int): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        setPadding(0, 16.dp, 0, 0)
+        labelRes.forEachIndexed { index, res ->
+            addView(historyCell(View.NO_ID, getString(res), if (index == 0) 2f else 1f))
+        }
+    }
+
+    private fun historyCell(idValue: Int, value: String, weight: Float): TextView = TextView(this).apply {
+        id = idValue
+        text = value
+        setTextColor(Color.rgb(71, 85, 105))
+        textSize = 14f
+        gravity = Gravity.CENTER
+        layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, weight)
+    }
+
     private fun formatMeasurement(measurement: Measurement): String = getString(
         R.string.history_row_format,
         measurement.measurementTime.ifBlank { measurement.savedAt },
@@ -266,6 +365,22 @@ class MainActivity : Activity() {
                 MeasurementStatus.Failed -> R.string.measurement_status_failed
             },
         ),
+    )
+
+    private fun armLabel(armSide: ArmSide): String = getString(
+        when (armSide) {
+            ArmSide.Left -> R.string.arm_left
+            ArmSide.Right -> R.string.arm_right
+            ArmSide.Unknown -> R.string.arm_unknown
+        },
+    )
+
+    private fun statusLabel(status: MeasurementStatus): String = getString(
+        when (status) {
+            MeasurementStatus.Saved -> R.string.measurement_status_saved
+            MeasurementStatus.Pending -> R.string.measurement_status_pending
+            MeasurementStatus.Failed -> R.string.measurement_status_failed
+        },
     )
 
     private fun runInBackground(work: () -> Unit) {

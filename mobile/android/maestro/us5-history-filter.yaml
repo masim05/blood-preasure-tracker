@@ -18,13 +18,17 @@ appId: com.masim05.bloodpressure.mobile
     id: com.masim05.bloodpressure.mobile:id/actions_history
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/history_from
-- inputText: 2026-05-01
+- tapOn: OK
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/history_to
-- inputText: 2026-05-31
+- tapOn: OK
 - tapOn:
     id: com.masim05.bloodpressure.mobile:id/history_apply_filter
 - assertVisible:
-    text: .*120.*80.*68.*
+    text: "120"
+- assertVisible:
+    text: "80"
+- assertVisible:
+    text: "68"
 - assertNotVisible:
     id: com.masim05.bloodpressure.mobile:id/capture_open_camera

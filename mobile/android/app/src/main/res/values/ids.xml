@@ -18,6 +18,14 @@
     <item name="history_apply_filter" type="id" />
     <item name="history_clear_filter" type="id" />
     <item name="history_return" type="id" />
+    <item name="history_table" type="id" />
+    <item name="history_row" type="id" />
+    <item name="history_time_column" type="id" />
+    <item name="history_systolic_column" type="id" />
+    <item name="history_diastolic_column" type="id" />
+    <item name="history_pulse_column" type="id" />
+    <item name="history_arm_column" type="id" />
+    <item name="history_status_column" type="id" />
     <item name="screen_title" type="id" />
     <item name="error_region" type="id" />
 </resources>

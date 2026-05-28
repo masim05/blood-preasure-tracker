@@ -50,6 +50,20 @@ data class HistoryFilter(
     val pageSize: Int = 20,
 )
 
+data class PasswordInput(
+    val value: String,
+    val usesPlatformMasking: Boolean = true,
+)
+
+data class HistoryTableRow(
+    val measurementTimeColumn: String,
+    val systolicColumn: String,
+    val diastolicColumn: String,
+    val pulseColumn: String,
+    val armSideColumn: String,
+    val statusColumn: String,
+)
+
 enum class ApiErrorSource {
     Api,
     Network,
