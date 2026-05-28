@@ -29,7 +29,7 @@ import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.ports.AuthGateway
 import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
-import com.masim05.bloodpressure.mobile.data.session.InMemorySessionStore
+import com.masim05.bloodpressure.mobile.adapters.session.InMemorySessionStore
 
 class MainActivity : Activity() {
     private val sessionStore = InMemorySessionStore()
