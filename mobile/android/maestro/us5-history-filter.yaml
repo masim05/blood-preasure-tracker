@@ -3,27 +3,31 @@ appId: com.masim05.bloodpressure.mobile
 - launchApp:
     clearState: true
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_to_login
+    id: auth_mode_login
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/login_email
+    id: login_email
 - inputText: us5@example.com
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/login_password
+    id: login_password
 - inputText: password123
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/login_submit
+    id: login_submit
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/actions_history
+    id: camera_history
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/actions_history
+    id: camera_history
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/history_from
-- tapOn: OK
+    id: history_from
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/history_to
-- tapOn: OK
+    text: OK
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/history_apply_filter
+    id: history_to
+- tapOn:
+    text: OK
+- tapOn:
+    id: history_apply_filter
 - assertVisible:
     text: "120"
 - assertVisible:
@@ -31,4 +35,4 @@ appId: com.masim05.bloodpressure.mobile
 - assertVisible:
     text: "68"
 - assertNotVisible:
-    id: com.masim05.bloodpressure.mobile:id/capture_open_camera
+    id: camera_upload

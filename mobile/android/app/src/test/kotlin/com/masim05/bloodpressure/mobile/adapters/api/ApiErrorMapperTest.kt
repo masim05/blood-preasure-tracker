@@ -20,6 +20,14 @@ class ApiErrorMapperTest {
     fun usesFallbackWhenApiBodyIsMalformedOrEmpty() {
         assertEquals("fallback", ApiErrorMapper.fromApiBody("{}", "fallback").message)
         assertEquals("fallback", ApiErrorMapper.fromApiBody(null, "fallback").message)
+        assertEquals("fallback", ApiErrorMapper.fromApiBody("{\"error\":\"\",\"message\":\"\"}", "fallback").message)
+    }
+
+    @Test
+    fun unescapesApiMessagesFromJsonBodies() {
+        val error = ApiErrorMapper.fromApiBody("{\"error\":\"validation\",\"message\":\"Email \\\"bad\\\"\"}", "fallback")
+
+        assertEquals("Email \"bad\"", error.message)
     }
 
     @Test

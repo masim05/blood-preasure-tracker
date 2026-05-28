@@ -21,7 +21,7 @@ object ApiErrorMapper {
         }
 
     private fun extractJsonString(body: String, field: String): String? {
-        val pattern = Regex("\\\"$field\\\"\\s*:\\s*\\\"([^\\\"]*)\\\"")
-        return pattern.find(body)?.groupValues?.get(1)?.replace("\\\\\"", "\"")
+        val pattern = Regex("\\\"$field\\\"\\s*:\\s*\\\"((?:\\\\.|[^\\\"])*)\\\"")
+        return pattern.find(body)?.groupValues?.get(1)?.replace("\\\"", "\"")
     }
 }

@@ -92,6 +92,32 @@ class HttpApiClientTest {
     }
 
     @Test
+    fun `logIn parses successful session`() {
+        server.enqueue(
+            201,
+            """
+                {"accessToken":"token-2","tokenType":"Bearer","expiresAt":"2026-05-27T12:00:00.000Z","user":{"id":"usr_2","email":"known@example.com"}}
+            """.trimIndent(),
+        )
+
+        val result = client.logIn("known@example.com", "password123")
+        val session = (result as AppResult.Success).value
+
+        assertEquals("token-2", session.accessToken)
+        assertEquals("known@example.com", session.user.email)
+        assertTrue(server.request.body.contains("\"password\":\"password123\""))
+    }
+
+    @Test
+    fun `auth maps closed connection to network error`() {
+        server.close()
+
+        val result = client.logIn("known@example.com", "password123") as AppResult.Failure
+
+        assertEquals("Network error", result.error.message)
+    }
+
+    @Test
     fun `list sends authorization and filter query then parses saved rows`() {
         server.enqueue(
             200,
@@ -132,6 +158,17 @@ class HttpApiClientTest {
 
         assertEquals("validation_error", failure.error.code)
         assertEquals("Image is required", failure.error.message)
+    }
+
+    @Test
+    fun `upload falls back when API error body has no message`() {
+        server.enqueue(500, "{\"error\":\"server_error\"}")
+
+        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val failure = result as AppResult.Failure
+
+        assertEquals("server_error", failure.error.code)
+        assertEquals("Unexpected API error", failure.error.message)
     }
 
     @Test

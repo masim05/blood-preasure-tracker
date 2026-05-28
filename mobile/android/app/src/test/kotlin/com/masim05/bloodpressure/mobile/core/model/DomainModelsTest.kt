@@ -2,6 +2,8 @@ package com.masim05.bloodpressure.mobile.core.model
 
 import com.masim05.bloodpressure.mobile.core.flow.Route
 import com.masim05.bloodpressure.mobile.core.flow.ScreenState
+import com.masim05.bloodpressure.mobile.core.model.AppScreen
+import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -11,7 +13,10 @@ import org.junit.Test
 class DomainModelsTest {
     @Test
     fun exposesEnumEntriesForRoutingDomainErrorsAndMeasurementValues() {
-        assertTrue(Route.entries.contains(Route.SignIn))
+        assertTrue(Route.entries.contains(Route.Auth))
+        assertTrue(Route.entries.contains(Route.Camera))
+        assertTrue(AppScreen.entries.contains(AppScreen.MeasurementDetail))
+        assertTrue(AuthMode.entries.contains(AuthMode.NewAccount))
         assertTrue(ArmSide.entries.contains(ArmSide.Left))
         assertTrue(ApiErrorSource.entries.contains(ApiErrorSource.Api))
         assertTrue(MeasurementStatus.entries.contains(MeasurementStatus.Saved))
@@ -27,7 +32,14 @@ class DomainModelsTest {
         val filter = HistoryFilter("2026-05-01", "2026-05-31")
         val passwordInput = PasswordInput("password123")
         val row = HistoryTableRow("2026-05-27", "120", "80", "68", "left", "saved")
-        val state = ScreenState(Route.History, session, error, null, listOf(measurement), filter)
+        val cameraState = CameraScreenState(session, isUploading = true, visibleError = error, lastUploadId = "msr_1")
+        val state = ScreenState(
+            route = Route.History,
+            session = session,
+            error = error,
+            measurements = listOf(measurement),
+            filter = filter,
+        )
 
         assertEquals("Bearer token", session.authorizationHeader)
         assertEquals("usr_1", user.id)
@@ -45,6 +57,9 @@ class DomainModelsTest {
         assertEquals(20, filter.pageSize)
         assertTrue(passwordInput.usesPlatformMasking)
         assertEquals("password123", passwordInput.value)
+        assertEquals(MeasurementDetail, MeasurementDetail)
+        assertEquals("msr_1", cameraState.lastUploadId)
+        assertTrue(cameraState.isUploading)
         assertEquals("2026-05-27", row.measurementTimeColumn)
         assertEquals("120", row.systolicColumn)
         assertEquals("80", row.diastolicColumn)
@@ -52,9 +67,14 @@ class DomainModelsTest {
         assertEquals("left", row.armSideColumn)
         assertEquals("saved", row.statusColumn)
         assertEquals(filter, state.filter)
+        assertEquals(AuthMode.Login, state.authMode)
         assertEquals(listOf(measurement), state.measurements)
         assertEquals(state, state.copy())
-        assertNotEquals(state, state.copy(route = Route.Capture))
+        assertNotEquals(state, state.copy(route = Route.Camera))
+        assertNotEquals(cameraState, cameraState.copy(isUploading = false))
+        assertTrue(cameraState.toString().contains("msr_1"))
+        assertEquals(error, cameraState.visibleError)
+        assertEquals(session, session.copy())
     }
 
     @Test

@@ -3,12 +3,16 @@ appId: com.masim05.bloodpressure.mobile
 - launchApp:
     clearState: true
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_email
+    id: auth_mode_new_account
+- tapOn:
+    id: signin_email
 - inputRandomEmail
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_password
+    id: signin_password
 - inputText: password123
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_submit
+    id: signin_submit
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/guide_continue
+    id: guide_continue

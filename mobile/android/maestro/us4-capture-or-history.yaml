@@ -3,27 +3,28 @@ appId: com.masim05.bloodpressure.mobile
 - launchApp:
     clearState: true
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_email
+    id: auth_mode_new_account
+- tapOn:
+    id: signin_email
 - inputRandomEmail
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_password
+    id: signin_password
 - inputText: password123
+- hideKeyboard
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/signin_submit
+    id: signin_submit
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/guide_continue
+    id: guide_continue
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/guide_continue
+    id: guide_continue
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/actions_capture
+    id: camera_upload
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/capture_open_camera
+    id: history_apply_filter
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/capture_open_camera
-- assertVisible: Measurement image uploaded.
+    id: history_return
 - tapOn:
-    id: com.masim05.bloodpressure.mobile:id/capture_back
-- tapOn:
-    id: com.masim05.bloodpressure.mobile:id/actions_history
+    id: camera_history
 - assertVisible:
-    id: com.masim05.bloodpressure.mobile:id/history_apply_filter
+    id: history_apply_filter

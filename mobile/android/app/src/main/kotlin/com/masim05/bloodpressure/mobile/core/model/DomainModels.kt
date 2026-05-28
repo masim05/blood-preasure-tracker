@@ -1,5 +1,18 @@
 package com.masim05.bloodpressure.mobile.core.model
 
+enum class AuthMode {
+    Login,
+    NewAccount,
+}
+
+enum class AppScreen {
+    Auth,
+    Guide,
+    Camera,
+    History,
+    MeasurementDetail,
+}
+
 data class MobileUser(
     val id: String,
     val email: String,
@@ -53,6 +66,15 @@ data class HistoryFilter(
 data class PasswordInput(
     val value: String,
     val usesPlatformMasking: Boolean = true,
+)
+
+data object MeasurementDetail
+
+data class CameraScreenState(
+    val session: Session,
+    val isUploading: Boolean = false,
+    val visibleError: ApiError? = null,
+    val lastUploadId: String? = null,
 )
 
 data class HistoryTableRow(

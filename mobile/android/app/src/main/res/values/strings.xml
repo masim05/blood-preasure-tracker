@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Blood Pressure Tracker</string>
+    <string name="auth_title">Blood pressure tracker</string>
+    <string name="auth_mode_login">Login</string>
+    <string name="auth_mode_new_account">New Account</string>
     <string name="signin_title">Create account</string>
     <string name="signin_email_hint">Email</string>
     <string name="signin_password_hint">Password</string>
-    <string name="signin_submit">Sign in</string>
-    <string name="signin_to_login">I already have an account</string>
+    <string name="signin_submit">Create account</string>
     <string name="login_title">Log in</string>
     <string name="login_submit">Log in</string>
-    <string name="login_to_signin">Create a new account</string>
     <string name="guide_title">Measurement guide</string>
     <string name="guide_copy">Take a clear picture with the tonometer and arm visible.</string>
-    <string name="guide_continue">Continue</string>
-    <string name="actions_title">Measurement actions</string>
-    <string name="actions_capture">Take picture</string>
-    <string name="actions_history">History</string>
-    <string name="capture_title">Camera capture</string>
-    <string name="capture_copy">Camera view is opening for one-click measurement capture.</string>
-    <string name="capture_open_camera">Open camera</string>
-    <string name="capture_back">Back to actions</string>
+    <string name="guide_continue">Next</string>
+    <string name="camera_title">Camera</string>
+    <string name="camera_copy">Take a clear measurement picture with one tap.</string>
+    <string name="camera_upload">Take picture</string>
+    <string name="camera_history">History</string>
+    <string name="camera_retry">Retry</string>
     <string name="history_title">Measurement history</string>
     <string name="history_from_hint">From date</string>
     <string name="history_to_hint">To date</string>
@@ -42,7 +41,11 @@
     <string name="measurement_status_saved">saved</string>
     <string name="measurement_status_pending">pending</string>
     <string name="measurement_status_failed">failed</string>
-    <string name="history_return">Back to actions</string>
+    <string name="history_return">Back</string>
+    <string name="date_picker_confirm">OK</string>
+    <string name="date_picker_cancel">Cancel</string>
+    <string name="date_picker_from_title">Select from date</string>
+    <string name="date_picker_to_title">Select to date</string>
     <string name="error_region_label">Error message</string>
     <string name="error_invalid_email">Enter a valid email address.</string>
     <string name="error_invalid_password">Password must contain at least 8 characters.</string>
@@ -56,10 +59,13 @@
     <string name="status_signed_in">Signed in.</string>
     <string name="status_logged_in">Logged in.</string>
     <string name="status_upload_complete">Measurement image uploaded.</string>
+    <string name="status_uploading">Uploading measurement image.</string>
     <string name="a11y_signin_email">Signin email input</string>
     <string name="a11y_signin_password">Signin password input</string>
     <string name="a11y_login_email">Login email input</string>
     <string name="a11y_login_password">Login password input</string>
     <string name="a11y_history_from">History from date selector</string>
     <string name="a11y_history_to">History to date selector</string>
+    <string name="a11y_auth_mode">Authentication mode</string>
+    <string name="a11y_history_table">Measurement history table</string>
 </resources>

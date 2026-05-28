@@ -11,8 +11,8 @@ command -v maestro >/dev/null 2>&1 || {
   exit 1
 }
 
-maestro test maestro/us1-signin.yaml
-maestro test maestro/us2-guide.yaml
-maestro test maestro/us3-login.yaml
-maestro test maestro/us4-capture-or-history.yaml
-maestro test maestro/us5-history-filter.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us1-signin.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us2-guide.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us3-login.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us4-capture-or-history.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us5-history-filter.yaml

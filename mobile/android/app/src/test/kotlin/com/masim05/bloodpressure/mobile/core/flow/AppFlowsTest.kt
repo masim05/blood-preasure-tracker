@@ -37,10 +37,10 @@ class AppFlowsTest {
     }
 
     @Test
-    fun loginStoresSessionAndRoutesToMeasurementActions() {
+    fun loginStoresSessionAndRoutesToCamera() {
         val state = AuthFlow(AuthSuccess(), MemoryStore()).logIn("known@example.com", "password123")
 
-        assertEquals(Route.MeasurementActions, state.route)
+        assertEquals(Route.Camera, state.route)
         assertEquals("known@example.com", state.session?.user?.email)
     }
 
@@ -53,26 +53,24 @@ class AppFlowsTest {
         assertEquals(ValidationError.InvalidPassword, invalidPassword.validationError)
 
         val failed = AuthFlow(AuthFailure(), MemoryStore()).logIn("user@example.com", "password123")
-        assertEquals(Route.SignIn, failed.route)
+        assertEquals(Route.Auth, failed.route)
         assertEquals("api message", failed.error?.message)
     }
 
     @Test
-    fun guideAndActionsRequireSession() {
+    fun guideAndCameraRequireSession() {
         val store = MemoryStore()
-        assertEquals(Route.SignIn, GuideFlow(store).enterGuide().route)
-        assertEquals(Route.SignIn, GuideFlow(store).continueToActions().route)
-        assertEquals(Route.SignIn, MeasurementActionFlow(store).enter().route)
-        assertEquals(Route.SignIn, MeasurementActionFlow(store).capture().route)
-        assertEquals(Route.SignIn, MeasurementActionFlow(store).history().route)
+        assertEquals(Route.Auth, GuideFlow(store).enterGuide().route)
+        assertEquals(Route.Auth, GuideFlow(store).continueToCamera().route)
+        assertEquals(Route.Auth, CaptureFlow(store, CameraFailure(), UploadSuccess()).enterCamera().route)
+        assertEquals(Route.Auth, CaptureFlow(store, CameraFailure(), UploadSuccess()).history().route)
 
         store.save(session("user@example.com"))
 
         assertNotNull(GuideFlow(store).enterGuide().session)
-        assertEquals(Route.MeasurementActions, GuideFlow(store).continueToActions().route)
-        assertNotNull(MeasurementActionFlow(store).enter().session)
-        assertEquals(Route.Capture, MeasurementActionFlow(store).capture().route)
-        assertEquals(Route.History, MeasurementActionFlow(store).history().route)
+        assertEquals(Route.Camera, GuideFlow(store).continueToCamera().route)
+        assertNotNull(CaptureFlow(store, CameraFailure(), UploadSuccess()).enterCamera().session)
+        assertEquals(Route.History, CaptureFlow(store, CameraFailure(), UploadSuccess()).history().route)
     }
 
     @Test
@@ -86,13 +84,14 @@ class AppFlowsTest {
         assertEquals("api message", uploadFailure.error?.message)
 
         val success = CaptureFlow(store, CameraSuccess(MeasurementImage("uri", "image/png", 1)), UploadSuccess()).captureAndUpload()
-        assertEquals(Route.MeasurementActions, success.route)
+        assertEquals(Route.History, success.route)
+        assertEquals("msr_1", success.lastUploadId)
     }
 
     @Test
     fun captureShowsCameraErrorsAndRequiresSession() {
         val noSession = CaptureFlow(MemoryStore(), CameraFailure(), UploadSuccess()).captureAndUpload()
-        assertEquals(Route.SignIn, noSession.route)
+        assertEquals(Route.Auth, noSession.route)
 
         val store = MemoryStore().apply { save(session("user@example.com")) }
         val cameraFailure = CaptureFlow(store, CameraFailure(), UploadSuccess()).captureAndUpload()
@@ -117,7 +116,7 @@ class AppFlowsTest {
 
     @Test
     fun historyRequiresSessionAndDisplaysApiErrors() {
-        assertEquals(Route.SignIn, HistoryFlow(MemoryStore(), HistorySuccess()).load(HistoryFilter()).route)
+        assertEquals(Route.Auth, HistoryFlow(MemoryStore(), HistorySuccess()).load(HistoryFilter()).route)
 
         val store = MemoryStore().apply { save(session("user@example.com")) }
         val failure = HistoryFlow(store, HistoryFailure()).load(HistoryFilter())

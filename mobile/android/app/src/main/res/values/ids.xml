@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="auth_mode_login" type="id" />
+    <item name="auth_mode_new_account" type="id" />
     <item name="signin_email" type="id" />
     <item name="signin_password" type="id" />
     <item name="signin_submit" type="id" />
-    <item name="signin_to_login" type="id" />
     <item name="login_email" type="id" />
     <item name="login_password" type="id" />
     <item name="login_submit" type="id" />
-    <item name="login_to_signin" type="id" />
     <item name="guide_continue" type="id" />
-    <item name="actions_capture" type="id" />
-    <item name="actions_history" type="id" />
-    <item name="capture_open_camera" type="id" />
-    <item name="capture_back" type="id" />
+    <item name="camera_upload" type="id" />
+    <item name="camera_history" type="id" />
+    <item name="camera_retry" type="id" />
     <item name="history_from" type="id" />
     <item name="history_to" type="id" />
     <item name="history_apply_filter" type="id" />

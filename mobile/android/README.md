@@ -1,6 +1,6 @@
 # Blood Pressure Tracker Android
 
-Minimal Android Studio project for the Blood Pressure Tracker mobile app.
+Android Studio project for the Blood Pressure Tracker mobile app. The UI uses Jetpack Compose Material 3 for the combined Login/New Account screen, guide, camera, and history journey.
 
 ## Open
 
@@ -22,6 +22,12 @@ Build from the repository root with the Android Gradle wrapper:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:assembleDebug
 ```
 
+The app targets the local API at `http://10.0.2.2:3000` for emulator validation. Start the API from the repository root with:
+
+```bash
+npm run api
+```
+
 ## Test And Coverage
 
 Run Android unit tests and the 95% coverage gate from the repository root:
@@ -38,12 +44,12 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" scripts/
 
 ## Maestro
 
-The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable resource IDs instead of visible text selectors. Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
+The happy-path flows for US1 through US5 live under `mobile/android/maestro` and use stable Compose semantics/resource IDs instead of visible text selectors. Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
 
 ```bash
-maestro test maestro/us1-signin.yaml
-maestro test maestro/us2-guide.yaml
-maestro test maestro/us3-login.yaml
-maestro test maestro/us4-capture-or-history.yaml
-maestro test maestro/us5-history-filter.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us1-signin.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us2-guide.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us3-login.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us4-capture-or-history.yaml
+MAESTRO_CLI_NO_ANALYTICS=1 MAESTRO_DRIVER_STARTUP_TIMEOUT=300000 maestro test maestro/us5-history-filter.yaml
 ```

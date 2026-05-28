@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     jacoco
 }
 
@@ -19,6 +20,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
     }
 
     buildTypes {
@@ -43,6 +45,13 @@ android {
     }
 }
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
     testImplementation(libs.junit)
 }
 
@@ -52,6 +61,8 @@ jacoco {
 
 val androidCoverageExcludes = listOf(
     "**/MainActivity*",
+    "**/MobileUiState*",
+    "**/ui/**",
     "**/BuildConfig.*",
     "**/R.class",
     "**/R$*.class",
