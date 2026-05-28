@@ -20,7 +20,7 @@ From repository root:
 npm run api
 ```
 
-The Android app expects the local API contract from `docs/openapi.yaml`, defaulting to `http://localhost:3000` for local development.
+The Android app expects the local API contract from `docs/openapi.yaml`. Android emulator validation uses `http://10.0.2.2:3000` to reach the host API.
 
 ## 2. Open Android Project
 
@@ -69,9 +69,11 @@ No US6 flow is required for this feature because measurement detail, image revie
 
 - App opens and displays hello world scaffold before full implementation.
 - Signin creates an account and navigates to the guide.
+- Signin and login password fields use Android standard password masking behavior.
 - Guide shows placeholder text asking for a clear picture with tonometer and arm.
 - Login authenticates an existing user and navigates to the measurement action screen.
 - Measurement action screen opens camera capture and history paths.
-- History shows saved measurement rows and applies date filters.
+- History shows saved measurement rows in vertically aligned columns.
+- History applies date filters through date selector controls rather than free-text inputs.
 - API errors and network failures are visible to the user on the current screen.
 - No files outside `mobile/android` are changed during implementation.

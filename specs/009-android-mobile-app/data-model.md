@@ -30,6 +30,18 @@
 - `signedOut` -> `authenticated` after successful signin/login.
 - `authenticated` -> `signedOut` when token is missing, expired, rejected as unauthorized, or explicitly cleared.
 
+## PasswordInput
+
+**Purpose**: Represents signin/login password entry state in the Android UI.
+
+**Fields**:
+- `value`: string, required for submission.
+- `maskedDisplay`: platform-controlled secure text display, required.
+
+**Validation**:
+- Password input must be non-empty and at least the API minimum length before signin/login submission.
+- Password fields must use Android standard password masking behavior with brief last-character reveal and automatic masking after typing.
+
 ## MeasurementImage
 
 **Purpose**: Represents a captured image selected for upload.
@@ -73,14 +85,31 @@
 **Purpose**: Captures the user-selected history date range.
 
 **Fields**:
-- `from`: optional ISO-8601 timestamp.
-- `to`: optional ISO-8601 timestamp.
+- `from`: optional date selected through a date selector control and converted to an inclusive ISO-8601 lower bound for the API.
+- `to`: optional date selected through a date selector control and converted to an inclusive ISO-8601 upper bound for the API.
 - `page`: positive integer; defaults to 1.
 - `pageSize`: positive integer; defaults to API default unless overridden.
 
 **Validation**:
 - If both dates are present, `from` must be less than or equal to `to`.
-- Invalid date input shows a user-visible validation message and does not submit the request.
+- Free-text date entry is not allowed; invalid or cancelled date selection keeps the previous selected value and does not submit the request.
+
+## HistoryTableRow
+
+**Purpose**: Represents a non-editable, vertically aligned row in the history table.
+
+**Fields**:
+- `measurementTimeColumn`: localized display text for measurement time.
+- `systolicColumn`: localized display text for systolic value.
+- `diastolicColumn`: localized display text for diastolic value.
+- `pulseColumn`: localized display text for pulse value.
+- `armSideColumn`: localized display text for arm side.
+- `statusColumn`: localized display text for status.
+
+**Validation**:
+- Columns must render in a consistent order with stable widths/alignment across all visible rows.
+- Row text must come from localized resources or equivalent localization formatting.
+- Rows are non-editable and do not open measurement detail in this feature.
 
 ## ApiError
 

@@ -15,6 +15,9 @@
 - Q: Which behavior should US6 require for measurement detail, value overrides, and save? -> A: Skip this user story for now; US6 is deferred from this feature.
 - Q: What files may change for this feature implementation? -> A: Only `mobile/android`; no API code or API test changes.
 - Q: How should visible Android text be handled? -> A: The app is multilingual; every visible string or text value must be localized.
+- Q: How should password characters be hidden after typing? -> A: Use Android standard password masking behavior with brief last-character reveal.
+- Q: How should users select history date filters? -> A: Use date selector controls, not free-text inputs.
+- Q: How should history rows be visually arranged? -> A: History table columns and rows must be vertically aligned for scanning.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -90,9 +93,10 @@ An authenticated user sees a table of previous saved measurements and can filter
 **Acceptance Scenarios**:
 
 1. **Given** saved measurements exist, **When** the user opens history, **Then** the app shows a table with measurement time, systolic, diastolic, pulse, arm side, and status for each returned saved measurement.
-2. **Given** the user enters a date filter, **When** the user applies the filter, **Then** the table updates to show only measurements in the selected date range and keeps the selected filter visible.
+2. **Given** the user selects a date range with date selector controls, **When** the user applies the filter, **Then** the table updates to show only measurements in the selected date range and keeps the selected filter visible.
 3. **Given** the history table is visible, **When** the user views measurement rows, **Then** the rows are displayed as non-editable history entries and do not open measurement detail in this feature.
 4. **Given** the API returns a validation, unauthorized, not found, or network error while loading history, **When** the error is returned to the app, **Then** the app shows the error to the user and preserves a path to retry or return.
+5. **Given** multiple history rows are visible, **When** the user scans the table, **Then** each measurement column is vertically aligned across rows.
 
 ---
 
@@ -139,8 +143,8 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-008**: The app MUST provide a one-click path from the measurement action screen to the camera view for taking a measurement picture.
 - **FR-009**: The app MUST provide a path from the measurement action screen to saved measurement history.
 - **FR-010**: The app MUST upload captured measurement images as authenticated measurement uploads and show upload/API errors to the user.
-- **FR-011**: The app MUST show saved measurement history as a table containing at least measurement time, systolic, diastolic, pulse, arm side, and status for each returned saved measurement.
-- **FR-012**: The app MUST allow the user to set and apply a date range filter for saved measurement history.
+- **FR-011**: The app MUST show saved measurement history as a vertically aligned table containing at least measurement time, systolic, diastolic, pulse, arm side, and status for each returned saved measurement.
+- **FR-012**: The app MUST allow the user to set and apply a date range filter for saved measurement history using date selector controls, not free-text inputs.
 - **FR-013**: The app MUST show measurement rows as non-editable history entries in this feature; opening a specific measurement detail, overriding values, and saving reviewed measurements are deferred.
 - **FR-014**: The app MUST not implement measurement detail, image review, value override, or reviewed save workflows in this feature.
 - **FR-018**: For every API error returned to the Android app, the app MUST show the error to the user rather than hiding it only in logs or silent state changes.
@@ -151,6 +155,7 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-023**: Android mobile code MUST maintain unit-test coverage of at least 95% in CI after user-story implementation begins.
 - **FR-024**: All implementation changes for this feature MUST be contained under `mobile/android`.
 - **FR-025**: API code and API tests MUST NOT change for this feature; any API limitation discovered during implementation MUST be handled by adjusting the Android client behavior within the existing OpenAPI contract or deferred to a separate feature.
+- **FR-026**: Signin and login password fields MUST use Android standard password masking behavior with brief last-character reveal and automatic masking after typing.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -171,7 +176,7 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **SC-004**: Android unit-test line coverage is at least 95% in CI for the implemented mobile code.
 - **SC-005**: A new user can complete signin and reach the guide screen in under 2 minutes during local validation.
 - **SC-006**: A returning user can log in and reach the measurement action screen in under 2 minutes during local validation.
-- **SC-007**: A user can apply a date filter to history with no more than 3 user actions after reaching the history screen.
+- **SC-007**: A user can apply a date filter to history with date selector controls and no more than 3 user actions after reaching the history screen.
 - **SC-008**: Measurement detail review, value override, and reviewed save workflows are absent from this feature and reserved for a future feature.
 
 ## Assumptions

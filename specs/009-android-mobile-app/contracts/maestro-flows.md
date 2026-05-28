@@ -9,6 +9,7 @@ Every in-scope Android user story requires one happy-path Maestro flow under `mo
 - Test data setup must not require API code or API test changes.
 - Selectors should use stable accessibility/test identifiers rather than fragile text-only matching where practical.
 - Error-path behavior is unit-tested; Maestro covers required happy paths.
+- Password entry flows use Android standard password masking behavior; Maestro does not assert raw password text visibility.
 
 ## US1: `us1-signin.yaml`
 
@@ -66,11 +67,12 @@ Every in-scope Android user story requires one happy-path Maestro flow under `mo
 **Steps**:
 1. Open history screen.
 2. Verify saved measurement rows are visible.
-3. Enter/apply date range filter.
-4. Verify filtered history state is visible.
-5. Verify rows are displayed as non-editable history entries.
+3. Select a date range using date selector controls.
+4. Apply the date range filter.
+5. Verify filtered history state is visible.
+6. Verify rows are displayed as non-editable, vertically aligned history entries.
 
-**Pass signal**: Date filter remains visible and history rows remain on the history screen.
+**Pass signal**: Date selector state remains visible and a saved row containing the expected measurement values remains aligned on the history screen.
 
 ## Deferred
 

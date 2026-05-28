@@ -4,7 +4,7 @@
 
 ## Global Rules
 
-- Base URL defaults to `http://localhost:3000` for local development.
+- Base URL defaults to `http://10.0.2.2:3000` for Android emulator local development against the host API.
 - Authenticated calls send `Authorization: Bearer <accessToken>`.
 - JSON requests use `Content-Type: application/json`.
 - Image upload uses `multipart/form-data` field name `image`.
@@ -80,6 +80,7 @@
 
 - Authenticated.
 - `from` and `to` are optional inclusive ISO-8601 bounds.
+- Android UI obtains `from` and `to` via date selector controls, not free-text inputs.
 
 **Success**: HTTP 200 `MeasurementHistoryPage`
 
@@ -108,6 +109,8 @@
 ```
 
 **Handled errors**: 400 validation, 401 unauthorized, network/fallback.
+
+**UI contract**: History renders returned items as non-editable, vertically aligned rows with stable columns for measurement time, systolic, diastolic, pulse, arm side, and status.
 
 ## Deferred API Operations
 
