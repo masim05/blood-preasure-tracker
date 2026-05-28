@@ -18,12 +18,16 @@
 - Q: How should password characters be hidden after typing? -> A: Use Android standard password masking behavior with brief last-character reveal.
 - Q: How should users select history date filters? -> A: Use date selector controls, not free-text inputs.
 - Q: How should history rows be visually arranged? -> A: History table columns and rows must be vertically aligned for scanning.
+- Q: Should the new customer journey implement measurement detail navigation now? -> A: Keep measurement detail deferred; history rows stay non-clickable and the 4 -> 5 transition is future scope.
+- Q: Should camera view replace the current measurement action hub? -> A: Yes; screen 3 is the post-guide/post-login camera screen with History access and upload behavior.
+- Q: Which official-guide layout approach should the Android screens use? -> A: Jetpack Compose Material 3 screens and migrate UI to Compose.
+- Q: Should login and new account be one screen or separate screens? -> A: Use one auth screen with Login and New Account modes/tabs.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Create Account And Enter Guide (Priority: P1)
 
-A new user opens the Android app, creates an account with email and password, and is taken directly to the measurement guide after successful account creation.
+A new user opens the Android app, selects the New Account mode on the combined auth screen, creates an account with email and password, and is taken directly to the measurement guide after successful account creation.
 
 **Why this priority**: Account creation is the first path for a new user and unlocks all authenticated measurement workflows.
 
@@ -31,8 +35,8 @@ A new user opens the Android app, creates an account with email and password, an
 
 **Acceptance Scenarios**:
 
-1. **Given** the app is opened by a signed-out user, **When** the user enters valid new-account credentials and submits signin, **Then** the app creates the account, stores the active session for app use, and shows the guide screen.
-2. **Given** the API returns a validation, duplicate email, rate limit, or network error during signin, **When** the user submits the signin form, **Then** the app remains on the signin screen and shows the API-provided error message or a clear connection error to the user.
+1. **Given** the app is opened by a signed-out user, **When** the user selects New Account, enters valid new-account credentials, and submits, **Then** the app creates the account, stores the active session for app use, and shows the guide screen.
+2. **Given** the API returns a validation, duplicate email, rate limit, or network error during account creation, **When** the user submits the New Account form, **Then** the app remains on the auth screen in New Account mode and shows the API-provided error message or a clear connection error to the user.
 
 ---
 
@@ -42,49 +46,49 @@ An authenticated user sees a simple guide that asks them to take a clear picture
 
 **Why this priority**: The guide sets the minimum instruction needed before measurement capture and provides a clear post-signin destination.
 
-**Independent Test**: Can be tested after signin by verifying the guide copy is visible and the user can continue to the measurement action screen. The story has a happy-path Maestro flow and unit tests for guide display and navigation.
+**Independent Test**: Can be tested after account creation by verifying the guide copy is visible and the user can continue to the camera screen. The story has a happy-path Maestro flow and unit tests for guide display and navigation.
 
 **Acceptance Scenarios**:
 
 1. **Given** a user has successfully created an account, **When** the guide screen opens, **Then** the user sees placeholder guidance asking for a clear picture with the tonometer and arm visible.
-2. **Given** the user has read the guide, **When** the user continues, **Then** the app shows the measurement action screen.
+2. **Given** the user has read the guide, **When** the user taps the Next button, **Then** the app shows the camera screen.
 
 ---
 
-### User Story 3 - Log In And Enter Measurement Actions (Priority: P3)
+### User Story 3 - Log In And Enter Camera Screen (Priority: P3)
 
-An existing user opens the Android app, logs in with valid credentials, and is taken to the measurement action screen after successful authentication.
+An existing user opens the Android app, selects the Login mode on the combined auth screen, logs in with valid credentials, and is taken to the camera screen after successful authentication.
 
 **Why this priority**: Returning users need a direct path into capture and history without creating a new account.
 
-**Independent Test**: Can be fully tested by running the app against the local API with an existing user, submitting valid login credentials, and verifying the measurement action screen appears. The story has a happy-path Maestro flow and unit tests for validation, API error display, session handling, and navigation.
+**Independent Test**: Can be fully tested by running the app against the local API with an existing user, submitting valid login credentials, and verifying the camera screen appears. The story has a happy-path Maestro flow and unit tests for validation, API error display, session handling, and navigation.
 
 **Acceptance Scenarios**:
 
-1. **Given** an existing signed-out user, **When** the user enters valid credentials and submits login, **Then** the app authenticates the user, stores the active session for app use, and shows the measurement action screen.
-2. **Given** the API returns validation, unauthorized, rate limit, or network error during login, **When** the user submits the login form, **Then** the app remains on the login screen and shows the API-provided error message or a clear connection error to the user.
+1. **Given** an existing signed-out user, **When** the user selects Login, enters valid credentials, and submits, **Then** the app authenticates the user, stores the active session for app use, and shows the camera screen.
+2. **Given** the API returns validation, unauthorized, rate limit, or network error during login, **When** the user submits the Login form, **Then** the app remains on the auth screen in Login mode and shows the API-provided error message or a clear connection error to the user.
 
 ---
 
-### User Story 4 - Choose Capture Or History (Priority: P4)
+### User Story 4 - Use Camera Or Open History (Priority: P4)
 
-An authenticated user can either start taking a measurement photo with one click or open saved measurement history.
+An authenticated user uses the camera screen to take a measurement photo with one click or open saved measurement history.
 
-**Why this priority**: This is the hub for the two primary authenticated workflows: capture a new reading or inspect previous readings.
+**Why this priority**: This screen is the primary authenticated workflow: capture a new reading or inspect previous readings.
 
-**Independent Test**: Can be tested by reaching the measurement action screen, tapping the capture action to open camera capture, and returning to open history. The story has a happy-path Maestro flow and unit tests for routing and authorization state behavior.
+**Independent Test**: Can be tested by reaching the camera screen, uploading a measurement image, and using the History button to open saved measurement history. The story has a happy-path Maestro flow and unit tests for routing, upload, authorization state, and error behavior.
 
 **Acceptance Scenarios**:
 
-1. **Given** an authenticated user is on the measurement action screen, **When** the user taps the capture action, **Then** the device camera view opens for a measurement image.
-2. **Given** an authenticated user is on the measurement action screen, **When** the user chooses history, **Then** the app opens saved measurement history.
+1. **Given** an authenticated user is on the camera screen, **When** the user takes or uploads a measurement image successfully, **Then** the app opens saved measurement history.
+2. **Given** an authenticated user is on the camera screen, **When** the user taps the History button, **Then** the app opens saved measurement history.
 3. **Given** the camera or upload flow produces an API error after capture, **When** the error is returned to the app, **Then** the app shows the error to the user and allows the user to retry or navigate away.
 
 ---
 
 ### User Story 5 - Browse Measurement History (Priority: P5)
 
-An authenticated user sees a table of previous saved measurements and can filter the list by date range. Measurement detail opening is deferred from this feature.
+An authenticated user sees a table of previous saved measurements and can filter the list by date range. Measurement detail opening is deferred from this feature; the future journey from history row to measurement detail remains out of scope for this implementation.
 
 **Why this priority**: Tracking blood pressure over time requires reviewing past saved measurements and narrowing the list to relevant dates.
 
@@ -94,7 +98,7 @@ An authenticated user sees a table of previous saved measurements and can filter
 
 1. **Given** saved measurements exist, **When** the user opens history, **Then** the app shows a table with measurement time, systolic, diastolic, pulse, arm side, and status for each returned saved measurement.
 2. **Given** the user selects a date range with date selector controls, **When** the user applies the filter, **Then** the table updates to show only measurements in the selected date range and keeps the selected filter visible.
-3. **Given** the history table is visible, **When** the user views measurement rows, **Then** the rows are displayed as non-editable history entries and do not open measurement detail in this feature.
+3. **Given** the history table is visible, **When** the user views or taps measurement rows, **Then** the rows are displayed as non-editable history entries and do not open measurement detail in this feature.
 4. **Given** the API returns a validation, unauthorized, not found, or network error while loading history, **When** the error is returned to the app, **Then** the app shows the error to the user and preserves a path to retry or return.
 5. **Given** multiple history rows are visible, **When** the user scans the table, **Then** each measurement column is vertically aligned across rows.
 
@@ -104,7 +108,7 @@ An authenticated user sees a table of previous saved measurements and can filter
 
 - Duplicate signin email, invalid email format, short password, rate limiting, invalid login credentials, expired token, and unavailable API all show user-visible errors.
 - History handles empty results, invalid date ranges, from-date after to-date, and pagination without hiding API errors.
-- Opening a measurement detail from history is out of scope for this feature because US6 is deferred.
+- Opening a measurement detail from history, including the customer journey transition from history screen to measurement screen, is out of scope for this feature because US6 is deferred.
 - Capture handles denied camera permission, cancelled camera capture, empty image selection, oversized or unsupported images, upload failure, and retry.
 - The hello world Android scaffold must build and run before full user-story implementation, but it is explicitly exempt from tests only for that initial scaffold milestone.
 
@@ -121,9 +125,10 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **Localization Impact**: Every visible Android text value, including labels,
   buttons, error messages, empty states, guide copy, and Maestro-visible text,
   must come from localized resources or an equivalent localization mechanism.
+- **Android UI Layout Approach**: The app screens must use Jetpack Compose Material 3 layouts following Android Developers guidance for forms, navigation, lists/tables, and action placement.
 - **Maestro Coverage**: Happy-path Maestro flow for each user story US1 through US5; the hello world scaffold milestone is exempt from tests as requested.
 - **Mobile Unit Coverage**: Android unit tests cover view state, validation, navigation decisions, API error mapping, session behavior, and history behavior with a `>= 95%` CI gate.
-- **Dependency Selection Rationale**: Android dependencies must be justified during planning; `docs/openapi.yaml` is a read-only API reference for this feature.
+- **Dependency Selection Rationale**: Android dependencies must be justified during planning; Jetpack Compose Material 3 is selected for the official-guide screen layout approach, and `docs/openapi.yaml` is a read-only API reference for this feature.
 - **Existing Test Impact**: No API tests or existing backend tests may change for this feature.
 - **New Test Coverage**: Android unit tests for each app flow and happy-path Maestro tests for all five in-scope user stories.
 - **Coverage Plan**: CI preserves existing backend coverage gates and adds Android unit coverage reporting with at least 95% line coverage before Android user-story work is complete.
@@ -138,15 +143,16 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-003**: The app MUST use `docs/openapi.yaml` as the API behavior reference and support local API validation against the service started with `npm run api`.
 - **FR-004**: The app MUST allow a new user to create an account with email and password through the signin endpoint and continue to the guide screen after success.
 - **FR-005**: The app MUST show a placeholder guide asking the user to take a clear picture with the tonometer and arm visible.
-- **FR-006**: The app MUST allow an existing user to log in with valid credentials and continue to the measurement action screen after success.
+- **FR-006**: The app MUST allow an existing user to log in with valid credentials and continue to the camera screen after success.
 - **FR-007**: The app MUST maintain an active authenticated session for API calls after successful signin or login until the session expires or is cleared.
-- **FR-008**: The app MUST provide a one-click path from the measurement action screen to the camera view for taking a measurement picture.
-- **FR-009**: The app MUST provide a path from the measurement action screen to saved measurement history.
-- **FR-010**: The app MUST upload captured measurement images as authenticated measurement uploads and show upload/API errors to the user.
+- **FR-008**: The app MUST use the camera screen as the authenticated post-guide and post-login destination for taking a measurement picture.
+- **FR-009**: The app MUST provide a History button on the camera screen that opens saved measurement history.
+- **FR-010**: The app MUST upload captured measurement images as authenticated measurement uploads, show upload/API errors to the user, and open saved measurement history after a successful upload.
 - **FR-011**: The app MUST show saved measurement history as a vertically aligned table containing at least measurement time, systolic, diastolic, pulse, arm side, and status for each returned saved measurement.
 - **FR-012**: The app MUST allow the user to set and apply a date range filter for saved measurement history using date selector controls, not free-text inputs.
 - **FR-013**: The app MUST show measurement rows as non-editable history entries in this feature; opening a specific measurement detail, overriding values, and saving reviewed measurements are deferred.
 - **FR-014**: The app MUST not implement measurement detail, image review, value override, or reviewed save workflows in this feature.
+- **FR-015**: The app MUST treat the history-to-measurement-screen transition as future scope; tapping a history row MUST NOT open measurement detail in this feature.
 - **FR-018**: For every API error returned to the Android app, the app MUST show the error to the user rather than hiding it only in logs or silent state changes.
 - **FR-019**: Every visible Android string or text value MUST be localized; hardcoded visible text in Android code, layouts, or Maestro flows is prohibited.
 - **FR-020**: Android mobile app source MUST live under `mobile/android`.
@@ -156,6 +162,8 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-024**: All implementation changes for this feature MUST be contained under `mobile/android`.
 - **FR-025**: API code and API tests MUST NOT change for this feature; any API limitation discovered during implementation MUST be handled by adjusting the Android client behavior within the existing OpenAPI contract or deferred to a separate feature.
 - **FR-026**: Signin and login password fields MUST use Android standard password masking behavior with brief last-character reveal and automatic masking after typing.
+- **FR-027**: Android screens MUST be implemented with Jetpack Compose Material 3 layouts following Android Developers guidance for text fields, buttons, date selectors, lists/tables, and screen navigation.
+- **FR-028**: Login and new-account creation MUST be presented on one auth screen with distinct Login and New Account modes or tabs; successful New Account routes to the guide screen, while successful Login routes to the camera screen.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -175,9 +183,9 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **SC-003**: Each of the five in-scope user stories has at least one passing happy-path Maestro flow before the feature is considered complete.
 - **SC-004**: Android unit-test line coverage is at least 95% in CI for the implemented mobile code.
 - **SC-005**: A new user can complete signin and reach the guide screen in under 2 minutes during local validation.
-- **SC-006**: A returning user can log in and reach the measurement action screen in under 2 minutes during local validation.
+- **SC-006**: A returning user can log in and reach the camera screen in under 2 minutes during local validation.
 - **SC-007**: A user can apply a date filter to history with date selector controls and no more than 3 user actions after reaching the history screen.
-- **SC-008**: Measurement detail review, value override, and reviewed save workflows are absent from this feature and reserved for a future feature.
+- **SC-008**: Measurement detail review, value override, reviewed save workflows, and history-row navigation to the measurement screen are absent from this feature and reserved for a future feature.
 
 ## Assumptions
 
