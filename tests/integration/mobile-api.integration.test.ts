@@ -39,189 +39,326 @@ describe('mobile API integration flow', () => {
   });
 
   describe('POST /api/v1/signin - happy path', () => {
-    it('creates a user and bearer token in PostgreSQL', async () => {
-      const response = await signIn(fixture, 'demo@example.com');
+    async function response(): Promise<FetchJsonResponse> {
+      return signIn(fixture, 'demo@example.com');
+    }
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual({
+    it('responds with HTTP 201', async () => {
+      expect((await response()).status).toBe(201);
+    });
+
+    it('responds with proper json', async () => {
+      expect((await response()).body).toEqual({
         accessToken: expect.any(String),
         tokenType: 'Bearer',
         expiresAt: expect.any(String),
         user: { id: expect.stringMatching(/^usr_/), email: 'demo@example.com' },
       });
+    });
+
+    it('creates a user in PostgreSQL', async () => {
+      await response();
+
       expect(await countRows(fixture.pool, 'user_accounts')).toBe(1);
+    });
+
+    it('creates a bearer token in PostgreSQL', async () => {
+      await response();
+
       expect(await countRows(fixture.pool, 'bearer_tokens')).toBe(1);
     });
   });
 
   describe('POST /api/v1/signin - invalid email', () => {
-    it('returns the OpenAPI validation error response', async () => {
-      const response = await postJson(fixture.baseUrl, '/api/v1/signin', {
+    async function response(): Promise<FetchJsonResponse> {
+      return postJson(fixture.baseUrl, '/api/v1/signin', {
         email: 'not-an-email',
         password: 'password123',
       });
+    }
 
-      expectError(response, 400, 'validation_error');
+    it('responds with HTTP 400', async () => {
+      expect((await response()).status).toBe(400);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'validation_error');
     });
   });
 
   describe('POST /api/v1/signin - email already taken', () => {
-    it('returns the OpenAPI conflict response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       await signIn(fixture, 'duplicate@example.com');
-      const response = await signIn(fixture, 'duplicate@example.com');
 
-      expectError(response, 409, 'conflict', 'Email is already registered');
+      return signIn(fixture, 'duplicate@example.com');
+    }
+
+    it('responds with HTTP 409', async () => {
+      expect((await response()).status).toBe(409);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'conflict', 'Email is already registered');
     });
   });
 
   describe('POST /api/v1/signin - rate limited', () => {
-    it('returns the OpenAPI rate limit response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const body = { email: 'limited-signin@example.com', password: 'short' };
       for (let attempt = 0; attempt < 5; attempt += 1) {
         await postJson(fixture.baseUrl, '/api/v1/signin', body);
       }
 
-      const response = await postJson(fixture.baseUrl, '/api/v1/signin', body);
+      return postJson(fixture.baseUrl, '/api/v1/signin', body);
+    }
 
-      expectError(response, 429, 'rate_limited', 'Too many authentication attempts; try again later');
+    it('responds with HTTP 429', async () => {
+      expect((await response()).status).toBe(429);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'rate_limited', 'Too many authentication attempts; try again later');
     });
   });
 
   describe('POST /api/v1/login - happy path', () => {
-    it('authenticates an existing user with the real password hasher and token store', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       await signIn(fixture, 'login@example.com');
-      const response = await login(fixture, 'login@example.com');
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual({
+      return login(fixture, 'login@example.com');
+    }
+
+    it('responds with HTTP 201', async () => {
+      expect((await response()).status).toBe(201);
+    });
+
+    it('responds with proper json', async () => {
+      expect((await response()).body).toEqual({
         accessToken: expect.any(String),
         tokenType: 'Bearer',
         expiresAt: expect.any(String),
         user: { id: expect.stringMatching(/^usr_/), email: 'login@example.com' },
       });
+    });
+
+    it('creates a bearer token in PostgreSQL', async () => {
+      await response();
+
       expect(await countRows(fixture.pool, 'bearer_tokens')).toBe(2);
     });
   });
 
   describe('POST /api/v1/login - invalid email', () => {
-    it('returns the OpenAPI validation error response', async () => {
-      const response = await postJson(fixture.baseUrl, '/api/v1/login', {
+    async function response(): Promise<FetchJsonResponse> {
+      return postJson(fixture.baseUrl, '/api/v1/login', {
         email: 'invalid',
         password: 'password123',
       });
+    }
 
-      expectError(response, 400, 'validation_error');
+    it('responds with HTTP 400', async () => {
+      expect((await response()).status).toBe(400);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'validation_error');
     });
   });
 
   describe('POST /api/v1/login - invalid credentials', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       await signIn(fixture, 'auth@example.com');
-      const response = await postJson(fixture.baseUrl, '/api/v1/login', {
+
+      return postJson(fixture.baseUrl, '/api/v1/login', {
         email: 'auth@example.com',
         password: 'wrong-password',
       });
+    }
 
-      expectError(response, 401, 'unauthorized', 'Invalid email or password');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Invalid email or password');
     });
   });
 
   describe('POST /api/v1/login - rate limited', () => {
-    it('returns the OpenAPI rate limit response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const body = { email: 'limited-login@example.com', password: 'wrong-password' };
       for (let attempt = 0; attempt < 5; attempt += 1) {
         await postJson(fixture.baseUrl, '/api/v1/login', body);
       }
 
-      const response = await postJson(fixture.baseUrl, '/api/v1/login', body);
+      return postJson(fixture.baseUrl, '/api/v1/login', body);
+    }
 
-      expectError(response, 429, 'rate_limited', 'Too many authentication attempts; try again later');
+    it('responds with HTTP 429', async () => {
+      expect((await response()).status).toBe(429);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'rate_limited', 'Too many authentication attempts; try again later');
     });
   });
 
   describe('GET /api/v1/measurements - happy path empty history', () => {
-    it('authenticates against PostgreSQL bearer tokens', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements', accessToken);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      return getJson(fixture.baseUrl, '/api/v1/measurements', accessToken);
+    }
+
+    it('responds with HTTP 200', async () => {
+      expect((await response()).status).toBe(200);
+    });
+
+    it('responds with proper json', async () => {
+      expect((await response()).body).toEqual({
         items: [],
         page: 1,
         pageSize: 20,
         hasNextPage: false,
         filters: { from: null, to: null },
       });
+    });
+
+    it('keeps measurements empty in PostgreSQL', async () => {
+      await response();
+
       expect(await countRows(fixture.pool, 'measurements')).toBe(0);
     });
   });
 
   describe('GET /api/v1/measurements - invalid bearer token', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements', 'invalid-token');
+    async function response(): Promise<FetchJsonResponse> {
+      return getJson(fixture.baseUrl, '/api/v1/measurements', 'invalid-token');
+    }
 
-      expectError(response, 401, 'unauthorized', 'Bearer token is invalid or expired');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is invalid or expired');
     });
   });
 
   describe('GET /api/v1/measurements - invalid date range', () => {
-    it('returns the OpenAPI validation error response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await getJson(
+
+      return getJson(
         fixture.baseUrl,
         '/api/v1/measurements?from=2026-05-31T00:00:00.000Z&to=2026-05-01T00:00:00.000Z',
         accessToken,
       );
+    }
 
-      expectError(response, 400, 'validation_error');
+    it('responds with HTTP 400', async () => {
+      expect((await response()).status).toBe(400);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'validation_error');
     });
   });
 
   describe('POST /api/v1/measurements - happy path', () => {
-    it('stores the image on disk and persists the queued measurement in PostgreSQL', async () => {
+    async function upload(): Promise<UploadMeasurementScenario> {
       const accessToken = await signedInAccessToken(fixture);
       const response = await uploadMeasurement(fixture, accessToken);
       const measurementId = readString(response.body.id, 'measurement id');
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual({
+      return { response, measurementId };
+    }
+
+    it('responds with HTTP 201', async () => {
+      expect((await upload()).response.status).toBe(201);
+    });
+
+    it('responds with proper json', async () => {
+      expect((await upload()).response.body).toEqual({
         id: expect.stringMatching(/^msr_/),
         status: 'pending',
         measurementTime: expect.any(String),
       });
+    });
+
+    it('persists the measurement in PostgreSQL', async () => {
+      const { measurementId } = await upload();
+
       expect(await countRows(fixture.pool, 'measurements')).toBe(1);
-      expect(await countRows(fixture.pool, 'measurement_images')).toBe(1);
-      expect(await countRows(fixture.pool, 'recognition_tasks')).toBe(1);
       expect(await measurementStatus(fixture.pool, measurementId)).toBe('pending');
+    });
+
+    it('stores the image on disk', async () => {
+      await upload();
+
+      expect(await countRows(fixture.pool, 'measurement_images')).toBe(1);
+    });
+
+    it('queues a recognition task in PostgreSQL', async () => {
+      await upload();
+
+      expect(await countRows(fixture.pool, 'recognition_tasks')).toBe(1);
+    });
+
+    it('does not call OpenAI during upload', async () => {
+      await upload();
+
       expect(fixture.llmProvider.calls).toHaveLength(0);
     });
   });
 
   describe('POST /api/v1/measurements - missing image', () => {
-    it('returns the OpenAPI validation error response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await postForm(fixture.baseUrl, '/api/v1/measurements', accessToken, new FormData());
 
-      expectError(response, 400, 'validation_error', 'image is required');
+      return postForm(fixture.baseUrl, '/api/v1/measurements', accessToken, new FormData());
+    }
+
+    it('responds with HTTP 400', async () => {
+      expect((await response()).status).toBe(400);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'validation_error', 'image is required');
     });
   });
 
   describe('POST /api/v1/measurements - missing bearer token', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
-      const response = await postForm(fixture.baseUrl, '/api/v1/measurements', undefined, measurementForm());
+    async function response(): Promise<FetchJsonResponse> {
+      return postForm(fixture.baseUrl, '/api/v1/measurements', undefined, measurementForm());
+    }
 
-      expectError(response, 401, 'unauthorized', 'Bearer token is required');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is required');
     });
   });
 
   describe('GET /api/v1/measurements/{id} - happy path recognized measurement', () => {
-    it('returns recognized values produced through the mocked OpenAI port', async () => {
+    async function response(): Promise<MeasurementResponseScenario> {
       const accessToken = await signedInAccessToken(fixture);
       const measurementId = await uploadAndRecognize(fixture, accessToken);
       const response = await getJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}`, accessToken);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      return { response, measurementId };
+    }
+
+    it('responds with HTTP 200', async () => {
+      expect((await response()).response.status).toBe(200);
+    });
+
+    it('responds with proper json', async () => {
+      const { response: measurementResponse, measurementId } = await response();
+
+      expect(measurementResponse.body).toEqual({
         id: measurementId,
         status: 'recognized',
         systolic: 122,
@@ -231,65 +368,117 @@ describe('mobile API integration flow', () => {
         measurementTime: expect.any(String),
         imageUrl: `/api/v1/measurements/${measurementId}/image`,
       });
+    });
+
+    it('calls OpenAI through the mocked port', async () => {
+      await response();
+
       expect(fixture.llmProvider.calls).toHaveLength(1);
     });
   });
 
   describe('GET /api/v1/measurements/{id} - missing bearer token', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing');
+    async function response(): Promise<FetchJsonResponse> {
+      return getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing');
+    }
 
-      expectError(response, 401, 'unauthorized', 'Bearer token is required');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is required');
     });
   });
 
   describe('GET /api/v1/measurements/{id} - measurement not found', () => {
-    it('returns the OpenAPI not found response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing', accessToken);
 
-      expectError(response, 404, 'not_found', 'Measurement was not found');
+      return getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing', accessToken);
+    }
+
+    it('responds with HTTP 404', async () => {
+      expect((await response()).status).toBe(404);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'not_found', 'Measurement was not found');
     });
   });
 
   describe('GET /api/v1/measurements/{id}/image - happy path', () => {
-    it('returns the stored image bytes from the filesystem adapter', async () => {
+    async function response(): Promise<Response> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await uploadMeasurement(fixture, accessToken);
-      const measurementId = readString(response.body.id, 'measurement id');
-      const imageResponse = await getRaw(fixture.baseUrl, `/api/v1/measurements/${measurementId}/image`, accessToken);
+      const uploadResponse = await uploadMeasurement(fixture, accessToken);
+      const measurementId = readString(uploadResponse.body.id, 'measurement id');
 
-      expect(imageResponse.status).toBe(200);
+      return getRaw(fixture.baseUrl, `/api/v1/measurements/${measurementId}/image`, accessToken);
+    }
+
+    it('responds with HTTP 200', async () => {
+      expect((await response()).status).toBe(200);
+    });
+
+    it('responds with binary image data', async () => {
+      const imageResponse = await response();
+
       expect(imageResponse.headers.get('content-type')).toContain('image/png');
       expect((await imageResponse.arrayBuffer()).byteLength).toBe(pngBytes.byteLength);
+    });
+
+    it('returns stored image bytes from the filesystem adapter', async () => {
+      expect((await (await response()).arrayBuffer()).byteLength).toBe(pngBytes.byteLength);
     });
   });
 
   describe('GET /api/v1/measurements/{id}/image - missing bearer token', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/image');
+    async function response(): Promise<FetchJsonResponse> {
+      return getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/image');
+    }
 
-      expectError(response, 401, 'unauthorized', 'Bearer token is required');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is required');
     });
   });
 
   describe('GET /api/v1/measurements/{id}/image - measurement not found', () => {
-    it('returns the OpenAPI not found response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/image', accessToken);
 
-      expectError(response, 404, 'not_found', 'Measurement was not found');
+      return getJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/image', accessToken);
+    }
+
+    it('responds with HTTP 404', async () => {
+      expect((await response()).status).toBe(404);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'not_found', 'Measurement was not found');
     });
   });
 
   describe('POST /api/v1/measurements/{id}/save - happy path', () => {
-    it('persists a recognized measurement as saved in PostgreSQL', async () => {
+    async function response(): Promise<MeasurementResponseScenario> {
       const accessToken = await signedInAccessToken(fixture);
       const measurementId = await uploadAndRecognize(fixture, accessToken);
       const response = await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual({
+      return { response, measurementId };
+    }
+
+    it('responds with HTTP 201', async () => {
+      expect((await response()).response.status).toBe(201);
+    });
+
+    it('responds with proper json', async () => {
+      const { response: saveResponse, measurementId } = await response();
+
+      expect(saveResponse.body).toEqual({
         id: measurementId,
         status: 'saved',
         systolic: 122,
@@ -299,47 +488,81 @@ describe('mobile API integration flow', () => {
         measurementTime: expect.any(String),
         savedAt: expect.any(String),
       });
+    });
+
+    it('persists the saved status in PostgreSQL', async () => {
+      const { measurementId } = await response();
+
       expect(await measurementStatus(fixture.pool, measurementId)).toBe('saved');
     });
   });
 
   describe('POST /api/v1/measurements/{id}/save - missing bearer token', () => {
-    it('returns the OpenAPI unauthorized response', async () => {
-      const response = await postJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/save', {});
+    async function response(): Promise<FetchJsonResponse> {
+      return postJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/save', {});
+    }
 
-      expectError(response, 401, 'unauthorized', 'Bearer token is required');
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is required');
     });
   });
 
   describe('POST /api/v1/measurements/{id}/save - measurement not found', () => {
-    it('returns the OpenAPI not found response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
-      const response = await postJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/save', {}, accessToken);
 
-      expectError(response, 404, 'not_found', 'Measurement was not found');
+      return postJson(fixture.baseUrl, '/api/v1/measurements/msr_missing/save', {}, accessToken);
+    }
+
+    it('responds with HTTP 404', async () => {
+      expect((await response()).status).toBe(404);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'not_found', 'Measurement was not found');
     });
   });
 
   describe('POST /api/v1/measurements/{id}/save - pending measurement conflict', () => {
-    it('returns the OpenAPI conflict response', async () => {
+    async function response(): Promise<FetchJsonResponse> {
       const accessToken = await signedInAccessToken(fixture);
       const upload = await uploadMeasurement(fixture, accessToken);
       const measurementId = readString(upload.body.id, 'measurement id');
-      const response = await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
 
-      expectError(response, 409, 'conflict', 'Measurement must be recognized before it can be saved');
+      return postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
+    }
+
+    it('responds with HTTP 409', async () => {
+      expect((await response()).status).toBe(409);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'conflict', 'Measurement must be recognized before it can be saved');
     });
   });
 
   describe('GET /api/v1/measurements - happy path saved history', () => {
-    it('returns saved measurements without image bytes', async () => {
+    async function response(): Promise<MeasurementResponseScenario> {
       const accessToken = await signedInAccessToken(fixture);
       const measurementId = await uploadAndRecognize(fixture, accessToken);
       await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
       const response = await getJson(fixture.baseUrl, '/api/v1/measurements', accessToken);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      return { response, measurementId };
+    }
+
+    it('responds with HTTP 200', async () => {
+      expect((await response()).response.status).toBe(200);
+    });
+
+    it('responds with proper json', async () => {
+      const { response: historyResponse, measurementId } = await response();
+
+      expect(historyResponse.body).toEqual({
         items: [
           {
             id: measurementId,
@@ -357,16 +580,39 @@ describe('mobile API integration flow', () => {
         hasNextPage: false,
         filters: { from: null, to: null },
       });
-      expect(JSON.stringify(response.body)).not.toContain('image/png');
+    });
+
+    it('omits image bytes from the response', async () => {
+      expect(JSON.stringify((await response()).response.body)).not.toContain('image/png');
     });
   });
 
   describe('GET /api/v1/measurements - debug logging', () => {
-    it('logs request metadata without credentials, tokens, payloads, image bytes, or readings', async () => {
+    async function requestHistoryWithLogs(): Promise<string> {
       const accessToken = await signedInAccessToken(fixture);
       const measurementId = await uploadAndRecognize(fixture, accessToken);
       await getJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}`, accessToken);
       await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
+
+      return measurementId;
+    }
+
+    async function response(): Promise<FetchJsonResponse> {
+      await requestHistoryWithLogs();
+
+      return getJson(fixture.baseUrl, '/api/v1/measurements', 'very-secret-token');
+    }
+
+    it('responds with HTTP 401', async () => {
+      expect((await response()).status).toBe(401);
+    });
+
+    it('responds with proper json', async () => {
+      expectErrorBody(await response(), 'unauthorized', 'Bearer token is invalid or expired');
+    });
+
+    it('logs request status metadata', async () => {
+      const measurementId = await requestHistoryWithLogs();
       await getJson(fixture.baseUrl, '/api/v1/measurements', 'very-secret-token');
 
       expect(findLog(fixture.requestLogs, 'POST', '/api/v1/signin')?.statusCode).toBe(201);
@@ -374,6 +620,11 @@ describe('mobile API integration flow', () => {
       expect(findLog(fixture.requestLogs, 'GET', `/api/v1/measurements/${measurementId}`)?.statusCode).toBe(200);
       expect(findLog(fixture.requestLogs, 'POST', `/api/v1/measurements/${measurementId}/save`)?.statusCode).toBe(201);
       expect(findLog(fixture.requestLogs, 'GET', '/api/v1/measurements')?.statusCode).toBe(401);
+    });
+
+    it('logs request metadata without credentials, tokens, payloads, image bytes, or readings', async () => {
+      await response();
+
       expect(JSON.stringify(fixture.requestLogs)).not.toMatch(/password123|very-secret-token|Authorization|Bearer|png|systolic|diastolic|pulse/);
     });
   });
@@ -392,6 +643,16 @@ type MobileApiFixture = {
 type FetchJsonResponse = {
   status: number;
   body: Record<string, unknown>;
+};
+
+type UploadMeasurementScenario = {
+  response: FetchJsonResponse;
+  measurementId: string;
+};
+
+type MeasurementResponseScenario = {
+  response: FetchJsonResponse;
+  measurementId: string;
 };
 
 type CountRow = {
@@ -571,13 +832,7 @@ async function parseJsonResponse(response: Response): Promise<FetchJsonResponse>
   return { status: response.status, body: (await response.json()) as Record<string, unknown> };
 }
 
-function expectError(
-  response: FetchJsonResponse,
-  status: number,
-  error: string,
-  message?: string,
-): void {
-  expect(response.status).toBe(status);
+function expectErrorBody(response: FetchJsonResponse, error: string, message?: string): void {
   expect(response.body).toEqual({
     error,
     message: message ?? expect.any(String),
