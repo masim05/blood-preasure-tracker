@@ -116,7 +116,8 @@ The docs server listens on `http://localhost:3001/` by default, loads [docs/open
 Android mobile app source belongs under `mobile/android`. Android implementation
 must target the latest active LTS Kotlin release. User-facing mobile flows must
 show every API error returned by the API, include a happy-path Maestro flow for
-each user story, and maintain at least 95% Android unit-test coverage in CI.
+each user story, localize every visible string or text value, and maintain at
+least 95% Android unit-test coverage in CI.
 
 ## Output
 

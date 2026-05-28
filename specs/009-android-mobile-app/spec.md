@@ -14,6 +14,7 @@
 
 - Q: Which behavior should US6 require for measurement detail, value overrides, and save? -> A: Skip this user story for now; US6 is deferred from this feature.
 - Q: What files may change for this feature implementation? -> A: Only `mobile/android`; no API code or API test changes.
+- Q: How should visible Android text be handled? -> A: The app is multilingual; every visible string or text value must be localized.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -113,6 +114,9 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **Android Source Location**: `mobile/android`.
 - **Kotlin Version Baseline**: Latest active LTS Kotlin release.
 - **API Error UX**: Every API error response with `message` is displayed to the user on the current screen; network or malformed responses use a clear user-facing fallback message.
+- **Localization Impact**: Every visible Android text value, including labels,
+  buttons, error messages, empty states, guide copy, and Maestro-visible text,
+  must come from localized resources or an equivalent localization mechanism.
 - **Maestro Coverage**: Happy-path Maestro flow for each user story US1 through US5; the hello world scaffold milestone is exempt from tests as requested.
 - **Mobile Unit Coverage**: Android unit tests cover view state, validation, navigation decisions, API error mapping, session behavior, and history behavior with a `>= 95%` CI gate.
 - **Dependency Selection Rationale**: Android dependencies must be justified during planning; `docs/openapi.yaml` is a read-only API reference for this feature.
@@ -140,12 +144,13 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-013**: The app MUST show measurement rows as non-editable history entries in this feature; opening a specific measurement detail, overriding values, and saving reviewed measurements are deferred.
 - **FR-014**: The app MUST not implement measurement detail, image review, value override, or reviewed save workflows in this feature.
 - **FR-018**: For every API error returned to the Android app, the app MUST show the error to the user rather than hiding it only in logs or silent state changes.
-- **FR-019**: Android mobile app source MUST live under `mobile/android`.
-- **FR-020**: Android mobile implementation MUST target the latest active LTS Kotlin release.
-- **FR-021**: Every Android mobile user story US1 through US5 MUST include a happy-path Maestro flow.
-- **FR-022**: Android mobile code MUST maintain unit-test coverage of at least 95% in CI after user-story implementation begins.
-- **FR-023**: All implementation changes for this feature MUST be contained under `mobile/android`.
-- **FR-024**: API code and API tests MUST NOT change for this feature; any API limitation discovered during implementation MUST be handled by adjusting the Android client behavior within the existing OpenAPI contract or deferred to a separate feature.
+- **FR-019**: Every visible Android string or text value MUST be localized; hardcoded visible text in Android code, layouts, or Maestro flows is prohibited.
+- **FR-020**: Android mobile app source MUST live under `mobile/android`.
+- **FR-021**: Android mobile implementation MUST target the latest active LTS Kotlin release.
+- **FR-022**: Every Android mobile user story US1 through US5 MUST include a happy-path Maestro flow.
+- **FR-023**: Android mobile code MUST maintain unit-test coverage of at least 95% in CI after user-story implementation begins.
+- **FR-024**: All implementation changes for this feature MUST be contained under `mobile/android`.
+- **FR-025**: API code and API tests MUST NOT change for this feature; any API limitation discovered during implementation MUST be handled by adjusting the Android client behavior within the existing OpenAPI contract or deferred to a separate feature.
 
 ### Key Entities *(include if feature involves data)*
 

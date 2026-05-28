@@ -88,6 +88,7 @@
 - **Android Source Location**: [`mobile/android` when Android mobile app is affected, otherwise N/A]
 - **Kotlin Version Baseline**: [Latest active LTS Kotlin when Android mobile app is affected, otherwise N/A]
 - **API Error UX**: [How every API error returned to Android/mobile users is shown in the UI, otherwise N/A]
+- **Localization Impact**: [How every visible Android/mobile string will be localized, otherwise N/A]
 - **Maestro Coverage**: [Happy-path Maestro test per Android mobile user story, otherwise N/A]
 - **Mobile Unit Coverage**: [How Android unit tests meet the `>= 95%` CI gate, otherwise N/A]
 - **Dependency Selection Rationale**: [Official Node/NestJS modules chosen first,
@@ -127,9 +128,11 @@
   Kotlin release.
 - **FR-013**: Android mobile UI MUST show every API error returned by the API to
   the user.
-- **FR-014**: Every Android mobile user story MUST include a happy-path Maestro
+- **FR-014**: Every visible Android mobile string or text value MUST be localized;
+  hardcoded visible text is prohibited.
+- **FR-015**: Every Android mobile user story MUST include a happy-path Maestro
   flow.
-- **FR-015**: Android mobile code MUST maintain unit-test coverage of at least
+- **FR-016**: Android mobile code MUST maintain unit-test coverage of at least
   95% in CI.
 
 *Example of marking unclear requirements:*

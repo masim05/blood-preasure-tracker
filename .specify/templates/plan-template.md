@@ -40,6 +40,8 @@
 
 **API Error UX**: [How every API error returned to Android/mobile users is shown in-app, or N/A]
 
+**Localization**: [How every visible Android/mobile string is localized, or N/A]
+
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 **Maestro Coverage**: [Happy-path Maestro flow per Android user story, or N/A]
@@ -70,6 +72,8 @@
   release when Android is affected.
 - [ ] **API errors visible to users**: Android/mobile API error responses have
   explicit user-visible UI handling.
+- [ ] **Localization coverage**: Every visible Android/mobile string is routed
+  through localized resources or an equivalent localization mechanism.
 - [ ] **Maestro happy paths**: Every Android mobile user story has a happy-path
   Maestro flow planned.
 - [ ] **Android unit coverage**: Android unit tests maintain a `>= 95%` CI gate.

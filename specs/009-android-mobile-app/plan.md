@@ -34,6 +34,8 @@ Build a Kotlin Android app under `mobile/android` that can be opened in Android 
 
 **API Error UX**: A shared Android error mapper converts `ErrorResponse.message` from the API into visible screen state. Connectivity, timeout, parsing, and unexpected status failures produce user-visible fallback messages and preserve retry/navigation options.
 
+**Localization**: Every visible Android text value is defined in localized string resources or an equivalent localization mechanism. Kotlin code, XML layouts, tests, and Maestro flows must not hardcode visible user-facing text.
+
 **Scale/Scope**: Five user stories, one Android app module, one HTTP API client boundary, one session store, one camera capture/upload path, one history list screen with date filters. Measurement detail, image review, override, and reviewed save are out of scope.
 
 **Maestro Coverage**: One happy-path Maestro flow each for US1, US2, US3, US4, and US5. The initial hello world scaffold milestone is exempt from tests only until user-story work begins.
@@ -54,6 +56,8 @@ Build a Kotlin Android app under `mobile/android` that can be opened in Android 
 - [x] **Android source location**: Mobile app code is planned under `mobile/android`.
 - [x] **Kotlin LTS baseline**: Kotlin latest stable Android-compatible baseline will be pinned in `mobile/android` because Kotlin has no separate LTS channel.
 - [x] **API errors visible to users**: Shared Android error mapping and screen state are required for every API response error and network fallback.
+- [x] **Localization coverage**: Every visible Android string is required to come
+  from localized resources or an equivalent localization mechanism.
 - [x] **Maestro happy paths**: US1-US5 each have a planned happy-path Maestro flow.
 - [x] **Android unit coverage**: Android unit tests maintain a `>= 95%` CI gate.
 - [x] **Dependency policy**: Backend dependencies are unchanged. Android dependencies are limited to standard Android/Kotlin ecosystem libraries and justified in [research.md](research.md).
