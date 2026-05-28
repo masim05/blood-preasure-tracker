@@ -261,9 +261,10 @@ jobs:
           MAESTRO_CLI_NO_ANALYTICS: '1'
           MAESTRO_DRIVER_STARTUP_TIMEOUT: '600000'
         with:
-          api-level: 34
+          api-level: 30
           target: google_apis
           arch: x86_64
+          profile: pixel_6
           emulator-boot-timeout: 1200
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
@@ -271,6 +272,8 @@ jobs:
             set -eu
             adb wait-for-device
             adb shell cmd package list packages >/dev/null
+            adb shell input keyevent KEYCODE_WAKEUP || true
+            adb shell wm dismiss-keyguard || true
             adb shell settings put global window_animation_scale 0 || true
             adb shell settings put global transition_animation_scale 0 || true
             adb shell settings put global animator_duration_scale 0 || true
