@@ -13,6 +13,7 @@
 ### Session 2026-05-28
 
 - Q: Which behavior should US6 require for measurement detail, value overrides, and save? -> A: Skip this user story for now; US6 is deferred from this feature.
+- Q: What files may change for this feature implementation? -> A: Only `mobile/android`; no API code or API test changes.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -114,8 +115,8 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **API Error UX**: Every API error response with `message` is displayed to the user on the current screen; network or malformed responses use a clear user-facing fallback message.
 - **Maestro Coverage**: Happy-path Maestro flow for each user story US1 through US5; the hello world scaffold milestone is exempt from tests as requested.
 - **Mobile Unit Coverage**: Android unit tests cover view state, validation, navigation decisions, API error mapping, session behavior, and history behavior with a `>= 95%` CI gate.
-- **Dependency Selection Rationale**: Android dependencies must be justified during planning; the API contract is the existing OpenAPI document and the backend remains unchanged unless a later plan explicitly identifies a requirement gap.
-- **Existing Test Impact**: Existing backend tests should not change for this specification unless planning identifies an API contract defect that must be corrected separately.
+- **Dependency Selection Rationale**: Android dependencies must be justified during planning; `docs/openapi.yaml` is a read-only API reference for this feature.
+- **Existing Test Impact**: No API tests or existing backend tests may change for this feature.
 - **New Test Coverage**: Android unit tests for each app flow and happy-path Maestro tests for all five in-scope user stories.
 - **Coverage Plan**: CI preserves existing backend coverage gates and adds Android unit coverage reporting with at least 95% line coverage before Android user-story work is complete.
 - **Worktree Path**: `tmp/009-android-mobile-app` for implementation work unless maintainers explicitly waive worktree isolation.
@@ -143,7 +144,8 @@ An authenticated user sees a table of previous saved measurements and can filter
 - **FR-020**: Android mobile implementation MUST target the latest active LTS Kotlin release.
 - **FR-021**: Every Android mobile user story US1 through US5 MUST include a happy-path Maestro flow.
 - **FR-022**: Android mobile code MUST maintain unit-test coverage of at least 95% in CI after user-story implementation begins.
-- **FR-023**: Existing backend business logic MUST remain unchanged unless a later specification explicitly expands backend scope.
+- **FR-023**: All implementation changes for this feature MUST be contained under `mobile/android`.
+- **FR-024**: API code and API tests MUST NOT change for this feature; any API limitation discovered during implementation MUST be handled by adjusting the Android client behavior within the existing OpenAPI contract or deferred to a separate feature.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -171,6 +173,7 @@ An authenticated user sees a table of previous saved measurements and can filter
 
 - The existing mobile API contract in `docs/openapi.yaml` remains the source of truth for request and response behavior.
 - The local backend is started separately with `npm run api`; the Android app does not start or manage the backend process.
+- API code, API tests, and backend test suites are out of scope and must remain unchanged for this feature.
 - Signin means account creation through `POST /api/v1/signin`; login means authentication through `POST /api/v1/login`.
 - Measurement detail review, value override, and reviewed save are intentionally deferred from this feature.
 - The first hello world scaffold is a setup milestone and intentionally has no tests; all user-story implementation after that milestone follows the Maestro and unit coverage rules.
