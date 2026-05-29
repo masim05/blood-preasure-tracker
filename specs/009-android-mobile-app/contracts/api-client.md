@@ -116,8 +116,44 @@
 
 **Handled errors**: 400 validation, 401 unauthorized, network/fallback.
 
-**UI contract**: History renders returned items as non-editable, vertically aligned Compose rows with stable columns for measurement time, systolic, diastolic, pulse, arm side, and status. Tapping a row must not open measurement detail in this feature.
+**UI contract**: History renders returned items as non-editable, vertically aligned Compose rows with stable columns for measurement time, systolic, diastolic, pulse, arm side, and status. Tapping a row opens measurement detail.
 
-## Deferred API Operations
+## getMeasurementDetail
 
-The Android client must not implement measurement detail, image retrieval, override, or save workflows in this feature. Endpoints such as `GET /api/v1/measurements/{id}`, `GET /api/v1/measurements/{id}/image`, and `POST /api/v1/measurements/{id}/save` remain out of scope for implementation.
+**Request**: `GET /api/v1/measurements/{id}`
+
+- Authenticated.
+
+**Success**: HTTP 200 `MeasurementDetail`
+
+```json
+{
+  "id": "msr_123",
+  "status": "recognized",
+  "systolic": 120,
+  "diastolic": 80,
+  "pulse": 68,
+  "armSide": "left",
+  "measurementTime": "2026-05-27T12:00:00.000Z",
+  "savedAt": "2026-05-27T12:05:00.000Z",
+  "imageUrl": "https://example/image.png",
+  "recognitionError": null
+}
+```
+
+**Handled errors**: 400 validation, 401 unauthorized, 404 not found, network/fallback.
+
+**UI contract**: History row tap opens measurement detail with image placeholder/data and editable recognized values.
+
+## saveMeasurementDetail
+
+**Request**: `POST /api/v1/measurements/{id}/save`
+
+- Authenticated.
+- Uses existing API contract behavior for persisted detail values.
+
+**Success**: HTTP 200 `MeasurementDetail`
+
+**Handled errors**: 400 validation, 401 unauthorized, 404 not found, network/fallback.
+
+**UI contract**: Save keeps the user on measurement detail with refreshed values on success; failures are shown as user-visible errors.

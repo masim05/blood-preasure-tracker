@@ -22,7 +22,7 @@
 **Purpose**: Represents the current Compose screen in the clarified customer journey.
 
 **Fields**:
-- `screen`: enum, required; `auth`, `guide`, `camera`, `history`, or future `measurementDetail`.
+- `screen`: enum, required; `auth`, `guide`, `camera`, `history`, or `measurementDetail`.
 - `session`: optional active session for authenticated screens.
 
 **State transitions**:
@@ -31,7 +31,8 @@
 - `auth(login)` -> `camera` after successful existing-user login.
 - `camera` -> `history` when the user taps History.
 - `camera` -> `history` after successful image upload.
-- `history` -> future `measurementDetail` is deferred and must not be implemented in this feature.
+- `history` -> `measurementDetail` when the user taps a measurement row.
+- `measurementDetail` -> `history` when the user taps Back.
 
 ## MobileUser
 
@@ -126,7 +127,7 @@
 - Displayed as non-editable rows in this feature.
 
 **State transitions**:
-- No client-side measurement state transitions are implemented beyond upload result display and saved-history row display. Measurement detail/review/save is deferred.
+- History rows open measurement detail, values can be edited, Save re-submits through the existing API contract, and Back returns to history.
 
 ## HistoryFilter
 
@@ -157,16 +158,18 @@
 **Validation**:
 - Columns must render in a consistent order with stable widths/alignment across all visible rows.
 - Row text must come from localized resources or equivalent localization formatting.
-- Rows are non-editable and do not open measurement detail in this feature.
+- Rows are non-editable in history and open measurement detail on row tap.
 
 ## MeasurementDetail
 
-**Purpose**: Future measurement screen entity for US6.
+**Purpose**: Measurement detail screen entity for US6.
 
-**Status**: Deferred from this feature.
+**Status**: In scope for this feature.
 
 **Validation**:
-- No measurement detail, image review, value override, save, or history-row navigation behavior is implemented in this feature.
+- Measurement detail opens from history row tap.
+- Editable recognized values can be updated and saved through the existing API contract.
+- Back navigation from measurement detail returns to history.
 
 ## ApiError
 

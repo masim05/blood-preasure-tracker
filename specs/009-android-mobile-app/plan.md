@@ -12,8 +12,6 @@ Implement an Android blood-pressure tracking app under `mobile/android` using Ko
 
 ## Technical Context
 
-## Technical Context
-
 **Language/Version**: Kotlin 2.0.21 (latest Android-compatible active LTS) on Android API 26–35
 
 **Android Language/Version**: Kotlin 2.0.21

@@ -12,12 +12,12 @@
 
 **Purpose**: Initialize Android project tooling and baseline configuration for all stories.
 
-- [ ] T001 Verify Android Gradle and Kotlin baseline versions in `mobile/android/build.gradle.kts` and `mobile/android/gradle/libs.versions.toml`
-- [ ] T002 Configure Android app module plugins, build features, and Jacoco in `mobile/android/app/build.gradle.kts`
-- [ ] T003 [P] Configure project-wide Gradle properties in `mobile/android/gradle.properties`
-- [ ] T004 [P] Set Android manifest baseline for app launch and permissions in `mobile/android/app/src/main/AndroidManifest.xml`
-- [ ] T005 [P] Define stable UI test IDs and tags in `mobile/android/app/src/main/res/values/ids.xml` and `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/TestTags.kt`
-- [ ] T006 [P] Initialize Maestro flow catalog and naming guidance in `mobile/android/maestro/README.md`
+- [X] T001 Verify Android Gradle and Kotlin baseline versions in `mobile/android/build.gradle.kts` and `mobile/android/gradle/libs.versions.toml`
+- [X] T002 Configure Android app module plugins, build features, and Jacoco in `mobile/android/app/build.gradle.kts`
+- [X] T003 [P] Configure project-wide Gradle properties in `mobile/android/gradle.properties`
+- [X] T004 [P] Set Android manifest baseline for app launch and permissions in `mobile/android/app/src/main/AndroidManifest.xml`
+- [X] T005 [P] Define stable UI test IDs and tags in `mobile/android/app/src/main/res/values/ids.xml` and `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/TestTags.kt`
+- [X] T006 [P] Initialize Maestro flow catalog and naming guidance in `mobile/android/maestro/README.md`
 
 ---
 
@@ -27,18 +27,18 @@
 
 **CRITICAL**: No user-story implementation should begin until this phase is complete.
 
-- [ ] T007 Implement domain entities and app-state models in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt`
-- [ ] T008 Implement application ports for auth/history/upload/detail/session in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt`
-- [ ] T009 Implement core validation helpers in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/validation/Validators.kt`
-- [ ] T010 Implement central flow/navigation orchestration in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T011 Implement centralized API error mapping in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapper.kt`
-- [ ] T012 Implement HTTP API client adapter using OpenAPI contract in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
-- [ ] T013 [P] Implement session persistence adapter in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/session/InMemorySessionStore.kt`
-- [ ] T014 [P] Implement generated camera gateway baseline in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/GeneratedCameraGateway.kt`
-- [ ] T015 Configure environment-based API URL via `buildConfigField` and Gradle property resolution in `mobile/android/app/build.gradle.kts`
-- [ ] T016 [P] Add localized baseline string resources in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
-- [ ] T017 [P] Add foundational unit tests for models, validators, and flows in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModelsTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/validation/ValidatorsTest.kt`, and `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T018 [P] Add foundational unit tests for API, errors, camera, and session adapters in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapperTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/GeneratedCameraGatewayTest.kt`, and `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/session/InMemorySessionStoreTest.kt`
+- [X] T007 Implement domain entities and app-state models in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt`
+- [X] T008 Implement application ports for auth/history/upload/detail/session in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt`
+- [X] T009 Implement core validation helpers in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/validation/Validators.kt`
+- [X] T010 Implement central flow/navigation orchestration in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T011 Implement centralized API error mapping in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapper.kt`
+- [X] T012 Implement HTTP API client adapter using OpenAPI contract in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
+- [X] T013 [P] Implement session persistence adapter in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/session/InMemorySessionStore.kt`
+- [X] T014 [P] Implement generated camera gateway baseline in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/GeneratedCameraGateway.kt`
+- [X] T015 Configure environment-based API URL via `buildConfigField` and Gradle property resolution in `mobile/android/app/build.gradle.kts`
+- [X] T016 [P] Add localized baseline string resources in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
+- [X] T017 [P] Add foundational unit tests for models, validators, and flows in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModelsTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/validation/ValidatorsTest.kt`, and `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T018 [P] Add foundational unit tests for API, errors, camera, and session adapters in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapperTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`, `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/GeneratedCameraGatewayTest.kt`, and `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/session/InMemorySessionStoreTest.kt`
 
 **Checkpoint**: Foundation complete. US1-US6 can proceed independently.
 
@@ -52,15 +52,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T019 [P] [US1] Add auth new-account validation and state unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T020 [P] [US1] Add auth API error mapping assertions for new-account failures in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapperTest.kt`
-- [ ] T021 [P] [US1] Implement happy-path Maestro flow for signin in `mobile/android/maestro/us1-signin.yaml`
+- [X] T019 [P] [US1] Add auth new-account validation and state unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T020 [P] [US1] Add auth API error mapping assertions for new-account failures in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/ApiErrorMapperTest.kt`
+- [X] T021 [P] [US1] Implement happy-path Maestro flow for signin in `mobile/android/maestro/us1-signin.yaml`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Implement combined auth UI with Login/New Account modes in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
-- [ ] T023 [US1] Wire New Account submission and success navigation to guide in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T024 [US1] Add localized New Account labels, actions, and error text in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
+- [X] T022 [US1] Implement combined auth UI with Login/New Account modes in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
+- [X] T023 [US1] Wire New Account submission and success navigation to guide in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T024 [US1] Add localized New Account labels, actions, and error text in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
 
 **Checkpoint**: US1 is functional and independently testable.
 
@@ -74,13 +74,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Add guide screen state/navigation unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T026 [P] [US2] Implement happy-path Maestro flow for guide transition in `mobile/android/maestro/us2-guide.yaml`
+- [X] T025 [P] [US2] Add guide screen state/navigation unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T026 [P] [US2] Implement happy-path Maestro flow for guide transition in `mobile/android/maestro/us2-guide.yaml`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Implement guide UI and Next action in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/GuideScreen.kt`
-- [ ] T028 [US2] Add localized guide copy and Next button strings in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
+- [X] T027 [US2] Implement guide UI and Next action in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/GuideScreen.kt`
+- [X] T028 [US2] Add localized guide copy and Next button strings in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
 
 **Checkpoint**: US2 is functional and independently testable.
 
@@ -94,14 +94,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T029 [P] [US3] Add login-mode flow and session unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T030 [P] [US3] Implement happy-path Maestro flow for login in `mobile/android/maestro/us3-login.yaml`
+- [X] T029 [P] [US3] Add login-mode flow and session unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T030 [P] [US3] Implement happy-path Maestro flow for login in `mobile/android/maestro/us3-login.yaml`
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Implement login-mode submit behavior on combined auth screen in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
-- [ ] T032 [US3] Wire login success navigation to camera and login error visibility in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T033 [US3] Enforce Android-standard password masking behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
+- [X] T031 [US3] Implement login-mode submit behavior on combined auth screen in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
+- [X] T032 [US3] Wire login success navigation to camera and login error visibility in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T033 [US3] Enforce Android-standard password masking behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt`
 
 **Checkpoint**: US3 is functional and independently testable.
 
@@ -115,15 +115,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T034 [P] [US4] Add camera/upload success and failure unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T035 [P] [US4] Add upload request/response unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
-- [ ] T036 [P] [US4] Implement happy-path Maestro flow for capture-or-history in `mobile/android/maestro/us4-capture-or-history.yaml`
+- [X] T034 [P] [US4] Add camera/upload success and failure unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T035 [P] [US4] Add upload request/response unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
+- [X] T036 [P] [US4] Implement happy-path Maestro flow for capture-or-history in `mobile/android/maestro/us4-capture-or-history.yaml`
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Implement camera screen UI actions and upload state rendering in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt`
-- [ ] T038 [US4] Wire camera/upload workflow and post-upload history navigation in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T039 [US4] Ensure user-visible upload/API errors on camera screen in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt`
+- [X] T037 [US4] Implement camera screen UI actions and upload state rendering in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt`
+- [X] T038 [US4] Wire camera/upload workflow and post-upload history navigation in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T039 [US4] Ensure user-visible upload/API errors on camera screen in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt`
 
 **Checkpoint**: US4 is functional and independently testable.
 
@@ -137,17 +137,17 @@
 
 ### Tests for User Story 5
 
-- [ ] T040 [P] [US5] Add history filtering and pagination-state unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T041 [P] [US5] Add history endpoint query/response unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
-- [ ] T042 [P] [US5] Implement happy-path Maestro flow for history filtering in `mobile/android/maestro/us5-history-filter.yaml`
+- [X] T040 [P] [US5] Add history filtering and pagination-state unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T041 [P] [US5] Add history endpoint query/response unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
+- [X] T042 [P] [US5] Implement happy-path Maestro flow for history filtering in `mobile/android/maestro/us5-history-filter.yaml`
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implement history table UI with stable aligned columns in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
-- [ ] T044 [US5] Implement date selector controls and filter apply/reset behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
-- [ ] T045 [US5] Wire history load/filter logic and error handling in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T046 [US5] Wire row-tap navigation intent to measurement detail in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
-- [ ] T047 [US5] Add localized history headers, filter labels, and empty/error state text in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
+- [X] T043 [US5] Implement history table UI with stable aligned columns in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
+- [X] T044 [US5] Implement date selector controls and filter apply/reset behavior in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
+- [X] T045 [US5] Wire history load/filter logic and error handling in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T046 [US5] Wire row-tap navigation intent to measurement detail in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/HistoryScreen.kt`
+- [X] T047 [US5] Add localized history headers, filter labels, and empty/error state text in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
 
 **Checkpoint**: US5 is functional and independently testable.
 
@@ -161,17 +161,17 @@
 
 ### Tests for User Story 6
 
-- [ ] T048 [P] [US6] Add measurement-detail state/edit/save unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
-- [ ] T049 [P] [US6] Add measurement detail/read/save API adapter unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
-- [ ] T050 [P] [US6] Implement happy-path Maestro flow for measurement detail in `mobile/android/maestro/us6-measurement-detail.yaml`
+- [X] T048 [P] [US6] Add measurement-detail state/edit/save unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt`
+- [X] T049 [P] [US6] Add measurement detail/read/save API adapter unit tests in `mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClientTest.kt`
+- [X] T050 [P] [US6] Implement happy-path Maestro flow for measurement detail in `mobile/android/maestro/us6-measurement-detail.yaml`
 
 ### Implementation for User Story 6
 
-- [ ] T051 [US6] Implement measurement-detail UI (image, recognized fields, editable values, Save, Back) in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/MeasurementDetailScreen.kt`
-- [ ] T052 [US6] Wire detail fetch/edit/save/back logic in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
-- [ ] T053 [US6] Extend HTTP adapter for detail/read/save operations using existing OpenAPI contract in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
-- [ ] T054 [US6] Ensure detail save errors are user-visible and localized in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/MeasurementDetailScreen.kt`
-- [ ] T055 [US6] Add localized measurement-detail labels/actions/messages in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
+- [X] T051 [US6] Implement measurement-detail UI (image, recognized fields, editable values, Save, Back) in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/MeasurementDetailScreen.kt`
+- [X] T052 [US6] Wire detail fetch/edit/save/back logic in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt`
+- [X] T053 [US6] Extend HTTP adapter for detail/read/save operations using existing OpenAPI contract in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/api/HttpApiClient.kt`
+- [X] T054 [US6] Ensure detail save errors are user-visible and localized in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/MeasurementDetailScreen.kt`
+- [X] T055 [US6] Add localized measurement-detail labels/actions/messages in `mobile/android/app/src/main/res/values/strings.xml` and `mobile/android/app/src/main/res/values-es/strings.xml`
 
 **Checkpoint**: US6 is functional and independently testable.
 
@@ -181,12 +181,12 @@
 
 **Purpose**: Final quality checks spanning all stories.
 
-- [ ] T056 [P] Run Android unit test suite in `mobile/android/app/src/test/kotlin/` via `mobile/android/gradlew :app:testDebugUnitTest`
-- [ ] T057 [P] Verify Android coverage gate >= 95% via `mobile/android/gradlew :app:androidCoverageVerify`
-- [ ] T058 [P] Run all Maestro happy-path flows in `mobile/android/maestro/us1-signin.yaml`, `mobile/android/maestro/us2-guide.yaml`, `mobile/android/maestro/us3-login.yaml`, `mobile/android/maestro/us4-capture-or-history.yaml`, `mobile/android/maestro/us5-history-filter.yaml`, and `mobile/android/maestro/us6-measurement-detail.yaml`
-- [ ] T059 Validate API base URL environment injection (`local.properties`, CI env var, release default) in `mobile/android/app/build.gradle.kts` and `mobile/android/local.properties`
-- [ ] T060 Reconcile API-client and Maestro contract docs with implemented US6 detail behavior in `specs/009-android-mobile-app/contracts/api-client.md` and `specs/009-android-mobile-app/contracts/maestro-flows.md`
-- [ ] T061 Execute quickstart validation steps from `specs/009-android-mobile-app/quickstart.md`
+- [X] T056 [P] Run Android unit test suite in `mobile/android/app/src/test/kotlin/` via `mobile/android/gradlew :app:testDebugUnitTest`
+- [X] T057 [P] Verify Android coverage gate >= 95% via `mobile/android/gradlew :app:androidCoverageVerify`
+- [X] T058 [P] Run all Maestro happy-path flows in `mobile/android/maestro/us1-signin.yaml`, `mobile/android/maestro/us2-guide.yaml`, `mobile/android/maestro/us3-login.yaml`, `mobile/android/maestro/us4-capture-or-history.yaml`, `mobile/android/maestro/us5-history-filter.yaml`, and `mobile/android/maestro/us6-measurement-detail.yaml`
+- [X] T059 Validate API base URL environment injection (`local.properties`, CI env var, release default) in `mobile/android/app/build.gradle.kts` and `mobile/android/local.properties`
+- [X] T060 Reconcile API-client and Maestro contract docs with implemented US6 detail behavior in `specs/009-android-mobile-app/contracts/api-client.md` and `specs/009-android-mobile-app/contracts/maestro-flows.md`
+- [X] T061 Execute quickstart validation steps from `specs/009-android-mobile-app/quickstart.md`
 
 ---
 

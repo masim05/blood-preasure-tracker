@@ -80,7 +80,7 @@ US6 validates the history-to-detail journey, editable recognized values, Save, a
 - Successful upload opens history.
 - History shows saved measurement rows in vertically aligned columns.
 - History applies date filters through date selector controls rather than free-text inputs.
-- Tapping a history row does not open measurement detail in this feature.
+- Tapping a history row opens measurement detail; Back returns to history.
 - API errors and network failures are visible to the user on the current screen.
 - Android screens use Jetpack Compose Material 3 layouts and localized visible strings.
 - No files outside `mobile/android` are changed during implementation, except Spec Kit planning artifacts when running planning commands.
