@@ -3,22 +3,24 @@ appId: com.masim05.bloodpressure.mobile
 - launchApp:
     clearState: true
 - tapOn:
-    text: New Account
+    id: auth_mode_login
 - tapOn:
-    text: Email
-- inputRandomEmail
+    id: login_email
+- inputText: us4@example.com
 - hideKeyboard
 - tapOn:
-    text: Password
+    id: login_password
 - inputText: password123
 - hideKeyboard
 - tapOn:
-    text: Create account
+    id: login_submit
 - assertVisible:
-    text: Next
-- tapOn:
-    text: Next
-- tapOn:
-    text: Take picture
+    id: camera_preview
 - assertVisible:
-    text: Apply filter
+    id: camera_upload
+- assertVisible:
+    id: camera_history
+- tapOn:
+    id: camera_upload
+- assertVisible:
+    id: history_table
