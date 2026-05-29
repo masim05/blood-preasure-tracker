@@ -5,7 +5,17 @@ plugins {
     jacoco
 }
 
-val apiBaseUrl = providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000")
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use { input -> load(input) }
+    }
+}
+val apiBaseUrl = localProperties.getProperty("apiBaseUrl")
+    ?.takeIf { value -> value.isNotBlank() }
+    ?: providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000").get()
 
 android {
     namespace = "com.masim05.bloodpressure.mobile"
@@ -17,7 +27,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
-        buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.get()}\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildFeatures {
