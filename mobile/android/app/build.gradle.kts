@@ -1,11 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     jacoco
 }
-
-import java.util.Properties
 
 val localProperties = Properties().apply {
     val localPropertiesFile = rootProject.file("local.properties")
@@ -78,8 +78,6 @@ jacoco {
 val androidCoverageExcludes = listOf(
     "**/MainActivity*",
     "**/MobileUiState*",
-    "**/adapters/camera/**",
-    "**/adapters/session/**",
     "**/core/model/CameraUiState*",
     "**/core/model/CameraUiStatus*",
     "**/ui/**",

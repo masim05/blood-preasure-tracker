@@ -21,6 +21,8 @@ import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
+import com.masim05.bloodpressure.mobile.core.model.Session
+import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
@@ -28,6 +30,7 @@ import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
+import java.time.Instant
 
 class MainActivity : ComponentActivity() {
     private val sessionStore by lazy { EncryptedSessionStore.create(this) }
@@ -286,8 +289,21 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-internal fun initialRoute(session: com.masim05.bloodpressure.mobile.core.model.Session?): Route {
+internal fun restoredSession(sessionStore: SessionStore, now: Instant = Instant.now()): Session? {
+    val session = sessionStore.load() ?: return null
+    if (!session.isValidAt(now)) {
+        sessionStore.clear()
+        return null
+    }
+    return session
+}
+
+internal fun initialRoute(session: Session?): Route {
     return if (session == null) Route.Auth else Route.Camera
+}
+
+private fun Session.isValidAt(now: Instant): Boolean {
+    return runCatching { Instant.parse(expiresAt).isAfter(now) }.getOrDefault(false)
 }
 
 private data class MobileUiState(

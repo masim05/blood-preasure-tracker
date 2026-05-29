@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -74,6 +75,7 @@ fun CameraScreen(
     var cameraReady by remember { mutableStateOf(false) }
     var localError by remember { mutableStateOf<String?>(null) }
     var isCapturing by remember { mutableStateOf(false) }
+    var previewBindingAttempt by remember { mutableStateOf(0) }
 
     val cameraController = remember(context) {
         LifecycleCameraController(context).apply {
@@ -84,8 +86,24 @@ fun CameraScreen(
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         permissionGranted = granted
         permissionDenied = !granted
+        cameraReady = false
         if (!granted) {
             localError = context.getString(R.string.camera_permission_denied)
+        } else {
+            localError = null
+            previewBindingAttempt += 1
+        }
+    }
+
+    fun bindCameraPreview() {
+        try {
+            cameraController.bindToLifecycle(lifecycleOwner)
+            cameraReady = true
+            permissionDenied = false
+            localError = null
+        } catch (_: Throwable) {
+            cameraReady = false
+            localError = context.getString(R.string.camera_capture_failed)
         }
     }
 
@@ -97,6 +115,9 @@ fun CameraScreen(
                 permissionDenied = !granted
                 if (granted) {
                     localError = null
+                    previewBindingAttempt += 1
+                } else {
+                    cameraReady = false
                 }
             }
         }
@@ -171,28 +192,22 @@ fun CameraScreen(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .testTag(TestTags.CameraPreview),
             ) {
-                AndroidView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = { viewContext ->
-                        PreviewView(viewContext).apply {
-                            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                            scaleType = PreviewView.ScaleType.FILL_CENTER
-                            controller = cameraController
-                            try {
-                                cameraController.bindToLifecycle(lifecycleOwner)
-                                cameraReady = true
-                                permissionDenied = false
-                                localError = null
-                            } catch (_: Throwable) {
-                                cameraReady = false
-                                localError = viewContext.getString(R.string.camera_capture_failed)
+                key(previewBindingAttempt) {
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize(),
+                        factory = { viewContext ->
+                            PreviewView(viewContext).apply {
+                                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                                scaleType = PreviewView.ScaleType.FILL_CENTER
+                                controller = cameraController
+                                bindCameraPreview()
                             }
-                        }
-                    },
-                    update = { previewView ->
-                        previewView.controller = cameraController
-                    },
-                )
+                        },
+                        update = { previewView ->
+                            previewView.controller = cameraController
+                        },
+                    )
+                }
             }
         }
 
@@ -279,7 +294,10 @@ fun CameraScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                onClick = onUpload,
+                onClick = {
+                    localError = null
+                    previewBindingAttempt += 1
+                },
             ) {
                 Text(stringResource(R.string.camera_retry))
             }

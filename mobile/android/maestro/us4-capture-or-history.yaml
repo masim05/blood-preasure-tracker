@@ -14,6 +14,8 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: login_submit
+- tapOn:
+    text: While using the app
 - assertVisible:
     id: camera_preview
 - assertVisible:

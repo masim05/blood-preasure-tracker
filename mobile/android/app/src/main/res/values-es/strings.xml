@@ -13,13 +13,13 @@
     <string name="guide_title">Guia de medicion</string>
     <string name="guide_copy">Toma una foto clara con el tensiometro y el brazo visibles.</string>
     <string name="guide_continue">Siguiente</string>
-    <string name="camera_title">Camara</string>
+    <string name="camera_title">Cámara</string>
     <string name="camera_copy">Toma una foto clara de la medicion con un toque.</string>
     <string name="camera_upload">Tomar foto</string>
     <string name="camera_history">Historial</string>
     <string name="camera_retry">Reintentar</string>
-    <string name="camera_preview_loading">Iniciando vista previa de la camara…</string>
-    <string name="camera_permission_denied">Se requiere permiso de camara para tomar una foto.</string>
+    <string name="camera_preview_loading">Iniciando vista previa de la cámara…</string>
+    <string name="camera_permission_denied">Se requiere permiso de cámara para tomar una foto.</string>
     <string name="camera_open_settings">Abrir ajustes</string>
     <string name="camera_capture_failed">No se pudo capturar la imagen. Intenta de nuevo.</string>
     <string name="history_title">Historial de mediciones</string>
