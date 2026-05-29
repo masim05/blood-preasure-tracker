@@ -1,173 +1,113 @@
-# Feature Specification: [FEATURE NAME]
+# Feature Specification: Auth Session Persistence Improvement
 
-**Feature Branch**: `[###-feature-name]`
+**Feature Branch**: `[012-auth-improvement]`
 
-**Created**: [DATE]
+**Created**: 2026-05-29
 
 **Status**: Draft
 
-**Input**: User description: "$ARGUMENTS"
+**Input**: User description: "authentication should persist after app shutdown. auth token should be alive 1 week, then refreshed."
 
 ## User Scenarios & Testing *(mandatory)*
 
-<!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
+### User Story 1 - Stay Signed In After App Restart (Priority: P1)
 
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
--->
+As a returning user, I can close and reopen the app without logging in again while my session is still valid.
 
-### User Story 1 - [Brief Title] (Priority: P1)
+**Why this priority**: This is the core auth-improvement outcome and directly addresses the persistence requirement.
 
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**Independent Test**: Sign in once, terminate the app, relaunch within token validity, verify authenticated route is restored without entering credentials.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a user has a stored valid session, **When** the app is relaunched, **Then** the app restores the authenticated session and skips auth form entry.
+2. **Given** there is no stored session, **When** the app launches, **Then** the app opens the auth route.
+3. **Given** stored session data is unreadable/corrupted, **When** the app launches, **Then** the app routes to auth and shows a user-visible error.
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+### User Story 2 - Refresh Session Before Expiry (Priority: P2)
 
-[Describe this user journey in plain language]
+As a signed-in user, my session remains active by refreshing auth when token lifetime is near expiry.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: A one-week token without refresh forces repeated re-login and breaks continuity.
 
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**: Start app with a token that has 24 hours or less remaining (or expired), verify refresh attempt occurs and success keeps user authenticated.
 
 **Acceptance Scenarios**:
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** a token has 24 hours or less remaining, **When** app launches or resumes, **Then** refresh is attempted before forcing sign-in.
+2. **Given** refresh succeeds, **When** new session data is returned, **Then** updated session is stored and user remains in authenticated flow.
+3. **Given** refresh fails due to invalid/unauthorized session, **When** response is received, **Then** stale session is cleared, auth route is shown, and a user-visible error is displayed.
+4. **Given** refresh fails due to transient network issues, **When** response is received, **Then** a user-visible error is shown and retry is available.
 
 ---
-
-### User Story 3 - [Brief Title] (Priority: P3)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
----
-
-[Add more user stories as needed, each with an assigned priority]
 
 ### Edge Cases
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
-
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+- Device clock skew causes local expiry check mismatch with server validity.
+- App is force-closed during refresh and reopened.
+- Multiple rapid app foreground events trigger overlapping refresh attempts.
+- Refresh response is malformed or missing required fields.
 
 ## Architecture & Test Impact *(mandatory)*
 
-- **Ports Affected**: [List domain ports introduced/changed, or N/A]
-- **Adapters Affected**: [List concrete adapters introduced/changed, or N/A]
-- **Boundary Guarantee**: [Explain how domain logic stays framework-agnostic]
-- **Node.js Version Baseline**: [Latest active LTS version targeted]
-- **NestJS Version Baseline**: [Latest active LTS major targeted]
-- **Android Source Location**: [`mobile/android` when Android mobile app is affected, otherwise N/A]
-- **Kotlin Version Baseline**: [Latest active LTS Kotlin when Android mobile app is affected, otherwise N/A]
-- **API Error UX**: [How every API error returned to Android/mobile users is shown in the UI, otherwise N/A]
-- **Localization Impact**: [How every visible Android/mobile string will be localized, otherwise N/A]
-- **Maestro Coverage**: [Happy-path Maestro test per Android mobile user story, otherwise N/A]
-- **Mobile Unit Coverage**: [How Android unit tests meet the `>= 95%` CI gate, otherwise N/A]
-- **Dependency Selection Rationale**: [Official Node/NestJS modules chosen first,
-  or justification for third-party choice]
-- **Existing Test Impact**: [State "No changes" or justify required updates]
-- **New Test Coverage**: [List the new unit/integration tests that will be added]
-- **Coverage Plan**: [How CI `>= 95%` is preserved and how 100% is pursued where feasible]
-- **Worktree Path**: [Feature worktree path under `tmp/`]
+- **Ports Affected**: Session store port, auth session lifecycle/refresh port.
+- **Adapters Affected**: Android session persistence adapter, API auth adapter, UI route-state adapter.
+- **Boundary Guarantee**: Auth state rules remain in core flow/domain and do not depend directly on Android framework APIs.
+- **Node.js Version Baseline**: Latest active LTS (unchanged backend baseline for local validation).
+- **NestJS Version Baseline**: Latest active LTS major (unchanged backend baseline for local validation).
+- **Android Source Location**: `mobile/android`.
+- **Kotlin Version Baseline**: Latest active LTS Kotlin baseline used by project.
+- **API Error UX**: Every auth restore/refresh API error is shown as visible UI feedback.
+- **Localization Impact**: All new or changed visible auth/session text is localized in Android resources.
+- **Maestro Coverage**: Happy-path Maestro for each story (restore-after-restart, refresh-continuity).
+- **Mobile Unit Coverage**: Android unit tests keep CI gate at `>= 95%`.
+- **Dependency Selection Rationale**: Reuse existing Android and auth infrastructure; avoid unnecessary third-party additions.
+- **Existing Test Impact**: No API code or API test changes.
+- **New Test Coverage**: Unit tests for restore, expiry evaluation, refresh success/failure, and route decisions; Maestro happy paths for US1 and US2.
+- **Coverage Plan**: Run and keep Android coverage verification at `>= 95%`, targeting near-100% in changed auth flow areas.
+- **Worktree Path**: `tmp/012-auth-improvement`.
 
 ## Requirements *(mandatory)*
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
-
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
-- **FR-006**: Implementation MUST preserve hexagonal boundaries: domain depends on
-  ports only, adapters depend on domain interfaces.
-- **FR-007**: Each new feature MUST add new tests; existing tests MUST remain
-  unchanged unless the specification documents why a change is required.
-- **FR-008**: Development workflow MUST remain MCP-free and execute in a dedicated
-  feature worktree under `tmp/`.
-- **FR-009**: Runtime stack MUST target the latest active Node.js LTS and latest
-  active NestJS LTS.
-- **FR-010**: Dependency decisions MUST prefer official Node.js/NestJS modules;
-  third-party additions require explicit justification.
-- **FR-011**: Android mobile app source MUST live under `mobile/android` when
-  Android code is added or changed.
-- **FR-012**: Android mobile implementation MUST target the latest active LTS
-  Kotlin release.
-- **FR-013**: Android mobile UI MUST show every API error returned by the API to
-  the user.
-- **FR-014**: Every visible Android mobile string or text value MUST be localized;
-  hardcoded visible text is prohibited.
-- **FR-015**: Every Android mobile user story MUST include a happy-path Maestro
-  flow.
-- **FR-016**: Android mobile code MUST maintain unit-test coverage of at least
-  95% in CI.
-
-*Example of marking unclear requirements:*
-
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-001**: App MUST persist authenticated session state so auth survives app shutdown and restart.
+- **FR-002**: Primary token lifetime MUST be treated as 7 days from issuance.
+- **FR-003**: App MUST evaluate token validity on startup and on foreground resume.
+- **FR-004**: If token is valid, app MUST restore authenticated flow without requiring credentials.
+- **FR-005**: If token has 24 hours or less remaining or is expired, app MUST attempt refresh before forcing sign-in.
+- **FR-006**: If refresh succeeds, updated auth state MUST be stored and used immediately.
+- **FR-007**: If refresh fails due to invalid or unauthorized session, stale auth state MUST be cleared and auth route shown.
+- **FR-008**: If refresh fails due to recoverable network issues, app MUST show user-visible error and offer retry.
+- **FR-009**: Every auth-related API error MUST be visible to the user in app UI.
+- **FR-010**: All visible text introduced or changed by this feature MUST be localized.
+- **FR-011**: All implementation changes MUST stay under `mobile/android`.
+- **FR-012**: API code and API tests MUST remain unchanged.
+- **FR-013**: Android unit-test coverage in CI MUST remain at or above 95%.
+- **FR-014**: Each user story in this feature MUST include a happy-path Maestro flow.
 
 ### Key Entities *(include if feature involves data)*
 
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+- **AuthSession**: Persisted authenticated state containing token credentials and expiry metadata.
+- **TokenLifetimeWindow**: Seven-day validity model and near-expiry threshold used for refresh decisions.
+- **RefreshAttempt**: Auth renewal operation returning updated session or failure outcome.
+- **AuthUiMessage**: Localized user-facing feedback for restore/refresh failures.
 
 ## Success Criteria *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-001**: In validation, 95% or more of users relaunching within token validity remain signed in without entering credentials.
+- **SC-002**: In validation where token is near-expiry or expired, 95% or more refresh-eligible sessions stay in authenticated flow after automatic refresh.
+- **SC-003**: 100% of tested restore/refresh failure paths display a visible, localized user-facing message.
+- **SC-004**: Android CI coverage remains at or above 95% after feature implementation.
+- **SC-005**: Happy-path Maestro flows for restart persistence and refresh continuity pass.
 
 ## Assumptions
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right assumptions based on reasonable defaults
-  chosen when the feature description did not specify certain details.
--->
-
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- Existing API contract supports required session refresh semantics for mobile client.
+- Existing auth endpoints remain the source of truth; backend behavior is not modified in this feature.
+- Auth improvement scope is limited to mobile app behavior and state management.
+- If network is unavailable and refresh cannot complete, user may need to retry or sign in based on returned failure type.
