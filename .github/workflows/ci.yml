@@ -218,12 +218,13 @@ jobs:
             flow="$1"
             for attempt in 1 2; do
               echo "Running $flow (attempt $attempt)"
-              if maestro test --no-ansi "$flow"; then
+              if timeout 420 maestro test --no-ansi "$flow"; then
                 return 0
               fi
               if [ "$attempt" -eq 2 ]; then
                 return 1
               fi
+              adb devices || true
               adb kill-server
               adb start-server
               adb wait-for-device
@@ -259,7 +260,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           MAESTRO_CLI_NO_ANALYTICS: '1'
-          MAESTRO_DRIVER_STARTUP_TIMEOUT: '600000'
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
         with:
           api-level: 30
           target: google_apis
