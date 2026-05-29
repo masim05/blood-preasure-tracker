@@ -223,13 +223,13 @@ class MainActivity : ComponentActivity() {
         error?.let {
             Log.e(
                 LOG_TAG,
-                "operation=$operation route=$route source=${it.source} code=${it.code ?: "none"} message=${it.message}",
+                "operation=$operation route=$route apiBaseUrl=${BuildConfig.API_BASE_URL} source=${it.source} code=${it.code ?: "none"} message=${it.message}",
             )
         }
         validationError?.let {
             Log.e(
                 LOG_TAG,
-                "operation=$operation route=$route validation=$it messageRes=${it.messageRes()}",
+                "operation=$operation route=$route apiBaseUrl=${BuildConfig.API_BASE_URL} validation=$it messageRes=${it.messageRes()}",
             )
         }
     }
