@@ -180,3 +180,20 @@
 **Validation**:
 - Every failed API call must produce an `ApiError` shown on the current screen.
 - Errors must not be logged only or silently swallowed.
+
+## ApiConfig
+
+**Purpose**: Captures the compile-time API base URL injected into the Android app through `BuildConfig.API_BASE_URL`.
+
+**Fields**:
+- `apiBaseUrl`: string, required; the base URL used by all HTTP adapter classes to reach the blood-pressure API. Resolved at Gradle configuration time from `providers.gradleProperty("apiBaseUrl")`.
+
+**Resolution order** (highest to lowest priority):
+1. `local.properties` key `apiBaseUrl` — developer machine override (git-ignored, analogous to `.env`).
+2. Environment variable `ORG_GRADLE_PROJECT_apiBaseUrl` — CI injection.
+3. Hardcoded `orElse` default `http://10.0.2.2:3000` — Android emulator localhost alias for debug builds.
+
+**Validation**:
+- Hard-coded base URLs in Kotlin source or Maestro flows are prohibited (FR-029).
+- The `local.properties` file must be listed in `.gitignore` to prevent accidental credential or URL commits.
+- CI Gradle invocations must pass the URL through `ORG_GRADLE_PROJECT_apiBaseUrl`; no API URL value is stored in tracked files.

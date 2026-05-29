@@ -28,6 +28,29 @@ The app targets the local API at `http://10.0.2.2:3000` for emulator validation.
 npm run api
 ```
 
+### Configure API host per environment
+
+The app reads `BuildConfig.API_BASE_URL` from a Gradle property named `apiBaseUrl`.
+If not provided, it defaults to `http://10.0.2.2:3000`.
+
+One-off override:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android -PapiBaseUrl=http://192.168.1.25:3000 :app:assembleDebug
+```
+
+Common values:
+
+- Emulator: `http://10.0.2.2:3000`
+- Physical device on Wi-Fi: `http://<your-mac-lan-ip>:3000`
+- Physical device via USB reverse: `http://127.0.0.1:3000` (run `adb reverse tcp:3000 tcp:3000` first)
+
+Persistent override (local machine only): add this to `~/.gradle/gradle.properties`:
+
+```properties
+apiBaseUrl=http://192.168.1.25:3000
+```
+
 ## Test And Coverage
 
 Run Android unit tests and the 95% coverage gate from the repository root:

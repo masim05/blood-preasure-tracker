@@ -23,6 +23,10 @@
 - Q: Which official-guide layout approach should the Android screens use? -> A: Jetpack Compose Material 3 screens and migrate UI to Compose.
 - Q: Should login and new account be one screen or separate screens? -> A: Use one auth screen with Login and New Account modes/tabs.
 
+### Session 2026-05-29
+
+- Q: How should the Android app receive the API base URL per environment (local dev vs CI vs release)? → A: Use `buildConfigField` in `build.gradle.kts` with a `local.properties` file (git-ignored) for local developer overrides; CI sets the URL via an environment variable read at Gradle configuration time; the release variant uses a production default. This is the idiomatic Android equivalent of a `.env` file.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Create Account And Enter Guide (Priority: P1)
@@ -164,6 +168,7 @@ An authenticated user sees a table of previous saved measurements, can filter th
 - **FR-026**: Signin and login password fields MUST use Android standard password masking behavior with brief last-character reveal and automatic masking after typing.
 - **FR-027**: Android screens MUST be implemented with Jetpack Compose Material 3 layouts following Android Developers guidance for text fields, buttons, date selectors, lists/tables, and screen navigation.
 - **FR-028**: Login and new-account creation MUST be presented on one auth screen with distinct Login and New Account modes or tabs; successful New Account routes to the guide screen, while successful Login routes to the camera screen.
+- **FR-029**: The Android app MUST read the API base URL from a `buildConfigField` defined in `build.gradle.kts`. Local developers override the URL via a git-ignored `local.properties` file; CI injects it through an environment variable; the release build variant uses a production default. Hard-coded base URLs in Kotlin source are prohibited.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -197,3 +202,4 @@ An authenticated user sees a table of previous saved measurements, can filter th
 - The first hello world scaffold is a setup milestone and intentionally has no tests; all user-story implementation after that milestone follows the Maestro and unit coverage rules.
 - Date filters use inclusive from/to measurement-time bounds matching the API contract.
 - Camera capture may use a real device or emulator-supported camera flow during validation, with permission denial handled as a user-visible app state.
+- The API base URL is environment-specific and is never hard-coded in Kotlin source; local developers set it in `local.properties` (git-ignored), CI sets it via an environment variable, and the release variant uses a production default — all wired through `buildConfigField` in `build.gradle.kts`.

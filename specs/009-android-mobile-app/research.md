@@ -89,3 +89,9 @@
 **Rationale**: The constitution requires a happy-path Maestro flow for each Android user story and 95% Android unit coverage. Maestro covers end-to-end user journeys; unit tests cover deterministic state, validation, adapter parsing, and error mapping.
 
 **Alternatives considered**: Espresso-only UI tests were rejected because the constitution names Maestro. Relying only on Maestro was rejected because it would not satisfy the 95% unit coverage gate.
+
+## Decision: Supply API base URL per-environment via `buildConfigField` in `build.gradle.kts`
+
+**Rationale**: Android does not have a runtime `.env` file mechanism. The idiomatic approach is to inject environment-specific values at compile time through `buildConfigField`. The value is read from a Gradle property (`apiBaseUrl`) using `providers.gradleProperty()`, which resolves from three sources in priority order: (1) `local.properties` for local developer overrides (git-ignored, analogous to `.env`), (2) the `ORG_GRADLE_PROJECT_apiBaseUrl` environment variable for CI injection, (3) the hardcoded `orElse("http://10.0.2.2:3000")` default for Android emulator debug builds. The resulting `BuildConfig.API_BASE_URL` constant is consumed by the HTTP adapter. Hard-coded base URLs in Kotlin source are prohibited by FR-029.
+
+**Alternatives considered**: Runtime `assets/config.json` swapped per flavor was rejected because it adds runtime file-read boilerplate without benefit for a small API surface. A shared `gradle.properties` default was rejected because it would commit the URL to version control and require manual override per developer. Hard-coding `10.0.2.2:3000` directly in Kotlin was rejected because it blocks CI and release use without a code change.
