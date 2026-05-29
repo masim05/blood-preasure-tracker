@@ -15,7 +15,8 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: login_submit
 - tapOn:
-    text: While using the app
+    text: (While using the app|Only this time|Allow)
+    optional: true
 - assertVisible:
     id: camera_preview
 - assertVisible:
