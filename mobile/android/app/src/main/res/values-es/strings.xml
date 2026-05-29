@@ -18,6 +18,10 @@
     <string name="camera_upload">Tomar foto</string>
     <string name="camera_history">Historial</string>
     <string name="camera_retry">Reintentar</string>
+    <string name="camera_preview_loading">Iniciando vista previa de la camara…</string>
+    <string name="camera_permission_denied">Se requiere permiso de camara para tomar una foto.</string>
+    <string name="camera_open_settings">Abrir ajustes</string>
+    <string name="camera_capture_failed">No se pudo capturar la imagen. Intenta de nuevo.</string>
     <string name="history_title">Historial de mediciones</string>
     <string name="history_from_hint">Fecha inicial</string>
     <string name="history_to_hint">Fecha final</string>

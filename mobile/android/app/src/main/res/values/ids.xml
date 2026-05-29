@@ -12,6 +12,9 @@
     <item name="camera_upload" type="id" />
     <item name="camera_history" type="id" />
     <item name="camera_retry" type="id" />
+    <item name="camera_preview" type="id" />
+    <item name="camera_loading" type="id" />
+    <item name="camera_open_settings" type="id" />
     <item name="history_from" type="id" />
     <item name="history_to" type="id" />
     <item name="history_apply_filter" type="id" />

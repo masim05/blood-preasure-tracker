@@ -33,5 +33,6 @@ interface MeasurementDetailGateway {
 }
 
 interface CameraGateway {
+    fun isReady(): Boolean
     fun openCamera(): AppResult<MeasurementImage>
 }

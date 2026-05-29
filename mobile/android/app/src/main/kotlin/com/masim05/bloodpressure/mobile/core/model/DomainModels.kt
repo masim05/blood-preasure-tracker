@@ -104,6 +104,22 @@ data class CameraScreenState(
     val lastUploadId: String? = null,
 )
 
+enum class CameraUiStatus {
+    Initializing,
+    Ready,
+    Capturing,
+    Uploading,
+    Error,
+}
+
+data class CameraUiState(
+    val status: CameraUiStatus,
+    val previewVisible: Boolean,
+    val canCapture: Boolean,
+    val canOpenHistory: Boolean,
+    val errorMessage: String? = null,
+)
+
 data class HistoryTableRow(
     val measurementTimeColumn: String,
     val systolicColumn: String,

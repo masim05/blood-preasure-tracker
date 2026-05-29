@@ -4,6 +4,7 @@ kotlin = "2.0.21"
 junit = "4.13.2"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
+cameraX = "1.4.2"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -19,3 +20,7 @@ androidx-compose-material-icons = { module = "androidx.compose.material:material
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraX" }

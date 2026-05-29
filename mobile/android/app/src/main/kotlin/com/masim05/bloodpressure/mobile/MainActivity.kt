@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.masim05.bloodpressure.mobile.adapters.api.HttpApiClient
-import com.masim05.bloodpressure.mobile.adapters.camera.GeneratedCameraGateway
 import com.masim05.bloodpressure.mobile.adapters.session.EncryptedSessionStore
+import com.masim05.bloodpressure.mobile.adapters.camera.CameraXCameraGateway
 import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
 import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
 import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
@@ -31,6 +31,7 @@ import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     private val sessionStore by lazy { EncryptedSessionStore.create(this) }
+    private val cameraGateway = CameraXCameraGateway()
     private val apiClient by lazy {
         HttpApiClient(
             baseUrl = BuildConfig.API_BASE_URL,
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
     }
     private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }
     private val guideFlow by lazy { GuideFlow(sessionStore) }
-    private val captureFlow by lazy { CaptureFlow(sessionStore, GeneratedCameraGateway(), apiClient) }
+    private val captureFlow by lazy { CaptureFlow(sessionStore, cameraGateway, apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
     private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
     private var uiState by mutableStateOf(MobileUiState())
@@ -65,6 +66,14 @@ class MainActivity : ComponentActivity() {
                         isUploading = uiState.isUploading,
                         errorText = uiState.errorText,
                         onUpload = ::captureAndUpload,
+                        onCaptureReady = { image ->
+                            cameraGateway.publishCapture(image)
+                            captureAndUpload()
+                        },
+                        onCaptureFailure = { message ->
+                            cameraGateway.publishFailure(message)
+                            uiState = uiState.copy(errorText = message)
+                        },
                         onHistory = { openHistory(HistoryFilter()) },
                     )
                     Route.History -> HistoryScreen(

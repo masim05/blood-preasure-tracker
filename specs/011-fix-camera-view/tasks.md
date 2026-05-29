@@ -12,11 +12,12 @@
 
 **Purpose**: Prepare CameraX dependencies, permissions, and localized baseline resources.
 
-- [ ] T001 Add CameraX dependency versions in mobile/android/gradle/libs.versions.toml
-- [ ] T002 Add CameraX libraries to mobile/android/app/build.gradle.kts
-- [ ] T003 Add camera permission declaration to mobile/android/app/src/main/AndroidManifest.xml
-- [ ] T004 [P] Add camera-ready and permission-recovery test tags in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/TestTags.kt
-- [ ] T005 [P] Add localized camera-preview, loading, and permission-recovery strings in mobile/android/app/src/main/res/values/strings.xml and mobile/android/app/src/main/res/values-es/strings.xml
+- [X] T001 Add CameraX dependency versions in mobile/android/gradle/libs.versions.toml
+- [X] T002 Add CameraX libraries to mobile/android/app/build.gradle.kts
+- [X] T003 Add camera permission declaration to mobile/android/app/src/main/AndroidManifest.xml
+- [X] T034 Verify Kotlin baseline is latest active LTS and update mobile/android/gradle/libs.versions.toml if required
+- [X] T004 [P] Add camera-ready and permission-recovery test tags in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/TestTags.kt
+- [X] T005 [P] Add localized camera-preview, loading, and permission-recovery strings in mobile/android/app/src/main/res/values/strings.xml and mobile/android/app/src/main/res/values-es/strings.xml
 
 ---
 
@@ -26,13 +27,13 @@
 
 **CRITICAL**: No user story implementation starts until this phase is complete.
 
-- [ ] T006 Refactor camera adapter to CameraX-based implementation in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGateway.kt
-- [ ] T007 Update camera port contracts for ready/capture/error behavior in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt
-- [ ] T008 Add camera UI state model for initializing/ready/capturing/uploading/error in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt
-- [ ] T009 Update capture flow to enforce single active capture/upload and route consistency in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
-- [ ] T010 Wire new camera gateway and state transitions into activity controller in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T011 [P] Extend foundational camera flow unit tests in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T012 [P] Add CameraX adapter unit tests in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGatewayTest.kt
+- [X] T006 Refactor camera adapter to CameraX-based implementation in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGateway.kt
+- [X] T007 Update camera port contracts for ready/capture/error behavior in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt
+- [X] T008 Add camera UI state model for initializing/ready/capturing/uploading/error in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt
+- [X] T009 Update capture flow to enforce single active capture/upload and route consistency in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
+- [X] T010 Wire new camera gateway and state transitions into activity controller in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T011 [P] Extend foundational camera flow unit tests in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T012 [P] Add CameraX adapter unit tests in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGatewayTest.kt
 
 **Checkpoint**: Foundation complete, user-story work can proceed.
 
@@ -46,17 +47,18 @@
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T013 [P] [US1] Add unit tests for post-login camera-ready route and one-tap capture success in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T014 [P] [US1] Add unit tests for Camera screen loading/disable behavior during capture and upload in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T015 [P] [US1] Update Maestro happy-path flow for live preview and one-tap capture in mobile/android/maestro/us4-capture-or-history.yaml
+- [X] T013 [P] [US1] Add unit tests for post-login camera-ready route and one-tap capture success in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T014 [P] [US1] Add unit tests for Camera screen loading/disable behavior during capture and upload in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T015 [P] [US1] Update Maestro happy-path flow for live preview and one-tap capture in mobile/android/maestro/us4-capture-or-history.yaml
+- [X] T035 [P] [US1] Add unit tests verifying API upload errors are rendered as user-visible camera errors in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Replace placeholder camera action UI with live preview container in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
-- [ ] T017 [US1] Integrate PreviewView/AndroidView camera rendering path in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
-- [ ] T018 [US1] Connect one-tap capture action to updated controller state in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T019 [US1] Ensure successful capture/upload transitions Camera -> History in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
-- [ ] T020 [US1] Show visible capture/upload loading state and disable repeated capture taps in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
+- [X] T016 [US1] Replace placeholder camera action UI with live preview container in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
+- [X] T017 [US1] Integrate PreviewView/AndroidView camera rendering path in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
+- [X] T018 [US1] Connect one-tap capture action to updated controller state in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T019 [US1] Ensure successful capture/upload transitions Camera -> History in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
+- [X] T020 [US1] Show visible capture/upload loading state and disable repeated capture taps in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
 
 **Checkpoint**: US1 is independently functional and testable.
 
@@ -70,17 +72,17 @@
 
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T021 [P] [US2] Add unit tests for permission-denied/unavailable recovery routing in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T022 [P] [US2] Add unit tests for camera adapter failure mapping and retryability in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGatewayTest.kt
-- [ ] T023 [P] [US2] Add Maestro recovery happy-path flow for denied camera with History fallback in mobile/android/maestro/us4-permission-recovery.yaml
+- [X] T021 [P] [US2] Add unit tests for permission-denied/unavailable recovery routing in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T022 [P] [US2] Add unit tests for camera adapter failure mapping and retryability in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGatewayTest.kt
+- [X] T023 [P] [US2] Add Maestro recovery happy-path flow for denied camera with History fallback in mobile/android/maestro/us4-permission-recovery.yaml
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Implement automatic camera permission request on Camera entry in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T025 [US2] Add denied/unavailable camera UI with Open Settings and History actions in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
-- [ ] T026 [US2] Implement Open Settings intent handler for camera recovery in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T027 [US2] Map camera initialization/capture failures to user-visible localized errors in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGateway.kt
-- [ ] T028 [US2] Ensure History action remains enabled during camera error states in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
+- [X] T024 [US2] Implement automatic camera permission request on Camera entry in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T025 [US2] Add denied/unavailable camera UI with Open Settings and History actions in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
+- [X] T026 [US2] Implement Open Settings intent handler for camera recovery in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T027 [US2] Map camera initialization/capture failures to user-visible localized errors in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGateway.kt
+- [X] T028 [US2] Ensure History action remains enabled during camera error states in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/CameraScreen.kt
 
 **Checkpoint**: US2 is independently functional and testable.
 
@@ -90,10 +92,11 @@
 
 **Purpose**: Final quality checks and documentation consistency across stories.
 
-- [ ] T029 [P] Update camera behavior notes and validation steps in mobile/android/README.md
-- [ ] T030 Run Android unit tests and coverage gate via mobile/android/app/build.gradle.kts tasks :app:testDebugUnitTest and :app:androidCoverageVerify
+- [X] T029 [P] Update camera behavior notes and validation steps in mobile/android/README.md
+- [X] T030 Run Android unit tests and coverage gate via mobile/android/app/build.gradle.kts tasks :app:testDebugUnitTest and :app:androidCoverageVerify
 - [ ] T031 Run Maestro validation flows in mobile/android/maestro/us4-capture-or-history.yaml and mobile/android/maestro/us4-permission-recovery.yaml
-- [ ] T032 Verify scope guard by checking changed files remain under mobile/android and no API code/tests changed using /Users/max/src/github.com/masim05/blood-preasure-tracker
+- [X] T032 Verify scope guard by checking changed files remain under mobile/android and no API code/tests changed using /Users/max/src/github.com/masim05/blood-preasure-tracker
+- [X] T033 Add regression test confirming auth token/session persistence across app restart remains intact in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
 
 ---
 
@@ -123,13 +126,13 @@
 
 - Phase 1 parallel: T004 and T005.
 - Phase 2 parallel: T011 and T012 after T006-T010 scaffold is in place.
-- US1 parallel: T013, T014, T015.
+- US1 parallel: T013, T014, T015, T035.
 - US2 parallel: T021, T022, T023.
 - Polish parallel: T029 and T032.
 
 ## Parallel Example: User Story 1
 
-- Run T013, T014, and T015 in parallel since they target separate test files/flows.
+- Run T013, T014, T015, and T035 in parallel since they target separate test files/flows.
 - Run T016 and T019 in parallel only after T009 is complete, because T016 is UI-focused and T019 is flow-focused.
 
 ## Parallel Example: User Story 2
@@ -157,7 +160,7 @@
 
 1. One developer handles CameraX adapter and flow tasks (T006-T010).
 2. One developer handles camera UI and localization (T005, T016-T018, T025, T028).
-3. One developer handles test and Maestro updates (T011-T015, T021-T023, T030-T031).
+3. One developer handles test and Maestro updates (T011-T015, T021-T023, T030-T031, T033, T035).
 
 ## Notes
 

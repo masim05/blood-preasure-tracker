@@ -18,7 +18,9 @@ appId: com.masim05.bloodpressure.mobile
     text: Next
 - tapOn:
     text: Next
+- assertVisible:
+    text: History
 - tapOn:
-    text: Take picture
+    text: History
 - assertVisible:
     text: Apply filter

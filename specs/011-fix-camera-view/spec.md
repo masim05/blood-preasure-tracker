@@ -59,8 +59,8 @@ As an authenticated user, if camera access is not available, I receive a clear e
 
 ## Architecture & Test Impact *(mandatory)*
 
-- **Ports Affected**: N/A (Android app UX behavior update only)
-- **Adapters Affected**: N/A (no backend adapter or domain port changes)
+- **Ports Affected**: `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt` (camera-ready/capture/error behavior contracts)
+- **Adapters Affected**: `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/camera/CameraXCameraGateway.kt` (CameraX preview/capture and failure mapping)
 - **Boundary Guarantee**: No backend domain or API boundary changes are introduced; scope remains in mobile app presentation and flow behavior.
 - **Node.js Version Baseline**: Unchanged (no Node.js runtime changes in this feature)
 - **NestJS Version Baseline**: Unchanged (no NestJS runtime changes in this feature)
@@ -72,7 +72,7 @@ As an authenticated user, if camera access is not available, I receive a clear e
 - **Mobile Unit Coverage**: Preserve CI gate of at least 95% unit coverage for Android mobile code.
 - **Dependency Selection Rationale**: Reuse existing mobile dependencies and platform-recommended patterns; no new dependency unless required and justified.
 - **Existing Test Impact**: No changes to API code or API tests.
-- **New Test Coverage**: Mobile-only tests validating post-login camera readiness, one-tap capture behavior, and camera-unavailable user messaging.
+- **New Test Coverage**: Mobile-only tests validating post-login camera readiness, one-tap capture behavior, camera-unavailable recovery messaging/actions, API upload error visibility, and auth persistence regression.
 - **Coverage Plan**: Keep or improve Android unit coverage to remain at or above 95% in CI; add focused tests for changed camera flow states.
 - **Worktree Path**: `tmp/011-fix-camera-view`
 
