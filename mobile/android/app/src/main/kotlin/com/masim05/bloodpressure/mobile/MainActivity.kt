@@ -286,6 +286,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+internal fun initialRoute(session: com.masim05.bloodpressure.mobile.core.model.Session?): Route {
+    return if (session == null) Route.Auth else Route.Camera
+}
+
 private data class MobileUiState(
     val route: Route = Route.Auth,
     val authMode: AuthMode = AuthMode.Login,
