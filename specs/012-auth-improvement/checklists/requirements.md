@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Auth Session Persistence Improvement
+# Specification Quality Checklist: Authentication Improvement
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-05-29
@@ -31,4 +31,5 @@
 
 ## Notes
 
-- Validation iteration 1: all checklist items pass for initial draft.
+- Validation iteration 1 passed all checklist items.
+- Scope partition is explicit: app-only changes for auth persistence, API-only changes for one-week token lifetime.
