@@ -97,7 +97,11 @@ class MainActivity : ComponentActivity() {
 
         if (restoredSession != null && !restoredSession.isActive()) {
             sessionStore.clear()
-            return MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+            return MobileUiState(
+                route = Route.Auth,
+                authMode = AuthMode.Login,
+                errorText = getString(R.string.error_restore_session),
+            )
         }
 
         val restoreError = sessionStore.loadError()

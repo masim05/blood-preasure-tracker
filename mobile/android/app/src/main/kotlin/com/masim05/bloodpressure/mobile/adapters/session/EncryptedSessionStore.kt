@@ -36,7 +36,7 @@ class EncryptedSessionStore internal constructor(
             val parsed = deserialize(decrypted)
             lastError = null
             parsed
-        } catch (_: RuntimeException) {
+        } catch (_: Exception) {
             keyValueStore.remove(SESSION_KEY)
             lastError = LOAD_ERROR_CORRUPTED
             null

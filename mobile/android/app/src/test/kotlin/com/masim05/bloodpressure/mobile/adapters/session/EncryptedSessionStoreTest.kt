@@ -2,6 +2,7 @@ package com.masim05.bloodpressure.mobile.adapters.session
 
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
 import com.masim05.bloodpressure.mobile.core.model.Session
+import java.security.GeneralSecurityException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -54,11 +55,29 @@ class EncryptedSessionStoreTest {
         assertEquals("recovered@example.com", store.load()?.user?.email)
     }
 
+    @Test
+    fun clearsCorruptedPayloadWhenDecryptThrowsCheckedException() {
+        val backend = InMemoryKeyValueStore().apply { put("encrypted_session", "ciphertext") }
+        val store = EncryptedSessionStore(backend, CheckedFailureEncryptor())
+
+        assertNull(store.load())
+        assertEquals("corrupted", store.loadError())
+        assertNull(backend.get("encrypted_session"))
+    }
+
     private class ReverseEncryptor : SessionEncryptor {
         override fun encrypt(plainText: String): String = plainText.reversed()
         override fun decrypt(cipherText: String): String {
             require(cipherText != "corrupted")
             return cipherText.reversed()
+        }
+    }
+
+    private class CheckedFailureEncryptor : SessionEncryptor {
+        override fun encrypt(plainText: String): String = plainText
+
+        override fun decrypt(cipherText: String): String {
+            throw GeneralSecurityException("decrypt failed")
         }
     }
 
