@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="auth_mode_login" type="id" />
+    <item name="auth_mode_new_account" type="id" />
+    <item name="signin_email" type="id" />
+    <item name="signin_password" type="id" />
+    <item name="signin_submit" type="id" />
+    <item name="login_email" type="id" />
+    <item name="login_password" type="id" />
+    <item name="login_submit" type="id" />
+    <item name="guide_continue" type="id" />
+    <item name="camera_upload" type="id" />
+    <item name="camera_history" type="id" />
+    <item name="camera_retry" type="id" />
+    <item name="history_from" type="id" />
+    <item name="history_to" type="id" />
+    <item name="history_apply_filter" type="id" />
+    <item name="history_clear_filter" type="id" />
+    <item name="history_table" type="id" />
+    <item name="history_row" type="id" />
+    <item name="history_time_column" type="id" />
+    <item name="history_systolic_column" type="id" />
+    <item name="history_diastolic_column" type="id" />
+    <item name="history_pulse_column" type="id" />
+    <item name="history_arm_column" type="id" />
+    <item name="history_status_column" type="id" />
+    <item name="measurement_detail_screen" type="id" />
+    <item name="measurement_detail_error" type="id" />
+    <item name="measurement_detail_image" type="id" />
+    <item name="measurement_detail_systolic" type="id" />
+    <item name="measurement_detail_diastolic" type="id" />
+    <item name="measurement_detail_pulse" type="id" />
+    <item name="measurement_detail_save" type="id" />
+    <item name="measurement_detail_back" type="id" />
+    <item name="screen_title" type="id" />
+    <item name="error_region" type="id" />
+</resources>

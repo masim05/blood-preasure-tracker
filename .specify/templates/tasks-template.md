@@ -12,7 +12,8 @@ description: "Task list template for feature implementation"
 **Tests**: Test tasks are REQUIRED. Every user story MUST include new tests,
 preserve existing tests unless justified, and maintain CI coverage >= 95%. Android
 mobile user stories MUST include happy-path Maestro flows and Android unit tests
-that preserve the `>= 95%` coverage gate.
+that preserve the `>= 95%` coverage gate. Every visible Android/mobile string
+MUST be localized; hardcoded visible text is not allowed.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -57,7 +58,7 @@ that preserve the `>= 95%` coverage gate.
   active LTS major
 - [ ] T003 [P] If Android is affected, create/verify `mobile/android` project structure
   and latest active LTS Kotlin baseline
-- [ ] T004 [P] Configure linting, formatting, Maestro, and coverage tools
+- [ ] T004 [P] Configure linting, formatting, localization checks, Maestro, and coverage tools
 - [ ] T005 [P] Validate official Node/NestJS modules are used before third-party additions
 
 ---
@@ -78,6 +79,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T010 Setup environment configuration management
 - [ ] T011 If Android is affected, implement shared API error-to-user-message handling
   in mobile/android/[module]
+- [ ] TXXX If Android is affected, create localized string resources for all visible UI text
+  in mobile/android/[module]/src/main/res/values/
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -206,6 +209,8 @@ Examples of foundational tasks (adjust based on your project):
 - Tests MUST be written and FAIL before implementation
 - Android user stories MUST include a Maestro happy-path flow before completion
 - Android unit coverage MUST remain at or above 95%
+- Visible Android text MUST come from localized resources or an equivalent
+  localization mechanism before any story is complete
 - Models before services
 - Services before endpoints
 - Core implementation before integration

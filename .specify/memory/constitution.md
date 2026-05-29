@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 -> 1.2.0
+- Version change: 1.2.0 -> 1.3.0
 - Modified principles:
-  - II. Coverage-Gated Unit Testing -> II. Coverage-Gated Unit Testing
+  - VI. Android Mobile Client Standards -> VI. Android Mobile Client Standards
   - Engineering Constraints -> Engineering Constraints
 - Added sections:
-  - VI. Android Mobile Client Standards
+  - None
 - Removed sections:
   - None
 - Templates requiring updates:
@@ -16,6 +16,8 @@ Sync Impact Report
   - .specify/extensions/git/commands/*.md: ✅ checked, no updates required
   - .specify/extensions/git/README.md: ✅ checked, no updates required
   - README.md: ✅ updated
+  - specs/009-android-mobile-app/spec.md: ✅ updated
+  - specs/009-android-mobile-app/plan.md: ✅ updated
 - Deferred TODOs:
   - None
 -->
@@ -78,11 +80,15 @@ Android mobile app source code MUST live under `mobile/android`. The Android app
 MUST target the latest active LTS Kotlin release. Every user story implemented in
 the Android app MUST include a passing happy-path Maestro flow. Any API error
 returned to the Android app MUST be shown to the user in the app UI; errors MUST
-NOT be silently swallowed or hidden only in logs.
+NOT be silently swallowed or hidden only in logs. Every visible Android UI string
+or text value MUST be localized through Android resources or an equivalent
+localization mechanism; hardcoded visible strings in code, layouts, tests, or
+Maestro flows are prohibited.
 
 Rationale: The mobile app is the primary user-facing workflow for blood-pressure
 tracking, so its source location, language baseline, user-visible failure handling,
-and end-to-end happy paths must be predictable and reviewable.
+localization readiness, and end-to-end happy paths must be predictable and
+reviewable.
 
 ## Engineering Constraints
 
@@ -96,6 +102,8 @@ and end-to-end happy paths must be predictable and reviewable.
   feedback.
 - Every Android mobile user story MUST have at least one happy-path Maestro flow.
 - Android mobile unit tests MUST meet the 95% coverage CI gate.
+- Every visible Android UI string or text value MUST be localized; hardcoded
+  visible text in Android code, layouts, tests, or Maestro flows is prohibited.
 - New dependencies SHOULD use official Node.js or NestJS packages first (for
   example: `node:` built-ins, official `@nestjs/*` packages). Third-party modules
   require a brief justification in the plan when an official option exists.
@@ -118,7 +126,8 @@ and end-to-end happy paths must be predictable and reviewable.
 6. Use meaningful branch names and commit messages that reflect intent and scope.
 7. Verify Node.js LTS and NestJS LTS targets are captured in plan/spec artifacts.
 8. Verify Android plans capture `mobile/android`, Kotlin LTS, API error display,
-   Maestro happy paths, and 95% mobile unit coverage when mobile code is affected.
+  localization, Maestro happy paths, and 95% mobile unit coverage when mobile
+  code is affected.
 9. Prefer official Node/NestJS modules before introducing third-party dependencies.
 10. Keep implementation MCP-free; if a process requires MCP, it is non-compliant.
 
@@ -141,7 +150,8 @@ Compliance review expectations:
 - Every plan, specification, and task list MUST include explicit constitution checks.
 - Every pull request review MUST verify architecture boundaries, test additions,
   coverage policy compliance, worktree usage, MCP-free implementation, tech stack
-  baseline compliance, and Android mobile standards when mobile code is affected.
+  baseline compliance, localization compliance, and Android mobile standards when
+  mobile code is affected.
 - Non-compliance MUST be documented with remediation before merge.
 
-**Version**: 1.2.0 | **Ratified**: 2026-05-24 | **Last Amended**: 2026-05-28
+**Version**: 1.3.0 | **Ratified**: 2026-05-24 | **Last Amended**: 2026-05-28

@@ -1,0 +1,9 @@
+## Copy this file to local.properties and adjust values for your machine.
+## Do not commit local.properties.
+
+# Android SDK location used by Gradle.
+sdk.dir=/Users/your-user/Library/Android/sdk
+
+# Android app API base URL override consumed by app/build.gradle.kts.
+# Defaults to http://10.0.2.2:3000 when omitted.
+apiBaseUrl=http://10.0.2.2:3000

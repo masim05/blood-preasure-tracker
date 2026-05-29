@@ -1,4 +1,4 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read specs/008-integration-test-assertions/plan.md
+shell commands, and other important information, read specs/009-android-mobile-app/plan.md
 <!-- SPECKIT END -->

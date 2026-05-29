@@ -1,0 +1,122 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    jacoco
+}
+
+val apiBaseUrl = providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000")
+
+android {
+    namespace = "com.masim05.bloodpressure.mobile"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.masim05.bloodpressure.mobile"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1.0"
+        buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.get()}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
+
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    testOptions {
+        unitTests.all {
+            it.useJUnit()
+        }
+    }
+}
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    testImplementation(libs.junit)
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val androidCoverageExcludes = listOf(
+    "**/MainActivity*",
+    "**/MobileUiState*",
+    "**/ui/**",
+    "**/BuildConfig.*",
+    "**/R.class",
+    "**/R$*.class",
+)
+
+tasks.register<JacocoReport>("androidUnitCoverageReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+            exclude(androidCoverageExcludes)
+        },
+    )
+    sourceDirectories.setFrom(files("src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec",
+            )
+        },
+    )
+}
+
+tasks.register<JacocoCoverageVerification>("androidCoverageVerify") {
+    dependsOn("testDebugUnitTest")
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+            exclude(androidCoverageExcludes)
+        },
+    )
+    sourceDirectories.setFrom(files("src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec",
+            )
+        },
+    )
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.95".toBigDecimal()
+            }
+        }
+    }
+}
