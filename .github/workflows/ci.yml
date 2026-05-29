@@ -201,7 +201,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5433/blood_pressure_tracker_test
 
       - name: Android unit tests, coverage, and build
-        run: ./gradlew :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug
         working-directory: mobile/android
 
       - name: Install Maestro
