@@ -12,11 +12,11 @@
 
 **Purpose**: Prepare shared artifacts and guardrails for split-scope implementation.
 
-- [ ] T001 Create auth improvement contracts directory at specs/012-auth-improvement/contracts/
-- [ ] T002 Create API token policy contract in specs/012-auth-improvement/contracts/auth-api-policy.md
-- [ ] T003 [P] Create mobile session persistence contract in specs/012-auth-improvement/contracts/mobile-session-persistence.md
-- [ ] T004 [P] Update quick validation commands for both stories in specs/012-auth-improvement/quickstart.md
-- [ ] T005 [P] Add feature-specific context references in specs/012-auth-improvement/plan.md
+- [X] T001 Create auth improvement contracts directory at specs/012-auth-improvement/contracts/
+- [X] T002 Create API token policy contract in specs/012-auth-improvement/contracts/auth-api-policy.md
+- [X] T003 [P] Create mobile session persistence contract in specs/012-auth-improvement/contracts/mobile-session-persistence.md
+- [X] T004 [P] Update quick validation commands for both stories in specs/012-auth-improvement/quickstart.md
+- [X] T005 [P] Add feature-specific context references in specs/012-auth-improvement/plan.md
 
 ---
 
@@ -26,10 +26,10 @@
 
 **CRITICAL**: No user story implementation starts until these are complete.
 
-- [ ] T006 Add auth-session persistence model fields for encrypted restore metadata in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt
-- [ ] T007 Add session-store port methods for save/load/clear persisted session in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt
-- [ ] T008 Add backend config support for one-week access-token default in src/infrastructure/config/api-config.ts
-- [ ] T009 [P] Add backend config validation tests for one-week access-token default in src/infrastructure/config/api-config.test.ts
+- [X] T006 Add auth-session persistence model fields for encrypted restore metadata in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/model/DomainModels.kt
+- [X] T007 Add session-store port methods for save/load/clear persisted session in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt
+- [X] T008 Add backend config support for one-week access-token default in src/infrastructure/config/api-config.ts
+- [X] T009 [P] Add backend config validation tests for one-week access-token default in src/infrastructure/config/api-config.test.ts
 - [ ] T010 [P] Add token issuance tests covering configurable TTL propagation in src/adapters/inbound/http/mobile-http-adapters.test.ts
 
 **Checkpoint**: Shared foundations complete; stories can proceed independently.
@@ -46,20 +46,20 @@
 
 - [ ] T011 [P] [US1] Add unit tests for persisted-session happy path restore in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
 - [ ] T012 [P] [US1] Add unit tests for unreadable/corrupted persisted session fallback in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T013 [P] [US1] Add adapter tests for encrypted persistence behavior in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/session/EncryptedSessionStoreTest.kt
-- [ ] T014 [P] [US1] Add Maestro happy path for shutdown/reopen persistence in mobile/android/maestro/us1-signin.yaml
-- [ ] T037 [P] [US1] Add unit tests ensuring API auth errors are surfaced as visible UI state in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T013 [P] [US1] Add adapter tests for encrypted persistence behavior in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/session/EncryptedSessionStoreTest.kt
+- [X] T014 [P] [US1] Add Maestro happy path for shutdown/reopen persistence in mobile/android/maestro/us1-signin.yaml
+- [X] T037 [P] [US1] Add unit tests ensuring API auth errors are surfaced as visible UI state in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement encrypted session store adapter in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/session/EncryptedSessionStore.kt
-- [ ] T016 [US1] Wire encrypted session store in app composition root in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T017 [US1] Persist session on successful signin/login in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
-- [ ] T018 [US1] Restore persisted session on app launch and route to Camera in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
-- [ ] T019 [US1] Show localized restore error messages in mobile/android/app/src/main/res/values/strings.xml
-- [ ] T020 [P] [US1] Show localized restore error messages in mobile/android/app/src/main/res/values-es/strings.xml
-- [ ] T021 [US1] Bind restore error message rendering on auth screen in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt
-- [ ] T038 [US1] Ensure login/restore API auth failures are rendered as user-visible localized messages in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T015 [US1] Implement encrypted session store adapter in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/adapters/session/EncryptedSessionStore.kt
+- [X] T016 [US1] Wire encrypted session store in app composition root in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T017 [US1] Persist session on successful signin/login in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlows.kt
+- [X] T018 [US1] Restore persisted session on app launch and route to Camera in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
+- [X] T019 [US1] Show localized restore error messages in mobile/android/app/src/main/res/values/strings.xml
+- [X] T020 [P] [US1] Show localized restore error messages in mobile/android/app/src/main/res/values-es/strings.xml
+- [X] T021 [US1] Bind restore error message rendering on auth screen in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/ui/screens/AuthScreen.kt
+- [X] T038 [US1] Ensure login/restore API auth failures are rendered as user-visible localized messages in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/MainActivity.kt
 
 **Checkpoint**: US1 is independently functional and testable.
 
@@ -73,19 +73,19 @@
 
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T022 [P] [US2] Add use-case tests asserting seven-day TTL from signin issuance in src/application/use-cases/create-account.use-case.test.ts
-- [ ] T023 [P] [US2] Add use-case tests asserting seven-day TTL from login issuance in src/application/use-cases/login-user.use-case.test.ts
-- [ ] T024 [P] [US2] Add authentication tests for expired-versus-valid token acceptance boundaries in src/application/use-cases/authenticate-bearer-token.use-case.test.ts
-- [ ] T025 [P] [US2] Add HTTP contract test assertions for expiresAt semantics in src/adapters/inbound/http/mobile-api.contract.test.ts
-- [ ] T039 [P] [US2] Add test covering legacy pre-rollout tokens preserving prior expiry semantics in src/application/use-cases/authenticate-bearer-token.use-case.test.ts
+- [X] T022 [P] [US2] Add use-case tests asserting seven-day TTL from signin issuance in src/application/use-cases/create-account.use-case.test.ts
+- [X] T023 [P] [US2] Add use-case tests asserting seven-day TTL from login issuance in src/application/use-cases/login-user.use-case.test.ts
+- [X] T024 [P] [US2] Add authentication tests for expired-versus-valid token acceptance boundaries in src/application/use-cases/authenticate-bearer-token.use-case.test.ts
+- [X] T025 [P] [US2] Add HTTP contract test assertions for expiresAt semantics in src/adapters/inbound/http/mobile-api.contract.test.ts
+- [X] T039 [P] [US2] Add test covering legacy pre-rollout tokens preserving prior expiry semantics in src/application/use-cases/authenticate-bearer-token.use-case.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Set ACCESS_TOKEN_TTL_SECONDS default to 604800 in src/infrastructure/config/api-config.ts
-- [ ] T027 [US2] Ensure auth controller continues passing configured TTL to use cases in src/adapters/inbound/http/auth.controller.ts
-- [ ] T028 [US2] Ensure login token issuance uses passed TTL consistently in src/application/use-cases/login-user.use-case.ts
-- [ ] T029 [US2] Ensure account-creation token issuance uses passed TTL consistently in src/application/use-cases/create-account.use-case.ts
-- [ ] T030 [US2] Document one-week access-token policy for newly issued tokens in docs/openapi.yaml
+- [X] T026 [US2] Set ACCESS_TOKEN_TTL_SECONDS default to 604800 in src/infrastructure/config/api-config.ts
+- [X] T027 [US2] Ensure auth controller continues passing configured TTL to use cases in src/adapters/inbound/http/auth.controller.ts
+- [X] T028 [US2] Ensure login token issuance uses passed TTL consistently in src/application/use-cases/login-user.use-case.ts
+- [X] T029 [US2] Ensure account-creation token issuance uses passed TTL consistently in src/application/use-cases/create-account.use-case.ts
+- [X] T030 [US2] Document one-week access-token policy for newly issued tokens in docs/openapi.yaml
 
 **Checkpoint**: US2 is independently functional and testable.
 
@@ -95,13 +95,13 @@
 
 **Purpose**: Final validation, regression safety, and release readiness.
 
-- [ ] T031 [P] Run backend test suite and coverage in package.json via npm run test:coverage
-- [ ] T032 [P] Run Android unit coverage verification in mobile/android/app/build.gradle.kts via :app:testDebugUnitTest and :app:androidCoverageVerify
-- [ ] T033 [P] Run US1 Maestro flow in mobile/android/maestro/us1-signin.yaml
-- [ ] T034 Verify US1 scope isolation (no API code/tests touched for US1) in specs/012-auth-improvement/spec.md
-- [ ] T035 Verify US2 scope isolation (no Android code/tests touched for US2) in specs/012-auth-improvement/spec.md
-- [ ] T036 Update implementation notes and execution evidence in specs/012-auth-improvement/quickstart.md
-- [ ] T040 Add regression validation checklist for unaffected customer-journey routes in specs/012-auth-improvement/quickstart.md
+- [X] T031 [P] Run backend test suite and coverage in package.json via npm run test:coverage
+- [X] T032 [P] Run Android unit coverage verification in mobile/android/app/build.gradle.kts via :app:testDebugUnitTest and :app:androidCoverageVerify
+- [X] T033 [P] Run US1 Maestro flow in mobile/android/maestro/us1-signin.yaml
+- [X] T034 Verify US1 scope isolation (no API code/tests touched for US1) in specs/012-auth-improvement/spec.md
+- [X] T035 Verify US2 scope isolation (no Android code/tests touched for US2) in specs/012-auth-improvement/spec.md
+- [X] T036 Update implementation notes and execution evidence in specs/012-auth-improvement/quickstart.md
+- [X] T040 Add regression validation checklist for unaffected customer-journey routes in specs/012-auth-improvement/quickstart.md
 
 ---
 
@@ -109,10 +109,10 @@
 
 **Purpose**: Satisfy constitution requirement for explicit checks in the task list.
 
-- [ ] T041 Verify ports/adapters boundary integrity for changed auth flows in specs/012-auth-improvement/plan.md
-- [ ] T042 Verify additive test evolution (new tests added, existing tests unchanged unless justified) via git diff review in specs/012-auth-improvement/spec.md
-- [ ] T043 Verify Android standards compliance (localized visible text, API error visibility, Maestro coverage, >=95% unit coverage) in specs/012-auth-improvement/spec.md
-- [ ] T044 Verify worktree isolation and MCP-free execution evidence in specs/012-auth-improvement/quickstart.md
+- [X] T041 Verify ports/adapters boundary integrity for changed auth flows in specs/012-auth-improvement/plan.md
+- [X] T042 Verify additive test evolution (new tests added, existing tests unchanged unless justified) via git diff review in specs/012-auth-improvement/spec.md
+- [X] T043 Verify Android standards compliance (localized visible text, API error visibility, Maestro coverage, >=95% unit coverage) in specs/012-auth-improvement/spec.md
+- [X] T044 Verify worktree isolation and MCP-free execution evidence in specs/012-auth-improvement/quickstart.md
 
 ---
 

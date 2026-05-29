@@ -10,6 +10,11 @@
 
 Deliver two coordinated but scope-isolated auth improvements: (1) app-only encrypted session persistence across shutdown with restore-to-Camera behavior, and (2) API-only one-week access-token TTL policy for newly issued tokens while preserving prior-token expiry semantics and unchanged refresh-token behavior. Preserve architecture boundaries, existing journey semantics, and all Android quality gates.
 
+## Feature Artifacts
+
+- Contracts: `specs/012-auth-improvement/contracts/auth-api-policy.md`, `specs/012-auth-improvement/contracts/mobile-session-persistence.md`
+- Validation runbook: `specs/012-auth-improvement/quickstart.md`
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.8.x on Node.js latest active LTS baseline (repository engines currently `>=24.0.0`)
@@ -116,3 +121,8 @@ mobile/android/
 ## Complexity Tracking
 
 No constitution violations or complexity exceptions require justification.
+
+## Implementation Verification
+
+- **T041 Boundary integrity**: Auth/session behavior remained inside existing ports/adapters seams (`SessionStore`, auth use cases, HTTP controllers). No framework leakage into domain entities.
+- **Scope split preserved**: Android persistence updates are limited to `mobile/android`; token TTL policy updates are limited to backend config/tests/docs.

@@ -165,6 +165,7 @@ class AppFlowsTest {
         private var session: Session? = null
         override fun save(session: Session) { this.session = session }
         override fun load(): Session? = session
+        override fun loadError(): String? = null
         override fun clear() { session = null }
     }
 

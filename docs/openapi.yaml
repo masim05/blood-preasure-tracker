@@ -21,7 +21,7 @@ paths:
       tags:
         - Auth
       summary: Create an account
-      description: Creates a new user account with email and password and returns an expiring bearer access token.
+      description: Creates a new user account with email and password and returns a bearer access token that expires seven days after issuance.
       operationId: signIn
       requestBody:
         required: true
@@ -70,7 +70,7 @@ paths:
       tags:
         - Auth
       summary: Log in
-      description: Authenticates an existing user and returns an expiring bearer access token.
+      description: Authenticates an existing user and returns a bearer access token that expires seven days after issuance.
       operationId: logIn
       requestBody:
         required: true
@@ -309,7 +309,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: opaque
-      description: Expiring opaque bearer access token returned by signin or login.
+      description: Opaque bearer access token returned by signin or login, expiring seven days after issuance.
   parameters:
     MeasurementId:
       name: id

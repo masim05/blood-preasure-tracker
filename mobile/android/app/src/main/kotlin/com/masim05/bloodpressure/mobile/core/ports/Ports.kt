@@ -15,6 +15,7 @@ interface AuthGateway {
 interface SessionStore {
     fun save(session: Session)
     fun load(): Session?
+    fun loadError(): String?
     fun clear()
 }
 

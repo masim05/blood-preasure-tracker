@@ -61,4 +61,26 @@ describe('LoginUserUseCase', () => {
 
     expect(verify).toHaveBeenCalledWith('password123', expect.stringMatching(/^pbkdf2:sha256:600000:/));
   });
+
+  it('issues login tokens with seven-day lifetime when configured', async () => {
+    const users = new InMemoryUserStore();
+    const tokens = new InMemoryBearerTokenStore();
+    const hasher = new SimplePasswordHasher();
+    await new CreateAccountUseCase(users, hasher, tokens, new StaticTokenGenerator('signup-token')).execute({
+      email: 'week@example.com',
+      password: 'password123',
+      now,
+      tokenTtlSeconds: 3600,
+    });
+
+    const output = await new LoginUserUseCase(users, hasher, tokens, new StaticTokenGenerator('login-week-token')).execute({
+      email: 'week@example.com',
+      password: 'password123',
+      now,
+      tokenTtlSeconds: 604800,
+    });
+
+    expect(output.accessToken).toBe('login-week-token');
+    expect(output.expiresAt).toBe('2026-06-03T12:00:00.000Z');
+  });
 });

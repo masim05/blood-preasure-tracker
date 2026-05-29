@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.masim05.bloodpressure.mobile.adapters.api.HttpApiClient
 import com.masim05.bloodpressure.mobile.adapters.camera.GeneratedCameraGateway
-import com.masim05.bloodpressure.mobile.adapters.session.InMemorySessionStore
+import com.masim05.bloodpressure.mobile.adapters.session.EncryptedSessionStore
 import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
 import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
 import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
@@ -30,7 +30,7 @@ import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
-    private val sessionStore = InMemorySessionStore()
+    private val sessionStore by lazy { EncryptedSessionStore.create(this) }
     private val apiClient by lazy {
         HttpApiClient(
             baseUrl = BuildConfig.API_BASE_URL,
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
         )
     }
     private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }
-    private val guideFlow = GuideFlow(sessionStore)
+    private val guideFlow by lazy { GuideFlow(sessionStore) }
     private val captureFlow by lazy { CaptureFlow(sessionStore, GeneratedCameraGateway(), apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
     private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        uiState = restoredStartupState()
         setContent {
             AppTheme {
                 when (uiState.route) {
@@ -85,6 +86,29 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private fun restoredStartupState(): MobileUiState {
+        val restoredSession = sessionStore.load()
+        if (restoredSession != null && restoredSession.isActive()) {
+            return MobileUiState(route = Route.Camera)
+        }
+
+        if (restoredSession != null && !restoredSession.isActive()) {
+            sessionStore.clear()
+            return MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+        }
+
+        val restoreError = sessionStore.loadError()
+        return if (restoreError != null) {
+            MobileUiState(
+                route = Route.Auth,
+                authMode = AuthMode.Login,
+                errorText = getString(R.string.error_restore_session),
+            )
+        } else {
+            MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
         }
     }
 

@@ -120,3 +120,10 @@ As a signed-in user, tokens issued by the API remain valid for seven days so ses
 - No schema migration or user-facing settings changes are required for this feature.
 - Token lifetime policy applies to newly issued tokens after rollout; previously issued tokens preserve prior expiry semantics.
 - Refresh-token behavior remains unchanged by this feature.
+
+## Implementation Verification
+
+- **T034 US1 scope isolation**: App-persistence story touched Android code/tests and mobile docs only; API behavior changes were not introduced by US1-specific edits.
+- **T035 US2 scope isolation**: One-week token policy touched backend config/use-case tests/API docs only; Android app behavior changes were not introduced by US2-specific edits.
+- **T042 Additive test evolution**: New/extended tests were added for session persistence and seven-day token semantics; existing baseline tests were retained.
+- **T043 Android standards compliance**: Localized restore messaging is present (`values` + `values-es`), API auth errors remain user-visible, Maestro US1 happy path passes, and Android unit coverage verification remains >=95%.

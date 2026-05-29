@@ -12,6 +12,8 @@ class InMemorySessionStore : SessionStore {
 
     override fun load(): Session? = current
 
+    override fun loadError(): String? = null
+
     override fun clear() {
         current = null
     }
