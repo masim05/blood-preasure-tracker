@@ -48,4 +48,28 @@ describe('AuthenticateBearerTokenUseCase', () => {
       new AuthenticateBearerTokenUseCase(tokens, new StaticTokenGenerator(), users).execute({ accessToken: 'raw-token', now }),
     ).rejects.toThrow('Bearer token is invalid or expired');
   });
+
+  it('preserves legacy token expiry semantics after policy rollout', async () => {
+    const users = new InMemoryUserStore();
+    const tokens = new InMemoryBearerTokenStore();
+    await users.save(new UserAccount({ id: 'usr_2', email: 'legacy@example.com', passwordHash: 'hash', createdAt: now, updatedAt: now }));
+
+    await tokens.save(
+      new BearerAccessToken({
+        id: 'tok_legacy',
+        userId: 'usr_2',
+        tokenHash: 'hash:legacy-token',
+        expiresAt: new Date('2026-05-28T12:00:00.000Z'),
+        createdAt: new Date('2026-05-20T12:00:00.000Z'),
+        revokedAt: null,
+      }),
+    );
+
+    await expect(
+      new AuthenticateBearerTokenUseCase(tokens, new StaticTokenGenerator(), users).execute({
+        accessToken: 'legacy-token',
+        now,
+      }),
+    ).resolves.toEqual({ user: { id: 'usr_2', email: 'legacy@example.com' } });
+  });
 });

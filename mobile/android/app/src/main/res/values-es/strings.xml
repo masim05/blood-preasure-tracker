@@ -68,6 +68,7 @@
     <string name="error_timeout">La API tardo demasiado en responder. Intenta de nuevo.</string>
     <string name="error_parse">No se pudo leer la respuesta de la API. Intenta de nuevo.</string>
     <string name="error_unexpected">Algo salio mal. Intenta de nuevo.</string>
+    <string name="error_restore_session">Los datos guardados de sesion no son validos. Inicia sesion de nuevo.</string>
     <string name="status_loading">Cargando</string>
     <string name="status_signed_in">Sesion creada.</string>
     <string name="status_logged_in">Sesion iniciada.</string>

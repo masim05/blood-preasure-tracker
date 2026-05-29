@@ -65,6 +65,8 @@ val androidCoverageExcludes = listOf(
     "**/MainActivity*",
     "**/MobileUiState*",
     "**/ui/**",
+    "**/adapters/session/AndroidKeystoreEncryptor*",
+    "**/adapters/session/SharedPreferencesStore*",
     "**/BuildConfig.*",
     "**/R.class",
     "**/R$*.class",

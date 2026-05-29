@@ -29,11 +29,20 @@ const apiConfig = {
     databaseUrl: 'postgres://example',
     apiPort: 3000,
     measurementImageDirectory: './tmp/images',
-    accessTokenTtlSeconds: 3600,
+    accessTokenTtlSeconds: 604800,
   }),
 } as ApiConfigService;
 
 describe('mobile API contract controllers', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(now);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('supports POST /api/v1/signin and duplicate conflict', async () => {
     const users = new InMemoryUserStore();
     const controller = new AuthController(
@@ -63,6 +72,7 @@ describe('mobile API contract controllers', () => {
 
     await expect(controller.login({ email: 'demo@example.com', password: 'password123' })).resolves.toMatchObject({
       accessToken: 'login-token',
+      expiresAt: '2026-06-03T12:00:00.000Z',
     });
     await expectStatus(controller.login({ email: 'demo@example.com', password: 'wrong-password' }), 401);
   });

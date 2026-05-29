@@ -48,4 +48,19 @@ describe('CreateAccountUseCase', () => {
       useCase.execute({ email: 'new@example.com', password: 'short', now, tokenTtlSeconds: 1 }),
     ).rejects.toThrow('Password must be at least 8 characters');
   });
+
+  it('issues tokens with a seven-day default lifetime policy', async () => {
+    const users = new InMemoryUserStore();
+    const tokens = new InMemoryBearerTokenStore();
+    const useCase = new CreateAccountUseCase(users, new SimplePasswordHasher(), tokens, new StaticTokenGenerator());
+
+    const output = await useCase.execute({
+      email: 'week@example.com',
+      password: 'password123',
+      now,
+      tokenTtlSeconds: 604800,
+    });
+
+    expect(output.expiresAt).toBe('2026-06-03T12:00:00.000Z');
+  });
 });

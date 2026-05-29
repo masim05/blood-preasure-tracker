@@ -68,6 +68,7 @@
     <string name="error_timeout">The API took too long to respond. Try again.</string>
     <string name="error_parse">The API response could not be read. Try again.</string>
     <string name="error_unexpected">Something went wrong. Try again.</string>
+    <string name="error_restore_session">Saved session data is invalid. Please sign in again.</string>
     <string name="status_loading">Loading</string>
     <string name="status_signed_in">Signed in.</string>
     <string name="status_logged_in">Logged in.</string>

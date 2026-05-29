@@ -19,7 +19,7 @@ export class ApiConfigService {
       measurementImageDirectory: runtimeEnv.MEASUREMENT_IMAGE_DIR ?? './tmp/measurement-images',
       accessTokenTtlSeconds: readPositiveInteger(
         runtimeEnv.ACCESS_TOKEN_TTL_SECONDS,
-        3600,
+        604800,
         'ACCESS_TOKEN_TTL_SECONDS',
       ),
     };

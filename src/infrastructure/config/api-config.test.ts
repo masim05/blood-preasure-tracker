@@ -6,7 +6,7 @@ describe('ApiConfigService', () => {
       databaseUrl: 'postgres://example',
       apiPort: 3000,
       measurementImageDirectory: './tmp/measurement-images',
-      accessTokenTtlSeconds: 3600,
+      accessTokenTtlSeconds: 604800,
     });
   });
 

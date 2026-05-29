@@ -1,5 +1,7 @@
 package com.masim05.bloodpressure.mobile.core.model
 
+import java.time.Instant
+
 enum class AuthMode {
     Login,
     NewAccount,
@@ -23,8 +25,20 @@ data class Session(
     val tokenType: String,
     val expiresAt: String,
     val user: MobileUser,
+    val persistedAtEpochMillis: Long? = null,
 ) {
     val authorizationHeader: String = "$tokenType $accessToken"
+
+    fun expiresAtEpochMillisOrNull(): Long? = try {
+        Instant.parse(expiresAt).toEpochMilli()
+    } catch (_: RuntimeException) {
+        null
+    }
+
+    fun isActive(nowEpochMillis: Long = System.currentTimeMillis()): Boolean {
+        val expiresAtEpochMillis = expiresAtEpochMillisOrNull() ?: return false
+        return expiresAtEpochMillis > nowEpochMillis
+    }
 }
 
 data class MeasurementImage(
