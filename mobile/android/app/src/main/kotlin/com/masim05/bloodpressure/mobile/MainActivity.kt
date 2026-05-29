@@ -1,6 +1,7 @@
 package com.masim05.bloodpressure.mobile
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -94,6 +95,7 @@ class MainActivity : ComponentActivity() {
                 AuthMode.Login -> authFlow.logIn(email, password)
                 AuthMode.NewAccount -> authFlow.signIn(email, password)
             }
+            state.logErrors("auth_submit")
             runOnUiThread {
                 uiState = uiState.copy(
                     route = state.route,
@@ -107,11 +109,13 @@ class MainActivity : ComponentActivity() {
 
     private fun continueFromGuide() {
         val state = guideFlow.continueToCamera()
+        state.logErrors("guide_continue")
         uiState = uiState.copy(route = state.route, errorText = state.visibleMessage())
     }
 
     private fun openCamera() {
         val state = captureFlow.enterCamera()
+        state.logErrors("camera_enter")
         uiState = uiState.copy(route = state.route, isUploading = false, errorText = state.visibleMessage())
     }
 
@@ -119,6 +123,7 @@ class MainActivity : ComponentActivity() {
         uiState = uiState.copy(isUploading = true, errorText = null)
         runInBackground {
             val state = captureFlow.captureAndUpload()
+            state.logErrors("camera_upload")
             runOnUiThread {
                 if (state.route == Route.History) {
                     openHistory(HistoryFilter())
@@ -144,6 +149,7 @@ class MainActivity : ComponentActivity() {
         )
         runInBackground {
             val state = historyFlow.load(filter)
+            state.logErrors("history_load")
             runOnUiThread {
                 uiState = uiState.copy(
                     route = state.route,
@@ -167,6 +173,7 @@ class MainActivity : ComponentActivity() {
         )
         runInBackground {
             val state = measurementDetailFlow.load(measurementId)
+            state.logErrors("detail_load")
             runOnUiThread {
                 if (state.route == Route.Auth) {
                     uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
@@ -186,6 +193,7 @@ class MainActivity : ComponentActivity() {
         uiState = uiState.copy(isDetailSaving = true, errorText = null)
         runInBackground {
             val state = measurementDetailFlow.save(detail)
+            state.logErrors("detail_save")
             runOnUiThread {
                 if (state.route == Route.Auth) {
                     uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
@@ -211,8 +219,33 @@ class MainActivity : ComponentActivity() {
         ValidationError.DateOrder -> R.string.error_date_order
     }
 
+    private fun ScreenState.logErrors(operation: String) {
+        error?.let {
+            Log.e(
+                LOG_TAG,
+                "operation=$operation route=$route source=${it.source} code=${it.code ?: "none"} message=${it.message}",
+            )
+        }
+        validationError?.let {
+            Log.e(
+                LOG_TAG,
+                "operation=$operation route=$route validation=$it messageRes=${it.messageRes()}",
+            )
+        }
+    }
+
     private fun runInBackground(work: () -> Unit) {
-        Thread(work).start()
+        Thread {
+            try {
+                work()
+            } catch (error: Throwable) {
+                Log.e(LOG_TAG, "operation=background_uncaught", error)
+            }
+        }.start()
+    }
+
+    companion object {
+        private const val LOG_TAG = "BPMobile"
     }
 }
 
