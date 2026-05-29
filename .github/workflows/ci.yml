@@ -218,7 +218,7 @@ jobs:
             flow="$1"
             for attempt in 1 2; do
               echo "Running $flow (attempt $attempt)"
-              if timeout 420 maestro test --no-ansi "$flow"; then
+              if timeout -k 30 420 maestro test --no-ansi "$flow"; then
                 return 0
               fi
               if [ "$attempt" -eq 2 ]; then
@@ -258,6 +258,7 @@ jobs:
 
       - name: Maestro happy paths
         uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 25
         env:
           MAESTRO_CLI_NO_ANALYTICS: '1'
           MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
