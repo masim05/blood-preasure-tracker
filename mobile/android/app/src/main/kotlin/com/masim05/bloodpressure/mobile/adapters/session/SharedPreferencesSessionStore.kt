@@ -32,6 +32,8 @@ class SharedPreferencesSessionStore(context: Context) : SessionStore {
         )
     }
 
+    override fun loadError(): String? = null
+
     override fun clear() {
         prefs.edit().clear().apply()
     }
