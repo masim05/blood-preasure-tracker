@@ -161,3 +161,7 @@ vite.config.ts.timestamp-*
 # Android local artifacts
 **/.gradle/
 **/local.properties
+
+# Local planning and agent-instruction artifacts
+.specify/feature.json
+.github/copilot-instructions.md
