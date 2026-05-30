@@ -1,0 +1,32 @@
+appId: com.masim05.bloodpressure.mobile
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: auth_mode_new_account
+- tapOn:
+    id: signin_email
+- inputRandomEmail
+- hideKeyboard
+- tapOn:
+    id: signin_password
+- inputText: password123
+- hideKeyboard
+- tapOn:
+    id: signin_submit
+- assertVisible:
+    id: guide_continue
+- tapOn:
+    id: guide_continue
+- tapOn:
+    text: (Deny|Don't allow|Not now)
+    optional: true
+- assertVisible:
+    id: camera_open_settings
+    optional: true
+- assertVisible:
+    id: camera_history
+- tapOn:
+    id: camera_history
+- assertVisible:
+    id: history_screen

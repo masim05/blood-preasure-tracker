@@ -12,6 +12,7 @@
     "api": "npm run build --silent && node dist/api-main.js",
     "cli": "npm run build --silent && node dist/main.js",
     "db:clean": "node scripts/db-clean.mjs",
+    "db:connect": "node scripts/db-connect.mjs",
     "db:init": "node scripts/db-init.mjs",
     "openapi:generate": "node scripts/generate-openapi-with-copilot.mjs",
     "openapi:serve": "node scripts/serve-openapi-docs.mjs",

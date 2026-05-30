@@ -91,6 +91,17 @@ class CaptureFlow(
 
     fun captureAndUpload(): ScreenState {
         val session = sessionStore.load() ?: return ScreenState(Route.Auth)
+        if (!cameraGateway.isReady()) {
+            return ScreenState(
+                route = Route.Camera,
+                session = session,
+                error = ApiError(
+                    code = "camera_not_ready",
+                    message = "camera_not_ready",
+                    source = com.masim05.bloodpressure.mobile.core.model.ApiErrorSource.Unexpected,
+                ),
+            )
+        }
         return when (val camera = cameraGateway.openCamera()) {
             is AppResult.Failure -> ScreenState(Route.Camera, session = session, error = camera.error)
             is AppResult.Success -> upload(session, camera.value)

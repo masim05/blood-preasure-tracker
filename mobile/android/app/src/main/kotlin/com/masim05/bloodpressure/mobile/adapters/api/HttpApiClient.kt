@@ -14,11 +14,11 @@ import com.masim05.bloodpressure.mobile.core.ports.HistoryGateway
 import com.masim05.bloodpressure.mobile.core.ports.MeasurementDetailGateway
 import com.masim05.bloodpressure.mobile.core.ports.MeasurementUploadGateway
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.Base64
 
 class HttpApiClient(
     private val baseUrl: String,
@@ -33,12 +33,13 @@ class HttpApiClient(
 
     override fun upload(session: Session, image: MeasurementImage): AppResult<String> = runCatching {
         val boundary = "----BloodPressureTrackerBoundary"
-        val pngBytes = Base64.getDecoder().decode(ONE_PIXEL_PNG_BASE64)
+        val imageBytes = readImageBytes(image)
+        val filename = resolveFilename(image.uri)
         val body = ByteArrayOutputStream().apply {
             write("--$boundary\r\n".toByteArray())
-            write("Content-Disposition: form-data; name=\"image\"; filename=\"measurement.png\"\r\n".toByteArray())
+            write("Content-Disposition: form-data; name=\"image\"; filename=\"$filename\"\r\n".toByteArray())
             write("Content-Type: ${image.mimeType}\r\n\r\n".toByteArray())
-            write(pngBytes)
+            write(imageBytes)
             write("\r\n--$boundary--\r\n".toByteArray())
         }.toByteArray()
         val response = request(
@@ -189,9 +190,28 @@ class HttpApiClient(
     private fun url(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name())
     private fun urlPath(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name()).replace("+", "%20")
 
-    private data class HttpResponse(val status: Int, val body: String)
-
-    companion object {
-        private const val ONE_PIXEL_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII="
+    private fun readImageBytes(image: MeasurementImage): ByteArray {
+        val imageUri = URI.create(image.uri)
+        if (imageUri.scheme == null || imageUri.scheme == "file") {
+            val file = if (imageUri.scheme == null) {
+                File(image.uri)
+            } else {
+                File(imageUri)
+            }
+            require(file.exists() && file.isFile) { "Image file is unavailable" }
+            return file.readBytes()
+        }
+        throw IllegalArgumentException("Unsupported image URI scheme: ${imageUri.scheme}")
     }
+
+    private fun resolveFilename(uri: String): String {
+        val parsed = URI.create(uri)
+        val fromPath = parsed.path?.substringAfterLast('/')?.takeIf { it.isNotBlank() }
+        if (fromPath != null) {
+            return fromPath
+        }
+        return "measurement"
+    }
+
+    private data class HttpResponse(val status: Int, val body: String)
 }

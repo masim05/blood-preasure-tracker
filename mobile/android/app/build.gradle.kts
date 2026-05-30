@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,7 +7,15 @@ plugins {
     jacoco
 }
 
-val apiBaseUrl = providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000")
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use { input -> load(input) }
+    }
+}
+val apiBaseUrl = localProperties.getProperty("apiBaseUrl")
+    ?.takeIf { value -> value.isNotBlank() }
+    ?: providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000").get()
 
 android {
     namespace = "com.masim05.bloodpressure.mobile"
@@ -17,7 +27,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
-        buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.get()}\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildFeatures {
@@ -49,6 +59,10 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.material3)
@@ -64,6 +78,8 @@ jacoco {
 val androidCoverageExcludes = listOf(
     "**/MainActivity*",
     "**/MobileUiState*",
+    "**/core/model/CameraUiState*",
+    "**/core/model/CameraUiStatus*",
     "**/ui/**",
     "**/adapters/session/AndroidKeystoreEncryptor*",
     "**/adapters/session/SharedPreferencesStore*",

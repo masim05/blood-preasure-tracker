@@ -75,6 +75,23 @@ class AppFlowsTest {
     }
 
     @Test
+    fun authTokenPersistsAcrossFlowRecreationWithSameSessionStore() {
+        val store = MemoryStore()
+        val auth = AuthFlow(AuthSuccess(), store)
+        val loginState = auth.logIn("persist@example.com", "password123")
+
+        assertEquals(Route.Camera, loginState.route)
+        assertNotNull(store.load())
+
+        val recreatedGuideFlow = GuideFlow(store)
+        val recreatedCaptureFlow = CaptureFlow(store, CameraFailure(), UploadSuccess())
+
+        assertEquals(Route.Guide, recreatedGuideFlow.enterGuide().route)
+        assertEquals(Route.Camera, recreatedCaptureFlow.enterCamera().route)
+        assertNotNull(recreatedCaptureFlow.enterCamera().session)
+    }
+
+    @Test
     fun captureValidatesImageAndShowsUploadErrors() {
         val store = MemoryStore().apply { save(session("user@example.com")) }
 
@@ -82,11 +99,21 @@ class AppFlowsTest {
         assertEquals(ValidationError.InvalidImage, invalid.validationError)
 
         val uploadFailure = CaptureFlow(store, CameraSuccess(MeasurementImage("uri", "image/png", 1)), UploadFailure()).captureAndUpload()
+        assertEquals(Route.Camera, uploadFailure.route)
         assertEquals("api message", uploadFailure.error?.message)
 
         val success = CaptureFlow(store, CameraSuccess(MeasurementImage("uri", "image/png", 1)), UploadSuccess()).captureAndUpload()
         assertEquals(Route.History, success.route)
         assertEquals("msr_1", success.lastUploadId)
+    }
+
+    @Test
+    fun captureRequiresCameraReadyBeforeUpload() {
+        val store = MemoryStore().apply { save(session("user@example.com")) }
+        val state = CaptureFlow(store, CameraNotReady(), UploadSuccess()).captureAndUpload()
+
+        assertEquals(Route.Camera, state.route)
+        assertEquals("camera_not_ready", state.error?.code)
     }
 
     @Test
@@ -180,10 +207,17 @@ class AppFlowsTest {
     }
 
     private class CameraSuccess(private val image: MeasurementImage) : CameraGateway {
+        override fun isReady(): Boolean = true
         override fun openCamera(): AppResult<MeasurementImage> = AppResult.Success(image)
     }
 
     private class CameraFailure : CameraGateway {
+        override fun isReady(): Boolean = true
+        override fun openCamera(): AppResult<MeasurementImage> = AppResult.Failure(apiError())
+    }
+
+    private class CameraNotReady : CameraGateway {
+        override fun isReady(): Boolean = false
         override fun openCamera(): AppResult<MeasurementImage> = AppResult.Failure(apiError())
     }
 

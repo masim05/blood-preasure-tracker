@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.masim05.bloodpressure.mobile.adapters.api.HttpApiClient
-import com.masim05.bloodpressure.mobile.adapters.camera.GeneratedCameraGateway
 import com.masim05.bloodpressure.mobile.adapters.session.EncryptedSessionStore
+import com.masim05.bloodpressure.mobile.adapters.camera.CameraXCameraGateway
 import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
 import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
 import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
@@ -21,6 +21,8 @@ import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
+import com.masim05.bloodpressure.mobile.core.model.Session
+import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
@@ -28,9 +30,11 @@ import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
+import java.time.Instant
 
 class MainActivity : ComponentActivity() {
     private val sessionStore by lazy { EncryptedSessionStore.create(this) }
+    private val cameraGateway = CameraXCameraGateway()
     private val apiClient by lazy {
         HttpApiClient(
             baseUrl = BuildConfig.API_BASE_URL,
@@ -42,7 +46,7 @@ class MainActivity : ComponentActivity() {
     }
     private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }
     private val guideFlow by lazy { GuideFlow(sessionStore) }
-    private val captureFlow by lazy { CaptureFlow(sessionStore, GeneratedCameraGateway(), apiClient) }
+    private val captureFlow by lazy { CaptureFlow(sessionStore, cameraGateway, apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
     private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
     private var uiState by mutableStateOf(MobileUiState())
@@ -65,6 +69,14 @@ class MainActivity : ComponentActivity() {
                         isUploading = uiState.isUploading,
                         errorText = uiState.errorText,
                         onUpload = ::captureAndUpload,
+                        onCaptureReady = { image ->
+                            cameraGateway.publishCapture(image)
+                            captureAndUpload()
+                        },
+                        onCaptureFailure = { message ->
+                            cameraGateway.publishFailure(message)
+                            uiState = uiState.copy(errorText = message)
+                        },
                         onHistory = { openHistory(HistoryFilter()) },
                     )
                     Route.History -> HistoryScreen(
@@ -237,7 +249,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun ScreenState.visibleMessage(): String? = validationError?.let { getString(it.messageRes()) } ?: error?.message
+    private fun ScreenState.visibleMessage(): String? {
+        validationError?.let { return getString(it.messageRes()) }
+        val currentError = error ?: return null
+        return when (currentError.code) {
+            "camera_not_ready" -> getString(R.string.camera_capture_failed)
+            else -> currentError.message
+        }
+    }
 
     private fun ValidationError.messageRes(): Int = when (this) {
         ValidationError.InvalidEmail -> R.string.error_invalid_email
@@ -275,6 +294,23 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val LOG_TAG = "BPMobile"
     }
+}
+
+internal fun restoredSession(sessionStore: SessionStore, now: Instant = Instant.now()): Session? {
+    val session = sessionStore.load() ?: return null
+    if (!session.isValidAt(now)) {
+        sessionStore.clear()
+        return null
+    }
+    return session
+}
+
+internal fun initialRoute(session: Session?): Route {
+    return if (session == null) Route.Auth else Route.Camera
+}
+
+private fun Session.isValidAt(now: Instant): Boolean {
+    return runCatching { Instant.parse(expiresAt).isAfter(now) }.getOrDefault(false)
 }
 
 private data class MobileUiState(

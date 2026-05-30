@@ -9,6 +9,7 @@ import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
 import com.masim05.bloodpressure.mobile.core.model.Session
 import java.net.ServerSocket
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.After
@@ -140,21 +141,24 @@ class HttpApiClientTest {
     @Test
     fun `upload sends multipart image with authorization`() {
         server.enqueue(201, "{\"id\":\"msr_1\",\"status\":\"pending\",\"measurementTime\":\"2026-05-27T12:00:00.000Z\"}")
+        val imageFile = tempImageFile("measurement.png", "png-bytes")
 
-        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val result = client.upload(session(), MeasurementImage(imageFile.toURI().toString(), "image/png", imageFile.length()))
         val id = (result as AppResult.Success).value
 
         assertEquals("msr_1", id)
         assertEquals("Bearer token-1", server.request.authorization)
         assertTrue(server.request.contentType.startsWith("multipart/form-data"))
-        assertTrue(server.request.body.contains("filename=\"measurement.png\""))
+        assertTrue(server.request.body.contains("filename=\"${imageFile.name}\""))
+        assertTrue(server.request.body.contains("png-bytes"))
     }
 
     @Test
     fun `upload surfaces API validation failure`() {
         server.enqueue(400, "{\"error\":\"validation_error\",\"message\":\"Image is required\"}")
+        val imageFile = tempImageFile("measurement.png", "png-bytes")
 
-        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val result = client.upload(session(), MeasurementImage(imageFile.toURI().toString(), "image/png", imageFile.length()))
         val failure = result as AppResult.Failure
 
         assertEquals("validation_error", failure.error.code)
@@ -164,12 +168,34 @@ class HttpApiClientTest {
     @Test
     fun `upload falls back when API error body has no message`() {
         server.enqueue(500, "{\"error\":\"server_error\"}")
+        val imageFile = tempImageFile("measurement.png", "png-bytes")
 
-        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val result = client.upload(session(), MeasurementImage(imageFile.toURI().toString(), "image/png", imageFile.length()))
         val failure = result as AppResult.Failure
 
         assertEquals("server_error", failure.error.code)
         assertEquals("Unexpected API error", failure.error.message)
+    }
+
+    @Test
+    fun `upload supports absolute file path URIs`() {
+        server.enqueue(201, "{\"id\":\"msr_1\"}")
+        val imageFile = tempImageFile("measurement.png", "path-bytes")
+
+        val result = client.upload(session(), MeasurementImage(imageFile.absolutePath, "image/png", imageFile.length()))
+        val id = (result as AppResult.Success).value
+
+        assertEquals("msr_1", id)
+        assertTrue(server.request.body.contains("filename=\"${imageFile.name}\""))
+        assertTrue(server.request.body.contains("path-bytes"))
+    }
+
+    @Test
+    fun `upload maps unsupported URI scheme to parse error`() {
+        val result = client.upload(session(), MeasurementImage("generated://measurement.png", "image/png", 68))
+        val failure = result as AppResult.Failure
+
+        assertEquals("Parse error", failure.error.message)
     }
 
     @Test
@@ -321,6 +347,13 @@ class HttpApiClientTest {
         imageUrl = "/api/v1/measurements/msr_1/image",
         recognitionError = null,
     )
+
+    private fun tempImageFile(name: String, content: String): java.io.File {
+        val file = kotlin.io.path.createTempFile(prefix = "http-api-client-", suffix = name).toFile()
+        file.writeText(content, StandardCharsets.UTF_8)
+        file.deleteOnExit()
+        return file
+    }
 
     private data class RecordedRequest(
         val path: String,
