@@ -12,8 +12,8 @@
 
 **Purpose**: Prepare the task scaffolding and feature-specific bootstrap test surface.
 
-- [ ] T001 Create Android bootstrap test directory and file scaffold in tests/bootstrap/android-ci-bootstrap.test.ts
-- [ ] T002 Confirm Android CI seed migration scope and ordering expectations from specs/013-ci-seed-hooks/contracts/ci-workflow-order.md
+- [X] T001 Create Android bootstrap test directory and file scaffold in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T002 Confirm Android CI seed migration scope and ordering expectations from specs/013-ci-seed-hooks/contracts/ci-workflow-order.md
 
 ---
 
@@ -23,10 +23,10 @@
 
 **CRITICAL**: No user story work starts until these tasks are complete.
 
-- [ ] T003 Create deterministic Maestro fixture constants and IDs in src/test-support/android-maestro-fixtures.ts
-- [ ] T004 Implement shared seed executor with PostgreSQL client lifecycle in src/test-support/android-maestro-fixtures.ts
-- [ ] T005 Implement password hash helper and fixture timestamp strategy in src/test-support/android-maestro-fixtures.ts
-- [ ] T006 Add bootstrap environment loading utility for `.env.test` in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T003 Create deterministic Maestro fixture constants and IDs in src/test-support/android-maestro-fixtures.ts
+- [X] T004 Implement shared seed executor with PostgreSQL client lifecycle in src/test-support/android-maestro-fixtures.ts
+- [X] T005 Implement password hash helper and fixture timestamp strategy in src/test-support/android-maestro-fixtures.ts
+- [X] T006 Add bootstrap environment loading utility for `.env.test` in tests/bootstrap/android-ci-bootstrap.test.ts
 
 **Checkpoint**: Shared bootstrap primitives are ready for story implementation.
 
@@ -40,14 +40,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T007 [P] [US1] Add bootstrap test that seeds required users and saved measurement in tests/bootstrap/android-ci-bootstrap.test.ts
-- [ ] T008 [P] [US1] Add contract assertion that inline Maestro seed heredoc signatures are absent in src/test-workflow.contract.test.ts
+- [X] T007 [P] [US1] Add bootstrap test that seeds required users and saved measurement in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T008 [P] [US1] Add contract assertion that inline Maestro seed heredoc signatures are absent in src/test-workflow.contract.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Replace inline `Seed Maestro accounts` payload with bootstrap Jest invocation in .github/workflows/ci.yml
-- [ ] T010 [US1] Ensure Android CI step order runs bootstrap after db:init and before Gradle/Maestro in .github/workflows/ci.yml
-- [ ] T011 [US1] Implement Jest `before` bootstrap invocation using shared seed executor in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T009 [US1] Replace inline `Seed Maestro accounts` payload with bootstrap Jest invocation in .github/workflows/ci.yml
+- [X] T010 [US1] Ensure Android CI step order runs bootstrap after db:init and before Gradle/Maestro in .github/workflows/ci.yml
+- [X] T011 [US1] Implement Jest `before` bootstrap invocation using shared seed executor in tests/bootstrap/android-ci-bootstrap.test.ts
 
 **Checkpoint**: Inline CI seeding is removed and replaced by Jest bootstrap.
 
@@ -61,14 +61,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Add idempotency test that runs seed executor twice in tests/bootstrap/android-ci-bootstrap.test.ts
-- [ ] T013 [P] [US2] Add fail-fast test for missing or invalid DATABASE_URL in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T012 [P] [US2] Add idempotency test that runs seed executor twice in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T013 [P] [US2] Add fail-fast test for missing or invalid DATABASE_URL in tests/bootstrap/android-ci-bootstrap.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Implement UPSERT semantics for user fixtures keyed by email in src/test-support/android-maestro-fixtures.ts
-- [ ] T015 [US2] Implement UPSERT semantics for saved measurement fixture keyed by id in src/test-support/android-maestro-fixtures.ts
-- [ ] T016 [US2] Add explicit error propagation and client cleanup guarantees in src/test-support/android-maestro-fixtures.ts
+- [X] T014 [US2] Implement UPSERT semantics for user fixtures keyed by email in src/test-support/android-maestro-fixtures.ts
+- [X] T015 [US2] Implement UPSERT semantics for saved measurement fixture keyed by id in src/test-support/android-maestro-fixtures.ts
+- [X] T016 [US2] Add explicit error propagation and client cleanup guarantees in src/test-support/android-maestro-fixtures.ts
 
 **Checkpoint**: Bootstrap is repeatable, safe, and isolated to test bootstrap code.
 
@@ -82,14 +82,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T017 [P] [US3] Add contract assertion that bootstrap step exists between db:init and Android Gradle step in src/test-workflow.contract.test.ts
-- [ ] T018 [P] [US3] Add contract assertion that non-Android jobs do not invoke Android bootstrap in src/test-workflow.contract.test.ts
-- [ ] T019 [P] [US3] Add contract assertion that inline Node/SQL seed payload markers are absent in src/test-workflow.contract.test.ts
+- [X] T017 [P] [US3] Add contract assertion that bootstrap step exists between db:init and Android Gradle step in src/test-workflow.contract.test.ts
+- [X] T018 [P] [US3] Add contract assertion that non-Android jobs do not invoke Android bootstrap in src/test-workflow.contract.test.ts
+- [X] T019 [P] [US3] Add contract assertion that inline Node/SQL seed payload markers are absent in src/test-workflow.contract.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Refactor workflow parsing helpers for ordered-step assertions in src/test-workflow.contract.test.ts
-- [ ] T021 [US3] Align bootstrap fixture expectations with contract fixture IDs/emails in tests/bootstrap/android-ci-bootstrap.test.ts
+- [X] T020 [US3] Refactor workflow parsing helpers for ordered-step assertions in src/test-workflow.contract.test.ts
+- [X] T021 [US3] Align bootstrap fixture expectations with contract fixture IDs/emails in tests/bootstrap/android-ci-bootstrap.test.ts
 
 **Checkpoint**: CI migration is guarded by contract tests and bootstrap checks.
 
@@ -99,12 +99,12 @@
 
 **Purpose**: Final validation and documentation of the completed migration.
 
-- [ ] T022 [P] Update bootstrap execution and idempotency commands in specs/013-ci-seed-hooks/quickstart.md
-- [ ] T023 [P] Update CI ordering contract notes to match final workflow step names in specs/013-ci-seed-hooks/contracts/ci-workflow-order.md
-- [ ] T024 Run bootstrap and contract test paths via npm run test:coverage and document verification notes in specs/013-ci-seed-hooks/quickstart.md
-- [ ] T025 Enforce scope guard by verifying changed files are limited to .github/workflows/ci.yml, src/test-support/, tests/bootstrap/, src/test-workflow.contract.test.ts, and specs/013-ci-seed-hooks/
-- [ ] T026 Verify FR-010 baseline remains unchanged by confirming Node.js 24.x and NestJS 11.x repository targets in package.json and plan constraints
-- [ ] T027 Verify FR-011 dependency policy by confirming no new third-party dependencies were added, or document explicit justification in specs/013-ci-seed-hooks/plan.md
+- [X] T022 [P] Update bootstrap execution and idempotency commands in specs/013-ci-seed-hooks/quickstart.md
+- [X] T023 [P] Update CI ordering contract notes to match final workflow step names in specs/013-ci-seed-hooks/contracts/ci-workflow-order.md
+- [X] T024 Run bootstrap and contract test paths via npm run test:coverage and document verification notes in specs/013-ci-seed-hooks/quickstart.md
+- [X] T025 Enforce scope guard by verifying changed files are limited to .github/workflows/ci.yml, src/test-support/, tests/bootstrap/, src/test-workflow.contract.test.ts, jest.config.ts, and specs/013-ci-seed-hooks/
+- [X] T026 Verify FR-010 baseline remains unchanged by confirming Node.js 24.x and NestJS 11.x repository targets in package.json and plan constraints
+- [X] T027 Verify FR-011 dependency policy by confirming no new third-party dependencies were added, or document explicit justification in specs/013-ci-seed-hooks/plan.md
 
 ---
 

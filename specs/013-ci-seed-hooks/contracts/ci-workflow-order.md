@@ -10,7 +10,7 @@ Capture the required Android CI job ordering after inline seed logic is removed 
 2. Set up Node.js 24 and install dependencies
 3. Set up JDK and Android SDK prerequisites
 4. Initialize Android test database with `npm run db:init -- --env .env.test`
-5. Invoke Android-only Jest bootstrap path
+5. Run `Bootstrap Android Maestro fixtures` (`npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts`)
 6. Run Android unit tests, coverage verification, and assemble debug APK
 7. Install Maestro and prepare the emulator runner script
 8. Start the API
