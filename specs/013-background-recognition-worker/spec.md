@@ -17,6 +17,13 @@
 - Q: How should queued tasks be selected per polling cycle? -> A: Option C (fixed-size FIFO batches), batch size configured from `.env` with default value 4.
 - Q: What polling interval should the worker use? -> A: Interval is configured from `.env`; default is Option B (10 seconds).
 - Q: When should the one allowed retry execute after a failed attempt? -> A: Option B (retry on the next polling cycle).
+- Q: What status wording should be used for terminal outcomes? -> A: Use successful for success outcomes and failed for failure outcomes.
+
+## Terminology
+
+- **Successful** means task processing finished with recognized values persisted.
+- **Failed** means task processing finished with an error and no successful recognition outcome.
+- In implementation/storage terms, successful may map to existing persisted status values (for example `completed`) to stay compatible with the current schema.
 
 ## User Scenarios & Testing *(mandatory)*
 
