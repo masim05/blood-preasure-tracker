@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { scripts?: Record<string, string> };
 const scripts = packageJson.scripts ?? {};
 const workflow = readFileSync('.github/workflows/ci.yml', 'utf8');
-const unitContractSelection = '--testPathIgnorePatterns=tests/integration';
+const unitContractSelection = '--testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap';
 const integrationSelection = '--testPathPatterns=tests/integration/.*\\.test\\.ts$';
 const requiredTestEnvKeys = [
   'OPENAI_API_KEY',
