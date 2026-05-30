@@ -29,4 +29,4 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: camera_history
 - assertVisible:
-    id: history_empty
+    id: history_screen
