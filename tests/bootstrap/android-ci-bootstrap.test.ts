@@ -2,6 +2,7 @@ import { Client } from 'pg';
 import { readFileSync } from 'node:fs';
 
 import {
+  MAESTRO_FIXTURE_MEASUREMENT_US4_ID,
   MAESTRO_FIXTURE_MEASUREMENT_ID,
   MAESTRO_FIXTURE_USER_US3_EMAIL,
   MAESTRO_FIXTURE_USER_US4_EMAIL,
@@ -62,11 +63,14 @@ describe('android ci bootstrap', () => {
     ]);
     expect(users.rows).toHaveLength(3);
 
-    const measurement = await client.query<{ id: string; status: string }>(
-      'SELECT id, status FROM measurements WHERE id = $1',
-      [MAESTRO_FIXTURE_MEASUREMENT_ID],
+    const measurements = await client.query<{ id: string; status: string }>(
+      'SELECT id, status FROM measurements WHERE id IN ($1, $2) ORDER BY id',
+      [MAESTRO_FIXTURE_MEASUREMENT_US4_ID, MAESTRO_FIXTURE_MEASUREMENT_ID],
     );
-    expect(measurement.rows).toEqual([{ id: MAESTRO_FIXTURE_MEASUREMENT_ID, status: 'saved' }]);
+    expect(measurements.rows).toEqual([
+      { id: MAESTRO_FIXTURE_MEASUREMENT_US4_ID, status: 'saved' },
+      { id: MAESTRO_FIXTURE_MEASUREMENT_ID, status: 'saved' },
+    ]);
 
     await client.end();
   });
