@@ -249,7 +249,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun ScreenState.visibleMessage(): String? = validationError?.let { getString(it.messageRes()) } ?: error?.message
+    private fun ScreenState.visibleMessage(): String? {
+        validationError?.let { return getString(it.messageRes()) }
+        val currentError = error ?: return null
+        return when (currentError.code) {
+            "camera_not_ready" -> getString(R.string.camera_capture_failed)
+            else -> currentError.message
+        }
+    }
 
     private fun ValidationError.messageRes(): Int = when (this) {
         ValidationError.InvalidEmail -> R.string.error_invalid_email

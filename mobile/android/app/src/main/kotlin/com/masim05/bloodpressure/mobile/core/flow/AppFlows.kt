@@ -97,7 +97,7 @@ class CaptureFlow(
                 session = session,
                 error = ApiError(
                     code = "camera_not_ready",
-                    message = "Camera is not ready for capture.",
+                    message = "camera_not_ready",
                     source = com.masim05.bloodpressure.mobile.core.model.ApiErrorSource.Unexpected,
                 ),
             )
