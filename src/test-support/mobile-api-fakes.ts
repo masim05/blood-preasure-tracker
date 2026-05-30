@@ -1,7 +1,7 @@
 import type { BearerAccessToken } from '../domain/entities/bearer-access-token';
 import type { Measurement } from '../domain/entities/measurement';
 import type { MeasurementImage } from '../domain/entities/measurement-image';
-import type { RecognitionTask } from '../domain/entities/recognition-task';
+import { RecognitionTask } from '../domain/entities/recognition-task';
 import type { UserAccount } from '../domain/entities/user-account';
 import type {
   BearerTokenGeneratorPort,
@@ -144,6 +144,48 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
 
   async findById(id: string): Promise<RecognitionTask | null> {
     return this.tasks.get(id) ?? null;
+  }
+
+  async claimQueued(now: Date, batchSize: number): Promise<RecognitionTask[]> {
+    const queued = [...this.tasks.values()]
+      .filter((task) => task.status === 'queued' && task.availableAt <= now)
+      .sort((left, right) => left.availableAt.getTime() - right.availableAt.getTime())
+      .slice(0, batchSize)
+      .map(
+        (task) =>
+          new RecognitionTask({
+            ...task.toJSON(),
+            status: 'processing',
+            attemptCount: task.attemptCount + 1,
+            startedAt: now,
+            updatedAt: now,
+          }),
+      );
+
+    for (const task of queued) {
+      this.tasks.set(task.id, task);
+    }
+
+    return queued;
+  }
+
+  async scheduleRetry(taskId: string, availableAt: Date, lastError: string, now: Date): Promise<void> {
+    const task = this.tasks.get(taskId);
+    if (!task) {
+      return;
+    }
+
+    this.tasks.set(
+      taskId,
+      new RecognitionTask({
+        ...task.toJSON(),
+        status: 'queued',
+        lastError,
+        availableAt,
+        startedAt: null,
+        updatedAt: now,
+      }),
+    );
   }
 
   async save(task: RecognitionTask): Promise<void> {
