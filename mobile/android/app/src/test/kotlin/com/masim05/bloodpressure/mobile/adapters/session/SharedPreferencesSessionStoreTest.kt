@@ -23,6 +23,8 @@ class SharedPreferencesSessionStoreTest {
 
         store.save(session)
 
+        assertNull(store.loadError())
+
         val loaded = store.load()
         requireNotNull(loaded)
         assertEquals("Bearer", loaded.tokenType)
@@ -33,6 +35,7 @@ class SharedPreferencesSessionStoreTest {
         store.clear()
 
         assertNull(store.load())
+        assertNull(store.loadError())
     }
 
     private class FakeContext : ContextWrapper(null) {
