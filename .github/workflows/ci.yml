@@ -182,7 +182,14 @@ jobs:
           async function main() {
             await client.connect();
             await upsertUser('usr_maestro_us3', 'us3@example.com');
+            await upsertUser('usr_maestro_us4', 'us4@example.com');
             await upsertUser('usr_maestro_us5', 'us5@example.com');
+            await client.query(
+              `INSERT INTO measurements (id, user_id, status, systolic, diastolic, pulse, arm_side, measurement_time, saved_at, created_at, updated_at)
+               VALUES ($1, $2, 'saved', 125, 82, 65, 'left', '2026-05-27T12:00:00.000Z', '2026-05-27T12:05:00.000Z', $3, $3)
+               ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status, systolic = EXCLUDED.systolic, diastolic = EXCLUDED.diastolic, pulse = EXCLUDED.pulse, arm_side = EXCLUDED.arm_side, measurement_time = EXCLUDED.measurement_time, saved_at = EXCLUDED.saved_at, updated_at = EXCLUDED.updated_at`,
+              ['msr_maestro_us4', 'usr_maestro_us4', now],
+            );
             await client.query(
               `INSERT INTO measurements (id, user_id, status, systolic, diastolic, pulse, arm_side, measurement_time, saved_at, created_at, updated_at)
                VALUES ($1, $2, 'saved', 120, 80, 68, 'left', '2026-05-27T12:00:00.000Z', '2026-05-27T12:05:00.000Z', $3, $3)
@@ -269,7 +276,7 @@ jobs:
           profile: pixel_6
           emulator-boot-timeout: 1200
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back emulated
           script: |
             set -eu
             adb wait-for-device
