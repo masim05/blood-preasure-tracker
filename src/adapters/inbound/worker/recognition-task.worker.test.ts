@@ -143,6 +143,8 @@ describe('RecognitionTaskWorker', () => {
     const recognitionTasks = {
       claimQueued: jest.fn().mockResolvedValue([claimedTask]),
       findById: jest.fn().mockResolvedValue({ status: 'failed' }),
+      scheduleRetry: jest.fn().mockResolvedValue(undefined),
+      save: jest.fn().mockResolvedValue(undefined),
     };
     const processRecognitionTask = {
       execute: jest.fn().mockRejectedValue(new Error('boom')),
@@ -157,6 +159,8 @@ describe('RecognitionTaskWorker', () => {
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', now, 'boom', now);
+    expect(recognitionTasks.save).not.toHaveBeenCalled();
   });
 
   it('logs unknown error text when thrown value is not an Error', async () => {
@@ -175,6 +179,8 @@ describe('RecognitionTaskWorker', () => {
     const recognitionTasks = {
       claimQueued: jest.fn().mockResolvedValue([claimedTask]),
       findById: jest.fn().mockResolvedValue({ status: 'failed' }),
+      scheduleRetry: jest.fn().mockResolvedValue(undefined),
+      save: jest.fn().mockResolvedValue(undefined),
     };
     const processRecognitionTask = {
       execute: jest.fn().mockRejectedValue('boom-string'),
@@ -189,6 +195,49 @@ describe('RecognitionTaskWorker', () => {
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', now, 'Unknown error', now);
+  });
+
+  it('marks task failed when unexpected throw happens on second attempt', async () => {
+    const claimedTask = new RecognitionTask({
+      id: 'rct_1',
+      measurementId: 'msr_1',
+      status: 'processing',
+      attemptCount: 2,
+      lastError: 'first failure',
+      availableAt: now,
+      startedAt: now,
+      completedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const recognitionTasks = {
+      claimQueued: jest.fn().mockResolvedValue([claimedTask]),
+      findById: jest.fn().mockResolvedValue({ status: 'failed' }),
+      scheduleRetry: jest.fn().mockResolvedValue(undefined),
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+    const processRecognitionTask = {
+      execute: jest.fn().mockRejectedValue(new Error('boom')),
+    };
+    const worker = new RecognitionTaskWorker(
+      recognitionTasks as never,
+      processRecognitionTask as never,
+      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
+    );
+
+    await worker.runCycle(now);
+
+    expect(recognitionTasks.scheduleRetry).not.toHaveBeenCalled();
+    expect(recognitionTasks.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'rct_1',
+        status: 'failed',
+        lastError: 'boom',
+        completedAt: now,
+      }),
+    );
   });
 
   it('processes valid tasks while invalid tasks retry then fail', async () => {

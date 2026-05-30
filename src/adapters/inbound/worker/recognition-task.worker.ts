@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger, type OnModuleDestroy, type OnModuleInit } f
 
 import { RECOGNITION_TASK_STORE, type RecognitionTaskStorePort } from '../../../application/ports/recognition-task-store.port';
 import { ProcessRecognitionTaskUseCase } from '../../../application/use-cases/process-recognition-task.use-case';
+import { RecognitionTask } from '../../../domain/entities/recognition-task';
 import { ApiConfigService } from '../../../infrastructure/config/api-config';
 import { EnvConfigService } from '../../../infrastructure/config/env-config';
 
@@ -63,9 +64,25 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
             failed += 1;
           }
         } catch (error) {
-          failed += 1;
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          if (task.attemptCount < 2) {
+            await this.recognitionTasks.scheduleRetry(task.id, now, errorMessage, now);
+            retried += 1;
+          } else {
+            await this.recognitionTasks.save(
+              new RecognitionTask({
+                ...task.toJSON(),
+                status: 'failed',
+                lastError: errorMessage,
+                completedAt: now,
+                updatedAt: now,
+              }),
+            );
+            failed += 1;
+          }
+
           this.logger.warn(
-            `Background recognition task failed taskId=${task.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Background recognition task failed taskId=${task.id}: ${errorMessage}`,
           );
         }
       }
