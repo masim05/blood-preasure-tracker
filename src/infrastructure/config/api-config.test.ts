@@ -7,6 +7,8 @@ describe('ApiConfigService', () => {
       apiPort: 3000,
       measurementImageDirectory: './tmp/measurement-images',
       accessTokenTtlSeconds: 604800,
+      recognitionWorkerIntervalSeconds: 10,
+      recognitionWorkerBatchSize: 4,
     });
   });
 
@@ -17,12 +19,16 @@ describe('ApiConfigService', () => {
         API_PORT: '4000',
         MEASUREMENT_IMAGE_DIR: '/tmp/images',
         ACCESS_TOKEN_TTL_SECONDS: '120',
+        RECOGNITION_WORKER_INTERVAL_SECONDS: '30',
+        RECOGNITION_WORKER_BATCH_SIZE: '8',
       }),
     ).toEqual({
       databaseUrl: 'postgres://example',
       apiPort: 4000,
       measurementImageDirectory: '/tmp/images',
       accessTokenTtlSeconds: 120,
+      recognitionWorkerIntervalSeconds: 30,
+      recognitionWorkerBatchSize: 8,
     });
   });
 
@@ -47,5 +53,11 @@ describe('ApiConfigService', () => {
     expect(() =>
       new ApiConfigService().load({ DATABASE_URL: 'postgres://example', ACCESS_TOKEN_TTL_SECONDS: 'nope' }),
     ).toThrow('ACCESS_TOKEN_TTL_SECONDS must be a positive integer');
+    expect(() =>
+      new ApiConfigService().load({ DATABASE_URL: 'postgres://example', RECOGNITION_WORKER_INTERVAL_SECONDS: '-1' }),
+    ).toThrow('RECOGNITION_WORKER_INTERVAL_SECONDS must be a positive integer');
+    expect(() =>
+      new ApiConfigService().load({ DATABASE_URL: 'postgres://example', RECOGNITION_WORKER_BATCH_SIZE: '0' }),
+    ).toThrow('RECOGNITION_WORKER_BATCH_SIZE must be a positive integer');
   });
 });

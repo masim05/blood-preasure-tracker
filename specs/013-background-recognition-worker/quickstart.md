@@ -48,12 +48,45 @@ Expected:
 ## 4. Run targeted tests
 
 ```bash
-npm run test -- src/application/use-cases/process-recognition-task.use-case.ts
+npx jest --runInBand --runTestsByPath src/application/use-cases/process-recognition-task.use-case.test.ts src/adapters/inbound/worker/recognition-task.worker.test.ts
 npm run test -- src/application/use-cases/measurement-review.use-cases.test.ts src/application/use-cases/mobile-api-error-branches.test.ts src/application/use-cases/mobile-api-not-found-branches.test.ts
 npm run test:coverage
 ```
 
-## 5. Regression checks
+## 5. SC-001 SLA verification (`>=95%` success in 5 minutes)
+
+1. Seed a repeatable dataset of valid queued tasks (for example 20 tasks) and record the start time.
+2. Start the API worker using default interval and batch size (`10s`, `4`) or your tuned values.
+3. After 5 minutes, compute completion ratio:
+
+```sql
+select
+  sum(case when status = 'completed' then 1 else 0 end)::float / nullif(count(*), 0) as completed_ratio
+from recognition_tasks
+where created_at >= now() - interval '5 minutes';
+```
+
+4. Save the query result and run configuration used for the run in your execution notes.
+
+Pass condition:
+- `completed_ratio >= 0.95`
+
+## 6. SC-004 queue-age health-check verification
+
+Use a queue-age metric/query to detect tasks stuck queued for more than 15 minutes:
+
+```sql
+select count(*) as queued_over_15m
+from recognition_tasks
+where status = 'queued'
+  and now() - available_at > interval '15 minutes';
+```
+
+Pass condition:
+- `queued_over_15m = 0` after worker availability is restored.
+- Capture this query output in execution notes alongside worker configuration.
+
+## 7. Regression checks
 
 - Existing API contracts remain unchanged.
 - Existing API tests remain unchanged unless explicitly required for corrected behavior.

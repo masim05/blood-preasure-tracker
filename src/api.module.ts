@@ -5,6 +5,7 @@ import { AuthRateLimitGuard } from './adapters/inbound/http/auth-rate-limit.guar
 import { BearerAuthGuard } from './adapters/inbound/http/bearer-auth.guard';
 import { HttpRequestLoggingMiddleware } from './adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from './adapters/inbound/http/measurements.controller';
+import { RecognitionTaskWorker } from './adapters/inbound/worker/recognition-task.worker';
 import { NodeBearerTokenAdapter } from './adapters/outbound/crypto/node-bearer-token.adapter';
 import { NodePasswordHasherAdapter } from './adapters/outbound/crypto/node-password-hasher.adapter';
 import { FilesystemMeasurementImageStorageAdapter } from './adapters/outbound/filesystem/measurement-image-storage.adapter';
@@ -51,6 +52,7 @@ import { EnvConfigService } from './infrastructure/config/env-config';
     SaveMeasurementUseCase,
     ProcessRecognitionTaskUseCase,
     ListMeasurementsUseCase,
+    RecognitionTaskWorker,
     { provide: USER_ACCOUNT_STORE, useClass: PostgresUserAccountRepository },
     { provide: BEARER_TOKEN_STORE, useClass: PostgresBearerTokenRepository },
     { provide: MEASUREMENT_STORE, useClass: PostgresMeasurementRepository },

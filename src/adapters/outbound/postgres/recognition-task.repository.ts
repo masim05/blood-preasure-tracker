@@ -31,6 +31,43 @@ export class PostgresRecognitionTaskRepository implements RecognitionTaskStorePo
     return result.rows[0] ? toRecognitionTask(result.rows[0]) : null;
   }
 
+  async claimQueued(now: Date, batchSize: number): Promise<RecognitionTask[]> {
+    const result = await this.pool.query<RecognitionTaskRow>(
+      `WITH claimable AS (
+         SELECT id
+         FROM recognition_tasks
+         WHERE status = 'queued' AND available_at <= $1
+         ORDER BY available_at ASC, created_at ASC
+         FOR UPDATE SKIP LOCKED
+         LIMIT $2
+       )
+       UPDATE recognition_tasks AS task
+       SET status = 'processing',
+           attempt_count = task.attempt_count + 1,
+           started_at = $1,
+           updated_at = $1
+       FROM claimable
+       WHERE task.id = claimable.id
+       RETURNING task.*`,
+      [now, batchSize],
+    );
+
+    return result.rows.map(toRecognitionTask);
+  }
+
+  async scheduleRetry(taskId: string, availableAt: Date, lastError: string, now: Date): Promise<void> {
+    await this.pool.query(
+      `UPDATE recognition_tasks
+       SET status = 'queued',
+           last_error = $2,
+           available_at = $3,
+           started_at = NULL,
+           updated_at = $4
+       WHERE id = $1`,
+      [taskId, lastError, availableAt, now],
+    );
+  }
+
   async save(task: RecognitionTask): Promise<void> {
     await this.pool.query(
       `INSERT INTO recognition_tasks
