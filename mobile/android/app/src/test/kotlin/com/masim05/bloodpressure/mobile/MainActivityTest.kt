@@ -51,6 +51,7 @@ class MainActivityTest {
     private class MemoryStore(private var session: Session? = null) : SessionStore {
         override fun save(session: Session) { this.session = session }
         override fun load(): Session? = session
+        override fun loadError(): String? = null
         override fun clear() { session = null }
     }
 }
