@@ -13,6 +13,8 @@ import { RecognitionTaskWorker } from './recognition-task.worker';
 const now = new Date('2026-05-30T10:00:00.000Z');
 
 describe('RecognitionTaskWorker', () => {
+  const retryAt = new Date('2026-05-30T10:00:10.000Z');
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -106,7 +108,41 @@ describe('RecognitionTaskWorker', () => {
       taskId: 'rct_1',
       model: 'test-model',
       now,
+      retryAt,
     });
+  });
+
+  it('counts a task as failed when execution resolves but persisted status is failed', async () => {
+    const claimedTask = new RecognitionTask({
+      id: 'rct_1',
+      measurementId: 'msr_1',
+      status: 'processing',
+      attemptCount: 1,
+      lastError: null,
+      availableAt: now,
+      startedAt: now,
+      completedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const recognitionTasks = {
+      claimQueued: jest.fn().mockResolvedValue([claimedTask]),
+      findById: jest.fn().mockResolvedValue({ status: 'failed' }),
+    };
+    const processRecognitionTask = {
+      execute: jest.fn().mockResolvedValue(undefined),
+    };
+    const worker = new RecognitionTaskWorker(
+      recognitionTasks as never,
+      processRecognitionTask as never,
+      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
+    );
+
+    await worker.runCycle(now);
+
+    expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
+    expect(recognitionTasks.findById).toHaveBeenCalledWith('rct_1');
   });
 
   it('skips cycle when another cycle is already running', async () => {
@@ -159,7 +195,7 @@ describe('RecognitionTaskWorker', () => {
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
-    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', now, 'boom', now);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', retryAt, 'boom', now);
     expect(recognitionTasks.save).not.toHaveBeenCalled();
   });
 
@@ -195,7 +231,7 @@ describe('RecognitionTaskWorker', () => {
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
-    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', now, 'Unknown error', now);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', retryAt, 'Unknown error', now);
   });
 
   it('marks task failed when unexpected throw happens on second attempt', async () => {
@@ -295,7 +331,7 @@ describe('RecognitionTaskWorker', () => {
     expect(tasks.tasks.get(validTaskId)?.status).toBe('completed');
     expect(tasks.tasks.get('missing-image-task')?.status).toBe('queued');
 
-    await worker.runCycle(now);
+    await worker.runCycle(retryAt);
     expect(tasks.tasks.get('missing-image-task')?.status).toBe('failed');
   });
 

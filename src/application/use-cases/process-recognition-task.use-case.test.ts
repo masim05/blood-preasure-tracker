@@ -12,6 +12,8 @@ import { ProcessRecognitionTaskUseCase } from './process-recognition-task.use-ca
 const now = new Date('2026-05-30T10:00:00.000Z');
 
 describe('ProcessRecognitionTaskUseCase', () => {
+  const retryAt = new Date('2026-05-30T10:00:10.000Z');
+
   it('marks queued task completed when recognition succeeds', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
@@ -41,6 +43,7 @@ describe('ProcessRecognitionTaskUseCase', () => {
       taskId,
       model: 'test-model',
       now,
+      retryAt,
     });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('completed');
@@ -76,10 +79,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       taskId,
       model: 'test-model',
       now,
+      retryAt,
     });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('queued');
     expect(tasks.tasks.get(taskId)?.attemptCount).toBe(1);
+    expect(tasks.tasks.get(taskId)?.availableAt).toEqual(retryAt);
   });
 
   it('marks task failed after second failed attempt', async () => {
@@ -108,8 +113,8 @@ describe('ProcessRecognitionTaskUseCase', () => {
     };
     const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
 
-    await useCase.execute({ taskId, model: 'test-model', now });
-    await useCase.execute({ taskId, model: 'test-model', now });
+    await useCase.execute({ taskId, model: 'test-model', now, retryAt });
+    await useCase.execute({ taskId, model: 'test-model', now, retryAt });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('failed');
     expect([...measurements.measurements.values()][0].status).toBe('failed');
@@ -141,10 +146,44 @@ describe('ProcessRecognitionTaskUseCase', () => {
       taskId: task.id,
       model: 'test-model',
       now,
+      retryAt,
     });
 
     expect(provider.infer).not.toHaveBeenCalled();
     expect(tasks.tasks.get(task.id)?.status).toBe('completed');
+  });
+
+  it('skips already failed tasks without invoking provider', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const images = new InMemoryMeasurementImageStore();
+    const tasks = new InMemoryRecognitionTaskStore();
+    const task = new RecognitionTask({
+      id: 'rct_failed',
+      measurementId: 'msr_1',
+      status: 'failed',
+      attemptCount: 2,
+      lastError: 'broken',
+      availableAt: now,
+      startedAt: now,
+      completedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await tasks.save(task);
+    const provider: LlmProviderPort = {
+      provider: 'test',
+      infer: jest.fn(),
+    };
+
+    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+      taskId: task.id,
+      model: 'test-model',
+      now,
+      retryAt,
+    });
+
+    expect(provider.infer).not.toHaveBeenCalled();
+    expect(tasks.tasks.get(task.id)?.status).toBe('failed');
   });
 
   it('requeues after provider throws on first attempt', async () => {
@@ -168,10 +207,73 @@ describe('ProcessRecognitionTaskUseCase', () => {
       taskId,
       model: 'test-model',
       now,
+      retryAt,
     });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('queued');
     expect(tasks.tasks.get(taskId)?.lastError).toBe('Recognition provider failure');
+    expect(tasks.tasks.get(taskId)?.availableAt).toEqual(retryAt);
+  });
+
+  it('uses the thrown Error message when the provider rejects with an Error', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const images = new InMemoryMeasurementImageStore();
+    const tasks = new InMemoryRecognitionTaskStore();
+    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+      userId: 'usr_1',
+      contentType: 'image/jpeg',
+      originalName: 'bp.jpg',
+      data: jpegBytes,
+      now,
+    });
+    const taskId = [...tasks.tasks.keys()][0];
+    const provider: LlmProviderPort = {
+      provider: 'test',
+      infer: jest.fn().mockRejectedValue(new Error('provider exploded')),
+    };
+
+    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+      taskId,
+      model: 'test-model',
+      now,
+      retryAt,
+    });
+
+    expect(tasks.tasks.get(taskId)?.status).toBe('queued');
+    expect(tasks.tasks.get(taskId)?.lastError).toBe('provider exploded');
+  });
+
+  it('defaults retryAt to now when not provided', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const images = new InMemoryMeasurementImageStore();
+    const tasks = new InMemoryRecognitionTaskStore();
+    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+      userId: 'usr_1',
+      contentType: 'image/jpeg',
+      originalName: 'bp.jpg',
+      data: jpegBytes,
+      now,
+    });
+    const taskId = [...tasks.tasks.keys()][0];
+    const provider: LlmProviderPort = {
+      provider: 'test',
+      infer: jest.fn().mockResolvedValue({
+        hand: null,
+        systolic: null,
+        diastolic: null,
+        pulse: null,
+        confidence: null,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+
+    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+      taskId,
+      model: 'test-model',
+    });
+
+    expect(tasks.tasks.get(taskId)?.availableAt.getTime()).toBeGreaterThanOrEqual(now.getTime());
   });
 
   it('processes a task already in processing state without incrementing attempts', async () => {
@@ -212,6 +314,7 @@ describe('ProcessRecognitionTaskUseCase', () => {
       taskId: task.id,
       model: 'test-model',
       now,
+      retryAt,
     });
 
     expect(tasks.tasks.get(task.id)?.status).toBe('completed');

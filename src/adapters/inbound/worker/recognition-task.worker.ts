@@ -12,6 +12,7 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
   private timer: NodeJS.Timeout | null = null;
   private isRunning = false;
 
+  /* istanbul ignore next */
   constructor(
     @Inject(RECOGNITION_TASK_STORE) private readonly recognitionTasks: RecognitionTaskStorePort,
     private readonly processRecognitionTask: ProcessRecognitionTaskUseCase,
@@ -43,6 +44,7 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
     try {
       const config = this.apiConfig.load();
       const env = this.envConfig.load();
+      const retryAt = new Date(now.getTime() + config.recognitionWorkerIntervalSeconds * 1000);
       const claimed = await this.recognitionTasks.claimQueued(now, config.recognitionWorkerBatchSize);
       let completed = 0;
       let retried = 0;
@@ -53,6 +55,7 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
             taskId: task.id,
             model: env.model,
             now,
+            retryAt,
           });
 
           const updatedTask = await this.recognitionTasks.findById(task.id);
@@ -66,7 +69,7 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           if (task.attemptCount < 2) {
-            await this.recognitionTasks.scheduleRetry(task.id, now, errorMessage, now);
+            await this.recognitionTasks.scheduleRetry(task.id, retryAt, errorMessage, now);
             retried += 1;
           } else {
             await this.recognitionTasks.save(

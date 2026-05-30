@@ -2,6 +2,15 @@ import { RecognitionTask } from '../../../domain/entities/recognition-task';
 import { PostgresRecognitionTaskRepository } from './recognition-task.repository';
 
 describe('PostgresRecognitionTaskRepository', () => {
+  it('returns null when a task is not found', async () => {
+    const pool = {
+      query: jest.fn().mockResolvedValue({ rows: [] }),
+    };
+    const repository = new PostgresRecognitionTaskRepository(pool as never);
+
+    await expect(repository.findById('missing')).resolves.toBeNull();
+  });
+
   it('claims queued tasks using FIFO + lock semantics', async () => {
     const now = new Date('2026-05-30T10:00:00.000Z');
     const pool = {

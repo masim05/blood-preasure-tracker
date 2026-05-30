@@ -22,6 +22,7 @@ export type ProcessRecognitionTaskInput = {
   taskId: string;
   model: string;
   now?: Date;
+  retryAt?: Date;
 };
 
 @Injectable()
@@ -35,6 +36,7 @@ export class ProcessRecognitionTaskUseCase {
 
   async execute(input: ProcessRecognitionTaskInput): Promise<void> {
     const now = input.now ?? new Date();
+    const retryAt = input.retryAt ?? now;
     const task = await this.recognitionTasks.findById(input.taskId);
     if (!task) {
       throw new ApiError('not_found', 'Recognition task was not found');
@@ -62,7 +64,7 @@ export class ProcessRecognitionTaskUseCase {
     const storedImage = await this.images.readByMeasurementId(activeTask.measurementId);
     const measurement = storedImage ? await this.measurements.findById(activeTask.measurementId) : null;
     if (!storedImage || !measurement) {
-      await this.handleFailure(activeTask, 'Missing measurement image', now);
+      await this.handleFailure(activeTask, 'Missing measurement image', now, retryAt);
       return;
     }
 
@@ -86,6 +88,7 @@ export class ProcessRecognitionTaskUseCase {
         activeTask,
         error instanceof Error ? error.message : 'Recognition provider failure',
         now,
+        retryAt,
         recognizingMeasurement,
       );
       return;
@@ -101,6 +104,7 @@ export class ProcessRecognitionTaskUseCase {
         activeTask,
         'Incomplete recognition result',
         now,
+        retryAt,
         recognizingMeasurement,
       );
       return;
@@ -127,10 +131,11 @@ export class ProcessRecognitionTaskUseCase {
     task: RecognitionTask,
     errorMessage: string,
     now: Date,
+    retryAt: Date,
     measurement: Measurement | null = null,
   ): Promise<void> {
     if (task.attemptCount < 2) {
-      await this.recognitionTasks.scheduleRetry(task.id, now, errorMessage, now);
+      await this.recognitionTasks.scheduleRetry(task.id, retryAt, errorMessage, now);
       return;
     }
 

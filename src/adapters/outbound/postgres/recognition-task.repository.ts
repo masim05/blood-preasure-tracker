@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import { Injectable } from '@nestjs/common';
 
 import type { RecognitionTaskStorePort } from '../../../application/ports/recognition-task-store.port';
@@ -20,6 +19,7 @@ type RecognitionTaskRow = {
 
 @Injectable()
 export class PostgresRecognitionTaskRepository implements RecognitionTaskStorePort {
+  /* istanbul ignore next */
   constructor(private readonly pool: PostgresPool) {}
 
   async findById(id: string): Promise<RecognitionTask | null> {

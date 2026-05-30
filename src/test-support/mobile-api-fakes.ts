@@ -149,7 +149,14 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
   async claimQueued(now: Date, batchSize: number): Promise<RecognitionTask[]> {
     const queued = [...this.tasks.values()]
       .filter((task) => task.status === 'queued' && task.availableAt <= now)
-      .sort((left, right) => left.availableAt.getTime() - right.availableAt.getTime())
+      .sort((left, right) => {
+        const availableAtOrder = left.availableAt.getTime() - right.availableAt.getTime();
+        if (availableAtOrder !== 0) {
+          return availableAtOrder;
+        }
+
+        return left.createdAt.getTime() - right.createdAt.getTime();
+      })
       .slice(0, batchSize)
       .map(
         (task) =>
