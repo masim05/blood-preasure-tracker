@@ -69,7 +69,9 @@ describe('test workflow contract', () => {
   it('runs Android bootstrap after db init and before Android Gradle tasks', () => {
     const dbInitIndex = workflow.indexOf('run: npm run db:init -- --env .env.test');
     const bootstrapIndex = workflow.indexOf('run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts');
-    const gradleIndex = workflow.indexOf('run: ./gradlew :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug');
+    const gradleIndex = workflow.indexOf(
+      'run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug',
+    );
 
     expect(dbInitIndex).toBeGreaterThan(-1);
     expect(bootstrapIndex).toBeGreaterThan(dbInitIndex);

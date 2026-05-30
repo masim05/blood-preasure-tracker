@@ -3,8 +3,10 @@ import { pbkdf2Sync } from 'node:crypto';
 import { Client } from 'pg';
 
 export const MAESTRO_FIXTURE_USER_US3_ID = 'usr_maestro_us3';
+export const MAESTRO_FIXTURE_USER_US4_ID = 'usr_maestro_us4';
 export const MAESTRO_FIXTURE_USER_US5_ID = 'usr_maestro_us5';
 export const MAESTRO_FIXTURE_USER_US3_EMAIL = 'us3@example.com';
+export const MAESTRO_FIXTURE_USER_US4_EMAIL = 'us4@example.com';
 export const MAESTRO_FIXTURE_USER_US5_EMAIL = 'us5@example.com';
 export const MAESTRO_FIXTURE_MEASUREMENT_ID = 'msr_maestro_us5';
 const MAESTRO_PASSWORD = 'password123';
@@ -24,6 +26,7 @@ export async function seedAndroidMaestroFixtures(databaseUrl = process.env.DATAB
   try {
     await client.connect();
     await upsertUser(client, MAESTRO_FIXTURE_USER_US3_ID, MAESTRO_FIXTURE_USER_US3_EMAIL, now);
+    await upsertUser(client, MAESTRO_FIXTURE_USER_US4_ID, MAESTRO_FIXTURE_USER_US4_EMAIL, now);
     await upsertUser(client, MAESTRO_FIXTURE_USER_US5_ID, MAESTRO_FIXTURE_USER_US5_EMAIL, now);
     await upsertSavedMeasurement(client, now);
   } finally {

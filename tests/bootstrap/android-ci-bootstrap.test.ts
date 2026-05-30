@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import {
   MAESTRO_FIXTURE_MEASUREMENT_ID,
   MAESTRO_FIXTURE_USER_US3_EMAIL,
+  MAESTRO_FIXTURE_USER_US4_EMAIL,
   MAESTRO_FIXTURE_USER_US5_EMAIL,
   seedAndroidMaestroFixtures,
 } from '../../src/test-support/android-maestro-fixtures';
@@ -54,11 +55,12 @@ describe('android ci bootstrap', () => {
     const client = new Client({ connectionString: databaseUrl });
     await client.connect();
 
-    const users = await client.query<{ email: string }>('SELECT email FROM user_accounts WHERE email IN ($1, $2)', [
+    const users = await client.query<{ email: string }>('SELECT email FROM user_accounts WHERE email IN ($1, $2, $3)', [
       MAESTRO_FIXTURE_USER_US3_EMAIL,
+      MAESTRO_FIXTURE_USER_US4_EMAIL,
       MAESTRO_FIXTURE_USER_US5_EMAIL,
     ]);
-    expect(users.rows).toHaveLength(2);
+    expect(users.rows).toHaveLength(3);
 
     const measurement = await client.query<{ id: string; status: string }>(
       'SELECT id, status FROM measurements WHERE id = $1',
