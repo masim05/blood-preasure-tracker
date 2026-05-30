@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { scripts?: Record<string, string> };
 const scripts = packageJson.scripts ?? {};
 const workflow = readFileSync('.github/workflows/ci.yml', 'utf8');
-const unitContractSelection = '--testPathIgnorePatterns=tests/integration';
+const unitContractSelection = '--testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap';
 const integrationSelection = '--testPathPatterns=tests/integration/.*\\.test\\.ts$';
 const requiredTestEnvKeys = [
   'OPENAI_API_KEY',
@@ -64,5 +64,49 @@ describe('test workflow contract', () => {
 
   it('does not run a separate npm test step in CI', () => {
     expect(workflow).not.toContain('run: npm test');
+  });
+
+  it('runs Android bootstrap after db init and before Android Gradle tasks', () => {
+    const dbInitIndex = workflow.indexOf('run: npm run db:init -- --env .env.test');
+    const bootstrapIndex = workflow.indexOf('run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts');
+    const gradleIndex = workflow.indexOf(
+      'run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug',
+    );
+
+    expect(dbInitIndex).toBeGreaterThan(-1);
+    expect(bootstrapIndex).toBeGreaterThan(dbInitIndex);
+    expect(gradleIndex).toBeGreaterThan(bootstrapIndex);
+  });
+
+  it('does not keep inline seed payload markers in workflow YAML', () => {
+    expect(workflow).not.toContain('name: Seed Maestro accounts');
+    expect(workflow).not.toContain("usr_maestro_us3");
+    expect(workflow).not.toContain("msr_maestro_us5");
+    expect(workflow).not.toContain("maestro-salt");
+  });
+
+  it('does not invoke android bootstrap outside android-mobile job', () => {
+    const bootstrapCommand = 'run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts';
+    const androidJobStart = workflow.indexOf('  android-mobile:\n');
+
+    expect(androidJobStart).toBeGreaterThan(-1);
+    const firstIndex = workflow.indexOf(bootstrapCommand);
+    expect(firstIndex).toBeGreaterThan(androidJobStart);
+
+    const secondIndex = workflow.indexOf(bootstrapCommand, firstIndex + 1);
+    expect(secondIndex).toBe(-1);
+
+    const buildJobBlock = workflow.slice(workflow.indexOf('  build:\n'), workflow.indexOf('  unit-contract-coverage:\n'));
+    const coverageJobBlock = workflow.slice(
+      workflow.indexOf('  unit-contract-coverage:\n'),
+      workflow.indexOf('  integration-tests:\n'),
+    );
+    const integrationJobBlock = workflow.slice(workflow.indexOf('  integration-tests:\n'), workflow.indexOf('  lint:\n'));
+    const lintJobBlock = workflow.slice(workflow.indexOf('  lint:\n'), workflow.indexOf('  android-mobile:\n'));
+
+    expect(buildJobBlock).not.toContain(bootstrapCommand);
+    expect(coverageJobBlock).not.toContain(bootstrapCommand);
+    expect(integrationJobBlock).not.toContain(bootstrapCommand);
+    expect(lintJobBlock).not.toContain(bootstrapCommand);
   });
 });

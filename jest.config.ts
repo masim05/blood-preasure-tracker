@@ -1,7 +1,7 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  roots: ['<rootDir>/src', '<rootDir>/tests/integration'],
+  roots: ['<rootDir>/src', '<rootDir>/tests/integration', '<rootDir>/tests/bootstrap'],
   testEnvironment: 'node',
   transform: {
     '^.+\\.ts$': [
