@@ -87,7 +87,7 @@ jobs:
         run: npm run db:init -- --env .env.test
 
       - name: Integration tests
-        run: npm run test:integration
+        run: npm run test:integration -- --verbose
 
   lint:
     name: Lint
