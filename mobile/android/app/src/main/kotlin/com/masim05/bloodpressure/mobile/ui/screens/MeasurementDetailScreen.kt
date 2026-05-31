@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -40,8 +41,6 @@ import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
-import java.net.HttpURLConnection
-import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -53,7 +52,7 @@ fun MeasurementDetailScreen(
     isSaving: Boolean,
     errorText: String?,
     apiBaseUrl: String,
-    authorizationHeader: String?,
+    loadMeasurementImage: (String) -> ByteArray?,
     onBack: () -> Unit,
     onSave: (MeasurementDetail) -> Unit,
 ) {
@@ -102,7 +101,7 @@ fun MeasurementDetailScreen(
             MeasurementImage(
                 imageUrl = detail.imageUrl,
                 apiBaseUrl = apiBaseUrl,
-                authorizationHeader = authorizationHeader,
+                loadMeasurementImage = loadMeasurementImage,
             )
         }
 
@@ -171,36 +170,34 @@ fun MeasurementDetailScreen(
 private fun MeasurementImage(
     imageUrl: String,
     apiBaseUrl: String,
-    authorizationHeader: String?,
+    loadMeasurementImage: (String) -> ByteArray?,
 ) {
     val resolvedImageUrl = resolveMeasurementImageUrl(imageUrl, apiBaseUrl)
-    var imageBytes by remember(resolvedImageUrl, authorizationHeader) { mutableStateOf<ByteArray?>(null) }
-    var loadFailed by remember(resolvedImageUrl, authorizationHeader) { mutableStateOf(false) }
+    var bitmap by remember(resolvedImageUrl) { mutableStateOf<ImageBitmap?>(null) }
+    var loadFailed by remember(resolvedImageUrl) { mutableStateOf(false) }
 
-    LaunchedEffect(resolvedImageUrl, authorizationHeader) {
+    LaunchedEffect(resolvedImageUrl) {
         if (resolvedImageUrl == null) {
-            imageBytes = null
+            bitmap = null
             loadFailed = true
             return@LaunchedEffect
         }
 
         loadFailed = false
-        imageBytes = runCatching {
+        bitmap = runCatching {
             withContext(Dispatchers.IO) {
-                fetchMeasurementImageBytes(resolvedImageUrl, authorizationHeader)
+                loadMeasurementImage(resolvedImageUrl)?.let { bytes ->
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                }
             }
         }.getOrNull()
-        loadFailed = imageBytes == null
-    }
-
-    val bitmap = remember(imageBytes) { imageBytes }?.let { bytes ->
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+        loadFailed = bitmap == null
     }
 
     if (bitmap != null) {
         Image(
             bitmap = bitmap,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.detail_image_content_description),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
         )
@@ -259,27 +256,4 @@ internal fun resolveMeasurementImageUrl(imageUrl: String, apiBaseUrl: String): S
     val normalizedBase = apiBaseUrl.trimEnd('/')
     val normalizedPath = if (trimmed.startsWith('/')) trimmed else "/$trimmed"
     return "$normalizedBase$normalizedPath"
-}
-
-private fun fetchMeasurementImageBytes(
-    imageUrl: String,
-    authorizationHeader: String?,
-): ByteArray {
-    val connection = URI.create(imageUrl).toURL().openConnection() as HttpURLConnection
-    return try {
-        connection.requestMethod = "GET"
-        connection.connectTimeout = 5_000
-        connection.readTimeout = 10_000
-        if (!authorizationHeader.isNullOrBlank()) {
-            connection.setRequestProperty("Authorization", authorizationHeader)
-        }
-        connection.setRequestProperty("Accept", "image/*")
-        val status = connection.responseCode
-        if (status !in 200..299) {
-            throw IllegalStateException("Failed to load measurement image")
-        }
-        connection.inputStream.use { it.readBytes() }
-    } finally {
-        connection.disconnect()
-    }
 }

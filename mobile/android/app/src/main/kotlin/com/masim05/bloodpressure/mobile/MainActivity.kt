@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                         isSaving = uiState.isDetailSaving,
                         errorText = uiState.errorText,
                         apiBaseUrl = BuildConfig.API_BASE_URL,
-                        authorizationHeader = sessionStore.load()?.authorizationHeader,
+                        loadMeasurementImage = ::loadMeasurementImage,
                         onBack = { openHistory(uiState.filter) },
                         onSave = ::saveMeasurementDetail,
                     )
@@ -214,6 +214,7 @@ class MainActivity : ComponentActivity() {
             measurementDetail = null,
             isDetailLoading = true,
             isDetailSaving = false,
+            detailAuthorizationHeader = sessionStore.load()?.authorizationHeader,
             errorText = null,
         )
         runInBackground {
@@ -269,6 +270,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun loadMeasurementImage(imageUrl: String): ByteArray? {
+        val authorizationHeader = uiState.detailAuthorizationHeader ?: return null
+        return apiClient.fetchMeasurementImage(imageUrl, authorizationHeader)
     }
 
     private fun ScreenState.visibleMessage(): String? {
@@ -370,4 +376,5 @@ private data class MobileUiState(
     val measurementDetail: MeasurementDetail? = null,
     val isDetailLoading: Boolean = false,
     val isDetailSaving: Boolean = false,
+    val detailAuthorizationHeader: String? = null,
 )

@@ -51,6 +51,7 @@
     <string name="measurement_status_failed">failed</string>
     <string name="detail_title">Measurement detail</string>
     <string name="detail_image_placeholder">Original image: %1$s</string>
+    <string name="detail_image_content_description">Captured measurement image</string>
     <string name="detail_image_unavailable">Original image is unavailable.</string>
     <string name="detail_systolic">Systolic</string>
     <string name="detail_diastolic">Diastolic</string>
