@@ -127,6 +127,27 @@ describe('measurement use cases', () => {
     });
   });
 
+  it('overrides saved readings after saving', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    await measurements.save(savedMeasurement('msr_1'));
+
+    const updated = await new OverrideMeasurementUseCase(measurements).execute({
+      userId: 'usr_1',
+      measurementId: 'msr_1',
+      diastolic: 81,
+      now,
+    });
+
+    expect(updated).toMatchObject({
+      id: 'msr_1',
+      status: 'saved',
+      systolic: 120,
+      diastolic: 81,
+      pulse: 68,
+      savedAt: now.toISOString(),
+    });
+  });
+
   it('rejects overriding pending measurements', async () => {
     const measurements = new InMemoryMeasurementStore();
     await measurements.save(

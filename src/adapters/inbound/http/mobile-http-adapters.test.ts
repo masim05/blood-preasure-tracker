@@ -63,6 +63,9 @@ describe('mobile HTTP adapter helpers', () => {
       'at least one of systolic, diastolic, pulse is required',
     );
     expect(() => parseMeasurementOverride({ pulse: 0 })).toThrow('pulse must be a positive integer');
+    expect(() => parseMeasurementOverride({ systolic: 121, unexpected: true } as never)).toThrow(
+      'unexpected field: unexpected',
+    );
   });
 
   it('maps unknown errors and API errors to HTTP exceptions', () => {

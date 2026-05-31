@@ -68,6 +68,38 @@ describe('mobile API integration flow', () => {
     });
   });
 
+  describe('POST /api/v1/measurements/{id}/override - saved measurement', () => {
+    it('keeps saved status and persists overridden values', async () => {
+      const accessToken = await signedInAccessToken(fixture);
+      const measurementId = await uploadAndRecognize(fixture, accessToken);
+      await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
+
+      const overrideResponse = await postJson(
+        fixture.baseUrl,
+        `/api/v1/measurements/${measurementId}/override`,
+        { systolic: 126, pulse: 74 },
+        accessToken,
+      );
+
+      expect(overrideResponse.status).toBe(201);
+      expect(overrideResponse.body).toEqual({
+        id: measurementId,
+        status: 'saved',
+        systolic: 126,
+        diastolic: 82,
+        pulse: 74,
+        armSide: 'right',
+        measurementTime: expect.any(String),
+        savedAt: expect.any(String),
+      });
+      expect(await measurementReadings(fixture.pool, measurementId)).toEqual({
+        systolic: 126,
+        diastolic: 82,
+        pulse: 74,
+      });
+    });
+  });
+
   beforeEach(async () => {
     clearAuthRateLimitBuckets();
     fixture.requestLogs.length = 0;

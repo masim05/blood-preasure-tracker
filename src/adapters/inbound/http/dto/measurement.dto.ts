@@ -35,6 +35,7 @@ export function parseMeasurementOverride(
   input: MeasurementOverrideDto | undefined,
 ): MeasurementOverrideDto {
   const payload = input ?? {};
+  rejectUnexpectedOverrideFields(payload);
   const output: MeasurementOverrideDto = {
     systolic: parseOptionalBodyInteger(payload.systolic, 'systolic'),
     diastolic: parseOptionalBodyInteger(payload.diastolic, 'diastolic'),
@@ -46,6 +47,15 @@ export function parseMeasurementOverride(
   }
 
   return output;
+}
+
+function rejectUnexpectedOverrideFields(payload: MeasurementOverrideDto): void {
+  const allowedFields = new Set(['systolic', 'diastolic', 'pulse']);
+  for (const field of Object.keys(payload)) {
+    if (!allowedFields.has(field)) {
+      throw new Error(`unexpected field: ${field}`);
+    }
+  }
 }
 
 function parseOptionalBodyInteger(value: number | undefined, field: string): number | undefined {

@@ -145,6 +145,33 @@ describe('mobile API contract controllers', () => {
     expect(headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 
+  it('rejects unknown override request fields and supports overriding saved measurements', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const controller = new MeasurementsController(
+      new SubmitMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore(), new InMemoryRecognitionTaskStore()),
+      new GetMeasurementDetailUseCase(measurements, new InMemoryMeasurementImageStore()),
+      new SaveMeasurementUseCase(measurements),
+      new OverrideMeasurementUseCase(measurements),
+      new ListMeasurementsUseCase(measurements),
+      new GetMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore()),
+    );
+    const request = authenticatedRequest();
+    await measurements.save(savedMeasurement('msr_saved'));
+
+    await expectStatus(
+      controller.override(request, 'msr_saved', { systolic: 121, unexpected: true } as never),
+      400,
+    );
+    await expect(controller.override(request, 'msr_saved', { pulse: 69 })).resolves.toMatchObject({
+      id: 'msr_saved',
+      status: 'saved',
+      systolic: 120,
+      diastolic: 80,
+      pulse: 69,
+      savedAt: '2026-05-27T12:00:00.000Z',
+    });
+  });
+
   it('returns expected measurement route errors', async () => {
     const controller = new MeasurementsController(
       new SubmitMeasurementImageUseCase(
@@ -177,4 +204,22 @@ async function expectStatus(promise: Promise<unknown>, status: number): Promise<
     expect(error).toBeInstanceOf(HttpException);
     expect((error as HttpException).getStatus()).toBe(status);
   }
+}
+
+function savedMeasurement(id: string, userId = 'usr_1'): Measurement {
+  return new Measurement({
+    id,
+    userId,
+    status: 'saved',
+    systolic: 120,
+    diastolic: 80,
+    pulse: 68,
+    armSide: 'left',
+    measurementTime: now,
+    imageId: 'img_1',
+    recognitionError: null,
+    savedAt: now,
+    createdAt: now,
+    updatedAt: now,
+  });
 }
