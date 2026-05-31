@@ -11,7 +11,7 @@ Use these source-of-truth files:
 
 Requirements:
 - Write a complete OpenAPI 3.1 YAML document to docs/openapi.yaml.
-- Include all /api/v1 endpoints: signin, login, measurements upload/list/detail/image/save.
+- Include all /api/v1 endpoints: signin, login, measurements upload/list/detail/override/image/save.
 - Include bearer auth security for protected endpoints only.
 - Include request bodies, query/path parameters, response schemas, error schemas, examples, and binary image response content types.
 - Derive response status codes from current NestJS controller behavior. Bare @Post() handlers without @HttpCode return 201 by default; prefer that runtime behavior over stale contract prose when they conflict.

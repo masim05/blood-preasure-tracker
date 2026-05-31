@@ -28,6 +28,7 @@ import { GetMeasurementDetailUseCase } from './application/use-cases/get-measure
 import { GetMeasurementImageUseCase } from './application/use-cases/get-measurement-image.use-case';
 import { ListMeasurementsUseCase } from './application/use-cases/list-measurements.use-case';
 import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
+import { OverrideMeasurementUseCase } from './application/use-cases/override-measurement.use-case';
 import { LLM_PROVIDER, ProcessRecognitionTaskUseCase } from './application/use-cases/process-recognition-task.use-case';
 import { SaveMeasurementUseCase } from './application/use-cases/save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from './application/use-cases/submit-measurement-image.use-case';
@@ -50,6 +51,7 @@ import { EnvConfigService } from './infrastructure/config/env-config';
     GetMeasurementDetailUseCase,
     GetMeasurementImageUseCase,
     SaveMeasurementUseCase,
+    OverrideMeasurementUseCase,
     ProcessRecognitionTaskUseCase,
     ListMeasurementsUseCase,
     RecognitionTaskWorker,

@@ -4,6 +4,7 @@ import { GetMeasurementDetailUseCase } from './get-measurement-detail.use-case';
 import { GetMeasurementImageUseCase } from './get-measurement-image.use-case';
 import { ListMeasurementsUseCase } from './list-measurements.use-case';
 import { LLM_PROVIDER, ProcessRecognitionTaskUseCase } from './process-recognition-task.use-case';
+import { OverrideMeasurementUseCase } from './override-measurement.use-case';
 import { SaveMeasurementUseCase } from './save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from './submit-measurement-image.use-case';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
@@ -98,6 +99,61 @@ describe('measurement use cases', () => {
     const history = await new ListMeasurementsUseCase(measurements).execute({ userId: 'usr_1', page: 1, pageSize: 20 });
     expect(history.items).toHaveLength(1);
     expect(history.items[0]).not.toHaveProperty('imageUrl');
+  });
+
+  it('overrides recognized readings before saving', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const recognized = new Measurement({
+      ...savedMeasurement('msr_1').toJSON(),
+      status: 'recognized',
+      savedAt: null,
+    });
+    await measurements.save(recognized);
+
+    const updated = await new OverrideMeasurementUseCase(measurements).execute({
+      userId: 'usr_1',
+      measurementId: 'msr_1',
+      systolic: 121,
+      pulse: 69,
+      now,
+    });
+
+    expect(updated).toMatchObject({
+      id: 'msr_1',
+      status: 'recognized',
+      systolic: 121,
+      diastolic: 80,
+      pulse: 69,
+    });
+  });
+
+  it('rejects overriding pending measurements', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    await measurements.save(
+      new Measurement({
+        id: 'msr_1',
+        userId: 'usr_1',
+        status: 'pending',
+        systolic: null,
+        diastolic: null,
+        pulse: null,
+        armSide: null,
+        measurementTime: now,
+        imageId: 'img_1',
+        recognitionError: null,
+        savedAt: null,
+        createdAt: now,
+        updatedAt: now,
+      }),
+    );
+
+    await expect(
+      new OverrideMeasurementUseCase(measurements).execute({
+        userId: 'usr_1',
+        measurementId: 'msr_1',
+        systolic: 121,
+      }),
+    ).rejects.toThrow('Measurement must be recognized before override can be applied');
   });
 
   it('rejects saving pending measurements and invalid history ranges', async () => {
