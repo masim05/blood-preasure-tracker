@@ -174,7 +174,10 @@ describe('measurement use cases', () => {
         updatedAt: now,
       }),
     );
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({ taskId: 'missing-task', model: 'test-model', now });
+    const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
+    await useCase.execute({ taskId: 'missing-task', model: 'test-model', now });
+    expect(tasks.tasks.get('missing-task')?.status).toBe('queued');
+    await useCase.execute({ taskId: 'missing-task', model: 'test-model', now });
     expect(tasks.tasks.get('missing-task')?.status).toBe('failed');
   });
 });

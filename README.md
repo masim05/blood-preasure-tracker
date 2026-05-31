@@ -48,7 +48,7 @@ CLI arguments override environment defaults for `--input`, `--csv`, `--provider`
 
 The mobile API runs beside the CLI as a NestJS HTTP adapter. It supports email account creation, login, bearer-protected measurement image upload, measurement detail and original image retrieval, explicit save confirmation, and saved measurement history.
 
-Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOKEN_TTL_SECONDS`, `API_PORT`, and `OPENAI_API_KEY`:
+Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOKEN_TTL_SECONDS`, `API_PORT`, and `OPENAI_API_KEY`. `RECOGNITION_WORKER_INTERVAL_SECONDS` and `RECOGNITION_WORKER_BATCH_SIZE` are optional and default to `10` and `4`:
 
 ```bash
 npm run api
@@ -164,6 +164,8 @@ export DATABASE_URL="postgres://postgres:postgres@localhost:5432/blood_pressure_
 export API_PORT="3000"
 export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
 export ACCESS_TOKEN_TTL_SECONDS="3600"
+export RECOGNITION_WORKER_INTERVAL_SECONDS="10"
+export RECOGNITION_WORKER_BATCH_SIZE="4"
 export NODE_ENV="development"
 ```
 

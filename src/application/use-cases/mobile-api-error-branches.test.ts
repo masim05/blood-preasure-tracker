@@ -50,7 +50,7 @@ describe('mobile API use-case error branches', () => {
     ).rejects.toThrow('Bearer token is invalid or expired');
   });
 
-  it('marks recognition failed when provider returns incomplete values', async () => {
+  it('retries once then marks recognition failed when provider returns incomplete values', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
@@ -68,8 +68,14 @@ describe('mobile API use-case error branches', () => {
       infer: jest.fn().mockResolvedValue({ hand: null, systolic: null, diastolic: null, pulse: null, confidence: null, uncertainFields: [], rawNotes: null }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({ taskId: [...tasks.tasks.keys()][0], model: 'model', now });
+    const taskId = [...tasks.tasks.keys()][0];
+    const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
 
+    await useCase.execute({ taskId, model: 'model', now });
+    expect(tasks.tasks.get(taskId)?.status).toBe('queued');
+
+    await useCase.execute({ taskId, model: 'model', now });
     expect([...measurements.measurements.values()][0].status).toBe('failed');
+    expect(tasks.tasks.get(taskId)?.status).toBe('failed');
   });
 });

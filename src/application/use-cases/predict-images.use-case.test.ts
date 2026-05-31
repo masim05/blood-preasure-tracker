@@ -4,6 +4,14 @@ import type { ImageSourcePort } from '../ports/image-source.port';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
 import type { OutputWriterPort } from '../ports/output-writer.port';
 import type { PredictionCsvWriterPort } from '../ports/prediction-csv-writer.port';
+import {
+  InMemoryMeasurementImageStore,
+  InMemoryMeasurementStore,
+  InMemoryRecognitionTaskStore,
+} from '../../test-support/mobile-api-fakes';
+import { SubmitMeasurementImageUseCase } from './submit-measurement-image.use-case';
+import { ProcessRecognitionTaskUseCase } from './process-recognition-task.use-case';
+import { jpegBytes } from '../../test-support/image-bytes';
 
 describe('PredictImagesUseCase', () => {
   it('writes one prediction record per image using the selected provider and model', async () => {
@@ -545,6 +553,84 @@ describe('PredictImagesUseCase', () => {
         status: 'error',
       }),
     );
+  });
+
+  it('matches worker recognition values with predict flow outputs', async () => {
+    const imageSource: ImageSourcePort = {
+      load: jest.fn().mockResolvedValue([
+        {
+          imageId: 'img001',
+          imagePath: 'data/eval/img001.jpg',
+          contentType: 'image/jpeg',
+          data: jpegBytes,
+        },
+      ]),
+    };
+    const imageMetadata: ImageMetadataPort = {
+      extractTimestamp: jest.fn().mockResolvedValue({
+        imageId: 'img001',
+        imagePath: 'data/eval/img001.jpg',
+        time: '2026-05-20 14:01:23',
+        sourceTag: 'DateTimeOriginal',
+        rawValue: '2026:05:20 14:01:23',
+        issues: [],
+      }),
+    };
+    const llmProvider: LlmProviderPort = {
+      provider: 'openai',
+      infer: jest.fn().mockResolvedValue({
+        hand: 'right',
+        systolic: 126,
+        diastolic: 79,
+        pulse: 68,
+        confidence: 0.95,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+    const outputWriter: OutputWriterPort = {
+      write: jest.fn().mockResolvedValue(undefined),
+    };
+    const predictionCsvWriter = createPredictionCsvWriter();
+
+    await new PredictImagesUseCase(
+      imageSource,
+      imageMetadata,
+      llmProvider,
+      outputWriter,
+      predictionCsvWriter,
+    ).execute({ inputDirectory: 'data/eval', model: 'gpt-5.4-mini' });
+
+    const predicted = (outputWriter.write as jest.Mock).mock.calls[0][0] as {
+      systolic: number;
+      diastolic: number;
+      pulse: number;
+      hand: 'left' | 'right' | 'unknown';
+    };
+
+    const measurements = new InMemoryMeasurementStore();
+    const images = new InMemoryMeasurementImageStore();
+    const tasks = new InMemoryRecognitionTaskStore();
+    const now = new Date('2026-05-30T10:00:00.000Z');
+    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+      userId: 'usr_1',
+      contentType: 'image/jpeg',
+      originalName: 'bp.jpg',
+      data: jpegBytes,
+      now,
+    });
+    const taskId = [...tasks.tasks.keys()][0];
+    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, llmProvider).execute({
+      taskId,
+      model: 'gpt-5.4-mini',
+      now,
+    });
+
+    const recognized = [...measurements.measurements.values()][0];
+    expect(recognized.systolic).toBe(predicted.systolic);
+    expect(recognized.diastolic).toBe(predicted.diastolic);
+    expect(recognized.pulse).toBe(predicted.pulse);
+    expect(recognized.armSide).toBe(predicted.hand);
   });
 });
 
