@@ -16,13 +16,13 @@ export type ListMeasurementsInput = {
 export type ListMeasurementsOutput = {
   items: Array<{
     id: string;
-    status: 'saved';
+    status: 'recognized' | 'saved';
     systolic: number;
     diastolic: number;
     pulse: number;
     armSide: string;
     measurementTime: string;
-    savedAt: string;
+    savedAt: string | null;
   }>;
   page: number;
   pageSize: number;
@@ -41,25 +41,25 @@ export class ListMeasurementsUseCase {
     return {
       items: page.items.map((measurement) => {
         if (
-          measurement.status !== 'saved' ||
+          (measurement.status !== 'recognized' && measurement.status !== 'saved') ||
           measurement.systolic === null ||
           measurement.diastolic === null ||
           measurement.pulse === null ||
           measurement.armSide === null ||
-          measurement.savedAt === null
+          (measurement.status === 'saved' && measurement.savedAt === null)
         ) {
-          throw new ApiError('validation_error', 'History can include saved measurements only');
+          throw new ApiError('validation_error', 'History can include recognized or saved measurements only');
         }
 
         return {
           id: measurement.id,
-          status: 'saved',
+          status: measurement.status,
           systolic: measurement.systolic,
           diastolic: measurement.diastolic,
           pulse: measurement.pulse,
           armSide: measurement.armSide,
           measurementTime: measurement.measurementTime.toISOString(),
-          savedAt: measurement.savedAt.toISOString(),
+          savedAt: measurement.savedAt ? measurement.savedAt.toISOString() : null,
         };
       }),
       page: page.page,

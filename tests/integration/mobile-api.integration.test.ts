@@ -545,14 +545,15 @@ describe('mobile API integration flow', () => {
     });
   });
 
-  describe('GET /api/v1/measurements - happy path saved history', () => {
+  describe('GET /api/v1/measurements - happy path saved and recognized history', () => {
     async function response(): Promise<MeasurementResponseScenario> {
       const accessToken = await signedInAccessToken(fixture);
-      const measurementId = await uploadAndRecognize(fixture, accessToken);
-      await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
+      const recognizedMeasurementId = await uploadAndRecognize(fixture, accessToken);
+      const savedMeasurementId = await uploadAndRecognize(fixture, accessToken);
+      await postJson(fixture.baseUrl, `/api/v1/measurements/${savedMeasurementId}/save`, {}, accessToken);
       const response = await getJson(fixture.baseUrl, '/api/v1/measurements', accessToken);
 
-      return { response, measurementId };
+      return { response, recognizedMeasurementId, savedMeasurementId };
     }
 
     it('responds with HTTP 200', async () => {
@@ -560,12 +561,12 @@ describe('mobile API integration flow', () => {
     });
 
     it('responds with proper json', async () => {
-      const { response: historyResponse, measurementId } = await response();
+      const { response: historyResponse, recognizedMeasurementId, savedMeasurementId } = await response();
 
       expect(historyResponse.body).toEqual({
         items: [
           {
-            id: measurementId,
+            id: savedMeasurementId,
             status: 'saved',
             systolic: 122,
             diastolic: 82,
@@ -573,6 +574,16 @@ describe('mobile API integration flow', () => {
             armSide: 'right',
             measurementTime: expect.any(String),
             savedAt: expect.any(String),
+          },
+          {
+            id: recognizedMeasurementId,
+            status: 'recognized',
+            systolic: 122,
+            diastolic: 82,
+            pulse: 70,
+            armSide: 'right',
+            measurementTime: expect.any(String),
+            savedAt: null,
           },
         ],
         page: 1,

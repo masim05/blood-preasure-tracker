@@ -90,7 +90,11 @@ export class InMemoryMeasurementStore implements MeasurementStorePort {
 
   async listSavedForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
     const filtered = [...this.measurements.values()]
-      .filter((measurement) => measurement.userId === filter.userId && measurement.status === 'saved')
+      .filter(
+        (measurement) =>
+          measurement.userId === filter.userId &&
+          (measurement.status === 'recognized' || measurement.status === 'saved'),
+      )
       .filter(
         (measurement) =>
           (!filter.from || measurement.measurementTime >= filter.from) &&
