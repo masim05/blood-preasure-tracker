@@ -1,5 +1,6 @@
 package com.masim05.bloodpressure.mobile
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -237,7 +238,15 @@ class MainActivity : ComponentActivity() {
             type = "text/csv"
             putExtra(Intent.EXTRA_TEXT, measurementsToCsv(measurements))
         }
-        startActivity(Intent.createChooser(sendIntent, getString(R.string.history_export_csv_chooser)))
+        if (sendIntent.resolveActivity(packageManager) == null) {
+            uiState = uiState.copy(errorText = getString(R.string.history_export_csv_unavailable))
+            return
+        }
+        try {
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.history_export_csv_chooser)))
+        } catch (_: ActivityNotFoundException) {
+            uiState = uiState.copy(errorText = getString(R.string.history_export_csv_unavailable))
+        }
     }
 
     private fun saveMeasurementDetail(detail: MeasurementDetail) {

@@ -31,6 +31,7 @@
     <string name="history_clear_filter">Clear filter</string>
     <string name="history_export_csv">Export CSV</string>
     <string name="history_export_csv_chooser">Share history CSV</string>
+    <string name="history_export_csv_unavailable">No app available to share CSV</string>
     <string name="history_empty">No saved measurements match the selected filter.</string>
     <string name="history_columns">Time | SYS | DIA | Pulse | Arm</string>
     <string name="history_column_time">Time</string>

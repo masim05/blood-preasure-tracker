@@ -31,6 +31,7 @@
     <string name="history_clear_filter">Borrar filtro</string>
     <string name="history_export_csv">Exportar CSV</string>
     <string name="history_export_csv_chooser">Compartir historial CSV</string>
+    <string name="history_export_csv_unavailable">No hay una app disponible para compartir CSV</string>
     <string name="history_empty">No hay mediciones guardadas para el filtro seleccionado.</string>
     <string name="history_columns">Hora | SYS | DIA | Pulso | Brazo</string>
     <string name="history_column_time">Hora</string>
