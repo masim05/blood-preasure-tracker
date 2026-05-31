@@ -1,36 +1,35 @@
-# Blood Pressure CLI Eval Tool
+# Blood Pressure Tracker
 
-This project provides a local CLI for extracting blood-pressure monitor readings from image files and evaluating those predictions against a CSV ground-truth dataset.
+Blood Pressure Tracker has three deliverables in one repository: a CLI predictor/evaluator for blood-pressure monitor images, a NestJS mobile API for accounts and measurement lifecycle, and an Android app that captures images and displays saved history.
 
-## Requirements
+## CLI Predictor/Evaluator
+
+### Requirements
 
 - Node.js 24.x LTS or newer
 - npm 11 or newer
 - `OPENAI_API_KEY` when using the default OpenAI adapter
 
-## Install
+### Installation And Build
 
 ```bash
 npm install
+npm run build
 ```
 
-## Commands
-
-Show usage and the static model catalog:
+Show usage and static model catalog:
 
 ```bash
 npm run cli -- --help
 ```
 
-Predict readings for every image in the input directory:
+Predict readings for all images in a directory:
 
 ```bash
 npm run cli -- predict --input ./data/eval
 ```
 
-Each predict run also creates or replaces `./data/eval/p.csv` with one CSV row per processed image. The generated file is overwritten on every predict run for that input directory.
-
-Evaluate predictions against the CSV dataset matched by filename stem:
+Evaluate predictions against a CSV matched by filename stem:
 
 ```bash
 npm run cli -- eval --input ./data/eval --csv ./data/eval/a.csv
@@ -42,100 +41,30 @@ Generated prediction CSV files can be reused as eval reference data:
 npm run cli -- eval --input ./data/eval --csv ./data/eval/p.csv
 ```
 
-CLI arguments override environment defaults for `--input`, `--csv`, `--provider`, and `--model`.
+### Configuration Options
 
-## Mobile API
+- CLI flags override env defaults: `--input`, `--csv`, `--provider`, and `--model`
+- Supported env variables:
+    - `OPENAI_API_KEY`
+    - `CLI_INPUT_DIR`
+    - `CLI_EVAL_CSV`
+    - `CLI_PROVIDER`
+    - `CLI_MODEL`
 
-The mobile API runs beside the CLI as a NestJS HTTP adapter. It supports email account creation, login, bearer-protected measurement image upload, measurement detail and original image retrieval, explicit save confirmation, and saved measurement history.
+Output behavior:
 
-Start the API after setting `DATABASE_URL`, `MEASUREMENT_IMAGE_DIR`, `ACCESS_TOKEN_TTL_SECONDS`, `API_PORT`, and `OPENAI_API_KEY`. `RECOGNITION_WORKER_INTERVAL_SECONDS` and `RECOGNITION_WORKER_BATCH_SIZE` are optional and default to `10` and `4`:
+- `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv`.
+- Generated `p.csv` uses header `imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes`.
+- `eval` emits JSONL `comparison` records, then a JSONL `summary`, plus an aligned human-readable accuracy block.
+- Metadata time extraction order is `DateTimeOriginal`, then `CreateDate`, then generic `DateTime`/`ModifyDate` parser output.
+- If no supported embedded timestamp exists, `time` remains `null` and `uncertainFields` includes `time`.
 
-```bash
-npm run api
-```
+Dataset expectations:
 
-API logging uses `NODE_ENV=production` for production mode, where debug request logs are suppressed and warning/error logs remain enabled. Any other `NODE_ENV` value, including unset, uses development mode and logs each HTTP request at debug level with its response status.
-
-Create the local Docker PostgreSQL database from `DATABASE_URL` and run project migrations:
-
-```bash
-npm run db:init
-```
-
-By default this reads `.env`. Use `-e` or `--env` to choose another env file:
-
-```bash
-npm run db:init -- --env .env.example
-```
-
-The command requires a running Docker daemon, creates or starts a local `postgres:17-alpine` container, creates the database named in `DATABASE_URL`, and applies SQL migrations from `src/infrastructure/database/migrations`. Set `DB_INIT_POSTGRES_IMAGE` to use another Postgres image.
-
-The container and data directory are named `bpt-db-<hash>`, where `<hash>` is a 4-character hash derived from `DATABASE_URL` and the project root path. Database files are stored in `data/bpt-db-<hash>`.
-
-Integration tests use the tracked non-secret `.env.test` file. Prepare the real test database before running them:
-
-```bash
-npm run db:init -- --env .env.test
-npm run test:integration
-```
-
-The mobile API integration suite uses PostgreSQL and filesystem storage from `.env.test`, while replacing only the OpenAI recognition boundary with deterministic test output.
-
-Delete the matching Docker container and local data directory for an env file:
-
-```bash
-npm run db:clean -- --env .env.example
-```
-
-Primary endpoints:
-
-- `POST /api/v1/signin` creates an account and returns an expiring bearer token.
-- `POST /api/v1/login` returns an expiring bearer token for an existing user.
-- `POST /api/v1/measurements` accepts an authenticated JPEG/PNG image up to 10 MB and returns a pending measurement id.
-- `GET /api/v1/measurements/<id>` returns owned measurement detail and an `imageUrl`.
-- `GET /api/v1/measurements/<id>/image` returns the owner-protected original image bytes.
-- `POST /api/v1/measurements/<id>/save` saves a recognized measurement into history.
-- `GET /api/v1/measurements` returns saved measurement history without image binary data.
-
-The OpenAPI document lives at [docs/openapi.yaml](docs/openapi.yaml). Regenerate it from the API contract and controllers with the local Copilot CLI:
-
-```bash
-npm run openapi:generate
-```
-
-Serve an interactive Swagger UI for the OpenAPI document without starting the main API:
-
-```bash
-npm run openapi:serve
-```
-
-The docs server listens on `http://localhost:3001/` by default, loads [docs/openapi.yaml](docs/openapi.yaml), and supports Swagger UI "Try it out" requests against the API server declared in the OpenAPI `servers` section. The raw YAML remains available at `http://localhost:3001/openapi.yaml`. Set `OPENAPI_DOCS_PORT` to use another port.
-
-## Android Mobile App
-
-Android mobile app source belongs under `mobile/android`. Android implementation
-must target the latest active LTS Kotlin release. User-facing mobile flows must
-show every API error returned by the API, include a happy-path Maestro flow for
-each user story, localize every visible string or text value, and maintain at
-least 95% Android unit-test coverage in CI.
-
-## Output
-
-- `predict` emits one JSONL `prediction` record per image and writes `<input>/p.csv` at the same time.
-- Generated `p.csv` files use the fixed header `imageId,time,hand,systolic,diastolic,pulse,status,confidence,uncertainFields,provider,model,rawNotes`.
-- Missing prediction values are empty CSV cells; `uncertainFields` is encoded as a JSON array string in one CSV cell.
-- `eval` emits one JSONL `comparison` record per image or unmatched row, followed by one JSONL `summary` record and an aligned human-readable accuracy block.
-- Eval accuracy lines report `hand`, `systolic`, `diastolic`, `pulse`, plus readings with at least 2, at least 3, and all 4 target parameters correct. Counts use comparable prediction/reference pairs as the denominator and percentages are shown to one decimal place.
-- `time` is read only from embedded image metadata, using `DateTimeOriginal`, then `CreateDate`, then generic `DateTime`/`ModifyDate` parser output.
-- Metadata timestamps are emitted as `YYYY-MM-DD HH:mm:ss`, for example `2026-05-19 06:05:20`.
-- If no supported embedded timestamp is present, `time` remains `null` and `uncertainFields` includes `time`; the CLI does not fall back to provider output, filename text, file modification time, or runtime timezone inference.
-
-## Dataset Expectations
-
-- Input images are read from a directory such as `data/eval/`.
-- Supported image formats are `.jpg`, `.jpeg`, `.png`, and `.webp`.
-- Eval CSV files must include `imageId,time,hand,systolic,diastolic,pulse` headers.
-- Eval ignores additional columns such as generated `p.csv` service fields: `status`, `confidence`, `uncertainFields`, `provider`, `model`, and `rawNotes`.
+- Images are read from a directory such as `data/eval/`.
+- Supported image formats: `.jpg`, `.jpeg`, `.png`, `.webp`.
+- Eval CSV must include headers `imageId,time,hand,systolic,diastolic,pulse`.
+- Additional generated columns (`status`, `confidence`, `uncertainFields`, `provider`, `model`, `rawNotes`) are ignored during eval.
 - `imageId` must uniquely match the image filename stem.
 - Duplicate `imageId` values or duplicate normalized filename stems are rejected.
 
@@ -144,13 +73,159 @@ Example layout:
 ```text
 data/
 └── eval/
-    ├── a.csv
-    ├── img001.jpg
-    ├── img002.png
-    └── ...
+        ├── a.csv
+        ├── img001.jpg
+        ├── img002.png
+        └── ...
 ```
 
-## Environment
+### Relevant CI Checks
+
+- [Build job](.github/workflows/ci.yml#L10)
+- [Unit/Contract Coverage job](.github/workflows/ci.yml#L27)
+- [Integration Tests job](.github/workflows/ci.yml#L44)
+- [Lint job](.github/workflows/ci.yml#L81)
+
+## API
+
+### Requirements
+
+- Node.js 24.x LTS or newer
+- npm 11 or newer
+- Docker daemon for local `db:init` database bootstrap
+- PostgreSQL connection string in `DATABASE_URL`
+
+### Installation And Build
+
+```bash
+npm install
+npm run build
+```
+
+Create/start local Docker PostgreSQL and run migrations:
+
+```bash
+npm run db:init
+```
+
+Choose a specific env file when needed:
+
+```bash
+npm run db:init -- --env .env.example
+```
+
+Run the API:
+
+```bash
+npm run api
+```
+
+Integration test flow:
+
+```bash
+npm run db:init -- --env .env.test
+npm run test:integration
+```
+
+Clean matching DB container and data directory for an env file:
+
+```bash
+npm run db:clean -- --env .env.example
+```
+
+Primary endpoints:
+
+- `POST /api/v1/signin`
+- `POST /api/v1/login`
+- `POST /api/v1/measurements`
+- `GET /api/v1/measurements/<id>`
+- `GET /api/v1/measurements/<id>/image`
+- `POST /api/v1/measurements/<id>/save`
+- `GET /api/v1/measurements`
+
+OpenAPI docs:
+
+- Source: [docs/openapi.yaml](docs/openapi.yaml)
+- Regenerate: `npm run openapi:generate`
+- Serve Swagger UI only: `npm run openapi:serve`
+
+### Configuration Options
+
+- Required for runtime:
+    - `DATABASE_URL`
+    - `MEASUREMENT_IMAGE_DIR`
+    - `ACCESS_TOKEN_TTL_SECONDS`
+    - `API_PORT`
+    - `OPENAI_API_KEY`
+- Optional worker tuning:
+    - `RECOGNITION_WORKER_INTERVAL_SECONDS` (default `10`)
+    - `RECOGNITION_WORKER_BATCH_SIZE` (default `4`)
+- Logging mode:
+    - `NODE_ENV=production` suppresses debug request logs
+    - any other value enables debug request logs
+- DB init override:
+    - `DB_INIT_POSTGRES_IMAGE` chooses another postgres image
+
+### Relevant CI Checks
+
+- [Build job](.github/workflows/ci.yml#L10)
+- [Integration Tests job](.github/workflows/ci.yml#L44)
+- [Lint job](.github/workflows/ci.yml#L81)
+
+## Mobile App
+
+### Requirements
+
+- Android Studio with Android SDK
+- Android Studio bundled JDK (Java 17)
+- Running API server reachable from emulator/device
+
+### Installation And Build
+
+Open Android project:
+
+```text
+mobile/android
+```
+
+Build debug APK from repository root:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:assembleDebug
+```
+
+Run Android unit tests and coverage gate:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:androidCoverageVerify
+```
+
+The app defaults to local emulator API host `http://10.0.2.2:3000`. Start API from repository root with:
+
+```bash
+npm run api
+```
+
+### Configuration Options
+
+- App API base URL comes from Gradle property `apiBaseUrl` and maps to `BuildConfig.API_BASE_URL`
+- Default `apiBaseUrl`: `http://10.0.2.2:3000`
+- One-off override example:
+
+```bash
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android -PapiBaseUrl=http://192.168.1.25:3000 :app:assembleDebug
+```
+
+- Persistent local override: set `apiBaseUrl` in `~/.gradle/gradle.properties`
+- Maestro happy-path flows for US1-US6 live under `mobile/android/maestro`
+- More Android-specific details: [mobile/android/README.md](mobile/android/README.md)
+
+### Relevant CI Checks
+
+- [Android Mobile Tests job](.github/workflows/ci.yml#L98)
+- [Build job](.github/workflows/ci.yml#L10)
+
+## Environment Example
 
 Copy values from `.env.example` into your shell or environment manager.
 
@@ -173,4 +248,4 @@ export NODE_ENV="development"
 
 Validation is enforced by CI checks in [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-For the latest status and required checks, see the repository Actions tab.
+For latest status and required checks, see repository Actions.
