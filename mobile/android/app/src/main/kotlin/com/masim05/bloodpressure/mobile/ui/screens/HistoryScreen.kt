@@ -88,21 +88,32 @@ fun HistoryScreen(
                 onSelected = { to = it },
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+        ) {
             Button(
-                modifier = Modifier.testTag("history_apply_filter"),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("history_apply_filter"),
                 onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
             ) {
                 Text(stringResource(R.string.history_apply_filter))
             }
             OutlinedButton(
-                modifier = Modifier.testTag("history_clear_filter"),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("history_clear_filter"),
                 onClick = onClearFilter,
             ) {
                 Text(stringResource(R.string.history_clear_filter))
             }
             OutlinedButton(
-                modifier = Modifier.testTag(TestTags.HistoryExportCsv),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(TestTags.HistoryExportCsv),
                 onClick = onExportCsv,
                 enabled = measurements.isNotEmpty() && !isLoading,
             ) {
