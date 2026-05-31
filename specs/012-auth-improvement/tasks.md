@@ -30,7 +30,7 @@
 - [X] T007 Add session-store port methods for save/load/clear persisted session in mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/core/ports/Ports.kt
 - [X] T008 Add backend config support for one-week access-token default in src/infrastructure/config/api-config.ts
 - [X] T009 [P] Add backend config validation tests for one-week access-token default in src/infrastructure/config/api-config.test.ts
-- [ ] T010 [P] Add token issuance tests covering configurable TTL propagation in src/adapters/inbound/http/mobile-http-adapters.test.ts
+- [X] T010 [P] Add token issuance tests covering configurable TTL propagation in src/adapters/inbound/http/mobile-http-adapters.test.ts
 
 **Checkpoint**: Shared foundations complete; stories can proceed independently.
 
@@ -44,8 +44,8 @@
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T011 [P] [US1] Add unit tests for persisted-session happy path restore in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
-- [ ] T012 [P] [US1] Add unit tests for unreadable/corrupted persisted session fallback in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T011 [P] [US1] Add unit tests for persisted-session happy path restore in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
+- [X] T012 [P] [US1] Add unit tests for unreadable/corrupted persisted session fallback in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt
 - [X] T013 [P] [US1] Add adapter tests for encrypted persistence behavior in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/adapters/session/EncryptedSessionStoreTest.kt
 - [X] T014 [P] [US1] Add Maestro happy path for shutdown/reopen persistence in mobile/android/maestro/us1-signin.yaml
 - [X] T037 [P] [US1] Add unit tests ensuring API auth errors are surfaced as visible UI state in mobile/android/app/src/test/kotlin/com/masim05/bloodpressure/mobile/core/flow/AppFlowsTest.kt

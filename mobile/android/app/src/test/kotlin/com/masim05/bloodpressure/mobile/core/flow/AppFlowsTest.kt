@@ -188,12 +188,46 @@ class AppFlowsTest {
         assertEquals("api message", failure.error?.message)
     }
 
+    @Test
+    fun restoredPersistedSessionRoutesToCameraOnFlowCreation() {
+        val store = MemoryStore()
+        store.save(session("restored@example.com"))
+
+        val captureState = CaptureFlow(store, CameraFailure(), UploadSuccess()).enterCamera()
+        assertEquals(Route.Camera, captureState.route)
+        assertEquals("restored@example.com", captureState.session?.user?.email)
+
+        val guideState = GuideFlow(store).enterGuide()
+        assertEquals(Route.Guide, guideState.route)
+        assertNotNull(guideState.session)
+    }
+
+    @Test
+    fun unreadableOrMissingPersistedSessionFallsBackToAuth() {
+        val emptyStore = MemoryStore()
+
+        assertEquals(Route.Auth, GuideFlow(emptyStore).enterGuide().route)
+        assertEquals(Route.Auth, GuideFlow(emptyStore).continueToCamera().route)
+        assertEquals(Route.Auth, CaptureFlow(emptyStore, CameraFailure(), UploadSuccess()).enterCamera().route)
+
+        val storeWithError = MemoryStoreWithError()
+        assertEquals(Route.Auth, GuideFlow(storeWithError).enterGuide().route)
+        assertEquals(Route.Auth, CaptureFlow(storeWithError, CameraFailure(), UploadSuccess()).enterCamera().route)
+    }
+
     private class MemoryStore : SessionStore {
         private var session: Session? = null
         override fun save(session: Session) { this.session = session }
         override fun load(): Session? = session
         override fun loadError(): String? = null
         override fun clear() { session = null }
+    }
+
+    private class MemoryStoreWithError : SessionStore {
+        override fun save(session: Session) {}
+        override fun load(): Session? = null
+        override fun loadError(): String? = "corrupted"
+        override fun clear() {}
     }
 
     private class AuthSuccess : AuthGateway {
