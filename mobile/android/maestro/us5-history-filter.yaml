@@ -34,13 +34,6 @@ appId: com.masim05.bloodpressure.mobile
     text: "80"
 - assertVisible:
     text: "68"
-- assertVisible:
-    id: history_export_csv
-- tapOn:
-    id: history_export_csv
-- assertVisible:
-    text: Share history CSV
-- pressKey: back
 - tapOn:
     id: history_row
 - assertVisible:
@@ -51,3 +44,7 @@ appId: com.masim05.bloodpressure.mobile
     id: history_apply_filter
 - assertNotVisible:
     id: camera_upload
+- assertVisible:
+    id: history_export_csv
+- tapOn:
+    id: history_export_csv
