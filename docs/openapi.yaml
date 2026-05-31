@@ -147,8 +147,8 @@ paths:
     get:
       tags:
         - Measurements
-      summary: List saved measurements
-      description: Returns a paginated list of saved measurements owned by the authenticated user. Original image binary data is never included.
+      summary: List measurement history
+      description: Returns a paginated list of the authenticated user's recognized and saved measurements. Original image binary data is never included.
       operationId: listMeasurements
       security:
         - bearerAuth: []
@@ -159,7 +159,7 @@ paths:
         - $ref: '#/components/parameters/To'
       responses:
         '200':
-          description: Saved measurement history page.
+          description: Measurement history page.
           content:
             application/json:
               schema:
@@ -176,6 +176,14 @@ paths:
                         armSide: left
                         measurementTime: '2026-05-27T12:00:00.000Z'
                         savedAt: '2026-05-27T12:05:00.000Z'
+                      - id: msr_124
+                        status: recognized
+                        systolic: 121
+                        diastolic: 81
+                        pulse: 69
+                        armSide: right
+                        measurementTime: '2026-05-27T12:10:00.000Z'
+                        savedAt: null
                     page: 1
                     pageSize: 20
                     hasNextPage: false
@@ -561,6 +569,47 @@ components:
           type: string
           format: date-time
           example: '2026-05-27T12:05:00.000Z'
+    MeasurementHistoryItem:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - status
+        - systolic
+        - diastolic
+        - pulse
+        - armSide
+        - measurementTime
+        - savedAt
+      properties:
+        id:
+          type: string
+          example: msr_123
+        status:
+          type: string
+          enum:
+            - recognized
+            - saved
+        systolic:
+          type: integer
+          example: 120
+        diastolic:
+          type: integer
+          example: 80
+        pulse:
+          type: integer
+          example: 68
+        armSide:
+          $ref: '#/components/schemas/ArmSide'
+        measurementTime:
+          type: string
+          format: date-time
+          example: '2026-05-27T12:00:00.000Z'
+        savedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-05-27T12:05:00.000Z'
     MeasurementHistoryPage:
       type: object
       additionalProperties: false
@@ -574,7 +623,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/SavedMeasurement'
+            $ref: '#/components/schemas/MeasurementHistoryItem'
         page:
           type: integer
           minimum: 1

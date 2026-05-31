@@ -88,9 +88,13 @@ export class InMemoryMeasurementStore implements MeasurementStorePort {
     this.measurements.set(measurement.id, measurement);
   }
 
-  async listSavedForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
+  async listHistoryForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
     const filtered = [...this.measurements.values()]
-      .filter((measurement) => measurement.userId === filter.userId && measurement.status === 'saved')
+      .filter(
+        (measurement) =>
+          measurement.userId === filter.userId &&
+          (measurement.status === 'recognized' || measurement.status === 'saved'),
+      )
       .filter(
         (measurement) =>
           (!filter.from || measurement.measurementTime >= filter.from) &&

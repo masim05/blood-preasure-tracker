@@ -23,5 +23,5 @@ export interface MeasurementStorePort {
   findById(id: string): Promise<Measurement | null>;
   findByIdForUser(id: string, userId: string): Promise<Measurement | null>;
   save(measurement: Measurement): Promise<void>;
-  listSavedForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage>;
+  listHistoryForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage>;
 }

@@ -74,11 +74,11 @@ export class PostgresMeasurementRepository implements MeasurementStorePort {
     );
   }
 
-  async listSavedForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
+  async listHistoryForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
     const offset = (filter.page - 1) * filter.pageSize;
     const result = await this.pool.query<MeasurementRow>(
       `SELECT * FROM measurements
-       WHERE user_id = $1 AND status = 'saved'
+       WHERE user_id = $1 AND status IN ('recognized', 'saved')
        AND ($2::timestamptz IS NULL OR measurement_time >= $2)
        AND ($3::timestamptz IS NULL OR measurement_time <= $3)
        ORDER BY measurement_time DESC, id DESC
