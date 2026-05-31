@@ -1,6 +1,8 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,8 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,6 +40,10 @@ import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import java.net.HttpURLConnection
+import java.net.URI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -43,6 +52,8 @@ fun MeasurementDetailScreen(
     isLoading: Boolean,
     isSaving: Boolean,
     errorText: String?,
+    apiBaseUrl: String,
+    authorizationHeader: String?,
     onBack: () -> Unit,
     onSave: (MeasurementDetail) -> Unit,
 ) {
@@ -88,13 +99,10 @@ fun MeasurementDetailScreen(
                 .testTag(TestTags.MeasurementDetailImage),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = if (detail.imageUrl.isBlank()) {
-                    stringResource(R.string.detail_image_unavailable)
-                } else {
-                    stringResource(R.string.detail_image_placeholder, detail.imageUrl)
-                },
-                style = MaterialTheme.typography.bodyMedium,
+            MeasurementImage(
+                imageUrl = detail.imageUrl,
+                apiBaseUrl = apiBaseUrl,
+                authorizationHeader = authorizationHeader,
             )
         }
 
@@ -160,6 +168,55 @@ fun MeasurementDetailScreen(
 }
 
 @Composable
+private fun MeasurementImage(
+    imageUrl: String,
+    apiBaseUrl: String,
+    authorizationHeader: String?,
+) {
+    val resolvedImageUrl = resolveMeasurementImageUrl(imageUrl, apiBaseUrl)
+    var imageBytes by remember(resolvedImageUrl, authorizationHeader) { mutableStateOf<ByteArray?>(null) }
+    var loadFailed by remember(resolvedImageUrl, authorizationHeader) { mutableStateOf(false) }
+
+    LaunchedEffect(resolvedImageUrl, authorizationHeader) {
+        if (resolvedImageUrl == null) {
+            imageBytes = null
+            loadFailed = true
+            return@LaunchedEffect
+        }
+
+        loadFailed = false
+        imageBytes = runCatching {
+            withContext(Dispatchers.IO) {
+                fetchMeasurementImageBytes(resolvedImageUrl, authorizationHeader)
+            }
+        }.getOrNull()
+        loadFailed = imageBytes == null
+    }
+
+    val bitmap = remember(imageBytes) { imageBytes }?.let { bytes ->
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+    }
+
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit,
+        )
+    } else {
+        Text(
+            text = if (loadFailed) {
+                stringResource(R.string.detail_image_unavailable)
+            } else {
+                stringResource(R.string.status_loading)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
 private fun NumberField(
     modifier: Modifier,
     value: String,
@@ -189,4 +246,40 @@ private fun statusLabel(status: MeasurementStatus): Int = when (status) {
     MeasurementStatus.Recognized -> R.string.measurement_status_recognized
     MeasurementStatus.Saved -> R.string.measurement_status_saved
     MeasurementStatus.Failed -> R.string.measurement_status_failed
+}
+
+internal fun resolveMeasurementImageUrl(imageUrl: String, apiBaseUrl: String): String? {
+    val trimmed = imageUrl.trim()
+    if (trimmed.isBlank()) {
+        return null
+    }
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+        return trimmed
+    }
+    val normalizedBase = apiBaseUrl.trimEnd('/')
+    val normalizedPath = if (trimmed.startsWith('/')) trimmed else "/$trimmed"
+    return "$normalizedBase$normalizedPath"
+}
+
+private fun fetchMeasurementImageBytes(
+    imageUrl: String,
+    authorizationHeader: String?,
+): ByteArray {
+    val connection = URI.create(imageUrl).toURL().openConnection() as HttpURLConnection
+    connection.requestMethod = "GET"
+    connection.connectTimeout = 5_000
+    connection.readTimeout = 10_000
+    if (!authorizationHeader.isNullOrBlank()) {
+        connection.setRequestProperty("Authorization", authorizationHeader)
+    }
+    connection.setRequestProperty("Accept", "image/*")
+    val status = connection.responseCode
+    if (status !in 200..299) {
+        throw IllegalStateException("Failed to load measurement image")
+    }
+    return try {
+        connection.inputStream.use { it.readBytes() }
+    } finally {
+        connection.disconnect()
+    }
 }

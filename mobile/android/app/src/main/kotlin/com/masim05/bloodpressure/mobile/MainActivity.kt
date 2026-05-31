@@ -96,6 +96,8 @@ class MainActivity : ComponentActivity() {
                         isLoading = uiState.isDetailLoading,
                         isSaving = uiState.isDetailSaving,
                         errorText = uiState.errorText,
+                        apiBaseUrl = BuildConfig.API_BASE_URL,
+                        authorizationHeader = sessionStore.load()?.authorizationHeader,
                         onBack = { openHistory(uiState.filter) },
                         onSave = ::saveMeasurementDetail,
                     )
