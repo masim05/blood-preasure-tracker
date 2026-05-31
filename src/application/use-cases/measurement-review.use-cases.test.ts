@@ -156,6 +156,16 @@ describe('measurement use cases', () => {
     ).rejects.toThrow('Measurement must be recognized before override can be applied');
   });
 
+  it('rejects overriding a missing measurement', async () => {
+    await expect(
+      new OverrideMeasurementUseCase(new InMemoryMeasurementStore()).execute({
+        userId: 'usr_1',
+        measurementId: 'missing',
+        pulse: 68,
+      }),
+    ).rejects.toThrow('Measurement was not found');
+  });
+
   it('rejects saving pending measurements and invalid history ranges', async () => {
     const measurements = new InMemoryMeasurementStore();
     await measurements.save(
