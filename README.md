@@ -238,6 +238,22 @@ export CLI_MODEL="gpt-5.4-mini"
 export DATABASE_URL="postgres://postgres:postgres@localhost:5432/blood_pressure_tracker"
 export API_PORT="3000"
 export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
+
+## Contributor Pre-PR Validation Profile
+
+Run the canonical repository validation sequence in this exact order before opening a pull request:
+
+```bash
+npm run build
+npm run lint
+npm run test:coverage
+```
+
+## Maintainer Guide-Sync Notes
+
+- Guide policy source of truth remains `README.md` and `CONTRIBUTING.md`.
+- If workflow policy text changes, update `src/test-workflow.contract.test.ts`, `src/guide-docs.contract.test.ts`, and `src/test-support/guide-*.ts` in the same change.
+- Contract checks should fail with remediation-oriented messages whenever policy/enforcement drift appears.
 export ACCESS_TOKEN_TTL_SECONDS="3600"
 export RECOGNITION_WORKER_INTERVAL_SECONDS="10"
 export RECOGNITION_WORKER_BATCH_SIZE="4"

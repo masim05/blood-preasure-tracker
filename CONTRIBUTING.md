@@ -17,26 +17,27 @@ This policy keeps work isolated, reduces accidental cross-change edits, and make
 
 1. From the repository root, create a worktree for your change:
    - git fetch origin
-   - git worktree add ../bpt-<short-change-name> -b <type>/<short-change-name> origin/main
+   - git worktree add tmp/<speckit-branch-name> -b <speckit-branch-name> origin/main
 2. Move into the new worktree directory.
 3. Implement, test, commit, and push from that worktree only.
 4. Open a pull request from the worktree branch.
 5. After merge, clean up:
-   - git worktree remove ../bpt-<short-change-name>
-   - git branch -d <type>/<short-change-name>
+   - git worktree remove tmp/<speckit-branch-name>
+   - git branch -d <speckit-branch-name>
 
 ## Branch Naming
 
-Use one of the following prefixes:
+Use Speckit branch naming conventions:
 
-- feature/<short-name>
-- bugfix/<short-name>
-- chore/<short-name>
+- 001-<feature-name>
+- 1234-<feature-name>
+- YYYYMMDD-HHMMSS-<feature-name>
 
 Examples:
 
-- feature/mobile-login
-- bugfix/timezone-parse
+- 014-implement-repo-guides
+- 1234-auth-improvement
+- 20260531-093000-mobile-login
 
 ## Pull Request Expectations
 
@@ -44,3 +45,11 @@ Examples:
 - Ensure relevant tests pass before opening a PR.
 - Include a short summary of what changed and why.
 - Reference related issue/spec when available.
+
+## Canonical Validation Sequence
+
+Before opening a pull request, run this sequence in order from the repository root:
+
+- npm run build
+- npm run lint
+- npm run test:coverage

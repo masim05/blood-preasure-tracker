@@ -1,6 +1,16 @@
 import { existsSync, readFileSync } from 'node:fs';
+import {
+  evaluateBranchNamingGuard,
+  evaluateWorktreeGuard,
+  isSpeckitBranchName,
+  readValidationProfileFromPackage,
+} from './test-support/guide-compliance';
 
-const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { scripts?: Record<string, string> };
+const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
+  scripts?: Record<string, string>;
+  engines?: Record<string, string>;
+  dependencies?: Record<string, string>;
+};
 const scripts = packageJson.scripts ?? {};
 const workflow = readFileSync('.github/workflows/ci.yml', 'utf8');
 const unitContractSelection = '--testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap';
@@ -17,6 +27,51 @@ const requiredTestEnvKeys = [
 ];
 
 describe('test workflow contract', () => {
+  it('enforces dedicated tmp worktree policy for feature implementation', () => {
+    const passing = evaluateWorktreeGuard({
+      branchName: '014-implement-repo-guides',
+      isDetachedHead: false,
+      repoRoot: '/repo',
+      cwd: '/repo/tmp/014-implement-repo-guides',
+    });
+    const failing = evaluateWorktreeGuard({
+      branchName: '014-implement-repo-guides',
+      isDetachedHead: false,
+      repoRoot: '/repo',
+      cwd: '/repo',
+    });
+
+    expect(passing.status).toBe('pass');
+    expect(failing.status).toBe('fail');
+    expect(failing.message).toContain('tmp/');
+  });
+
+  it('enforces Speckit branch naming conventions', () => {
+    expect(isSpeckitBranchName('001-feature-name')).toBe(true);
+    expect(isSpeckitBranchName('1234-feature-name')).toBe(true);
+    expect(isSpeckitBranchName('20260531-093000-feature-name')).toBe(true);
+    expect(isSpeckitBranchName('feature-name')).toBe(false);
+  });
+
+  it('fails safe for detached HEAD branch policy checks', () => {
+    const result = evaluateBranchNamingGuard({
+      branchName: null,
+      isDetachedHead: true,
+      repoRoot: '/repo',
+      cwd: '/repo/tmp/014-implement-repo-guides',
+    });
+
+    expect(result.status).toBe('fail');
+    expect(result.message).toContain('detached HEAD');
+  });
+
+  it('exposes canonical pre-PR validation profile as build/lint/test:coverage', () => {
+    const profile = readValidationProfileFromPackage('package.json');
+
+    expect(profile.commands).toEqual(['npm run build', 'npm run lint', 'npm run test:coverage']);
+    expect(profile.required).toBe(true);
+  });
+
   it('defines unit and contract scripts without integration test selection', () => {
     expect(scripts.test).toBe(`jest --runInBand ${unitContractSelection}`);
     expect(scripts['test:coverage']).toBe(`jest --runInBand --coverage ${unitContractSelection}`);
@@ -64,6 +119,14 @@ describe('test workflow contract', () => {
 
   it('does not run a separate npm test step in CI', () => {
     expect(workflow).not.toContain('run: npm test');
+  });
+
+  it('keeps Node and Nest baselines aligned with guide policy', () => {
+    const nodeVersion = packageJson.engines?.node ?? '';
+
+    expect(nodeVersion).toContain('24');
+    expect(packageJson.dependencies?.['@nestjs/common']).toMatch(/^\^11\./);
+    expect(packageJson.dependencies?.['@nestjs/core']).toMatch(/^\^11\./);
   });
 
   it('runs Android bootstrap after db init and before Android Gradle tasks', () => {
