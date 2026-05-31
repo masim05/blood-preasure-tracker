@@ -20,6 +20,9 @@ import com.masim05.bloodpressure.mobile.core.flow.MeasurementDetailFlow
 import com.masim05.bloodpressure.mobile.core.flow.Route
 import com.masim05.bloodpressure.mobile.core.flow.ScreenState
 import com.masim05.bloodpressure.mobile.core.model.AuthMode
+import com.masim05.bloodpressure.mobile.core.model.ApiError
+import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
+import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
@@ -272,8 +275,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun loadMeasurementImage(imageUrl: String): ByteArray? {
-        val authorizationHeader = uiState.detailAuthorizationHeader ?: return null
+    private fun loadMeasurementImage(imageUrl: String): AppResult<ByteArray> {
+        val authorizationHeader = uiState.detailAuthorizationHeader ?: return AppResult.Failure(
+            ApiError(
+                code = "missing_authorization",
+                message = getString(R.string.error_unexpected),
+                source = ApiErrorSource.Unexpected,
+            ),
+        )
         return apiClient.fetchMeasurementImage(imageUrl, authorizationHeader)
     }
 

@@ -37,6 +37,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.masim05.bloodpressure.mobile.R
+import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
@@ -52,7 +53,7 @@ fun MeasurementDetailScreen(
     isSaving: Boolean,
     errorText: String?,
     apiBaseUrl: String,
-    loadMeasurementImage: (String) -> ByteArray?,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
     onBack: () -> Unit,
     onSave: (MeasurementDetail) -> Unit,
 ) {
@@ -170,28 +171,44 @@ fun MeasurementDetailScreen(
 private fun MeasurementImage(
     imageUrl: String,
     apiBaseUrl: String,
-    loadMeasurementImage: (String) -> ByteArray?,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
 ) {
     val resolvedImageUrl = resolveMeasurementImageUrl(imageUrl, apiBaseUrl)
     var bitmap by remember(resolvedImageUrl) { mutableStateOf<ImageBitmap?>(null) }
-    var loadFailed by remember(resolvedImageUrl) { mutableStateOf(false) }
+    var imageErrorText by remember(resolvedImageUrl) { mutableStateOf<String?>(null) }
+    var isLoading by remember(resolvedImageUrl) { mutableStateOf(resolvedImageUrl != null) }
 
     LaunchedEffect(resolvedImageUrl) {
         if (resolvedImageUrl == null) {
             bitmap = null
-            loadFailed = true
+            imageErrorText = null
+            isLoading = false
             return@LaunchedEffect
         }
 
-        loadFailed = false
-        bitmap = runCatching {
-            withContext(Dispatchers.IO) {
-                loadMeasurementImage(resolvedImageUrl)?.let { bytes ->
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+        isLoading = true
+        imageErrorText = null
+        val result = withContext(Dispatchers.IO) {
+            when (val imageResult = loadMeasurementImage(resolvedImageUrl)) {
+                is AppResult.Success -> {
+                    AppResult.Success(
+                        BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size)?.asImageBitmap(),
+                    )
                 }
+                is AppResult.Failure -> imageResult
             }
-        }.getOrNull()
-        loadFailed = bitmap == null
+        }
+        when (result) {
+            is AppResult.Success -> {
+                bitmap = result.value
+                imageErrorText = null
+            }
+            is AppResult.Failure -> {
+                bitmap = null
+                imageErrorText = result.error.message
+            }
+        }
+        isLoading = false
     }
 
     if (bitmap != null) {
@@ -201,13 +218,20 @@ private fun MeasurementImage(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
         )
+    } else if (isLoading) {
+        Text(
+            text = stringResource(R.string.status_loading),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    } else if (imageErrorText != null) {
+        Text(
+            text = imageErrorText ?: "",
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     } else {
         Text(
-            text = if (loadFailed) {
-                stringResource(R.string.detail_image_unavailable)
-            } else {
-                stringResource(R.string.status_loading)
-            },
+            text = stringResource(R.string.detail_image_unavailable),
             style = MaterialTheme.typography.bodyMedium,
         )
     }

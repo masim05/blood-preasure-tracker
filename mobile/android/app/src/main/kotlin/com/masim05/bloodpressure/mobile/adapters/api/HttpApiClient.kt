@@ -27,14 +27,14 @@ class HttpApiClient(
     private val timeoutMessage: String,
     private val parseMessage: String,
 ) : AuthGateway, HistoryGateway, MeasurementUploadGateway, MeasurementDetailGateway {
-    fun fetchMeasurementImage(imageUrl: String, authorization: String): ByteArray? = runCatching {
+    fun fetchMeasurementImage(imageUrl: String, authorization: String): AppResult<ByteArray> = runCatching {
         val response = requestBytes(url = imageUrl, method = "GET", authorization = authorization, accept = "image/*")
         if (response.status in 200..299) {
-            response.body
+            AppResult.Success(response.body)
         } else {
-            null
+            AppResult.Failure(ApiErrorMapper.fromApiBody(response.body.toString(StandardCharsets.UTF_8), fallbackApiMessage))
         }
-    }.getOrNull()
+    }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
 
     override fun signIn(email: String, password: String): AppResult<Session> = authenticate("/api/v1/signin", email, password)
 
