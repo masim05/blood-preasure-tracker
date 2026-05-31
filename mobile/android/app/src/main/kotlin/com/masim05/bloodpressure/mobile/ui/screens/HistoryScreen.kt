@@ -42,7 +42,9 @@ import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -172,7 +174,7 @@ private fun HistoryRow(measurement: Measurement, onMeasurementSelected: (Measure
             .testTag(TestTags.HistoryRow),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HistoryCell(measurement.measurementTime.ifBlank { measurement.savedAt }, 2f)
+        HistoryCell(formatHistoryTime(measurement.measurementTime.ifBlank { measurement.savedAt }), 2f)
         HistoryCell(measurement.systolic.toString(), 1f)
         HistoryCell(measurement.diastolic.toString(), 1f)
         HistoryCell(measurement.pulse.toString(), 1f)
@@ -240,6 +242,23 @@ private fun String.toDateMillis(): Long? = runCatching {
 }.getOrNull()
 
 private fun Long.toIsoDate(): String = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate().toString()
+
+private val historyTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+
+internal fun formatHistoryTime(
+    value: String,
+    deviceZoneId: ZoneId = ZoneId.systemDefault(),
+): String {
+    if (value.isBlank()) return value
+    val isoInstant = runCatching {
+        Instant.parse(value).atZone(deviceZoneId).format(historyTimeFormatter)
+    }.getOrNull()
+    if (isoInstant != null) {
+        return isoInstant
+    }
+    return runCatching { LocalDateTime.parse(value, historyTimeFormatter).format(historyTimeFormatter) }
+        .getOrDefault(value)
+}
 
 private fun armLabel(armSide: ArmSide): Int = when (armSide) {
     ArmSide.Left -> R.string.arm_left
