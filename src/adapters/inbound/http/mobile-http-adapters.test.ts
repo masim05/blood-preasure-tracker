@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { extractBearerToken } from './bearer-auth.guard';
 import { requireAuthRequest } from './dto/auth.dto';
-import { parseOptionalPositiveInteger } from './dto/measurement.dto';
+import { parseMeasurementOverride, parseOptionalPositiveInteger } from './dto/measurement.dto';
 import { ApiError, toHttpException } from './http-error.mapper';
 import { CreateAccountUseCase } from '../../../application/use-cases/create-account.use-case';
 import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case';
@@ -51,6 +51,21 @@ describe('mobile HTTP adapter helpers', () => {
     expect(parseOptionalPositiveInteger(undefined)).toBeUndefined();
     expect(parseOptionalPositiveInteger('20')).toBe(20);
     expect(() => parseOptionalPositiveInteger('1.5')).toThrow('query value must be an integer');
+  });
+
+  it('parses measurement override payloads', () => {
+    expect(parseMeasurementOverride({ systolic: 121 })).toEqual({
+      systolic: 121,
+      diastolic: undefined,
+      pulse: undefined,
+    });
+    expect(() => parseMeasurementOverride(undefined)).toThrow(
+      'at least one of systolic, diastolic, pulse is required',
+    );
+    expect(() => parseMeasurementOverride({ pulse: 0 })).toThrow('pulse must be a positive integer');
+    expect(() => parseMeasurementOverride({ systolic: 121, unexpected: true } as never)).toThrow(
+      'unexpected field: unexpected',
+    );
   });
 
   it('maps unknown errors and API errors to HTTP exceptions', () => {

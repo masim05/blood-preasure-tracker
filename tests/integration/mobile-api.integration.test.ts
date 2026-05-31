@@ -25,6 +25,81 @@ describe('mobile API integration flow', () => {
     fixture = await createMobileApiFixture();
   });
 
+  describe('POST /api/v1/measurements/{id}/override - happy path', () => {
+    async function response(): Promise<MeasurementResponseScenario> {
+      const accessToken = await signedInAccessToken(fixture);
+      const measurementId = await uploadAndRecognize(fixture, accessToken);
+      const response = await postJson(
+        fixture.baseUrl,
+        `/api/v1/measurements/${measurementId}/override`,
+        { systolic: 124, diastolic: 84, pulse: 72 },
+        accessToken,
+      );
+
+      return { response, measurementId };
+    }
+
+    it('responds with HTTP 201', async () => {
+      expect((await response()).response.status).toBe(201);
+    });
+
+    it('responds with proper json', async () => {
+      const { response: overrideResponse, measurementId } = await response();
+
+      expect(overrideResponse.body).toEqual({
+        id: measurementId,
+        status: 'recognized',
+        systolic: 124,
+        diastolic: 84,
+        pulse: 72,
+        armSide: 'right',
+        measurementTime: expect.any(String),
+      });
+    });
+
+    it('persists overridden values in PostgreSQL', async () => {
+      const { measurementId } = await response();
+
+      expect(await measurementReadings(fixture.pool, measurementId)).toEqual({
+        systolic: 124,
+        diastolic: 84,
+        pulse: 72,
+      });
+    });
+  });
+
+  describe('POST /api/v1/measurements/{id}/override - saved measurement', () => {
+    it('keeps saved status and persists overridden values', async () => {
+      const accessToken = await signedInAccessToken(fixture);
+      const measurementId = await uploadAndRecognize(fixture, accessToken);
+      await postJson(fixture.baseUrl, `/api/v1/measurements/${measurementId}/save`, {}, accessToken);
+
+      const overrideResponse = await postJson(
+        fixture.baseUrl,
+        `/api/v1/measurements/${measurementId}/override`,
+        { systolic: 126, pulse: 74 },
+        accessToken,
+      );
+
+      expect(overrideResponse.status).toBe(201);
+      expect(overrideResponse.body).toEqual({
+        id: measurementId,
+        status: 'saved',
+        systolic: 126,
+        diastolic: 82,
+        pulse: 74,
+        armSide: 'right',
+        measurementTime: expect.any(String),
+        savedAt: expect.any(String),
+      });
+      expect(await measurementReadings(fixture.pool, measurementId)).toEqual({
+        systolic: 126,
+        diastolic: 82,
+        pulse: 74,
+      });
+    });
+  });
+
   beforeEach(async () => {
     clearAuthRateLimitBuckets();
     fixture.requestLogs.length = 0;
@@ -678,6 +753,12 @@ type StatusRow = {
   status: string;
 };
 
+type ReadingRow = {
+  systolic: number;
+  diastolic: number;
+  pulse: number;
+};
+
 type TaskRow = {
   id: string;
 };
@@ -881,6 +962,19 @@ async function measurementStatus(pool: PostgresPool, measurementId: string): Pro
   const result = await pool.query<StatusRow>('SELECT status FROM measurements WHERE id = $1', [measurementId]);
 
   return readString(result.rows[0]?.status, 'measurement status');
+}
+
+async function measurementReadings(pool: PostgresPool, measurementId: string): Promise<ReadingRow> {
+  const result = await pool.query<ReadingRow>(
+    'SELECT systolic, diastolic, pulse FROM measurements WHERE id = $1 LIMIT 1',
+    [measurementId],
+  );
+  const row = result.rows[0];
+  if (!row) {
+    throw new Error('expected measurement readings');
+  }
+
+  return row;
 }
 
 async function queuedTaskId(pool: PostgresPool, measurementId: string): Promise<string> {
