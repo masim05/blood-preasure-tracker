@@ -546,7 +546,11 @@ describe('mobile API integration flow', () => {
   });
 
   describe('GET /api/v1/measurements - happy path saved and recognized history', () => {
-    async function response(): Promise<MeasurementResponseScenario> {
+    async function response(): Promise<{
+      response: FetchJsonResponse;
+      recognizedMeasurementId: string;
+      savedMeasurementId: string;
+    }> {
       const accessToken = await signedInAccessToken(fixture);
       const recognizedMeasurementId = await uploadAndRecognize(fixture, accessToken);
       const savedMeasurementId = await uploadAndRecognize(fixture, accessToken);

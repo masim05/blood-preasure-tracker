@@ -36,7 +36,7 @@ export class ListMeasurementsUseCase {
 
   async execute(input: ListMeasurementsInput): Promise<ListMeasurementsOutput> {
     const pagination = parsePagination(input);
-    const page = await this.measurements.listSavedForUser({ userId: input.userId, ...pagination });
+    const page = await this.measurements.listHistoryForUser({ userId: input.userId, ...pagination });
 
     return {
       items: page.items.map((measurement) => {

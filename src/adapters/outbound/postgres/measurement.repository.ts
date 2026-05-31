@@ -74,7 +74,7 @@ export class PostgresMeasurementRepository implements MeasurementStorePort {
     );
   }
 
-  async listSavedForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
+  async listHistoryForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
     const offset = (filter.page - 1) * filter.pageSize;
     const result = await this.pool.query<MeasurementRow>(
       `SELECT * FROM measurements

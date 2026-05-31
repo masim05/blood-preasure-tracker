@@ -104,7 +104,7 @@ describe('mobile API not-found and malformed-state branches', () => {
       findById: jest.fn(),
       findByIdForUser: jest.fn(),
       save: jest.fn(),
-      listSavedForUser: jest.fn<Promise<MeasurementHistoryPage>, []>().mockResolvedValue({
+      listHistoryForUser: jest.fn<Promise<MeasurementHistoryPage>, []>().mockResolvedValue({
         items: [malformed],
         page: 1,
         pageSize: 20,
