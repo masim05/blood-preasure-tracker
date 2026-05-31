@@ -42,8 +42,8 @@ import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -245,16 +245,19 @@ private fun Long.toIsoDate(): String = Instant.ofEpochMilli(this).atZone(ZoneId.
 
 private val historyTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-internal fun formatHistoryTime(value: String): String {
+internal fun formatHistoryTime(
+    value: String,
+    deviceZoneId: ZoneId = ZoneId.systemDefault(),
+): String {
     if (value.isBlank()) return value
-    val normalized = value.replace('T', ' ')
-    val plainMatch = Regex("""^(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2})""").find(normalized)
-    if (plainMatch != null) {
-        return "${plainMatch.groupValues[1]} ${plainMatch.groupValues[2]}"
+    val isoInstant = runCatching {
+        Instant.parse(value).atZone(deviceZoneId).format(historyTimeFormatter)
+    }.getOrNull()
+    if (isoInstant != null) {
+        return isoInstant
     }
-    return runCatching {
-        Instant.parse(value).atZone(ZoneOffset.UTC).format(historyTimeFormatter)
-    }.getOrDefault(value)
+    return runCatching { LocalDateTime.parse(value, historyTimeFormatter).format(historyTimeFormatter) }
+        .getOrDefault(value)
 }
 
 private fun armLabel(armSide: ArmSide): Int = when (armSide) {
