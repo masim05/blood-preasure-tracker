@@ -266,18 +266,18 @@ private fun fetchMeasurementImageBytes(
     authorizationHeader: String?,
 ): ByteArray {
     val connection = URI.create(imageUrl).toURL().openConnection() as HttpURLConnection
-    connection.requestMethod = "GET"
-    connection.connectTimeout = 5_000
-    connection.readTimeout = 10_000
-    if (!authorizationHeader.isNullOrBlank()) {
-        connection.setRequestProperty("Authorization", authorizationHeader)
-    }
-    connection.setRequestProperty("Accept", "image/*")
-    val status = connection.responseCode
-    if (status !in 200..299) {
-        throw IllegalStateException("Failed to load measurement image")
-    }
     return try {
+        connection.requestMethod = "GET"
+        connection.connectTimeout = 5_000
+        connection.readTimeout = 10_000
+        if (!authorizationHeader.isNullOrBlank()) {
+            connection.setRequestProperty("Authorization", authorizationHeader)
+        }
+        connection.setRequestProperty("Accept", "image/*")
+        val status = connection.responseCode
+        if (status !in 200..299) {
+            throw IllegalStateException("Failed to load measurement image")
+        }
         connection.inputStream.use { it.readBytes() }
     } finally {
         connection.disconnect()
