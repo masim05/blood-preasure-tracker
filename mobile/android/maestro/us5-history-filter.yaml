@@ -44,3 +44,7 @@ appId: com.masim05.bloodpressure.mobile
     id: history_apply_filter
 - assertNotVisible:
     id: camera_upload
+- assertVisible:
+    id: history_export_csv
+- tapOn:
+    id: history_export_csv

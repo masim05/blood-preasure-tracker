@@ -18,6 +18,7 @@ object TestTags {
     const val HistoryRow = "history_row"
     const val HistoryFromDate = "history_from"
     const val HistoryToDate = "history_to"
+    const val HistoryExportCsv = "history_export_csv"
     const val MeasurementDetailScreen = "measurement_detail_screen"
     const val MeasurementDetailError = "measurement_detail_error"
     const val MeasurementDetailImage = "measurement_detail_image"

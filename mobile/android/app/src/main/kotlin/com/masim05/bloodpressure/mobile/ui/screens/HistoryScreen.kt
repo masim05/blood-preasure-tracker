@@ -39,7 +39,6 @@ import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
-import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import java.time.Instant
 import java.time.LocalDate
@@ -54,6 +53,7 @@ fun HistoryScreen(
     errorText: String?,
     onApplyFilter: (HistoryFilter) -> Unit,
     onClearFilter: () -> Unit,
+    onExportCsv: () -> Unit,
     onMeasurementSelected: (Measurement) -> Unit,
 ) {
     var from by remember(filter) { mutableStateOf(filter.from) }
@@ -88,18 +88,36 @@ fun HistoryScreen(
                 onSelected = { to = it },
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+        ) {
             Button(
-                modifier = Modifier.testTag("history_apply_filter"),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("history_apply_filter"),
                 onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
             ) {
                 Text(stringResource(R.string.history_apply_filter))
             }
             OutlinedButton(
-                modifier = Modifier.testTag("history_clear_filter"),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("history_clear_filter"),
                 onClick = onClearFilter,
             ) {
                 Text(stringResource(R.string.history_clear_filter))
+            }
+            OutlinedButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(TestTags.HistoryExportCsv),
+                onClick = onExportCsv,
+                enabled = measurements.isNotEmpty() && !isLoading,
+            ) {
+                Text(stringResource(R.string.history_export_csv))
             }
         }
         if (errorText != null) {
@@ -141,7 +159,6 @@ private fun HistoryHeader() {
         HistoryCell(stringResource(R.string.history_column_diastolic), 1f, true)
         HistoryCell(stringResource(R.string.history_column_pulse), 1f, true)
         HistoryCell(stringResource(R.string.history_column_arm), 1f, true)
-        HistoryCell(stringResource(R.string.history_column_status), 1f, true)
     }
 }
 
@@ -160,7 +177,6 @@ private fun HistoryRow(measurement: Measurement, onMeasurementSelected: (Measure
         HistoryCell(measurement.diastolic.toString(), 1f)
         HistoryCell(measurement.pulse.toString(), 1f)
         HistoryCell(stringResource(armLabel(measurement.armSide)), 1f)
-        HistoryCell(stringResource(statusLabel(measurement.status)), 1f)
     }
 }
 
@@ -229,12 +245,4 @@ private fun armLabel(armSide: ArmSide): Int = when (armSide) {
     ArmSide.Left -> R.string.arm_left
     ArmSide.Right -> R.string.arm_right
     ArmSide.Unknown -> R.string.arm_unknown
-}
-
-private fun statusLabel(status: MeasurementStatus): Int = when (status) {
-    MeasurementStatus.Recognizing -> R.string.measurement_status_recognizing
-    MeasurementStatus.Recognized -> R.string.measurement_status_recognized
-    MeasurementStatus.Saved -> R.string.measurement_status_saved
-    MeasurementStatus.Pending -> R.string.measurement_status_pending
-    MeasurementStatus.Failed -> R.string.measurement_status_failed
 }

@@ -1,5 +1,7 @@
 package com.masim05.bloodpressure.mobile
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -86,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         errorText = uiState.errorText,
                         onApplyFilter = ::openHistory,
                         onClearFilter = { openHistory(HistoryFilter()) },
+                        onExportCsv = { exportHistoryCsv(uiState.measurements) },
                         onMeasurementSelected = { openMeasurementDetail(it.id) },
                     )
                     Route.MeasurementDetail -> MeasurementDetailScreen(
@@ -229,6 +232,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun exportHistoryCsv(measurements: List<Measurement>) {
+        if (measurements.isEmpty()) return
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/csv"
+            putExtra(Intent.EXTRA_TEXT, measurementsToCsv(measurements))
+        }
+        if (sendIntent.resolveActivity(packageManager) == null) {
+            uiState = uiState.copy(errorText = getString(R.string.history_export_csv_unavailable))
+            return
+        }
+        try {
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.history_export_csv_chooser)))
+        } catch (_: ActivityNotFoundException) {
+            uiState = uiState.copy(errorText = getString(R.string.history_export_csv_unavailable))
+        }
+    }
+
     private fun saveMeasurementDetail(detail: MeasurementDetail) {
         uiState = uiState.copy(isDetailSaving = true, errorText = null)
         runInBackground {
@@ -311,6 +331,28 @@ internal fun initialRoute(session: Session?): Route {
 
 private fun Session.isValidAt(now: Instant): Boolean {
     return runCatching { Instant.parse(expiresAt).isAfter(now) }.getOrDefault(false)
+}
+
+internal fun measurementsToCsv(measurements: List<Measurement>): String {
+    val header = "time,systolic,diastolic,pulse,arm"
+    if (measurements.isEmpty()) return header
+    val rows = measurements.joinToString(separator = "\n") { measurement ->
+        listOf(
+            measurement.measurementTime.ifBlank { measurement.savedAt },
+            measurement.systolic.toString(),
+            measurement.diastolic.toString(),
+            measurement.pulse.toString(),
+            measurement.armSide.name.lowercase(),
+        ).joinToString(separator = ",") { csvEscape(it) }
+    }
+    return "$header\n$rows"
+}
+
+private fun csvEscape(value: String): String {
+    if (value.none { it == ',' || it == '"' || it == '\n' || it == '\r' }) {
+        return value
+    }
+    return "\"${value.replace("\"", "\"\"")}\""
 }
 
 private data class MobileUiState(
