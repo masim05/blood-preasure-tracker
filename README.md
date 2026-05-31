@@ -2,12 +2,6 @@
 
 Blood Pressure Tracker has three deliverables in one repository: a CLI predictor/evaluator for blood-pressure monitor images, a NestJS mobile API for accounts and measurement lifecycle, and an Android app that captures images and displays saved history.
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-All feature and bugfix work must be done in separate git worktrees created specifically for that work.
-
 ## CLI Predictor/Evaluator
 
 ### Requirements
@@ -255,3 +249,9 @@ export NODE_ENV="development"
 Validation is enforced by CI checks in [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 For latest status and required checks, see repository Actions.
+
+## Contributing
+
+Contribution guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+All feature and bugfix work must be done in separate Git worktrees, with one worktree per change.
