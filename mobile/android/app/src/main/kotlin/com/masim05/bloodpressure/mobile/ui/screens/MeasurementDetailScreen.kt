@@ -211,9 +211,10 @@ private fun MeasurementImage(
         isLoading = false
     }
 
-    if (bitmap != null) {
+    val loadedBitmap = bitmap
+    if (loadedBitmap != null) {
         Image(
-            bitmap = bitmap,
+            bitmap = loadedBitmap,
             contentDescription = stringResource(R.string.detail_image_content_description),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
