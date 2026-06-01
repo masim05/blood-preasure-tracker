@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { scripts?: Record<string, string> };
 const scripts = packageJson.scripts ?? {};
 const workflow = readFileSync('.github/workflows/ci.yml', 'utf8');
+const dbInitScript = readFileSync('scripts/db-init.mjs', 'utf8');
 const unitContractSelection = '--testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap';
 const integrationSelection = '--testPathPatterns=tests/integration/.*\\.test\\.ts$';
 const requiredTestEnvKeys = [
@@ -33,6 +34,10 @@ describe('test workflow contract', () => {
 
   it('defines db:migrate to run only with .env defaults', () => {
     expect(scripts['db:migrate']).toBe('node scripts/db-migrate.mjs');
+  });
+
+  it('runs migrations through runDbCommand migrate branch during db:init', () => {
+    expect(dbInitScript).toContain("await runDbCommand('migrate', args);");
   });
 
   it('rejects db:migrate arguments to avoid overriding .env', () => {

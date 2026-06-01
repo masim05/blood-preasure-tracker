@@ -30,7 +30,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 export async function runDbCommand(command, args) {
   loadRuntimeConfig(args);
   if (command === 'init') {
-    await initDatabase();
+    await initDatabase(args);
     return;
   }
   if (command === 'migrate') {
@@ -59,7 +59,7 @@ function loadRuntimeConfig(args) {
   legacyDataDirectory = path.join(rootDirectory, 'data', legacyContainerName);
 }
 
-async function initDatabase() {
+async function initDatabase(args) {
   ensureLocalDatabaseHost(database.hostname);
   if (skipDockerProvisioning) {
     console.log('Using existing PostgreSQL service because DB_INIT_SKIP_DOCKER=1');
@@ -70,7 +70,7 @@ async function initDatabase() {
   await waitForPostgres(buildConnectionString('postgres'));
   await ensureDatabaseExists();
   await waitForPostgres(databaseUrl);
-  await runMigrations(databaseUrl);
+  await runDbCommand('migrate', args);
 
   if (skipDockerProvisioning) {
     console.log(`PostgreSQL service is ready: ${database.hostname}:${database.port}`);
