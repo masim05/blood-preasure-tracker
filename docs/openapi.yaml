@@ -284,63 +284,6 @@ paths:
                   value:
                     error: conflict
                     message: Measurement must be recognized before it can be saved
-  /api/v1/measurements/{id}/override:
-    post:
-      tags:
-        - Measurements
-      summary: Override recognized values
-      description: Overrides one or more recognized reading fields on an owned recognized or saved measurement.
-      operationId: overrideMeasurement
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/MeasurementId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MeasurementOverrideRequest'
-            examples:
-              default:
-                value:
-                  systolic: 121
-                  diastolic: 81
-                  pulse: 69
-      responses:
-        '201':
-          description: Measurement override persisted.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OverriddenMeasurement'
-              examples:
-                default:
-                  value:
-                    id: msr_123
-                    status: recognized
-                    systolic: 121
-                    diastolic: 81
-                    pulse: 69
-                    armSide: right
-                    measurementTime: '2026-05-27T12:00:00.000Z'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          description: Measurement is not in a recognized/saved state.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidState:
-                  value:
-                    error: conflict
-                    message: Measurement must be recognized before override can be applied
   /api/v1/measurements/{id}/image:
     get:
       tags:
@@ -616,62 +559,6 @@ components:
         pulse:
           type: integer
           example: 68
-        armSide:
-          $ref: '#/components/schemas/ArmSide'
-        measurementTime:
-          type: string
-          format: date-time
-          example: '2026-05-27T12:00:00.000Z'
-        savedAt:
-          type: string
-          format: date-time
-          example: '2026-05-27T12:05:00.000Z'
-    MeasurementOverrideRequest:
-      type: object
-      additionalProperties: false
-      minProperties: 1
-      properties:
-        systolic:
-          type: integer
-          minimum: 1
-          example: 121
-        diastolic:
-          type: integer
-          minimum: 1
-          example: 81
-        pulse:
-          type: integer
-          minimum: 1
-          example: 69
-    OverriddenMeasurement:
-      type: object
-      additionalProperties: false
-      required:
-        - id
-        - status
-        - systolic
-        - diastolic
-        - pulse
-        - armSide
-        - measurementTime
-      properties:
-        id:
-          type: string
-          example: msr_123
-        status:
-          type: string
-          enum:
-            - recognized
-            - saved
-        systolic:
-          type: integer
-          example: 121
-        diastolic:
-          type: integer
-          example: 81
-        pulse:
-          type: integer
-          example: 69
         armSide:
           $ref: '#/components/schemas/ArmSide'
         measurementTime:

@@ -1,6 +1,5 @@
 /* istanbul ignore file */
 import {
-  Body,
   Controller,
   Get,
   Param,
@@ -19,16 +18,13 @@ import { Readable } from 'node:stream';
 import { GetMeasurementDetailUseCase } from '../../../application/use-cases/get-measurement-detail.use-case';
 import { GetMeasurementImageUseCase } from '../../../application/use-cases/get-measurement-image.use-case';
 import { ListMeasurementsUseCase } from '../../../application/use-cases/list-measurements.use-case';
-import { OverrideMeasurementUseCase } from '../../../application/use-cases/override-measurement.use-case';
 import { SaveMeasurementUseCase } from '../../../application/use-cases/save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from '../../../application/use-cases/submit-measurement-image.use-case';
 import { MAX_UPLOAD_BYTES } from '../../../domain/services/upload-image-policy';
 import { BearerAuthGuard, type AuthenticatedHttpRequest } from './bearer-auth.guard';
 import {
   type MeasurementQueryDto,
-  type MeasurementOverrideDto,
   type MeasurementUploadFile,
-  parseMeasurementOverride,
   parseOptionalPositiveInteger,
 } from './dto/measurement.dto';
 import { ApiError, toHttpException } from './http-error.mapper';
@@ -40,7 +36,6 @@ export class MeasurementsController {
     private readonly submitMeasurementImage: SubmitMeasurementImageUseCase,
     private readonly getMeasurementDetail: GetMeasurementDetailUseCase,
     private readonly saveMeasurement: SaveMeasurementUseCase,
-    private readonly overrideMeasurement: OverrideMeasurementUseCase,
     private readonly listMeasurements: ListMeasurementsUseCase,
     private readonly getMeasurementImage: GetMeasurementImageUseCase,
   ) {}
@@ -132,25 +127,6 @@ export class MeasurementsController {
     }
   }
 
-  @Post('/:id/override')
-  async override(
-    @Req() request: AuthenticatedHttpRequest,
-    @Param('id') measurementId: string,
-    @Body() body: MeasurementOverrideDto,
-  ): Promise<unknown> {
-    try {
-      const override = parseMeasurementOverride(body);
-      return await this.overrideMeasurement.execute({
-        userId: requireUserId(request),
-        measurementId,
-        systolic: override.systolic,
-        diastolic: override.diastolic,
-        pulse: override.pulse,
-      });
-    } catch (error) {
-      throw toHttpException(error);
-    }
-  }
 }
 
 type HeaderResponse = {

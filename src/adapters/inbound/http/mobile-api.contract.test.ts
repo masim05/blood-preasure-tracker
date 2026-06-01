@@ -9,7 +9,6 @@ import { GetMeasurementDetailUseCase } from '../../../application/use-cases/get-
 import { GetMeasurementImageUseCase } from '../../../application/use-cases/get-measurement-image.use-case';
 import { ListMeasurementsUseCase } from '../../../application/use-cases/list-measurements.use-case';
 import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case';
-import { OverrideMeasurementUseCase } from '../../../application/use-cases/override-measurement.use-case';
 import { SaveMeasurementUseCase } from '../../../application/use-cases/save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from '../../../application/use-cases/submit-measurement-image.use-case';
 import { Measurement } from '../../../domain/entities/measurement';
@@ -85,7 +84,6 @@ describe('mobile API contract controllers', () => {
       new SubmitMeasurementImageUseCase(measurements, images, new InMemoryRecognitionTaskStore()),
       new GetMeasurementDetailUseCase(measurements, images),
       new SaveMeasurementUseCase(measurements),
-      new OverrideMeasurementUseCase(measurements),
       new ListMeasurementsUseCase(measurements),
       new GetMeasurementImageUseCase(measurements, images),
     );
@@ -116,19 +114,6 @@ describe('mobile API contract controllers', () => {
         armSide: 'left',
       }),
     );
-    await expect(
-      controller.override(request, measurementId, {
-        systolic: 121,
-        diastolic: 81,
-        pulse: 69,
-      }),
-    ).resolves.toMatchObject({
-      id: measurementId,
-      status: 'recognized',
-      systolic: 121,
-      diastolic: 81,
-      pulse: 69,
-    });
     await expect(controller.save(request, measurementId)).resolves.toMatchObject({ status: 'saved' });
     await expect(controller.list(request, { page: '1', pageSize: '20' })).resolves.toMatchObject({
       items: [expect.objectContaining({ id: measurementId, status: 'saved' })],
@@ -145,29 +130,30 @@ describe('mobile API contract controllers', () => {
     expect(headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 
-  it('rejects unknown override request fields and supports overriding saved measurements', async () => {
+  it('supports saving recognized measurements', async () => {
     const measurements = new InMemoryMeasurementStore();
     const controller = new MeasurementsController(
       new SubmitMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore(), new InMemoryRecognitionTaskStore()),
       new GetMeasurementDetailUseCase(measurements, new InMemoryMeasurementImageStore()),
       new SaveMeasurementUseCase(measurements),
-      new OverrideMeasurementUseCase(measurements),
       new ListMeasurementsUseCase(measurements),
       new GetMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore()),
     );
     const request = authenticatedRequest();
-    await measurements.save(savedMeasurement('msr_saved'));
-
-    await expectStatus(
-      controller.override(request, 'msr_saved', { systolic: 121, unexpected: true } as never),
-      400,
+    await measurements.save(
+      new Measurement({
+        ...savedMeasurement('msr_saved').toJSON(),
+        status: 'recognized',
+        savedAt: null,
+      }),
     );
-    await expect(controller.override(request, 'msr_saved', { pulse: 69 })).resolves.toMatchObject({
+
+    await expect(controller.save(request, 'msr_saved')).resolves.toMatchObject({
       id: 'msr_saved',
       status: 'saved',
       systolic: 120,
       diastolic: 80,
-      pulse: 69,
+      pulse: 68,
       savedAt: '2026-05-27T12:00:00.000Z',
     });
   });
@@ -181,7 +167,6 @@ describe('mobile API contract controllers', () => {
       ),
       new GetMeasurementDetailUseCase(new InMemoryMeasurementStore(), new InMemoryMeasurementImageStore()),
       new SaveMeasurementUseCase(new InMemoryMeasurementStore()),
-      new OverrideMeasurementUseCase(new InMemoryMeasurementStore()),
       new ListMeasurementsUseCase(new InMemoryMeasurementStore()),
       new GetMeasurementImageUseCase(new InMemoryMeasurementStore(), new InMemoryMeasurementImageStore()),
     );
