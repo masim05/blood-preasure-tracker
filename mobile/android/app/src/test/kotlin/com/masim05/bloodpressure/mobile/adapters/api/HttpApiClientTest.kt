@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -328,6 +329,49 @@ class HttpApiClientTest {
         assertEquals("Parse error", result.error.message)
     }
 
+    @Test
+    fun `fetch measurement image sends authorization and returns bytes`() {
+        val imageBytes = "png-bytes".toByteArray(StandardCharsets.UTF_8)
+        server.enqueueBinary(200, imageBytes, "image/png")
+
+        val result = client.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:${server.port}/api/v1/measurements/msr_1/image",
+            authorization = session().authorizationHeader,
+        )
+        val payload = (result as AppResult.Success).value
+
+        assertArrayEquals(imageBytes, payload)
+        assertEquals(session().authorizationHeader, server.request.authorization)
+        assertEquals("/api/v1/measurements/msr_1/image", server.request.path)
+    }
+
+    @Test
+    fun `fetch measurement image surfaces API error`() {
+        server.enqueueBinary(404, "{\"error\":\"not_found\",\"message\":\"Image not found\"}".toByteArray())
+
+        val result = client.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:${server.port}/api/v1/measurements/missing/image",
+            authorization = session().authorizationHeader,
+        )
+        val failure = result as AppResult.Failure
+
+        assertEquals("not_found", failure.error.code)
+        assertEquals("Image not found", failure.error.message)
+    }
+
+    @Test
+    fun `fetch measurement image maps closed connection to network error`() {
+        server.close()
+
+        val result = client.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:${server.port}/api/v1/measurements/msr_1/image",
+            authorization = session().authorizationHeader,
+        )
+        val failure = result as AppResult.Failure
+
+        assertEquals("Network error", failure.error.message)
+    }
+
     private fun session(): Session = Session(
         accessToken = "token-1",
         tokenType = "Bearer",
@@ -376,51 +420,65 @@ class HttpApiClientTest {
         fun enqueue(status: Int, body: String) {
             this.status = status
             this.body = body
-            Thread {
-                socket.accept().use { connection ->
-                    val input = connection.getInputStream()
-                    val headerBytes = mutableListOf<Byte>()
-                    while (!headerBytes.endsWithHeaderTerminator()) {
-                        headerBytes += input.read().toByte()
-                    }
-                    val headerText = headerBytes.toByteArray().toString(Charsets.ISO_8859_1)
-                    val headerLines = headerText.split("\r\n")
-                    val requestLine = headerLines.first()
-                    val headers = mutableMapOf<String, String>()
-                    var contentLength = 0
-                    headerLines.drop(1).forEach { line ->
-                        val separator = line.indexOf(':')
-                        if (separator > 0) {
-                            val name = line.substring(0, separator)
-                            val value = line.substring(separator + 1).trim()
-                            headers[name] = value
-                            if (name.equals("Content-Length", ignoreCase = true)) contentLength = value.toInt()
-                        }
-                    }
-                    val requestBody = ByteArray(contentLength).let { bytes ->
-                        var offset = 0
-                        while (offset < contentLength) {
-                            val read = input.read(bytes, offset, contentLength - offset)
-                            if (read < 0) break
-                            offset += read
-                        }
-                        bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
-                    }
-                    request = RecordedRequest(
-                        path = requestLine.substringAfter(' ').substringBefore('?').substringBefore(' '),
-                        body = requestBody,
-                        authorization = headers["Authorization"].orEmpty(),
-                        contentType = headers["Content-Type"].orEmpty(),
-                        query = requestLine.substringAfter('?').substringBefore(' '),
-                    )
-                    val responseBytes = body.toByteArray()
-                    connection.getOutputStream().use { output ->
-                        output.write("HTTP/1.1 $status OK\r\nContent-Length: ${responseBytes.size}\r\nConnection: close\r\n\r\n".toByteArray())
-                        output.write(responseBytes)
-                    }
-                    latch.countDown()
+            this.contentType = "application/json"
+            Thread { acceptAndRespond() }.start()
+        }
+
+        fun enqueueBinary(status: Int, body: ByteArray, contentType: String = "application/octet-stream") {
+            this.status = status
+            this.body = body.toString(Charsets.ISO_8859_1)
+            this.contentType = contentType
+            Thread { acceptAndRespond() }.start()
+        }
+
+        private var contentType: String = "application/json"
+
+        private fun acceptAndRespond() {
+            socket.accept().use { connection ->
+                val input = connection.getInputStream()
+                val headerBytes = mutableListOf<Byte>()
+                while (!headerBytes.endsWithHeaderTerminator()) {
+                    headerBytes += input.read().toByte()
                 }
-            }.start()
+                val headerText = headerBytes.toByteArray().toString(Charsets.ISO_8859_1)
+                val headerLines = headerText.split("\r\n")
+                val requestLine = headerLines.first()
+                val headers = mutableMapOf<String, String>()
+                var contentLength = 0
+                headerLines.drop(1).forEach { line ->
+                    val separator = line.indexOf(':')
+                    if (separator > 0) {
+                        val name = line.substring(0, separator)
+                        val value = line.substring(separator + 1).trim()
+                        headers[name] = value
+                        if (name.equals("Content-Length", ignoreCase = true)) contentLength = value.toInt()
+                    }
+                }
+                val requestBody = ByteArray(contentLength).let { bytes ->
+                    var offset = 0
+                    while (offset < contentLength) {
+                        val read = input.read(bytes, offset, contentLength - offset)
+                        if (read < 0) break
+                        offset += read
+                    }
+                    bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
+                }
+                request = RecordedRequest(
+                    path = requestLine.substringAfter(' ').substringBefore('?').substringBefore(' '),
+                    body = requestBody,
+                    authorization = headers["Authorization"].orEmpty(),
+                    contentType = headers["Content-Type"].orEmpty(),
+                    query = requestLine.substringAfter('?').substringBefore(' '),
+                )
+                val responseBytes = body.toByteArray(Charsets.ISO_8859_1)
+                connection.getOutputStream().use { output ->
+                    output.write(
+                        "HTTP/1.1 $status OK\r\nContent-Length: ${responseBytes.size}\r\nContent-Type: $contentType\r\nConnection: close\r\n\r\n".toByteArray(),
+                    )
+                    output.write(responseBytes)
+                }
+                latch.countDown()
+            }
         }
 
         private fun MutableList<Byte>.endsWithHeaderTerminator(): Boolean =
