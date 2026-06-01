@@ -304,7 +304,7 @@ class HttpApiClientTest {
     }
 
     @Test
-    fun `save measurement detail posts save endpoint and preserves image url`() {
+    fun `save measurement detail posts save endpoint with edited readings and preserves image url`() {
         server.enqueue(
             201,
             """
@@ -330,6 +330,8 @@ class HttpApiClientTest {
         val detail = (result as AppResult.Success).value
 
         assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("application/json", server.request.contentType)
+        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69}""", server.request.body)
         assertEquals(MeasurementStatus.Saved, detail.status)
         assertEquals(ArmSide.Right, detail.armSide)
         assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
