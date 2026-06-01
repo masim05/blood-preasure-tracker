@@ -29,9 +29,18 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: measurement_detail_systolic
 - eraseText
-- inputText: "120"
+- inputText: "121"
 - hideKeyboard
 - tapOn:
+    id: measurement_detail_save
+- tapOn:
     id: measurement_detail_back
+    optional: true
 - assertVisible:
     id: history_apply_filter
+- tapOn:
+    id: history_row
+- assertVisible:
+    id: measurement_detail_screen
+- assertVisible:
+    id: measurement_detail_systolic

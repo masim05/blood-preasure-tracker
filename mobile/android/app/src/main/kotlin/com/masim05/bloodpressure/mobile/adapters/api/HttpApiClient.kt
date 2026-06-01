@@ -90,7 +90,13 @@ class HttpApiClient(
     }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
 
     override fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail> = runCatching {
-        val response = request("/api/v1/measurements/${urlPath(detail.id)}/save", "POST", authorization = session.authorizationHeader)
+        val response = request(
+            path = "/api/v1/measurements/${urlPath(detail.id)}/save",
+            method = "POST",
+            body = saveMeasurementBody(detail).toByteArray(StandardCharsets.UTF_8),
+            contentType = "application/json",
+            authorization = session.authorizationHeader,
+        )
         if (response.status in 200..299) {
             val saved = parseMeasurementDetail(response.body)
             AppResult.Success(saved.copy(imageUrl = saved.imageUrl.ifBlank { detail.imageUrl }))
@@ -223,6 +229,11 @@ class HttpApiClient(
     private fun escape(value: String): String = value.replace("\\", "\\\\").replace("\"", "\\\"")
     private fun url(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name())
     private fun urlPath(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.name()).replace("+", "%20")
+    private fun saveMeasurementBody(detail: MeasurementDetail): String = buildList {
+        detail.systolic?.let { add("\"systolic\":$it") }
+        detail.diastolic?.let { add("\"diastolic\":$it") }
+        detail.pulse?.let { add("\"pulse\":$it") }
+    }.joinToString(separator = ",", prefix = "{", postfix = "}")
 
     private fun readImageBytes(image: MeasurementImage): ByteArray {
         val imageUri = URI.create(image.uri)

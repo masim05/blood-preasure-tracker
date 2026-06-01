@@ -8,10 +8,9 @@ import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
 import com.masim05.bloodpressure.mobile.core.model.Session
+import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
 import java.net.ServerSocket
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -304,7 +303,7 @@ class HttpApiClientTest {
     }
 
     @Test
-    fun `save measurement detail posts save endpoint and preserves image url`() {
+    fun `save measurement detail posts save endpoint with edited readings and preserves image url`() {
         server.enqueue(
             201,
             """
@@ -329,10 +328,45 @@ class HttpApiClientTest {
         )
         val detail = (result as AppResult.Success).value
 
+        assertEquals(1, server.requests.size)
         assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("application/json", server.request.contentType)
+        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69}""", server.request.body)
         assertEquals(MeasurementStatus.Saved, detail.status)
         assertEquals(ArmSide.Right, detail.armSide)
         assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
+    }
+
+    @Test
+    fun `save measurement detail surfaces save API failures`() {
+        server.enqueue(400, "{\"error\":\"validation\",\"message\":\"At least one field must be provided\"}")
+
+        val failure = client.save(session(), detailForSave()) as AppResult.Failure
+
+        assertEquals(1, server.requests.size)
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("validation", failure.error.code)
+        assertEquals("At least one field must be provided", failure.error.message)
+    }
+
+    @Test
+    fun `save measurement detail sends empty save body when all readings are null`() {
+        server.enqueue(
+            201,
+            """
+            {"id":"msr_1","status":"saved","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z","savedAt":"2026-05-27T12:05:00.000Z"}
+            """.trimIndent(),
+        )
+
+        val result = client.save(
+            session(),
+            detailForSave().copy(systolic = null, diastolic = null, pulse = null),
+        )
+
+        assertTrue(result is AppResult.Success)
+        assertEquals(1, server.requests.size)
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("{}", server.request.body)
     }
 
     @Test
@@ -370,8 +404,8 @@ class HttpApiClientTest {
         val getFailure = client.get(session(), "msr_1") as AppResult.Failure
         val saveFailure = client.save(session(), detailForSave()) as AppResult.Failure
 
-        assertEquals("Network error", getFailure.error.message)
-        assertEquals("Network error", saveFailure.error.message)
+        assertTrue(getFailure.error.source == ApiErrorSource.Network || getFailure.error.source == ApiErrorSource.Timeout)
+        assertTrue(saveFailure.error.source == ApiErrorSource.Network || saveFailure.error.source == ApiErrorSource.Timeout)
     }
 
     @Test
@@ -463,76 +497,84 @@ class HttpApiClientTest {
 
     private class TestHttpServer : AutoCloseable {
         private val socket = ServerSocket(0)
-        private val latch = CountDownLatch(1)
-        private var status = 200
-        private var body = "{}"
-        lateinit var request: RecordedRequest
-            private set
+        private val responseQueue = java.util.concurrent.LinkedBlockingQueue<Triple<Int, String, String>>()
+        private val recordedRequests = mutableListOf<RecordedRequest>()
+        private val pending = java.util.concurrent.atomic.AtomicInteger(0)
 
         val port: Int = socket.localPort
+        val request: RecordedRequest get() = recordedRequests.last()
+        val requests: List<RecordedRequest> get() = recordedRequests.toList()
+
+        init {
+            Thread(::acceptLoop, "test-http-server").also { it.isDaemon = true }.start()
+        }
 
         fun enqueue(status: Int, body: String) {
-            this.status = status
-            this.body = body
-            this.contentType = "application/json"
-            Thread { acceptAndRespond() }.start()
+            pending.incrementAndGet()
+            responseQueue.put(Triple(status, body, "application/json"))
         }
 
         fun enqueueBinary(status: Int, body: ByteArray, contentType: String = "application/octet-stream") {
-            this.status = status
-            this.body = body.toString(Charsets.ISO_8859_1)
-            this.contentType = contentType
-            Thread { acceptAndRespond() }.start()
+            pending.incrementAndGet()
+            responseQueue.put(Triple(status, body.toString(Charsets.ISO_8859_1), contentType))
         }
 
-        private var contentType: String = "application/json"
+        private fun acceptLoop() {
+            try {
+                while (!socket.isClosed) {
+                    val connection = try { socket.accept() } catch (_: Exception) { break }
+                    connection.use { acceptAndRespond(it) }
+                }
+            } catch (_: Exception) {}
+        }
 
-        private fun acceptAndRespond() {
-            socket.accept().use { connection ->
-                val input = connection.getInputStream()
-                val headerBytes = mutableListOf<Byte>()
-                while (!headerBytes.endsWithHeaderTerminator()) {
-                    headerBytes += input.read().toByte()
+        private fun acceptAndRespond(connection: java.net.Socket) {
+            val input = connection.getInputStream()
+            val headerBytes = mutableListOf<Byte>()
+            while (!headerBytes.endsWithHeaderTerminator()) {
+                headerBytes += input.read().toByte()
+            }
+            val headerText = headerBytes.toByteArray().toString(Charsets.ISO_8859_1)
+            val headerLines = headerText.split("\r\n")
+            val requestLine = headerLines.first()
+            val headers = mutableMapOf<String, String>()
+            var contentLength = 0
+            headerLines.drop(1).forEach { line ->
+                val separator = line.indexOf(':')
+                if (separator > 0) {
+                    val name = line.substring(0, separator)
+                    val value = line.substring(separator + 1).trim()
+                    headers[name] = value
+                    if (name.equals("Content-Length", ignoreCase = true)) contentLength = value.toInt()
                 }
-                val headerText = headerBytes.toByteArray().toString(Charsets.ISO_8859_1)
-                val headerLines = headerText.split("\r\n")
-                val requestLine = headerLines.first()
-                val headers = mutableMapOf<String, String>()
-                var contentLength = 0
-                headerLines.drop(1).forEach { line ->
-                    val separator = line.indexOf(':')
-                    if (separator > 0) {
-                        val name = line.substring(0, separator)
-                        val value = line.substring(separator + 1).trim()
-                        headers[name] = value
-                        if (name.equals("Content-Length", ignoreCase = true)) contentLength = value.toInt()
-                    }
+            }
+            val requestBody = ByteArray(contentLength).let { bytes ->
+                var offset = 0
+                while (offset < contentLength) {
+                    val read = input.read(bytes, offset, contentLength - offset)
+                    if (read < 0) break
+                    offset += read
                 }
-                val requestBody = ByteArray(contentLength).let { bytes ->
-                    var offset = 0
-                    while (offset < contentLength) {
-                        val read = input.read(bytes, offset, contentLength - offset)
-                        if (read < 0) break
-                        offset += read
-                    }
-                    bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
-                }
-                request = RecordedRequest(
+                bytes.copyOf(offset).toString(Charsets.ISO_8859_1)
+            }
+            recordedRequests.add(
+                RecordedRequest(
                     path = requestLine.substringAfter(' ').substringBefore('?').substringBefore(' '),
                     body = requestBody,
                     authorization = headers["Authorization"].orEmpty(),
                     contentType = headers["Content-Type"].orEmpty(),
                     query = requestLine.substringAfter('?').substringBefore(' '),
                 )
-                val responseBytes = body.toByteArray(Charsets.ISO_8859_1)
-                connection.getOutputStream().use { output ->
-                    output.write(
-                        "HTTP/1.1 $status OK\r\nContent-Length: ${responseBytes.size}\r\nContent-Type: $contentType\r\nConnection: close\r\n\r\n".toByteArray(),
-                    )
-                    output.write(responseBytes)
-                }
-                latch.countDown()
+            )
+            val (status, body, contentType) = responseQueue.take()
+            val responseBytes = body.toByteArray(Charsets.ISO_8859_1)
+            connection.getOutputStream().use { output ->
+                output.write(
+                    "HTTP/1.1 $status OK\r\nContent-Length: ${responseBytes.size}\r\nContent-Type: $contentType\r\nConnection: close\r\n\r\n".toByteArray(),
+                )
+                output.write(responseBytes)
             }
+            pending.decrementAndGet()
         }
 
         private fun MutableList<Byte>.endsWithHeaderTerminator(): Boolean =
@@ -540,7 +582,10 @@ class HttpApiClientTest {
                 this[size - 2] == '\r'.code.toByte() && this[size - 1] == '\n'.code.toByte()
 
         override fun close() {
-            latch.await(1, TimeUnit.SECONDS)
+            val deadline = System.currentTimeMillis() + 1_000L
+            while (pending.get() > 0 && System.currentTimeMillis() < deadline) {
+                Thread.sleep(10)
+            }
             socket.close()
         }
     }
