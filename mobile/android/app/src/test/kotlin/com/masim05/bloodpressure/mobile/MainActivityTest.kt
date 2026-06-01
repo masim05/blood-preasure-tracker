@@ -128,6 +128,28 @@ class MainActivityTest {
         assertEquals(MainTab.Profile, topLevelMainTab(Route.Profile))
     }
 
+    @Test
+    fun topLevelMainTabForDestinationRouteUsesDestinationWhenPresent() {
+        assertEquals(
+            MainTab.History,
+            topLevelMainTabForDestinationRoute(
+                MainDestination.MeasurementDetail.route,
+                Route.Profile,
+            ),
+        )
+    }
+
+    @Test
+    fun topLevelMainTabForDestinationRouteFallsBackToUiRoute() {
+        assertEquals(
+            MainTab.Profile,
+            topLevelMainTabForDestinationRoute(
+                destinationRoute = null,
+                fallbackRoute = Route.Profile,
+            ),
+        )
+    }
+
     private fun session(email: String, expiresAt: String = "2026-12-31T00:00:00.000Z") = Session(
         accessToken = "token",
         tokenType = "Bearer",

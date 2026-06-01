@@ -87,7 +87,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = backStackEntry?.destination
-                val mainTab = remember(uiState.route) { topLevelMainTab(uiState.route) }
+                val mainTab = remember(currentDestination?.route, uiState.route) {
+                    topLevelMainTabForDestinationRoute(currentDestination?.route, uiState.route)
+                }
 
                 LaunchedEffect(uiState.route, uiState.selectedMeasurementId) {
                     syncNavigationState(navController, uiState.route, uiState.selectedMeasurementId)
@@ -417,9 +419,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun logout() {
-        sessionStore.clear()
         historyRequestVersion += 1
         uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+        runInBackground {
+            sessionStore.clear()
+        }
     }
 
     private fun shouldApplyHistoryState(requestVersion: Int, route: Route): Boolean {
@@ -598,6 +602,15 @@ internal fun topLevelMainTab(route: Route): MainTab {
         Route.History, Route.MeasurementDetail -> MainTab.History
         Route.Profile -> MainTab.Profile
         else -> MainTab.Capture
+    }
+}
+
+internal fun topLevelMainTabForDestinationRoute(destinationRoute: String?, fallbackRoute: Route): MainTab {
+    return when (destinationRoute) {
+        MainDestination.History.route, MainDestination.MeasurementDetail.route -> MainTab.History
+        MainDestination.Profile.route -> MainTab.Profile
+        MainDestination.Capture.route -> MainTab.Capture
+        else -> topLevelMainTab(fallbackRoute)
     }
 }
 
