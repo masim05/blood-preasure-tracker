@@ -133,7 +133,7 @@ class MainActivityTest {
         assertEquals(
             MainTab.History,
             topLevelMainTabForDestinationRoute(
-                MainDestination.MeasurementDetail.route,
+                "main/history/detail",
                 Route.Profile,
             ),
         )
