@@ -83,7 +83,7 @@ fun MeasurementDetailScreen(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            if (isLoading || detail == null) {
+            if (shouldShowDetailLoadingPlaceholder(detail)) {
                 Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
                 Spacer(Modifier.weight(1f))
                 OutlinedButton(
@@ -93,6 +93,9 @@ fun MeasurementDetailScreen(
                     onClick = onBack,
                 ) { Text(stringResource(R.string.detail_back)) }
                 return@Column
+            }
+            if (showDetailRefreshLoadingIndicator(isLoading, detail)) {
+                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
             }
 
             var systolic by remember(detail.id, detail.systolic) { mutableStateOf(detail.systolic?.toString().orEmpty()) }
@@ -296,4 +299,12 @@ internal fun resolveMeasurementImageUrl(imageUrl: String, apiBaseUrl: String): S
     val normalizedBase = apiBaseUrl.trimEnd('/')
     val normalizedPath = if (trimmed.startsWith('/')) trimmed else "/$trimmed"
     return "$normalizedBase$normalizedPath"
+}
+
+internal fun shouldShowDetailLoadingPlaceholder(detail: MeasurementDetail?): Boolean {
+    return detail == null
+}
+
+internal fun showDetailRefreshLoadingIndicator(isLoading: Boolean, detail: MeasurementDetail?): Boolean {
+    return isLoading && detail != null
 }

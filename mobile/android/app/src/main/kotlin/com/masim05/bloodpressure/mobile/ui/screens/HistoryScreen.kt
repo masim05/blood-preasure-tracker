@@ -140,10 +140,12 @@ fun HistoryScreen(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            if (isLoading) {
+            if (showHistoryRefreshLoadingIndicator(isLoading, measurements)) {
                 Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
-            } else if (measurements.isEmpty()) {
-                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.history_empty))
+            }
+            val statusRes = historyStatusTextRes(isLoading, measurements)
+            if (statusRes != null) {
+                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(statusRes))
             } else {
                 HistoryTable(measurements, onMeasurementSelected)
             }
@@ -274,4 +276,16 @@ private fun armLabel(armSide: ArmSide): Int = when (armSide) {
     ArmSide.Left -> R.string.arm_left
     ArmSide.Right -> R.string.arm_right
     ArmSide.Unknown -> R.string.arm_unknown
+}
+
+internal fun showHistoryRefreshLoadingIndicator(isLoading: Boolean, measurements: List<Measurement>): Boolean {
+    return isLoading && measurements.isNotEmpty()
+}
+
+internal fun historyStatusTextRes(isLoading: Boolean, measurements: List<Measurement>): Int? {
+    return if (measurements.isEmpty()) {
+        if (isLoading) R.string.status_loading else R.string.history_empty
+    } else {
+        null
+    }
 }
