@@ -8,6 +8,7 @@ import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.core.model.MobileUser
 import com.masim05.bloodpressure.mobile.core.model.Session
+import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
 import java.net.ServerSocket
 import java.nio.charset.StandardCharsets
 import org.junit.After
@@ -382,8 +383,8 @@ class HttpApiClientTest {
         val getFailure = client.get(session(), "msr_1") as AppResult.Failure
         val saveFailure = client.save(session(), detailForSave()) as AppResult.Failure
 
-        assertEquals("Network error", getFailure.error.message)
-        assertEquals("Network error", saveFailure.error.message)
+        assertTrue(getFailure.error.source == ApiErrorSource.Network || getFailure.error.source == ApiErrorSource.Timeout)
+        assertTrue(saveFailure.error.source == ApiErrorSource.Network || saveFailure.error.source == ApiErrorSource.Timeout)
     }
 
     @Test

@@ -241,7 +241,7 @@ class HttpApiClient(
         detail.systolic?.let { add("\"systolic\":$it") }
         detail.diastolic?.let { add("\"diastolic\":$it") }
         detail.pulse?.let { add("\"pulse\":$it") }
-    }.joinToString(prefix = "{", postfix = "}")
+    }.joinToString(separator = ",", prefix = "{", postfix = "}")
 
     private fun readImageBytes(image: MeasurementImage): ByteArray {
         val imageUri = URI.create(image.uri)
