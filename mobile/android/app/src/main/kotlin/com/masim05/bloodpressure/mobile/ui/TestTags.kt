@@ -13,6 +13,7 @@ object TestTags {
     const val CameraCapture = "camera_upload"
     const val CameraHistory = "camera_history"
     const val HistoryScreen = "history_screen"
+    const val HistoryRefresh = "history_refresh"
     const val HistoryError = "history_error"
     const val HistoryTable = "history_table"
     const val HistoryRow = "history_row"

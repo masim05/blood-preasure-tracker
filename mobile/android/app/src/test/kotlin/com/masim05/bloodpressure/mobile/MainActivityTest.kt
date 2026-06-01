@@ -74,6 +74,16 @@ class MainActivityTest {
         )
     }
 
+    @Test
+    fun refreshMeasurementDetailIdReturnsNullForBlankValue() {
+        assertNull(refreshMeasurementDetailId("   "))
+    }
+
+    @Test
+    fun refreshMeasurementDetailIdReturnsMeasurementIdWhenPresent() {
+        assertEquals("msr_1", refreshMeasurementDetailId("msr_1"))
+    }
+
     private fun session(email: String, expiresAt: String = "2026-12-31T00:00:00.000Z") = Session(
         accessToken = "token",
         tokenType = "Bearer",

@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
                         measurements = uiState.measurements,
                         isLoading = uiState.isHistoryLoading,
                         errorText = uiState.errorText,
+                        onRefresh = ::refreshHistory,
                         onApplyFilter = ::openHistory,
                         onClearFilter = { openHistory(HistoryFilter()) },
                         onExportCsv = { exportHistoryCsv(uiState.measurements) },
@@ -101,6 +102,7 @@ class MainActivity : ComponentActivity() {
                         errorText = uiState.errorText,
                         apiBaseUrl = BuildConfig.API_BASE_URL,
                         loadMeasurementImage = ::loadMeasurementImage,
+                        onRefresh = ::refreshMeasurementDetail,
                         onBack = { openHistory(uiState.filter) },
                         onSave = ::saveMeasurementDetail,
                     )
@@ -238,6 +240,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun refreshHistory() {
+        openHistory(uiState.filter)
+    }
+
+    private fun refreshMeasurementDetail() {
+        val measurementId = refreshMeasurementDetailId(uiState.selectedMeasurementId) ?: return
+        openMeasurementDetail(measurementId)
+    }
+
     private fun exportHistoryCsv(measurements: List<Measurement>) {
         if (measurements.isEmpty()) return
         val sendIntent = Intent(Intent.ACTION_SEND).apply {
@@ -348,6 +359,10 @@ internal fun initialRoute(session: Session?): Route {
 
 private fun Session.isValidAt(now: Instant): Boolean {
     return runCatching { Instant.parse(expiresAt).isAfter(now) }.getOrDefault(false)
+}
+
+internal fun refreshMeasurementDetailId(selectedMeasurementId: String?): String? {
+    return selectedMeasurementId?.takeIf { it.isNotBlank() }
 }
 
 internal fun measurementsToCsv(measurements: List<Measurement>): String {

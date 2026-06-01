@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,7 +47,7 @@ import com.masim05.bloodpressure.mobile.ui.TestTags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MeasurementDetailScreen(
     detail: MeasurementDetail?,
@@ -54,115 +56,123 @@ fun MeasurementDetailScreen(
     errorText: String?,
     apiBaseUrl: String,
     loadMeasurementImage: (String) -> AppResult<ByteArray>,
+    onRefresh: () -> Unit,
     onBack: () -> Unit,
     onSave: (MeasurementDetail) -> Unit,
 ) {
-    Column(
+    PullToRefreshBox(
+        isRefreshing = isLoading,
+        onRefresh = onRefresh,
         modifier = Modifier
             .fillMaxSize()
-            .semantics { testTagsAsResourceId = true }
-            .padding(16.dp)
-            .testTag(TestTags.MeasurementDetailScreen),
     ) {
-        Text(stringResource(R.string.detail_title), style = MaterialTheme.typography.headlineMedium)
-        if (errorText != null) {
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .testTag(TestTags.MeasurementDetailError),
-                text = errorText,
-                color = MaterialTheme.colorScheme.error,
-            )
-        }
-        if (isLoading || detail == null) {
-            Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
-            Spacer(Modifier.weight(1f))
-            OutlinedButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(TestTags.MeasurementDetailBack),
-                onClick = onBack,
-            ) { Text(stringResource(R.string.detail_back)) }
-            return@Column
-        }
-
-        var systolic by remember(detail.id, detail.systolic) { mutableStateOf(detail.systolic?.toString().orEmpty()) }
-        var diastolic by remember(detail.id, detail.diastolic) { mutableStateOf(detail.diastolic?.toString().orEmpty()) }
-        var pulse by remember(detail.id, detail.pulse) { mutableStateOf(detail.pulse?.toString().orEmpty()) }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(3f)
-                .padding(top = 16.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .testTag(TestTags.MeasurementDetailImage),
-            contentAlignment = Alignment.Center,
-        ) {
-            MeasurementImage(
-                imageUrl = detail.imageUrl,
-                apiBaseUrl = apiBaseUrl,
-                loadMeasurementImage = loadMeasurementImage,
-            )
-        }
-
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .fillMaxSize()
+                .semantics { testTagsAsResourceId = true }
+                .padding(16.dp)
+                .testTag(TestTags.MeasurementDetailScreen),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NumberField(
-                    modifier = Modifier.weight(1f),
-                    value = systolic,
-                    label = stringResource(R.string.detail_systolic),
-                    testTag = TestTags.MeasurementDetailSystolic,
-                    onValueChange = { systolic = it },
-                )
-                NumberField(
-                    modifier = Modifier.weight(1f),
-                    value = diastolic,
-                    label = stringResource(R.string.detail_diastolic),
-                    testTag = TestTags.MeasurementDetailDiastolic,
-                    onValueChange = { diastolic = it },
-                )
-                NumberField(
-                    modifier = Modifier.weight(1f),
-                    value = pulse,
-                    label = stringResource(R.string.detail_pulse),
-                    testTag = TestTags.MeasurementDetailPulse,
-                    onValueChange = { pulse = it },
+            Text(stringResource(R.string.detail_title), style = MaterialTheme.typography.headlineMedium)
+            if (errorText != null) {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag(TestTags.MeasurementDetailError),
+                    text = errorText,
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
-            Text(stringResource(R.string.detail_arm_side, stringResource(armLabel(detail.armSide))))
-            Text(stringResource(R.string.detail_status, stringResource(statusLabel(detail.status))))
-            detail.recognitionError?.takeIf { it.isNotBlank() }?.let {
-                Text(text = stringResource(R.string.detail_recognition_error, it), color = MaterialTheme.colorScheme.error)
+            if (isLoading || detail == null) {
+                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
+                Spacer(Modifier.weight(1f))
+                OutlinedButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TestTags.MeasurementDetailBack),
+                    onClick = onBack,
+                ) { Text(stringResource(R.string.detail_back)) }
+                return@Column
             }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(
+
+            var systolic by remember(detail.id, detail.systolic) { mutableStateOf(detail.systolic?.toString().orEmpty()) }
+            var diastolic by remember(detail.id, detail.diastolic) { mutableStateOf(detail.diastolic?.toString().orEmpty()) }
+            var pulse by remember(detail.id, detail.pulse) { mutableStateOf(detail.pulse?.toString().orEmpty()) }
+
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .testTag(TestTags.MeasurementDetailBack),
-                onClick = onBack,
-            ) { Text(stringResource(R.string.detail_back)) }
-            Button(
+                    .fillMaxWidth()
+                    .weight(3f)
+                    .padding(top = 16.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .testTag(TestTags.MeasurementDetailImage),
+                contentAlignment = Alignment.Center,
+            ) {
+                MeasurementImage(
+                    imageUrl = detail.imageUrl,
+                    apiBaseUrl = apiBaseUrl,
+                    loadMeasurementImage = loadMeasurementImage,
+                )
+            }
+
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .testTag(TestTags.MeasurementDetailSave),
-                enabled = !isSaving,
-                onClick = {
-                    onSave(
-                        detail.copy(
-                            systolic = systolic.toIntOrNull() ?: detail.systolic,
-                            diastolic = diastolic.toIntOrNull() ?: detail.diastolic,
-                            pulse = pulse.toIntOrNull() ?: detail.pulse,
-                        ),
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    NumberField(
+                        modifier = Modifier.weight(1f),
+                        value = systolic,
+                        label = stringResource(R.string.detail_systolic),
+                        testTag = TestTags.MeasurementDetailSystolic,
+                        onValueChange = { systolic = it },
                     )
-                },
-            ) { Text(stringResource(if (isSaving) R.string.status_loading else R.string.detail_save)) }
+                    NumberField(
+                        modifier = Modifier.weight(1f),
+                        value = diastolic,
+                        label = stringResource(R.string.detail_diastolic),
+                        testTag = TestTags.MeasurementDetailDiastolic,
+                        onValueChange = { diastolic = it },
+                    )
+                    NumberField(
+                        modifier = Modifier.weight(1f),
+                        value = pulse,
+                        label = stringResource(R.string.detail_pulse),
+                        testTag = TestTags.MeasurementDetailPulse,
+                        onValueChange = { pulse = it },
+                    )
+                }
+                Text(stringResource(R.string.detail_arm_side, stringResource(armLabel(detail.armSide))))
+                Text(stringResource(R.string.detail_status, stringResource(statusLabel(detail.status))))
+                detail.recognitionError?.takeIf { it.isNotBlank() }?.let {
+                    Text(text = stringResource(R.string.detail_recognition_error, it), color = MaterialTheme.colorScheme.error)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(TestTags.MeasurementDetailBack),
+                    onClick = onBack,
+                ) { Text(stringResource(R.string.detail_back)) }
+                Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(TestTags.MeasurementDetailSave),
+                    enabled = !isSaving,
+                    onClick = {
+                        onSave(
+                            detail.copy(
+                                systolic = systolic.toIntOrNull() ?: detail.systolic,
+                                diastolic = diastolic.toIntOrNull() ?: detail.diastolic,
+                                pulse = pulse.toIntOrNull() ?: detail.pulse,
+                            ),
+                        )
+                    },
+                ) { Text(stringResource(if (isSaving) R.string.status_loading else R.string.detail_save)) }
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,13 +47,14 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     filter: HistoryFilter,
     measurements: List<Measurement>,
     isLoading: Boolean,
     errorText: String?,
+    onRefresh: () -> Unit,
     onApplyFilter: (HistoryFilter) -> Unit,
     onClearFilter: () -> Unit,
     onExportCsv: () -> Unit,
@@ -61,82 +63,90 @@ fun HistoryScreen(
     var from by remember(filter) { mutableStateOf(filter.from) }
     var to by remember(filter) { mutableStateOf(filter.to) }
 
-    Column(
+    PullToRefreshBox(
+        isRefreshing = isLoading,
+        onRefresh = onRefresh,
         modifier = Modifier
             .fillMaxSize()
-            .semantics { testTagsAsResourceId = true }
-            .padding(16.dp)
-            .testTag(TestTags.HistoryScreen),
+            .testTag(TestTags.HistoryRefresh),
     ) {
-        Text(stringResource(R.string.history_title), style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DateSelectorButton(
-                modifier = Modifier.weight(1f),
-                labelRes = R.string.history_from_hint,
-                selectedFormatRes = R.string.history_from_selected,
-                titleRes = R.string.date_picker_from_title,
-                value = from,
-                testTag = TestTags.HistoryFromDate,
-                onSelected = { from = it },
-            )
-            DateSelectorButton(
-                modifier = Modifier.weight(1f),
-                labelRes = R.string.history_to_hint,
-                selectedFormatRes = R.string.history_to_selected,
-                titleRes = R.string.date_picker_to_title,
-                value = to,
-                testTag = TestTags.HistoryToDate,
-                onSelected = { to = it },
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+                .fillMaxSize()
+                .semantics { testTagsAsResourceId = true }
+                .padding(16.dp)
+                .testTag(TestTags.HistoryScreen),
         ) {
-            Button(
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("history_apply_filter"),
-                onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
-            ) {
-                Text(stringResource(R.string.history_apply_filter))
+            Text(stringResource(R.string.history_title), style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DateSelectorButton(
+                    modifier = Modifier.weight(1f),
+                    labelRes = R.string.history_from_hint,
+                    selectedFormatRes = R.string.history_from_selected,
+                    titleRes = R.string.date_picker_from_title,
+                    value = from,
+                    testTag = TestTags.HistoryFromDate,
+                    onSelected = { from = it },
+                )
+                DateSelectorButton(
+                    modifier = Modifier.weight(1f),
+                    labelRes = R.string.history_to_hint,
+                    selectedFormatRes = R.string.history_to_selected,
+                    titleRes = R.string.date_picker_to_title,
+                    value = to,
+                    testTag = TestTags.HistoryToDate,
+                    onSelected = { to = it },
+                )
             }
-            OutlinedButton(
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                    .weight(1f)
-                    .testTag("history_clear_filter"),
-                onClick = onClearFilter,
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
             ) {
-                Text(stringResource(R.string.history_clear_filter))
+                Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("history_apply_filter"),
+                    onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
+                ) {
+                    Text(stringResource(R.string.history_apply_filter))
+                }
+                OutlinedButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("history_clear_filter"),
+                    onClick = onClearFilter,
+                ) {
+                    Text(stringResource(R.string.history_clear_filter))
+                }
+                OutlinedButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(TestTags.HistoryExportCsv),
+                    onClick = onExportCsv,
+                    enabled = measurements.isNotEmpty() && !isLoading,
+                ) {
+                    Text(stringResource(R.string.history_export_csv))
+                }
             }
-            OutlinedButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag(TestTags.HistoryExportCsv),
-                onClick = onExportCsv,
-                enabled = measurements.isNotEmpty() && !isLoading,
-            ) {
-                Text(stringResource(R.string.history_export_csv))
+            if (errorText != null) {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag(TestTags.HistoryError),
+                    text = errorText,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
-        }
-        if (errorText != null) {
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .testTag(TestTags.HistoryError),
-                text = errorText,
-                color = MaterialTheme.colorScheme.error,
-            )
-        }
-        if (isLoading) {
-            Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
-        } else if (measurements.isEmpty()) {
-            Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.history_empty))
-        } else {
-            HistoryTable(measurements, onMeasurementSelected)
+            if (isLoading) {
+                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
+            } else if (measurements.isEmpty()) {
+                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.history_empty))
+            } else {
+                HistoryTable(measurements, onMeasurementSelected)
+            }
         }
     }
 }
