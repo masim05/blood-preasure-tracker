@@ -188,16 +188,7 @@ private fun MeasurementImage(
 
         isLoading = true
         imageErrorText = null
-        val result = withContext(Dispatchers.IO) {
-            when (val imageResult = loadMeasurementImage(resolvedImageUrl)) {
-                is AppResult.Success -> {
-                    AppResult.Success(
-                        BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size)?.asImageBitmap(),
-                    )
-                }
-                is AppResult.Failure -> imageResult
-            }
-        }
+        val result = loadMeasurementBitmap(resolvedImageUrl, loadMeasurementImage)
         when (result) {
             is AppResult.Success -> {
                 bitmap = result.value
@@ -235,6 +226,20 @@ private fun MeasurementImage(
             text = stringResource(R.string.detail_image_unavailable),
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+private suspend fun loadMeasurementBitmap(
+    resolvedImageUrl: String,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
+): AppResult<ImageBitmap?> = withContext(Dispatchers.IO) {
+    when (val imageResult = loadMeasurementImage(resolvedImageUrl)) {
+        is AppResult.Success -> {
+            AppResult.Success(
+                BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size)?.asImageBitmap(),
+            )
+        }
+        is AppResult.Failure -> imageResult
     }
 }
 
