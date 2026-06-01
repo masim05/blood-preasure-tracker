@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import androidx.navigation.compose.NavHost
@@ -77,6 +76,7 @@ class MainActivity : ComponentActivity() {
     private val captureFlow by lazy { CaptureFlow(sessionStore, cameraGateway, apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
     private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
+    private var historyRequestVersion = 0
     private var uiState by mutableStateOf(MobileUiState())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -227,6 +227,7 @@ class MainActivity : ComponentActivity() {
     private fun openCamera() {
         val state = captureFlow.enterCamera()
         state.logErrors("camera_enter")
+        historyRequestVersion += 1
         uiState = uiState.copy(route = state.route, isUploading = false, errorText = state.visibleMessage())
     }
 
@@ -235,6 +236,7 @@ class MainActivity : ComponentActivity() {
             uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
             return
         }
+        historyRequestVersion += 1
         uiState = uiState.copy(route = Route.Profile, errorText = null)
     }
 
@@ -258,6 +260,8 @@ class MainActivity : ComponentActivity() {
             uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
             return
         }
+        val requestVersion = historyRequestVersion + 1
+        historyRequestVersion = requestVersion
         uiState = uiState.copy(
             route = Route.History,
             filter = filter,
@@ -270,6 +274,7 @@ class MainActivity : ComponentActivity() {
             val state = historyFlow.load(filter)
             state.logErrors("history_load")
             runOnUiThread {
+                if (!shouldApplyHistoryState(requestVersion, state.route)) return@runOnUiThread
                 uiState = uiState.copy(
                     route = state.route,
                     filter = state.filter,
@@ -318,6 +323,8 @@ class MainActivity : ComponentActivity() {
             uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
             return
         }
+        val requestVersion = historyRequestVersion + 1
+        historyRequestVersion = requestVersion
         val filter = uiState.filter
         val currentMeasurements = uiState.measurements
         uiState = uiState.copy(
@@ -331,6 +338,7 @@ class MainActivity : ComponentActivity() {
             val state = historyFlow.load(filter)
             state.logErrors("history_refresh")
             runOnUiThread {
+                if (!shouldApplyHistoryState(requestVersion, state.route)) return@runOnUiThread
                 uiState = uiState.copy(
                     route = state.route,
                     filter = state.filter,
@@ -410,7 +418,13 @@ class MainActivity : ComponentActivity() {
 
     private fun logout() {
         sessionStore.clear()
+        historyRequestVersion += 1
         uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+    }
+
+    private fun shouldApplyHistoryState(requestVersion: Int, route: Route): Boolean {
+        if (route == Route.Auth) return true
+        return requestVersion == historyRequestVersion && uiState.route == Route.History
     }
 
     private fun loadMeasurementImage(imageUrl: String): AppResult<ByteArray> {
@@ -543,20 +557,15 @@ private fun syncNavigationState(
 ) {
     when (route) {
         Route.Auth -> navController.navigate(AuthDestination.Login.route) {
-            popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+            popUpTo(RootGraph.Main.route) { inclusive = true }
             launchSingleTop = true
         }
-        Route.Camera, Route.Guide -> navController.navigate(MainDestination.Capture.route) {
-            popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
-            launchSingleTop = true
-        }
+        Route.Camera, Route.Guide -> navController.navigateToMainTopLevel(MainDestination.Capture.route)
         Route.History -> {
             if (navController.currentDestination?.route == MainDestination.MeasurementDetail.route) {
                 navController.popBackStack()
             } else {
-                navController.navigate(MainDestination.History.route) {
-                    launchSingleTop = true
-                }
+                navController.navigateToMainTopLevel(MainDestination.History.route)
             }
         }
         Route.MeasurementDetail -> {
@@ -565,9 +574,22 @@ private fun syncNavigationState(
                 launchSingleTop = true
             }
         }
-        Route.Profile -> navController.navigate(MainDestination.Profile.route) {
-            launchSingleTop = true
+        Route.Profile -> navController.navigateToMainTopLevel(MainDestination.Profile.route)
+    }
+}
+
+private fun NavHostController.navigateToMainTopLevel(destinationRoute: String) {
+    val isInMainGraph = currentDestination?.hierarchy?.any { it.route == RootGraph.Main.route } == true
+    navigate(destinationRoute) {
+        if (isInMainGraph) {
+            popUpTo(RootGraph.Main.route) {
+                saveState = true
+            }
+            restoreState = true
+        } else {
+            popUpTo(RootGraph.Auth.route) { inclusive = true }
         }
+        launchSingleTop = true
     }
 }
 
