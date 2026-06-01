@@ -98,9 +98,17 @@ fun MeasurementDetailScreen(
                 Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
             }
 
-            var systolic by remember(detail.id, detail.systolic) { mutableStateOf(detail.systolic?.toString().orEmpty()) }
-            var diastolic by remember(detail.id, detail.diastolic) { mutableStateOf(detail.diastolic?.toString().orEmpty()) }
-            var pulse by remember(detail.id, detail.pulse) { mutableStateOf(detail.pulse?.toString().orEmpty()) }
+            val measurementDetail = detail ?: return@Column
+
+            var systolic by remember(measurementDetail.id, measurementDetail.systolic) {
+                mutableStateOf(measurementDetail.systolic?.toString().orEmpty())
+            }
+            var diastolic by remember(measurementDetail.id, measurementDetail.diastolic) {
+                mutableStateOf(measurementDetail.diastolic?.toString().orEmpty())
+            }
+            var pulse by remember(measurementDetail.id, measurementDetail.pulse) {
+                mutableStateOf(measurementDetail.pulse?.toString().orEmpty())
+            }
 
             Box(
                 modifier = Modifier
@@ -112,7 +120,7 @@ fun MeasurementDetailScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 MeasurementImage(
-                    imageUrl = detail.imageUrl,
+                    imageUrl = measurementDetail.imageUrl,
                     apiBaseUrl = apiBaseUrl,
                     loadMeasurementImage = loadMeasurementImage,
                 )
@@ -147,9 +155,9 @@ fun MeasurementDetailScreen(
                         onValueChange = { pulse = it },
                     )
                 }
-                Text(stringResource(R.string.detail_arm_side, stringResource(armLabel(detail.armSide))))
-                Text(stringResource(R.string.detail_status, stringResource(statusLabel(detail.status))))
-                detail.recognitionError?.takeIf { it.isNotBlank() }?.let {
+                Text(stringResource(R.string.detail_arm_side, stringResource(armLabel(measurementDetail.armSide))))
+                Text(stringResource(R.string.detail_status, stringResource(statusLabel(measurementDetail.status))))
+                measurementDetail.recognitionError?.takeIf { it.isNotBlank() }?.let {
                     Text(text = stringResource(R.string.detail_recognition_error, it), color = MaterialTheme.colorScheme.error)
                 }
             }
@@ -167,10 +175,10 @@ fun MeasurementDetailScreen(
                     enabled = !isSaving,
                     onClick = {
                         onSave(
-                            detail.copy(
-                                systolic = systolic.toIntOrNull() ?: detail.systolic,
-                                diastolic = diastolic.toIntOrNull() ?: detail.diastolic,
-                                pulse = pulse.toIntOrNull() ?: detail.pulse,
+                            measurementDetail.copy(
+                                systolic = systolic.toIntOrNull() ?: measurementDetail.systolic,
+                                diastolic = diastolic.toIntOrNull() ?: measurementDetail.diastolic,
+                                pulse = pulse.toIntOrNull() ?: measurementDetail.pulse,
                             ),
                         )
                     },
