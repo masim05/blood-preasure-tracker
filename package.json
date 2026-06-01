@@ -14,6 +14,7 @@
     "db:clean": "node scripts/db-clean.mjs",
     "db:connect": "node scripts/db-connect.mjs",
     "db:init": "node scripts/db-init.mjs",
+    "db:migrate": "node scripts/db-migrate.mjs",
     "openapi:generate": "node scripts/generate-openapi-with-copilot.mjs",
     "openapi:serve": "node scripts/serve-openapi-docs.mjs",
     "test": "jest --runInBand --testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap",
