@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
                         measurements = uiState.measurements,
                         isLoading = uiState.isHistoryLoading,
                         errorText = uiState.errorText,
+                        onRefresh = ::refreshHistory,
                         onApplyFilter = ::openHistory,
                         onClearFilter = { openHistory(HistoryFilter()) },
                         onExportCsv = { exportHistoryCsv(uiState.measurements) },
@@ -101,6 +102,7 @@ class MainActivity : ComponentActivity() {
                         errorText = uiState.errorText,
                         apiBaseUrl = BuildConfig.API_BASE_URL,
                         loadMeasurementImage = ::loadMeasurementImage,
+                        onRefresh = ::refreshMeasurementDetail,
                         onBack = { openHistory(uiState.filter) },
                         onSave = ::saveMeasurementDetail,
                     )
@@ -238,6 +240,64 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun refreshHistory() {
+        if (captureFlow.history().route == Route.Auth) {
+            uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+            return
+        }
+        val filter = uiState.filter
+        val currentMeasurements = uiState.measurements
+        uiState = uiState.copy(
+            route = Route.History,
+            filter = filter,
+            isUploading = false,
+            isHistoryLoading = true,
+            errorText = null,
+        )
+        runInBackground {
+            val state = historyFlow.load(filter)
+            state.logErrors("history_refresh")
+            runOnUiThread {
+                uiState = uiState.copy(
+                    route = state.route,
+                    filter = state.filter,
+                    measurements = refreshedHistoryMeasurements(currentMeasurements, state),
+                    isHistoryLoading = false,
+                    errorText = state.visibleMessage(),
+                )
+            }
+        }
+    }
+
+    private fun refreshMeasurementDetail() {
+        val measurementId = refreshMeasurementDetailId(uiState.selectedMeasurementId) ?: return
+        val currentDetail = uiState.measurementDetail
+        uiState = uiState.copy(
+            route = Route.MeasurementDetail,
+            selectedMeasurementId = measurementId,
+            isDetailLoading = true,
+            isDetailSaving = false,
+            detailAuthorizationHeader = sessionStore.load()?.authorizationHeader,
+            errorText = null,
+        )
+        runInBackground {
+            val state = measurementDetailFlow.load(measurementId)
+            state.logErrors("detail_refresh")
+            runOnUiThread {
+                if (state.route == Route.Auth) {
+                    uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+                } else {
+                    uiState = uiState.copy(
+                        route = Route.MeasurementDetail,
+                        measurementDetail = refreshedMeasurementDetail(currentDetail, state),
+                        isDetailLoading = false,
+                        errorText = state.visibleMessage(),
+                    )
+                }
+            }
+        }
+    }
+
     private fun exportHistoryCsv(measurements: List<Measurement>) {
         if (measurements.isEmpty()) return
         val sendIntent = Intent(Intent.ACTION_SEND).apply {
@@ -348,6 +408,18 @@ internal fun initialRoute(session: Session?): Route {
 
 private fun Session.isValidAt(now: Instant): Boolean {
     return runCatching { Instant.parse(expiresAt).isAfter(now) }.getOrDefault(false)
+}
+
+internal fun refreshMeasurementDetailId(selectedMeasurementId: String?): String? {
+    return selectedMeasurementId?.takeIf { it.isNotBlank() }
+}
+
+internal fun refreshedHistoryMeasurements(currentMeasurements: List<Measurement>, state: ScreenState): List<Measurement> {
+    return if (state.error != null) currentMeasurements else state.measurements
+}
+
+internal fun refreshedMeasurementDetail(currentDetail: MeasurementDetail?, state: ScreenState): MeasurementDetail? {
+    return state.measurementDetail ?: currentDetail
 }
 
 internal fun measurementsToCsv(measurements: List<Measurement>): String {
