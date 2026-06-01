@@ -113,9 +113,63 @@ class HttpApiClientTest {
 
     @Test
     fun `auth maps closed connection to network error`() {
-        server.close()
+        val closedPort = ServerSocket(0).use { it.localPort }
+        val closedPortClient = HttpApiClient(
+            baseUrl = "http://127.0.0.1:$closedPort",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+        )
 
-        val result = client.logIn("known@example.com", "password123") as AppResult.Failure
+        val result = closedPortClient.logIn("known@example.com", "password123") as AppResult.Failure
+
+        assertEquals("Network error", result.error.message)
+    }
+
+    @Test
+    fun `fetch measurement image returns bytes for successful response`() {
+        server.enqueue(200, "image-bytes")
+
+        val result = client.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:${server.port}/api/v1/measurements/msr_1/image",
+            authorization = "Bearer token-1",
+        )
+        val payload = (result as AppResult.Success).value
+
+        assertEquals("Bearer token-1", server.request.authorization)
+        assertEquals("/api/v1/measurements/msr_1/image", server.request.path)
+        assertEquals("image-bytes", payload.toString(StandardCharsets.UTF_8))
+    }
+
+    @Test
+    fun `fetch measurement image maps API error payload`() {
+        server.enqueue(404, "{\"error\":\"not_found\",\"message\":\"Image not found\"}")
+
+        val result = client.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:${server.port}/api/v1/measurements/missing/image",
+            authorization = "Bearer token-1",
+        ) as AppResult.Failure
+
+        assertEquals("not_found", result.error.code)
+        assertEquals("Image not found", result.error.message)
+    }
+
+    @Test
+    fun `fetch measurement image maps connection failure to network error`() {
+        val closedPort = ServerSocket(0).use { it.localPort }
+        val closedPortClient = HttpApiClient(
+            baseUrl = "http://127.0.0.1:$closedPort",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+        )
+
+        val result = closedPortClient.fetchMeasurementImage(
+            imageUrl = "http://127.0.0.1:$closedPort/api/v1/measurements/msr_1/image",
+            authorization = "Bearer token-1",
+        ) as AppResult.Failure
 
         assertEquals("Network error", result.error.message)
     }

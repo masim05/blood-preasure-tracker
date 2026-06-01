@@ -11,6 +11,7 @@ class InMemorySessionStoreTest {
     fun storesLoadsAndClearsSession() {
         val store = InMemorySessionStore()
         assertNull(store.load())
+        assertNull(store.loadError())
 
         val session = Session("token", "Bearer", "2026-12-31T00:00:00.000Z", MobileUser("usr_1", "user@example.com"))
         store.save(session)
@@ -20,5 +21,6 @@ class InMemorySessionStoreTest {
         store.clear()
 
         assertNull(store.load())
+        assertNull(store.loadError())
     }
 }
