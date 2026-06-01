@@ -1,15 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 export type HttpRequestLogEntry = {
-  level: 'debug';
+  level: 'debug' | 'error';
   method: string;
   path: string;
   statusCode: number;
   durationMs: number;
 };
 
-type DebugLogger = {
+type RequestLogger = {
   debug(message: string): void;
+  error(message: string): void;
 };
 
 export type HttpLoggingRequest = {
@@ -25,9 +26,9 @@ export type HttpLoggingResponse = {
 
 @Injectable()
 export class HttpRequestLoggingMiddleware {
-  private logger: DebugLogger = new Logger('HttpRequest');
+  private logger: RequestLogger = new Logger('HttpRequest');
 
-  static withLogger(logger: DebugLogger): HttpRequestLoggingMiddleware {
+  static withLogger(logger: RequestLogger): HttpRequestLoggingMiddleware {
     const middleware = new HttpRequestLoggingMiddleware();
     middleware.logger = logger;
 
@@ -38,7 +39,15 @@ export class HttpRequestLoggingMiddleware {
     const startedAt = process.hrtime.bigint();
 
     response.once('finish', () => {
-      this.logger.debug(JSON.stringify(createHttpRequestLogEntry(request, response.statusCode, elapsedMilliseconds(startedAt))));
+      const entry = createHttpRequestLogEntry(request, response.statusCode, elapsedMilliseconds(startedAt));
+      const serialized = JSON.stringify(entry);
+
+      if (entry.level === 'error') {
+        this.logger.error(serialized);
+        return;
+      }
+
+      this.logger.debug(serialized);
     });
 
     next();
@@ -47,7 +56,7 @@ export class HttpRequestLoggingMiddleware {
 
 export function createHttpRequestLogEntry(request: HttpLoggingRequest, statusCode: number, durationMs: number): HttpRequestLogEntry {
   return {
-    level: 'debug',
+    level: statusCode >= 500 ? 'error' : 'debug',
     method: request.method,
     path: request.originalUrl || request.url,
     statusCode,

@@ -23,6 +23,26 @@ describe('HTTP request logging', () => {
     });
   });
 
+  it('marks 5xx responses as error-level request entries', () => {
+    expect(
+      createHttpRequestLogEntry(
+        {
+          method: 'GET',
+          originalUrl: '/api/v1/measurements',
+          url: '/measurements',
+        },
+        503,
+        12,
+      ),
+    ).toMatchObject({
+      level: 'error',
+      method: 'GET',
+      path: '/api/v1/measurements',
+      statusCode: 503,
+      durationMs: 12,
+    });
+  });
+
   it('falls back to url when originalUrl is unavailable', () => {
     expect(
       createHttpRequestLogEntry(
@@ -61,7 +81,7 @@ describe('HTTP request logging', () => {
   });
 
   it('logs when the response finishes', () => {
-    const logger = { debug: jest.fn<void, [string]>() };
+    const logger = { debug: jest.fn<void, [string]>(), error: jest.fn<void, [string]>() };
     const middleware = HttpRequestLoggingMiddleware.withLogger(logger);
     const response = new EventEmitter() as EventEmitter & { statusCode: number };
     response.statusCode = 404;
@@ -80,5 +100,29 @@ describe('HTTP request logging', () => {
       path: '/api/v1/measurements/missing',
       statusCode: 404,
     });
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('logs 5xx responses at error level', () => {
+    const logger = { debug: jest.fn<void, [string]>(), error: jest.fn<void, [string]>() };
+    const middleware = HttpRequestLoggingMiddleware.withLogger(logger);
+    const response = new EventEmitter() as EventEmitter & { statusCode: number };
+    response.statusCode = 500;
+
+    middleware.use(
+      { method: 'POST', originalUrl: '/api/v1/measurements', url: '/measurements' },
+      response,
+      jest.fn(),
+    );
+    response.emit('finish');
+
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(logger.error.mock.calls[0][0]) as unknown).toMatchObject({
+      level: 'error',
+      method: 'POST',
+      path: '/api/v1/measurements',
+      statusCode: 500,
+    });
+    expect(logger.debug).not.toHaveBeenCalled();
   });
 });
