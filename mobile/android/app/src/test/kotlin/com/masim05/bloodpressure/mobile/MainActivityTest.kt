@@ -118,6 +118,16 @@ class MainActivityTest {
         assertEquals(currentDetail, refreshedMeasurementDetail(currentDetail, state))
     }
 
+    @Test
+    fun topLevelMainTabMapsDetailToHistoryTab() {
+        assertEquals(MainTab.History, topLevelMainTab(Route.MeasurementDetail))
+    }
+
+    @Test
+    fun topLevelMainTabMapsProfileRouteToProfileTab() {
+        assertEquals(MainTab.Profile, topLevelMainTab(Route.Profile))
+    }
+
     private fun session(email: String, expiresAt: String = "2026-12-31T00:00:00.000Z") = Session(
         accessToken = "token",
         tokenType = "Bearer",

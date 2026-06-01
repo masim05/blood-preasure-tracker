@@ -5,6 +5,7 @@ junit = "4.13.2"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 cameraX = "1.4.2"
+navigationCompose = "2.8.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -24,3 +25,4 @@ androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraX" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

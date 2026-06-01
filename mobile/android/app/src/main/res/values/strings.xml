@@ -62,6 +62,12 @@
     <string name="detail_save">Save</string>
     <string name="detail_save_success">Measurement saved.</string>
     <string name="detail_back">Back</string>
+    <string name="nav_capture">Capture</string>
+    <string name="nav_history">History</string>
+    <string name="nav_profile">Profile</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_logout">Log out</string>
     <string name="date_picker_confirm">OK</string>
     <string name="date_picker_cancel">Cancel</string>
     <string name="date_picker_from_title">Select from date</string>

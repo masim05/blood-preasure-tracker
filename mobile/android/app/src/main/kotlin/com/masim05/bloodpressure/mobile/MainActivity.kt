@@ -6,34 +6,58 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.navigation
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.masim05.bloodpressure.mobile.adapters.api.HttpApiClient
-import com.masim05.bloodpressure.mobile.adapters.session.EncryptedSessionStore
 import com.masim05.bloodpressure.mobile.adapters.camera.CameraXCameraGateway
+import com.masim05.bloodpressure.mobile.adapters.session.EncryptedSessionStore
 import com.masim05.bloodpressure.mobile.core.flow.AuthFlow
 import com.masim05.bloodpressure.mobile.core.flow.CaptureFlow
-import com.masim05.bloodpressure.mobile.core.flow.GuideFlow
 import com.masim05.bloodpressure.mobile.core.flow.HistoryFlow
 import com.masim05.bloodpressure.mobile.core.flow.MeasurementDetailFlow
 import com.masim05.bloodpressure.mobile.core.flow.Route
 import com.masim05.bloodpressure.mobile.core.flow.ScreenState
-import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.ApiError
 import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
 import com.masim05.bloodpressure.mobile.core.model.AppResult
+import com.masim05.bloodpressure.mobile.core.model.AuthMode
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
+import com.masim05.bloodpressure.mobile.ui.TestTags
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
-import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
+import com.masim05.bloodpressure.mobile.ui.screens.ProfileScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 import java.time.Instant
 
@@ -50,7 +74,6 @@ class MainActivity : ComponentActivity() {
         )
     }
     private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }
-    private val guideFlow by lazy { GuideFlow(sessionStore) }
     private val captureFlow by lazy { CaptureFlow(sessionStore, cameraGateway, apiClient) }
     private val historyFlow by lazy { HistoryFlow(sessionStore, apiClient) }
     private val measurementDetailFlow by lazy { MeasurementDetailFlow(sessionStore, apiClient) }
@@ -61,51 +84,95 @@ class MainActivity : ComponentActivity() {
         uiState = restoredStartupState()
         setContent {
             AppTheme {
-                when (uiState.route) {
-                    Route.Auth -> AuthScreen(
-                        mode = uiState.authMode,
-                        isSubmitting = uiState.isSubmitting,
-                        errorText = uiState.errorText,
-                        onModeChange = { uiState = uiState.copy(authMode = it, errorText = null) },
-                        onSubmit = ::submitAuth,
-                    )
-                    Route.Guide -> GuideScreen(onNext = ::continueFromGuide)
-                    Route.Camera -> CameraScreen(
-                        isUploading = uiState.isUploading,
-                        errorText = uiState.errorText,
-                        onUpload = ::captureAndUpload,
-                        onCaptureReady = { image ->
-                            cameraGateway.publishCapture(image)
-                            captureAndUpload()
-                        },
-                        onCaptureFailure = { message ->
-                            cameraGateway.publishFailure(message)
-                            uiState = uiState.copy(errorText = message)
-                        },
-                        onHistory = { openHistory(HistoryFilter()) },
-                    )
-                    Route.History -> HistoryScreen(
-                        filter = uiState.filter,
-                        measurements = uiState.measurements,
-                        isLoading = uiState.isHistoryLoading,
-                        errorText = uiState.errorText,
-                        onRefresh = ::refreshHistory,
-                        onApplyFilter = ::openHistory,
-                        onClearFilter = { openHistory(HistoryFilter()) },
-                        onExportCsv = { exportHistoryCsv(uiState.measurements) },
-                        onMeasurementSelected = { openMeasurementDetail(it.id) },
-                    )
-                    Route.MeasurementDetail -> MeasurementDetailScreen(
-                        detail = uiState.measurementDetail,
-                        isLoading = uiState.isDetailLoading,
-                        isSaving = uiState.isDetailSaving,
-                        errorText = uiState.errorText,
-                        apiBaseUrl = BuildConfig.API_BASE_URL,
-                        loadMeasurementImage = ::loadMeasurementImage,
-                        onRefresh = ::refreshMeasurementDetail,
-                        onBack = { openHistory(uiState.filter) },
-                        onSave = ::saveMeasurementDetail,
-                    )
+                val navController = rememberNavController()
+                val backStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = backStackEntry?.destination
+                val mainTab = remember(uiState.route) { topLevelMainTab(uiState.route) }
+
+                LaunchedEffect(uiState.route, uiState.selectedMeasurementId) {
+                    syncNavigationState(navController, uiState.route, uiState.selectedMeasurementId)
+                }
+
+                Scaffold(
+                    bottomBar = {
+                        if (showBottomNavigation(currentDestination)) {
+                            MainBottomNavigation(
+                                selectedTab = mainTab,
+                                onCaptureSelected = ::openCamera,
+                                onHistorySelected = { openHistory(uiState.filter) },
+                                onProfileSelected = ::openProfile,
+                            )
+                        }
+                    },
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = startGraphFor(uiState.route),
+                        modifier = Modifier.padding(innerPadding),
+                    ) {
+                        navigation(startDestination = AuthDestination.Login.route, route = RootGraph.Auth.route) {
+                            composable(AuthDestination.Login.route) {
+                                AuthScreen(
+                                    mode = uiState.authMode,
+                                    isSubmitting = uiState.isSubmitting,
+                                    errorText = uiState.errorText,
+                                    onModeChange = { uiState = uiState.copy(authMode = it, errorText = null) },
+                                    onSubmit = ::submitAuth,
+                                )
+                            }
+                        }
+
+                        navigation(startDestination = MainDestination.Capture.route, route = RootGraph.Main.route) {
+                            composable(MainDestination.Capture.route) {
+                                CameraScreen(
+                                    isUploading = uiState.isUploading,
+                                    errorText = uiState.errorText,
+                                    onUpload = ::captureAndUpload,
+                                    onCaptureReady = { image ->
+                                        cameraGateway.publishCapture(image)
+                                        captureAndUpload()
+                                    },
+                                    onCaptureFailure = { message ->
+                                        cameraGateway.publishFailure(message)
+                                        uiState = uiState.copy(errorText = message)
+                                    },
+                                    onHistory = { openHistory(HistoryFilter()) },
+                                )
+                            }
+
+                            composable(MainDestination.History.route) {
+                                HistoryScreen(
+                                    filter = uiState.filter,
+                                    measurements = uiState.measurements,
+                                    isLoading = uiState.isHistoryLoading,
+                                    errorText = uiState.errorText,
+                                    onRefresh = ::refreshHistory,
+                                    onApplyFilter = ::openHistory,
+                                    onClearFilter = { openHistory(HistoryFilter()) },
+                                    onExportCsv = { exportHistoryCsv(uiState.measurements) },
+                                    onMeasurementSelected = { openMeasurementDetail(it.id) },
+                                )
+                            }
+
+                            composable(MainDestination.Profile.route) {
+                                ProfileScreen(onLogout = ::logout)
+                            }
+
+                            composable(MainDestination.MeasurementDetail.route) {
+                                MeasurementDetailScreen(
+                                    detail = uiState.measurementDetail,
+                                    isLoading = uiState.isDetailLoading,
+                                    isSaving = uiState.isDetailSaving,
+                                    errorText = uiState.errorText,
+                                    apiBaseUrl = BuildConfig.API_BASE_URL,
+                                    loadMeasurementImage = ::loadMeasurementImage,
+                                    onRefresh = ::refreshMeasurementDetail,
+                                    onBack = ::closeMeasurementDetail,
+                                    onSave = ::saveMeasurementDetail,
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -157,16 +224,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun continueFromGuide() {
-        val state = guideFlow.continueToCamera()
-        state.logErrors("guide_continue")
-        uiState = uiState.copy(route = state.route, errorText = state.visibleMessage())
-    }
-
     private fun openCamera() {
         val state = captureFlow.enterCamera()
         state.logErrors("camera_enter")
         uiState = uiState.copy(route = state.route, isUploading = false, errorText = state.visibleMessage())
+    }
+
+    private fun openProfile() {
+        if (captureFlow.enterCamera().route == Route.Auth) {
+            uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+            return
+        }
+        uiState = uiState.copy(route = Route.Profile, errorText = null)
     }
 
     private fun captureAndUpload() {
@@ -238,6 +307,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun closeMeasurementDetail() {
+        uiState = uiState.copy(route = Route.History, selectedMeasurementId = null, errorText = null)
     }
 
     private fun refreshHistory() {
@@ -335,6 +408,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun logout() {
+        sessionStore.clear()
+        uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+    }
+
     private fun loadMeasurementImage(imageUrl: String): AppResult<ByteArray> {
         val authorizationHeader = uiState.detailAuthorizationHeader ?: return AppResult.Failure(
             ApiError(
@@ -390,6 +468,114 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val LOG_TAG = "BPMobile"
+    }
+}
+
+private enum class RootGraph(val route: String) {
+    Auth("auth_graph"),
+    Main("main_graph"),
+}
+
+private enum class AuthDestination(val route: String) {
+    Login("auth/login"),
+}
+
+private enum class MainDestination(val route: String) {
+    Capture("main/capture"),
+    History("main/history"),
+    MeasurementDetail("main/history/detail"),
+    Profile("main/profile"),
+}
+
+internal enum class MainTab {
+    Capture,
+    History,
+    Profile,
+}
+
+@Composable
+private fun MainBottomNavigation(
+    selectedTab: MainTab,
+    onCaptureSelected: () -> Unit,
+    onHistorySelected: () -> Unit,
+    onProfileSelected: () -> Unit,
+) {
+    NavigationBar(modifier = Modifier.testTag(TestTags.BottomNav)) {
+        NavigationBarItem(
+            selected = selectedTab == MainTab.Capture,
+            onClick = onCaptureSelected,
+            icon = { androidx.compose.material3.Icon(Icons.Filled.CameraAlt, contentDescription = null) },
+            label = { Text(stringResource(R.string.nav_capture)) },
+            modifier = Modifier.testTag(TestTags.BottomNavCapture),
+        )
+        NavigationBarItem(
+            selected = selectedTab == MainTab.History,
+            onClick = onHistorySelected,
+            icon = { androidx.compose.material3.Icon(Icons.Filled.History, contentDescription = null) },
+            label = { Text(stringResource(R.string.nav_history)) },
+            modifier = Modifier.testTag(TestTags.BottomNavHistory),
+        )
+        NavigationBarItem(
+            selected = selectedTab == MainTab.Profile,
+            onClick = onProfileSelected,
+            icon = { androidx.compose.material3.Icon(Icons.Filled.AccountCircle, contentDescription = null) },
+            label = { Text(stringResource(R.string.nav_profile)) },
+            modifier = Modifier.testTag(TestTags.BottomNavProfile),
+        )
+    }
+}
+
+private fun startGraphFor(route: Route): String {
+    return if (route == Route.Auth) RootGraph.Auth.route else RootGraph.Main.route
+}
+
+private fun showBottomNavigation(currentDestination: NavDestination?): Boolean {
+    if (currentDestination == null) return false
+    val isMainGraphDestination = currentDestination.hierarchy.any { it.route == RootGraph.Main.route }
+    val isDetailDestination = currentDestination.route == MainDestination.MeasurementDetail.route
+    return isMainGraphDestination && !isDetailDestination
+}
+
+private fun syncNavigationState(
+    navController: NavHostController,
+    route: Route,
+    selectedMeasurementId: String?,
+) {
+    when (route) {
+        Route.Auth -> navController.navigate(AuthDestination.Login.route) {
+            popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+            launchSingleTop = true
+        }
+        Route.Camera, Route.Guide -> navController.navigate(MainDestination.Capture.route) {
+            popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+            launchSingleTop = true
+        }
+        Route.History -> {
+            if (navController.currentDestination?.route == MainDestination.MeasurementDetail.route) {
+                navController.popBackStack()
+            } else {
+                navController.navigate(MainDestination.History.route) {
+                    launchSingleTop = true
+                }
+            }
+        }
+        Route.MeasurementDetail -> {
+            if (selectedMeasurementId.isNullOrBlank()) return
+            navController.navigate(MainDestination.MeasurementDetail.route) {
+                launchSingleTop = true
+            }
+        }
+        Route.Profile -> navController.navigate(MainDestination.Profile.route) {
+            launchSingleTop = true
+        }
+    }
+}
+
+internal fun topLevelMainTab(route: Route): MainTab {
+    return when (route) {
+        Route.History, Route.MeasurementDetail -> MainTab.History
+        Route.Profile -> MainTab.Profile
+        else -> MainTab.Capture
     }
 }
 
