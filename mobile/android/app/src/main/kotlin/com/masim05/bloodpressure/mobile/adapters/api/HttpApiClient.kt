@@ -27,6 +27,15 @@ class HttpApiClient(
     private val timeoutMessage: String,
     private val parseMessage: String,
 ) : AuthGateway, HistoryGateway, MeasurementUploadGateway, MeasurementDetailGateway {
+    fun fetchMeasurementImage(imageUrl: String, authorization: String): AppResult<ByteArray> = runCatching {
+        val response = requestBytes(url = imageUrl, method = "GET", authorization = authorization, accept = "image/*")
+        if (response.status in 200..299) {
+            AppResult.Success(response.body)
+        } else {
+            AppResult.Failure(ApiErrorMapper.fromApiBody(response.body.toString(StandardCharsets.UTF_8), fallbackApiMessage))
+        }
+    }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
+
     override fun signIn(email: String, password: String): AppResult<Session> = authenticate("/api/v1/signin", email, password)
 
     override fun logIn(email: String, password: String): AppResult<Session> = authenticate("/api/v1/login", email, password)
@@ -108,18 +117,43 @@ class HttpApiClient(
         authorization: String? = null,
     ): HttpResponse {
         val connection = URI.create(baseUrl + path).toURL().openConnection() as HttpURLConnection
-        connection.requestMethod = method
-        connection.connectTimeout = 5_000
-        connection.readTimeout = 10_000
-        authorization?.let { connection.setRequestProperty("Authorization", it) }
-        contentType?.let { connection.setRequestProperty("Content-Type", it) }
-        if (body != null) {
-            connection.doOutput = true
-            connection.outputStream.use { it.write(body) }
+        return try {
+            connection.requestMethod = method
+            connection.connectTimeout = 5_000
+            connection.readTimeout = 10_000
+            authorization?.let { connection.setRequestProperty("Authorization", it) }
+            contentType?.let { connection.setRequestProperty("Content-Type", it) }
+            if (body != null) {
+                connection.doOutput = true
+                connection.outputStream.use { it.write(body) }
+            }
+            val status = connection.responseCode
+            val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+            HttpResponse(status, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
+        } finally {
+            connection.disconnect()
         }
-        val status = connection.responseCode
-        val stream = if (status in 200..299) connection.inputStream else connection.errorStream
-        return HttpResponse(status, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
+    }
+
+    private fun requestBytes(
+        url: String,
+        method: String,
+        authorization: String? = null,
+        accept: String? = null,
+    ): HttpBytesResponse {
+        val connection = URI.create(url).toURL().openConnection() as HttpURLConnection
+        return try {
+            connection.requestMethod = method
+            connection.connectTimeout = 5_000
+            connection.readTimeout = 10_000
+            authorization?.let { connection.setRequestProperty("Authorization", it) }
+            accept?.let { connection.setRequestProperty("Accept", it) }
+            val status = connection.responseCode
+            val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+            HttpBytesResponse(status, stream?.use { it.readBytes() } ?: ByteArray(0))
+        } finally {
+            connection.disconnect()
+        }
     }
 
     private fun parseSession(body: String): Session = Session(
@@ -214,4 +248,5 @@ class HttpApiClient(
     }
 
     private data class HttpResponse(val status: Int, val body: String)
+    private data class HttpBytesResponse(val status: Int, val body: ByteArray)
 }

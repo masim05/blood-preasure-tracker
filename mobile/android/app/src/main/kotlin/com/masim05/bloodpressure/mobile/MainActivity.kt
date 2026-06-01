@@ -20,6 +20,9 @@ import com.masim05.bloodpressure.mobile.core.flow.MeasurementDetailFlow
 import com.masim05.bloodpressure.mobile.core.flow.Route
 import com.masim05.bloodpressure.mobile.core.flow.ScreenState
 import com.masim05.bloodpressure.mobile.core.model.AuthMode
+import com.masim05.bloodpressure.mobile.core.model.ApiError
+import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
+import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
 import com.masim05.bloodpressure.mobile.core.model.Measurement
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
@@ -96,6 +99,8 @@ class MainActivity : ComponentActivity() {
                         isLoading = uiState.isDetailLoading,
                         isSaving = uiState.isDetailSaving,
                         errorText = uiState.errorText,
+                        apiBaseUrl = BuildConfig.API_BASE_URL,
+                        loadMeasurementImage = ::loadMeasurementImage,
                         onBack = { openHistory(uiState.filter) },
                         onSave = ::saveMeasurementDetail,
                     )
@@ -212,6 +217,7 @@ class MainActivity : ComponentActivity() {
             measurementDetail = null,
             isDetailLoading = true,
             isDetailSaving = false,
+            detailAuthorizationHeader = sessionStore.load()?.authorizationHeader,
             errorText = null,
         )
         runInBackground {
@@ -267,6 +273,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun loadMeasurementImage(imageUrl: String): AppResult<ByteArray> {
+        val authorizationHeader = uiState.detailAuthorizationHeader ?: return AppResult.Failure(
+            ApiError(
+                code = "missing_authorization",
+                message = getString(R.string.error_unexpected),
+                source = ApiErrorSource.Unexpected,
+            ),
+        )
+        return apiClient.fetchMeasurementImage(imageUrl, authorizationHeader)
     }
 
     private fun ScreenState.visibleMessage(): String? {
@@ -368,4 +385,5 @@ private data class MobileUiState(
     val measurementDetail: MeasurementDetail? = null,
     val isDetailLoading: Boolean = false,
     val isDetailSaving: Boolean = false,
+    val detailAuthorizationHeader: String? = null,
 )

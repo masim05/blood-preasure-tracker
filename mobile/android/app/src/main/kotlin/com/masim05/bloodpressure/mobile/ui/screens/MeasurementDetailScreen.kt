@@ -1,6 +1,8 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,17 +27,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.masim05.bloodpressure.mobile.R
+import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -43,6 +52,8 @@ fun MeasurementDetailScreen(
     isLoading: Boolean,
     isSaving: Boolean,
     errorText: String?,
+    apiBaseUrl: String,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
     onBack: () -> Unit,
     onSave: (MeasurementDetail) -> Unit,
 ) {
@@ -88,13 +99,10 @@ fun MeasurementDetailScreen(
                 .testTag(TestTags.MeasurementDetailImage),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = if (detail.imageUrl.isBlank()) {
-                    stringResource(R.string.detail_image_unavailable)
-                } else {
-                    stringResource(R.string.detail_image_placeholder, detail.imageUrl)
-                },
-                style = MaterialTheme.typography.bodyMedium,
+            MeasurementImage(
+                imageUrl = detail.imageUrl,
+                apiBaseUrl = apiBaseUrl,
+                loadMeasurementImage = loadMeasurementImage,
             )
         }
 
@@ -160,6 +168,82 @@ fun MeasurementDetailScreen(
 }
 
 @Composable
+private fun MeasurementImage(
+    imageUrl: String,
+    apiBaseUrl: String,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
+) {
+    val resolvedImageUrl = resolveMeasurementImageUrl(imageUrl, apiBaseUrl)
+    var bitmap by remember(resolvedImageUrl) { mutableStateOf<ImageBitmap?>(null) }
+    var imageErrorText by remember(resolvedImageUrl) { mutableStateOf<String?>(null) }
+    var isLoading by remember(resolvedImageUrl) { mutableStateOf(resolvedImageUrl != null) }
+
+    LaunchedEffect(resolvedImageUrl) {
+        if (resolvedImageUrl == null) {
+            bitmap = null
+            imageErrorText = null
+            isLoading = false
+            return@LaunchedEffect
+        }
+
+        isLoading = true
+        imageErrorText = null
+        val result = loadMeasurementBitmap(resolvedImageUrl, loadMeasurementImage)
+        when (result) {
+            is AppResult.Success -> {
+                bitmap = result.value
+                imageErrorText = null
+            }
+            is AppResult.Failure -> {
+                bitmap = null
+                imageErrorText = result.error.message
+            }
+        }
+        isLoading = false
+    }
+
+    val loadedBitmap = bitmap
+    if (loadedBitmap != null) {
+        Image(
+            bitmap = loadedBitmap,
+            contentDescription = stringResource(R.string.detail_image_content_description),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit,
+        )
+    } else if (isLoading) {
+        Text(
+            text = stringResource(R.string.status_loading),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    } else if (imageErrorText != null) {
+        Text(
+            text = imageErrorText ?: "",
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    } else {
+        Text(
+            text = stringResource(R.string.detail_image_unavailable),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+private suspend fun loadMeasurementBitmap(
+    resolvedImageUrl: String,
+    loadMeasurementImage: (String) -> AppResult<ByteArray>,
+): AppResult<ImageBitmap?> = withContext(Dispatchers.IO) {
+    when (val imageResult = loadMeasurementImage(resolvedImageUrl)) {
+        is AppResult.Success -> {
+            AppResult.Success(
+                BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size)?.asImageBitmap(),
+            )
+        }
+        is AppResult.Failure -> imageResult
+    }
+}
+
+@Composable
 private fun NumberField(
     modifier: Modifier,
     value: String,
@@ -189,4 +273,17 @@ private fun statusLabel(status: MeasurementStatus): Int = when (status) {
     MeasurementStatus.Recognized -> R.string.measurement_status_recognized
     MeasurementStatus.Saved -> R.string.measurement_status_saved
     MeasurementStatus.Failed -> R.string.measurement_status_failed
+}
+
+internal fun resolveMeasurementImageUrl(imageUrl: String, apiBaseUrl: String): String? {
+    val trimmed = imageUrl.trim()
+    if (trimmed.isBlank()) {
+        return null
+    }
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+        return trimmed
+    }
+    val normalizedBase = apiBaseUrl.trimEnd('/')
+    val normalizedPath = if (trimmed.startsWith('/')) trimmed else "/$trimmed"
+    return "$normalizedBase$normalizedPath"
 }
