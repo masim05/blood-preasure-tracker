@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { scripts?: Record<string, string> };
 const scripts = packageJson.scripts ?? {};
@@ -28,6 +29,19 @@ describe('test workflow contract', () => {
     expect(scripts['test:integration']).toBe(`jest --runInBand ${integrationSelection}`);
     expect(scripts['test:integration']).not.toContain('--coverage');
     expect(scripts['test:integration']).not.toContain('src/');
+  });
+
+  it('defines db:migrate to run only with .env defaults', () => {
+    expect(scripts['db:migrate']).toBe('node scripts/db-migrate.mjs');
+  });
+
+  it('rejects db:migrate arguments to avoid overriding .env', () => {
+    const result = spawnSync(process.execPath, ['scripts/db-migrate.mjs', '--env', '.env.test'], {
+      encoding: 'utf8',
+    });
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('db:migrate does not accept arguments and always uses DATABASE_URL from .env');
   });
 
   it('tracks the integration test environment file with required keys', () => {

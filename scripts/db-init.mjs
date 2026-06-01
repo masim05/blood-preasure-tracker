@@ -33,6 +33,11 @@ export async function runDbCommand(command, args) {
     await initDatabase();
     return;
   }
+  if (command === 'migrate') {
+    await runMigrations(databaseUrl);
+    console.log(`Database migrations applied from ${path.relative(rootDirectory, envFilePath)}`);
+    return;
+  }
   if (command === 'clean') {
     cleanDatabase();
     return;

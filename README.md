@@ -114,6 +114,12 @@ Choose a specific env file when needed:
 npm run db:init -- --env .env.example
 ```
 
+Apply migrations to the database from `DATABASE_URL` in `.env`:
+
+```bash
+npm run db:migrate
+```
+
 Run the API:
 
 ```bash
