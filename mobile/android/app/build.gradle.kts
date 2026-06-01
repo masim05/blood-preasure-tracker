@@ -78,6 +78,11 @@ jacoco {
 
 val androidCoverageExcludes = listOf(
     "**/MainActivity*",
+    "**/MainActivityKt*",
+    "**/ComposableSingletons\$MainActivityKt*",
+    "**/RootGraph*",
+    "**/AuthDestination*",
+    "**/MainDestination*",
     "**/MobileUiState*",
     "**/core/model/CameraUiState*",
     "**/core/model/CameraUiStatus*",
