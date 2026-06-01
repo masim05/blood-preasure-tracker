@@ -348,6 +348,44 @@ class HttpApiClientTest {
     }
 
     @Test
+    fun `save measurement detail surfaces override API failures and does not call save endpoint`() {
+        server.enqueue(400, "{\"error\":\"validation\",\"message\":\"At least one field must be provided\"}")
+
+        val failure = client.save(session(), detailForSave()) as AppResult.Failure
+
+        assertEquals(1, server.requests.size)
+        assertEquals("/api/v1/measurements/msr_1/override", server.request.path)
+        assertEquals("validation", failure.error.code)
+        assertEquals("At least one field must be provided", failure.error.message)
+    }
+
+    @Test
+    fun `save measurement detail sends empty override body when all readings are null`() {
+        server.enqueue(
+            200,
+            """
+            {"id":"msr_1","status":"recognized","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z"}
+            """.trimIndent(),
+        )
+        server.enqueue(
+            201,
+            """
+            {"id":"msr_1","status":"saved","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z","savedAt":"2026-05-27T12:05:00.000Z"}
+            """.trimIndent(),
+        )
+
+        val result = client.save(
+            session(),
+            detailForSave().copy(systolic = null, diastolic = null, pulse = null),
+        )
+
+        assertTrue(result is AppResult.Success)
+        assertEquals(2, server.requests.size)
+        assertEquals("{}", server.requests[0].body)
+        assertEquals("/api/v1/measurements/msr_1/save", server.requests[1].path)
+    }
+
+    @Test
     fun `measurement detail supports pending recognizing failed and API failures`() {
         server.enqueue(
             200,
