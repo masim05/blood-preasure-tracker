@@ -41,4 +41,6 @@ appId: com.masim05.bloodpressure.mobile
     id: history_apply_filter
 - tapOn:
     id: history_row
+- assertVisible:
+    id: measurement_detail_screen
 - assertVisible: "121"
