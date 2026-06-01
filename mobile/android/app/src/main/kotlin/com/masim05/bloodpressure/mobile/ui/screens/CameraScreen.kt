@@ -13,7 +13,6 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -176,7 +175,6 @@ fun CameraScreen(
             .semantics { testTagsAsResourceId = true }
             .padding(24.dp)
             .testTag(TestTags.CameraScreen),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(stringResource(R.string.camera_title), style = MaterialTheme.typography.headlineMedium)
@@ -249,6 +247,8 @@ fun CameraScreen(
                 color = MaterialTheme.colorScheme.error,
             )
         }
+
+        Spacer(Modifier.weight(1f))
 
         if (permissionDenied) {
             OutlinedButton(
