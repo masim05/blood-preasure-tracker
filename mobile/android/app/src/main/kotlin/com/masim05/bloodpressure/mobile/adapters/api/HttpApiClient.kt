@@ -90,26 +90,18 @@ class HttpApiClient(
     }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
 
     override fun save(session: Session, detail: MeasurementDetail): AppResult<MeasurementDetail> = runCatching {
-        val overrideResponse = request(
-            path = "/api/v1/measurements/${urlPath(detail.id)}/override",
+        val response = request(
+            path = "/api/v1/measurements/${urlPath(detail.id)}/save",
             method = "POST",
             body = saveMeasurementBody(detail).toByteArray(StandardCharsets.UTF_8),
             contentType = "application/json",
             authorization = session.authorizationHeader,
         )
-        if (overrideResponse.status !in 200..299) {
-            return@runCatching AppResult.Failure(ApiErrorMapper.fromApiBody(overrideResponse.body, fallbackApiMessage))
-        }
-        val saveResponse = request(
-            path = "/api/v1/measurements/${urlPath(detail.id)}/save",
-            method = "POST",
-            authorization = session.authorizationHeader,
-        )
-        if (saveResponse.status in 200..299) {
-            val saved = parseMeasurementDetail(saveResponse.body)
+        if (response.status in 200..299) {
+            val saved = parseMeasurementDetail(response.body)
             AppResult.Success(saved.copy(imageUrl = saved.imageUrl.ifBlank { detail.imageUrl }))
         } else {
-            AppResult.Failure(ApiErrorMapper.fromApiBody(saveResponse.body, fallbackApiMessage))
+            AppResult.Failure(ApiErrorMapper.fromApiBody(response.body, fallbackApiMessage))
         }
     }.getOrElse { AppResult.Failure(ApiErrorMapper.fromThrowable(it, networkMessage, timeoutMessage, parseMessage)) }
 

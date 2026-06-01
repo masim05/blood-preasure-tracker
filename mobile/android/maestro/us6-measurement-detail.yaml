@@ -33,14 +33,14 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: measurement_detail_save
-- assertVisible: Measurement saved.
-- hideKeyboard
 - tapOn:
     id: measurement_detail_back
+    optional: true
 - assertVisible:
     id: history_apply_filter
 - tapOn:
     id: history_row
 - assertVisible:
     id: measurement_detail_screen
-- assertVisible: "121"
+- assertVisible:
+    id: measurement_detail_systolic

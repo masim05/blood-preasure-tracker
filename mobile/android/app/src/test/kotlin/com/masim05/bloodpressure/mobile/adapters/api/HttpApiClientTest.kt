@@ -303,13 +303,7 @@ class HttpApiClientTest {
     }
 
     @Test
-    fun `save measurement detail overrides readings then saves and preserves image url`() {
-        server.enqueue(
-            200,
-            """
-            {"id":"msr_1","status":"recognized","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z"}
-            """.trimIndent(),
-        )
+    fun `save measurement detail posts save endpoint with edited readings and preserves image url`() {
         server.enqueue(
             201,
             """
@@ -334,39 +328,29 @@ class HttpApiClientTest {
         )
         val detail = (result as AppResult.Success).value
 
-        assertEquals(2, server.requests.size)
-        val overrideReq = server.requests[0]
-        val saveReq = server.requests[1]
-        assertEquals("/api/v1/measurements/msr_1/override", overrideReq.path)
-        assertEquals("application/json", overrideReq.contentType)
-        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69}""", overrideReq.body)
-        assertEquals("/api/v1/measurements/msr_1/save", saveReq.path)
-        assertEquals("", saveReq.body)
+        assertEquals(1, server.requests.size)
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("application/json", server.request.contentType)
+        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69}""", server.request.body)
         assertEquals(MeasurementStatus.Saved, detail.status)
         assertEquals(ArmSide.Right, detail.armSide)
         assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
     }
 
     @Test
-    fun `save measurement detail surfaces override API failures and does not call save endpoint`() {
+    fun `save measurement detail surfaces save API failures`() {
         server.enqueue(400, "{\"error\":\"validation\",\"message\":\"At least one field must be provided\"}")
 
         val failure = client.save(session(), detailForSave()) as AppResult.Failure
 
         assertEquals(1, server.requests.size)
-        assertEquals("/api/v1/measurements/msr_1/override", server.request.path)
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
         assertEquals("validation", failure.error.code)
         assertEquals("At least one field must be provided", failure.error.message)
     }
 
     @Test
-    fun `save measurement detail sends empty override body when all readings are null`() {
-        server.enqueue(
-            200,
-            """
-            {"id":"msr_1","status":"recognized","systolic":121,"diastolic":81,"pulse":69,"armSide":"right","measurementTime":"2026-05-27T12:00:00.000Z"}
-            """.trimIndent(),
-        )
+    fun `save measurement detail sends empty save body when all readings are null`() {
         server.enqueue(
             201,
             """
@@ -380,9 +364,9 @@ class HttpApiClientTest {
         )
 
         assertTrue(result is AppResult.Success)
-        assertEquals(2, server.requests.size)
-        assertEquals("{}", server.requests[0].body)
-        assertEquals("/api/v1/measurements/msr_1/save", server.requests[1].path)
+        assertEquals(1, server.requests.size)
+        assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
+        assertEquals("{}", server.request.body)
     }
 
     @Test
@@ -408,7 +392,6 @@ class HttpApiClientTest {
         server.close()
         server = TestHttpServer()
         client = HttpApiClient("http://127.0.0.1:${server.port}", "Unexpected API error", "Network error", "Timeout", "Parse error")
-        server.enqueue(200, "{\"id\":\"msr_1\",\"status\":\"recognized\",\"systolic\":121,\"diastolic\":81,\"pulse\":69,\"armSide\":\"right\",\"measurementTime\":\"2026-05-27T12:00:00.000Z\"}")
         server.enqueue(409, "{\"error\":\"conflict\",\"message\":\"Measurement must be recognized before it can be saved\"}")
         val saveFailure = client.save(session(), detailForSave()) as AppResult.Failure
         assertEquals("conflict", saveFailure.error.code)
