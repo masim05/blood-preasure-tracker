@@ -498,7 +498,7 @@ private enum class AuthDestination(val route: String) {
     Login("auth/login"),
 }
 
-private enum class MainDestination(val route: String) {
+internal enum class MainDestination(val route: String) {
     Capture("main/capture"),
     History("main/history"),
     MeasurementDetail("main/history/detail"),
