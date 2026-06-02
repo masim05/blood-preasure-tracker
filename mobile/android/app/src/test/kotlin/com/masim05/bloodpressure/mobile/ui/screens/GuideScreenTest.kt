@@ -13,10 +13,10 @@ class GuideScreenTest {
         assertEquals(listOf(true, true, false, false), examples.map { it.isGood })
         assertEquals(
             listOf(
-                R.drawable.guide_example_good1,
-                R.drawable.guide_example_good2,
-                R.drawable.guide_example_bad1,
-                R.drawable.guide_example_bad2,
+                R.drawable.guide_1,
+                R.drawable.guide_2,
+                R.drawable.guide_3,
+                R.drawable.guide_4,
             ),
             examples.map { it.drawableRes },
         )
