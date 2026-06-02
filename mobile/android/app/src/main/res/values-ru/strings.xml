@@ -11,7 +11,9 @@
     <string name="login_title">Войти</string>
     <string name="login_submit">Войти</string>
     <string name="guide_title">Руководство по измерению</string>
-    <string name="guide_copy">Сделайте четкое фото, где видны тонометр и рука.</string>
+    <string name="guide_copy">Сделайте четкое фото, на котором видны весь дисплей тонометра и рука, на которой проводилось измерение.</string>
+    <string name="guide_example_good">Хороший пример</string>
+    <string name="guide_example_bad">Плохой пример</string>
     <string name="guide_continue">Далее</string>
     <string name="camera_title">Камера</string>
     <string name="camera_copy">Сделайте четкое фото измерения одним нажатием.</string>

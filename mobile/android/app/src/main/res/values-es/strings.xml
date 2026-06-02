@@ -11,7 +11,9 @@
     <string name="login_title">Iniciar sesión</string>
     <string name="login_submit">Iniciar sesión</string>
     <string name="guide_title">Guía de medición</string>
-    <string name="guide_copy">Toma una foto clara con el tensiómetro y el brazo visibles.</string>
+    <string name="guide_copy">Toma una foto clara que muestre toda la pantalla del tensiómetro y el brazo en el que se realizó la medición.</string>
+    <string name="guide_example_good">Buen ejemplo</string>
+    <string name="guide_example_bad">Mal ejemplo</string>
     <string name="guide_continue">Siguiente</string>
     <string name="camera_title">Cámara</string>
     <string name="camera_copy">Toma una foto clara de la medición con un toque.</string>

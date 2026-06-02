@@ -11,7 +11,9 @@
     <string name="login_title">Entrar</string>
     <string name="login_submit">Entrar</string>
     <string name="guide_title">Guia de medição</string>
-    <string name="guide_copy">Tire uma foto nítida com o medidor e o braço visíveis.</string>
+    <string name="guide_copy">Tire uma foto nítida mostrando todo o visor do medidor de pressão arterial e o braço em que a medição foi feita.</string>
+    <string name="guide_example_good">Bom exemplo</string>
+    <string name="guide_example_bad">Mau exemplo</string>
     <string name="guide_continue">Próximo</string>
     <string name="camera_title">Câmera</string>
     <string name="camera_copy">Tire uma foto nítida da medição com um toque.</string>

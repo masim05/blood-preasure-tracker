@@ -11,7 +11,9 @@
     <string name="login_title">登录</string>
     <string name="login_submit">登录</string>
     <string name="guide_title">测量指南</string>
-    <string name="guide_copy">请拍摄一张清晰照片，确保血压计和手臂可见。</string>
+    <string name="guide_copy">请拍摄一张清晰照片，显示整个血压计屏幕以及进行测量的手臂。</string>
+    <string name="guide_example_good">好示例</string>
+    <string name="guide_example_bad">坏示例</string>
     <string name="guide_continue">下一步</string>
     <string name="camera_title">相机</string>
     <string name="camera_copy">轻点一次即可拍摄清晰的测量照片。</string>

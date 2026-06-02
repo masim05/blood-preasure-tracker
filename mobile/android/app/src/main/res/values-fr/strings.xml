@@ -11,7 +11,9 @@
     <string name="login_title">Se connecter</string>
     <string name="login_submit">Se connecter</string>
     <string name="guide_title">Guide de mesure</string>
-    <string name="guide_copy">Prenez une photo nette avec le tensiomètre et le bras visibles.</string>
+    <string name="guide_copy">Prenez une photo nette montrant tout l’écran du tensiomètre et le bras sur lequel la mesure a été prise.</string>
+    <string name="guide_example_good">Bon exemple</string>
+    <string name="guide_example_bad">Mauvais exemple</string>
     <string name="guide_continue">Suivant</string>
     <string name="camera_title">Caméra</string>
     <string name="camera_copy">Prenez une photo nette de la mesure en un seul appui.</string>
