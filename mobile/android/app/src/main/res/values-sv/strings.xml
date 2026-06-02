@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Blodtryckslogg</string>
-    <string name="auth_title">Blodtryckslogg</string>
+    <string name="app_name">blood pressure</string>
+    <string name="auth_title">blood pressure</string>
     <string name="auth_mode_login">Logga in</string>
     <string name="auth_mode_new_account">Nytt konto</string>
     <string name="signin_title">Skapa konto</string>
