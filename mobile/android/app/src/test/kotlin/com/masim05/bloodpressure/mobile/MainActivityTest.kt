@@ -151,6 +151,17 @@ class MainActivityTest {
     }
 
     @Test
+    fun topLevelMainTabForDestinationRouteMapsGuideToCaptureTab() {
+        assertEquals(
+            MainTab.Capture,
+            topLevelMainTabForDestinationRoute(
+                destinationRoute = MainDestination.Guide.route,
+                fallbackRoute = Route.Profile,
+            ),
+        )
+    }
+
+    @Test
     fun readPreferredLanguageCodeFallsBackToSystemForUnknownCode() {
         assertEquals(SYSTEM_LANGUAGE_CODE, readPreferredLanguageCode("xx"))
     }

@@ -26,3 +26,11 @@ appId: com.masim05.bloodpressure.mobile
     id: profile_language_option_fr
 - assertVisible:
     id: profile_logout
+- tapOn:
+    id: profile_guide
+- assertVisible:
+    id: guide_screen
+- tapOn:
+    id: guide_continue
+- assertVisible:
+    id: camera_screen

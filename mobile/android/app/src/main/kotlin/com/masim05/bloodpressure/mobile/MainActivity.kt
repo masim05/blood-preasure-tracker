@@ -56,6 +56,7 @@ import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
+import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.screens.ProfileScreen
@@ -154,6 +155,10 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
+                            composable(MainDestination.Guide.route) {
+                                GuideScreen(onNext = ::openCamera)
+                            }
+
                             composable(MainDestination.History.route) {
                                 HistoryScreen(
                                     filter = uiState.filter,
@@ -181,6 +186,7 @@ class MainActivity : ComponentActivity() {
                                             recreate()
                                         }
                                     },
+                                    onOpenGuide = ::openGuide,
                                     onLogout = ::logout,
                                 )
                             }
@@ -265,6 +271,14 @@ class MainActivity : ComponentActivity() {
         state.logErrors("camera_enter")
         historyRequestVersion += 1
         uiState = uiState.copy(route = state.route, isUploading = false, errorText = state.visibleMessage())
+    }
+
+    private fun openGuide() {
+        if (captureFlow.enterCamera().route == Route.Auth) {
+            uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+            return
+        }
+        uiState = uiState.copy(route = Route.Guide, errorText = null)
     }
 
     private fun openProfile() {
@@ -534,6 +548,7 @@ private enum class AuthDestination(val route: String) {
 
 internal enum class MainDestination(val route: String) {
     Capture("main/capture"),
+    Guide("main/guide"),
     History("main/history"),
     MeasurementDetail("main/history/detail"),
     Profile("main/profile"),
@@ -585,7 +600,8 @@ private fun showBottomNavigation(currentDestination: NavDestination?): Boolean {
     if (currentDestination == null) return false
     val isMainGraphDestination = currentDestination.hierarchy.any { it.route == RootGraph.Main.route }
     val isDetailDestination = currentDestination.route == MainDestination.MeasurementDetail.route
-    return isMainGraphDestination && !isDetailDestination
+    val isGuideDestination = currentDestination.route == MainDestination.Guide.route
+    return isMainGraphDestination && !isDetailDestination && !isGuideDestination
 }
 
 private fun syncNavigationState(
@@ -598,7 +614,8 @@ private fun syncNavigationState(
             popUpTo(RootGraph.Main.route) { inclusive = true }
             launchSingleTop = true
         }
-        Route.Camera, Route.Guide -> navController.navigateToMainTopLevel(MainDestination.Capture.route)
+        Route.Camera -> navController.navigateToMainTopLevel(MainDestination.Capture.route)
+        Route.Guide -> navController.navigateToMainTopLevel(MainDestination.Guide.route)
         Route.History -> {
             if (navController.currentDestination?.route == MainDestination.MeasurementDetail.route) {
                 navController.popBackStack()
@@ -641,9 +658,9 @@ internal fun topLevelMainTab(route: Route): MainTab {
 
 internal fun topLevelMainTabForDestinationRoute(destinationRoute: String?, fallbackRoute: Route): MainTab {
     return when (destinationRoute) {
+        MainDestination.Guide.route, MainDestination.Capture.route -> MainTab.Capture
         MainDestination.History.route, MainDestination.MeasurementDetail.route -> MainTab.History
         MainDestination.Profile.route -> MainTab.Profile
-        MainDestination.Capture.route -> MainTab.Capture
         else -> topLevelMainTab(fallbackRoute)
     }
 }

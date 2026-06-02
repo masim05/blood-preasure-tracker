@@ -14,6 +14,10 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: signin_submit
+- assertVisible:
+    id: guide_screen
+- tapOn:
+    id: guide_continue
 - tapOn:
     text: (Deny|Don't allow|Not now)
     optional: true
