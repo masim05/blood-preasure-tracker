@@ -36,5 +36,6 @@ object TestTags {
     const val ProfileScreen = "profile_screen"
     const val ProfileLogout = "profile_logout"
     const val ProfileLanguageSelector = "profile_language_selector"
+    const val ProfileGuide = "profile_guide"
     const val ProfileLanguageOptionPrefix = "profile_language_option_"
 }

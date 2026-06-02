@@ -46,7 +46,7 @@ class AuthFlow(
     fun signIn(email: String, password: String): ScreenState = authenticate(
         email = email,
         password = password,
-        routeOnSuccess = Route.Camera,
+        routeOnSuccess = Route.Guide,
         authMode = AuthMode.NewAccount,
     ) { authGateway.signIn(email.trim(), password) }
 

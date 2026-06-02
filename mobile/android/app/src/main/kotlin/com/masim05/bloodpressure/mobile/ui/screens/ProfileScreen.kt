@@ -13,6 +13,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import com.masim05.bloodpressure.mobile.ui.TestTags
 fun ProfileScreen(
     selectedLanguageCode: String,
     onLanguageSelected: (String) -> Unit,
+    onOpenGuide: () -> Unit,
     onLogout: () -> Unit,
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -72,6 +74,13 @@ fun ProfileScreen(
                     )
                 }
             }
+        }
+        Spacer(Modifier.height(8.dp))
+        TextButton(
+            modifier = Modifier.testTag(TestTags.ProfileGuide),
+            onClick = onOpenGuide,
+        ) {
+            Text(stringResource(R.string.guide_title))
         }
         Spacer(Modifier.height(16.dp))
         Button(
