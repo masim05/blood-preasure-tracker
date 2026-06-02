@@ -24,6 +24,7 @@ enum class Route {
     Camera,
     History,
     MeasurementDetail,
+    Profile,
 }
 
 data class ScreenState(
@@ -45,7 +46,7 @@ class AuthFlow(
     fun signIn(email: String, password: String): ScreenState = authenticate(
         email = email,
         password = password,
-        routeOnSuccess = Route.Guide,
+        routeOnSuccess = Route.Camera,
         authMode = AuthMode.NewAccount,
     ) { authGateway.signIn(email.trim(), password) }
 

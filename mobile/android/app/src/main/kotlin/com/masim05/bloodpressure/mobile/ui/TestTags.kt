@@ -28,4 +28,10 @@ object TestTags {
     const val MeasurementDetailPulse = "measurement_detail_pulse"
     const val MeasurementDetailSave = "measurement_detail_save"
     const val MeasurementDetailBack = "measurement_detail_back"
+    const val BottomNav = "bottom_nav"
+    const val BottomNavCapture = "bottom_nav_capture"
+    const val BottomNavHistory = "bottom_nav_history"
+    const val BottomNavProfile = "bottom_nav_profile"
+    const val ProfileScreen = "profile_screen"
+    const val ProfileLogout = "profile_logout"
 }

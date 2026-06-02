@@ -26,13 +26,13 @@ import org.junit.Test
 
 class AppFlowsTest {
     @Test
-    fun signInStoresSessionAndRoutesToGuide() {
+    fun signInStoresSessionAndRoutesToCamera() {
         val store = MemoryStore()
         val flow = AuthFlow(AuthSuccess(), store)
 
         val state = flow.signIn("new@example.com", "password123")
 
-        assertEquals(Route.Guide, state.route)
+        assertEquals(Route.Camera, state.route)
         assertNotNull(store.load())
         assertEquals("Bearer token", store.load()?.authorizationHeader)
     }
