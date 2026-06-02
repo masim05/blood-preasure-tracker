@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * npm run deploy -- [branch-name] [-h host]
+ * npm run api:deploy -- [branch-name] [-h host]
  *
  * Positional:  branch-name  (default: main)
  * Option:     -h <host>     (default: con01.crptmax.com)

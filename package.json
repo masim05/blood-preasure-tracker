@@ -11,7 +11,7 @@
     "build": "tsc -p tsconfig.json",
     "api": "npm run build --silent && node dist/api-main.js",
     "cli": "npm run build --silent && node dist/main.js",
-    "deploy": "node scripts/deploy.mjs",
+    "api:deploy": "node scripts/deploy.mjs",
     "db:clean": "node scripts/db-clean.mjs",
     "db:connect": "node scripts/db-connect.mjs",
     "db:init": "node scripts/db-init.mjs",
