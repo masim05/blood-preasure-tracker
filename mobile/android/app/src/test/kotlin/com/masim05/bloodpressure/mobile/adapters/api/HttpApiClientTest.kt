@@ -389,6 +389,24 @@ class HttpApiClientTest {
     }
 
     @Test
+    fun `failed API logger exceptions do not change API failure handling`() {
+        val loggingClient = HttpApiClient(
+            baseUrl = "http://127.0.0.1:${server.port}",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+            onFailedApiRequest = { _, _ -> error("logger failure") },
+        )
+        server.enqueue(401, "{\"error\":\"unauthorized\",\"message\":\"Invalid credentials\"}")
+
+        val result = loggingClient.logIn("user@example.com", "password123") as AppResult.Failure
+
+        assertEquals("unauthorized", result.error.code)
+        assertEquals("Invalid credentials", result.error.message)
+    }
+
+    @Test
     fun `measurement detail supports pending recognizing failed and API failures`() {
         server.enqueue(
             200,

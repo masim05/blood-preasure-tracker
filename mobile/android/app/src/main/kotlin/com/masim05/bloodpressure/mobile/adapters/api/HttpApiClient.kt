@@ -137,7 +137,7 @@ class HttpApiClient(
             }
             val status = connection.responseCode
             if (status !in 200..299) {
-                onFailedApiRequest(requestUrl, status)
+                reportFailedApiRequest(requestUrl, status)
             }
             val stream = if (status in 200..299) connection.inputStream else connection.errorStream
             HttpResponse(status, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
@@ -162,12 +162,18 @@ class HttpApiClient(
             accept?.let { connection.setRequestProperty("Accept", it) }
             val status = connection.responseCode
             if (status !in 200..299) {
-                onFailedApiRequest(requestUrl, status)
+                reportFailedApiRequest(requestUrl, status)
             }
             val stream = if (status in 200..299) connection.inputStream else connection.errorStream
             HttpBytesResponse(status, stream?.use { it.readBytes() } ?: ByteArray(0))
         } finally {
             connection.disconnect()
+        }
+    }
+
+    private fun reportFailedApiRequest(url: String, statusCode: Int) {
+        runCatching {
+            onFailedApiRequest(url, statusCode)
         }
     }
 

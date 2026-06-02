@@ -293,20 +293,11 @@ private fun rotateBitmap(bitmap: android.graphics.Bitmap?, rotationDegrees: Floa
 }
 
 private fun extractExifRotationDegrees(imageBytes: ByteArray): Float {
-    val orientation = runCatching {
+    return runCatching {
         ByteArrayInputStream(imageBytes).use { input ->
-            ExifInterface(input).getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_UNDEFINED,
-            )
+            ExifInterface(input).rotationDegrees.toFloat()
         }
-    }.getOrDefault(ExifInterface.ORIENTATION_UNDEFINED)
-    return when (orientation) {
-        ExifInterface.ORIENTATION_ROTATE_90 -> 90f
-        ExifInterface.ORIENTATION_ROTATE_180 -> 180f
-        ExifInterface.ORIENTATION_ROTATE_270 -> 270f
-        else -> 0f
-    }
+    }.getOrDefault(0f)
 }
 
 @Composable
