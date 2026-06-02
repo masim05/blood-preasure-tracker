@@ -6,7 +6,7 @@
     <string name="auth_mode_new_account">Nuovo account</string>
     <string name="signin_title">Crea account</string>
     <string name="signin_email_hint">Posta elettronica</string>
-    <string name="signin_password_hint">Parola d'ordine</string>
+    <string name="signin_password_hint">Password</string>
     <string name="signin_submit">Crea account</string>
     <string name="login_title">Accedi</string>
     <string name="login_submit">Accedi</string>
