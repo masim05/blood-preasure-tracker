@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">blood pressure</string>
-    <string name="auth_title">blood pressure</string>
+    <string name="app_name">Blood Pressure</string>
+    <string name="auth_title">Blood Pressure</string>
     <string name="auth_mode_login">Đăng nhập</string>
     <string name="auth_mode_new_account">Tài khoản mới</string>
     <string name="signin_title">Tạo tài khoản</string>
