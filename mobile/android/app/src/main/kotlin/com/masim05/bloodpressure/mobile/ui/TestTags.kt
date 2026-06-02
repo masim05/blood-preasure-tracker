@@ -34,4 +34,6 @@ object TestTags {
     const val BottomNavProfile = "bottom_nav_profile"
     const val ProfileScreen = "profile_screen"
     const val ProfileLogout = "profile_logout"
+    const val ProfileLanguageSelector = "profile_language_selector"
+    const val ProfileLanguageOptionPrefix = "profile_language_option_"
 }

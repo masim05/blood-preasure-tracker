@@ -1,7 +1,9 @@
 package com.masim05.bloodpressure.mobile
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -59,9 +61,11 @@ import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.screens.ProfileScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 import java.time.Instant
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private val sessionStore by lazy { EncryptedSessionStore.create(this) }
+    private val settingsPreferences by lazy { getSharedPreferences(LANGUAGE_PREFERENCES_NAME, MODE_PRIVATE) }
     private val cameraGateway = CameraXCameraGateway()
     private val apiClient by lazy {
         HttpApiClient(
@@ -83,6 +87,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         uiState = restoredStartupState()
         setContent {
+            var selectedLanguageCode by remember {
+                mutableStateOf(readPreferredLanguageCode(settingsPreferences.getString(LANGUAGE_CODE_PREFERENCE_KEY, null)))
+            }
             AppTheme {
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
@@ -157,7 +164,20 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(MainDestination.Profile.route) {
-                                ProfileScreen(onLogout = ::logout)
+                                ProfileScreen(
+                                    selectedLanguageCode = selectedLanguageCode,
+                                    onLanguageSelected = { selectedCode ->
+                                        val normalizedCode = readPreferredLanguageCode(selectedCode)
+                                        if (normalizedCode != selectedLanguageCode) {
+                                            selectedLanguageCode = normalizedCode
+                                            settingsPreferences.edit()
+                                                .putString(LANGUAGE_CODE_PREFERENCE_KEY, normalizedCode)
+                                                .apply()
+                                            recreate()
+                                        }
+                                    },
+                                    onLogout = ::logout,
+                                )
                             }
 
                             composable(MainDestination.MeasurementDetail.route) {
@@ -172,6 +192,14 @@ class MainActivity : ComponentActivity() {
                                     onBack = ::closeMeasurementDetail,
                                     onSave = ::saveMeasurementDetail,
                                 )
+                            }
+
+                            override fun attachBaseContext(newBase: Context) {
+                                val preferredLanguageCode = readPreferredLanguageCode(
+                                    newBase.getSharedPreferences(LANGUAGE_PREFERENCES_NAME, MODE_PRIVATE)
+                                        .getString(LANGUAGE_CODE_PREFERENCE_KEY, null),
+                                )
+                                super.attachBaseContext(withLanguageContext(newBase, preferredLanguageCode))
                             }
                         }
                     }
@@ -663,6 +691,44 @@ private fun csvEscape(value: String): String {
         return value
     }
     return "\"${value.replace("\"", "\"\"")}\""
+}
+
+internal const val LANGUAGE_PREFERENCES_NAME = "app_preferences"
+internal const val LANGUAGE_CODE_PREFERENCE_KEY = "language_code"
+internal const val SYSTEM_LANGUAGE_CODE = "system"
+
+private val SUPPORTED_LANGUAGE_CODES = setOf(
+    SYSTEM_LANGUAGE_CODE,
+    "es",
+    "fr",
+    "pt",
+    "it",
+    "sv",
+    "ru",
+    "zh",
+    "ko",
+    "ja",
+    "th",
+    "vi",
+)
+
+internal fun readPreferredLanguageCode(languageCode: String?): String {
+    return languageCode?.takeIf { it in SUPPORTED_LANGUAGE_CODES } ?: SYSTEM_LANGUAGE_CODE
+}
+
+internal fun withLanguageContext(baseContext: Context, languageCode: String): Context {
+    val locale = localeForLanguageCode(languageCode) ?: return baseContext
+    val configuration = Configuration(baseContext.resources.configuration)
+    configuration.setLocale(locale)
+    return baseContext.createConfigurationContext(configuration)
+}
+
+private fun localeForLanguageCode(languageCode: String): Locale? {
+    return when (languageCode) {
+        SYSTEM_LANGUAGE_CODE -> null
+        "zh" -> Locale.SIMPLIFIED_CHINESE
+        else -> Locale.forLanguageTag(languageCode)
+    }
 }
 
 private data class MobileUiState(
