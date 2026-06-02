@@ -194,18 +194,19 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            override fun attachBaseContext(newBase: Context) {
-                                val preferredLanguageCode = readPreferredLanguageCode(
-                                    newBase.getSharedPreferences(LANGUAGE_PREFERENCES_NAME, MODE_PRIVATE)
-                                        .getString(LANGUAGE_CODE_PREFERENCE_KEY, null),
-                                )
-                                super.attachBaseContext(withLanguageContext(newBase, preferredLanguageCode))
-                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val preferredLanguageCode = readPreferredLanguageCode(
+            newBase.getSharedPreferences(LANGUAGE_PREFERENCES_NAME, MODE_PRIVATE)
+                .getString(LANGUAGE_CODE_PREFERENCE_KEY, null),
+        )
+        super.attachBaseContext(withLanguageContext(newBase, preferredLanguageCode))
     }
 
     private fun restoredStartupState(): MobileUiState {
