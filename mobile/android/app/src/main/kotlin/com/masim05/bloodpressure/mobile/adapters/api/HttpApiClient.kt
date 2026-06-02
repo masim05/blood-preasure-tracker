@@ -26,6 +26,7 @@ class HttpApiClient(
     private val networkMessage: String,
     private val timeoutMessage: String,
     private val parseMessage: String,
+    private val onFailedApiRequest: (url: String, statusCode: Int) -> Unit = { _, _ -> },
 ) : AuthGateway, HistoryGateway, MeasurementUploadGateway, MeasurementDetailGateway {
     fun fetchMeasurementImage(imageUrl: String, authorization: String): AppResult<ByteArray> = runCatching {
         val response = requestBytes(url = imageUrl, method = "GET", authorization = authorization, accept = "image/*")
@@ -122,7 +123,8 @@ class HttpApiClient(
         contentType: String? = null,
         authorization: String? = null,
     ): HttpResponse {
-        val connection = URI.create(baseUrl + path).toURL().openConnection() as HttpURLConnection
+        val requestUrl = URI.create(baseUrl + path).toString()
+        val connection = URI.create(requestUrl).toURL().openConnection() as HttpURLConnection
         return try {
             connection.requestMethod = method
             connection.connectTimeout = 5_000
@@ -134,6 +136,9 @@ class HttpApiClient(
                 connection.outputStream.use { it.write(body) }
             }
             val status = connection.responseCode
+            if (status !in 200..299) {
+                reportFailedApiRequest(requestUrl, status)
+            }
             val stream = if (status in 200..299) connection.inputStream else connection.errorStream
             HttpResponse(status, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
         } finally {
@@ -147,7 +152,8 @@ class HttpApiClient(
         authorization: String? = null,
         accept: String? = null,
     ): HttpBytesResponse {
-        val connection = URI.create(url).toURL().openConnection() as HttpURLConnection
+        val requestUrl = URI.create(url).toString()
+        val connection = URI.create(requestUrl).toURL().openConnection() as HttpURLConnection
         return try {
             connection.requestMethod = method
             connection.connectTimeout = 5_000
@@ -155,10 +161,19 @@ class HttpApiClient(
             authorization?.let { connection.setRequestProperty("Authorization", it) }
             accept?.let { connection.setRequestProperty("Accept", it) }
             val status = connection.responseCode
+            if (status !in 200..299) {
+                reportFailedApiRequest(requestUrl, status)
+            }
             val stream = if (status in 200..299) connection.inputStream else connection.errorStream
             HttpBytesResponse(status, stream?.use { it.readBytes() } ?: ByteArray(0))
         } finally {
             connection.disconnect()
+        }
+    }
+
+    private fun reportFailedApiRequest(url: String, statusCode: Int) {
+        runCatching {
+            onFailedApiRequest(url, statusCode)
         }
     }
 
@@ -233,7 +248,14 @@ class HttpApiClient(
         detail.systolic?.let { add("\"systolic\":$it") }
         detail.diastolic?.let { add("\"diastolic\":$it") }
         detail.pulse?.let { add("\"pulse\":$it") }
+        add("\"armSide\":\"${serializeArmSide(detail.armSide)}\"")
     }.joinToString(separator = ",", prefix = "{", postfix = "}")
+
+    private fun serializeArmSide(armSide: ArmSide): String = when (armSide) {
+        ArmSide.Left -> "left"
+        ArmSide.Right -> "right"
+        ArmSide.Unknown -> "unknown"
+    }
 
     private fun readImageBytes(image: MeasurementImage): ByteArray {
         val imageUri = URI.create(image.uri)

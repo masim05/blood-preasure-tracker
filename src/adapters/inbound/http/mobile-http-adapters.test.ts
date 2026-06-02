@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { extractBearerToken } from './bearer-auth.guard';
 import { requireAuthRequest } from './dto/auth.dto';
-import { parseMeasurementOverride, parseOptionalPositiveInteger } from './dto/measurement.dto';
+import { parseMeasurementOverride, parseOptionalPositiveInteger, parseSaveMeasurement } from './dto/measurement.dto';
 import { ApiError, toHttpException } from './http-error.mapper';
 import { CreateAccountUseCase } from '../../../application/use-cases/create-account.use-case';
 import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case';
@@ -64,6 +64,27 @@ describe('mobile HTTP adapter helpers', () => {
     );
     expect(() => parseMeasurementOverride({ pulse: 0 })).toThrow('pulse must be a positive integer');
     expect(() => parseMeasurementOverride({ systolic: 121, unexpected: true } as never)).toThrow(
+      'unexpected field: unexpected',
+    );
+  });
+
+  it('parses save payloads with optional arm side', () => {
+    expect(parseSaveMeasurement({ armSide: 'right' })).toEqual({
+      systolic: undefined,
+      diastolic: undefined,
+      pulse: undefined,
+      armSide: 'right',
+    });
+    expect(parseSaveMeasurement(undefined)).toEqual({
+      systolic: undefined,
+      diastolic: undefined,
+      pulse: undefined,
+      armSide: undefined,
+    });
+    expect(() => parseSaveMeasurement({ armSide: 'up' as never })).toThrow(
+      'armSide must be one of left, right, unknown',
+    );
+    expect(() => parseSaveMeasurement({ armSide: 'left', unexpected: true } as never)).toThrow(
       'unexpected field: unexpected',
     );
   });

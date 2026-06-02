@@ -18,6 +18,13 @@ export type MeasurementOverrideDto = {
   pulse?: number;
 };
 
+export type SaveMeasurementDto = {
+  systolic?: number;
+  diastolic?: number;
+  pulse?: number;
+  armSide?: ArmSide;
+};
+
 export function parseOptionalPositiveInteger(value: string | undefined): number | undefined {
   if (value === undefined) {
     return undefined;
@@ -49,8 +56,31 @@ export function parseMeasurementOverride(
   return output;
 }
 
+export function parseSaveMeasurement(
+  input: SaveMeasurementDto | undefined,
+): SaveMeasurementDto {
+  const payload = input ?? {};
+  rejectUnexpectedSaveFields(payload);
+
+  return {
+    systolic: parseOptionalBodyInteger(payload.systolic, 'systolic'),
+    diastolic: parseOptionalBodyInteger(payload.diastolic, 'diastolic'),
+    pulse: parseOptionalBodyInteger(payload.pulse, 'pulse'),
+    armSide: parseOptionalArmSide(payload.armSide),
+  };
+}
+
 function rejectUnexpectedOverrideFields(payload: MeasurementOverrideDto): void {
   const allowedFields = new Set(['systolic', 'diastolic', 'pulse']);
+  for (const field of Object.keys(payload)) {
+    if (!allowedFields.has(field)) {
+      throw new Error(`unexpected field: ${field}`);
+    }
+  }
+}
+
+function rejectUnexpectedSaveFields(payload: SaveMeasurementDto): void {
+  const allowedFields = new Set(['systolic', 'diastolic', 'pulse', 'armSide']);
   for (const field of Object.keys(payload)) {
     if (!allowedFields.has(field)) {
       throw new Error(`unexpected field: ${field}`);
@@ -68,3 +98,15 @@ function parseOptionalBodyInteger(value: number | undefined, field: string): num
 
   return value;
 }
+
+function parseOptionalArmSide(value: string | undefined): ArmSide | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value !== 'left' && value !== 'right' && value !== 'unknown') {
+    throw new Error('armSide must be one of left, right, unknown');
+  }
+
+  return value;
+}
+import type { ArmSide } from '../../../../domain/entities/measurement';

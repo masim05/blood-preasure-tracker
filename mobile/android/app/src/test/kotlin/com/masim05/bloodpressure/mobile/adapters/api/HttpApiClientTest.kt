@@ -11,6 +11,7 @@ import com.masim05.bloodpressure.mobile.core.model.Session
 import com.masim05.bloodpressure.mobile.core.model.ApiErrorSource
 import java.net.ServerSocket
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -331,7 +332,7 @@ class HttpApiClientTest {
         assertEquals(1, server.requests.size)
         assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
         assertEquals("application/json", server.request.contentType)
-        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69}""", server.request.body)
+        assertEquals("""{"systolic":121,"diastolic":81,"pulse":69,"armSide":"right"}""", server.request.body)
         assertEquals(MeasurementStatus.Saved, detail.status)
         assertEquals(ArmSide.Right, detail.armSide)
         assertEquals("/api/v1/measurements/msr_1/image", detail.imageUrl)
@@ -366,7 +367,43 @@ class HttpApiClientTest {
         assertTrue(result is AppResult.Success)
         assertEquals(1, server.requests.size)
         assertEquals("/api/v1/measurements/msr_1/save", server.request.path)
-        assertEquals("{}", server.request.body)
+        assertEquals("""{"armSide":"right"}""", server.request.body)
+    }
+
+    @Test
+    fun `failed API responses trigger failure logger with full URL and status`() {
+        val failedRequests = CopyOnWriteArrayList<Pair<String, Int>>()
+        val loggingClient = HttpApiClient(
+            baseUrl = "http://127.0.0.1:${server.port}",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+            onFailedApiRequest = { url, statusCode -> failedRequests += (url to statusCode) },
+        )
+        server.enqueue(401, "{\"error\":\"unauthorized\",\"message\":\"Invalid credentials\"}")
+
+        loggingClient.logIn("user@example.com", "password123")
+
+        assertEquals(listOf("http://127.0.0.1:${server.port}/api/v1/login" to 401), failedRequests)
+    }
+
+    @Test
+    fun `failed API logger exceptions do not change API failure handling`() {
+        val loggingClient = HttpApiClient(
+            baseUrl = "http://127.0.0.1:${server.port}",
+            fallbackApiMessage = "Unexpected API error",
+            networkMessage = "Network error",
+            timeoutMessage = "Timeout",
+            parseMessage = "Parse error",
+            onFailedApiRequest = { _, _ -> error("logger failure") },
+        )
+        server.enqueue(401, "{\"error\":\"unauthorized\",\"message\":\"Invalid credentials\"}")
+
+        val result = loggingClient.logIn("user@example.com", "password123") as AppResult.Failure
+
+        assertEquals("unauthorized", result.error.code)
+        assertEquals("Invalid credentials", result.error.message)
     }
 
     @Test
