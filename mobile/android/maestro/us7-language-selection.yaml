@@ -24,4 +24,5 @@ appId: com.masim05.bloodpressure.mobile
     id: profile_language_selector
 - tapOn:
     id: profile_language_option_fr
-- assertVisible: Se déconnecter
+- assertVisible:
+    id: profile_logout
