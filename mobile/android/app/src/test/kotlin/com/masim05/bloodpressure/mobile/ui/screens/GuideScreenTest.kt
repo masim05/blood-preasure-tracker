@@ -1,5 +1,6 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import com.masim05.bloodpressure.mobile.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,12 +13,12 @@ class GuideScreenTest {
         assertEquals(listOf(true, true, false, false), examples.map { it.isGood })
         assertEquals(
             listOf(
-                GuideExampleVariant.FullDisplayCentered,
-                GuideExampleVariant.FullDisplayAngled,
-                GuideExampleVariant.CroppedDisplay,
-                GuideExampleVariant.MissingArm,
+                R.drawable.guide_example_good1,
+                R.drawable.guide_example_good2,
+                R.drawable.guide_example_bad1,
+                R.drawable.guide_example_bad2,
             ),
-            examples.map { it.variant },
+            examples.map { it.drawableRes },
         )
     }
 }

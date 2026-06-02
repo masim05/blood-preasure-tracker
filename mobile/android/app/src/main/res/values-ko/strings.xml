@@ -12,6 +12,8 @@
     <string name="login_submit">로그인</string>
     <string name="guide_title">측정 가이드</string>
     <string name="guide_copy">혈압계 화면 전체와 측정한 팔이 모두 보이도록 선명한 사진을 찍으세요.</string>
+    <string name="guide_example_good">좋은 예</string>
+    <string name="guide_example_bad">나쁜 예</string>
     <string name="guide_continue">다음</string>
     <string name="camera_title">카메라</string>
     <string name="camera_copy">한 번 탭하여 선명한 측정 사진을 찍으세요.</string>

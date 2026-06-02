@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bad example 1: monitor display cropped – top and right edges cut off -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Background -->
+    <path
+        android:pathData="M0,0 L200,0 L200,200 L0,200 Z"
+        android:fillColor="#FFF7ED" />
+
+    <!-- Arm (partial, cut off on right) -->
+    <path
+        android:pathData="M0,158 Q0,148 10,148 L155,148 Q165,148 165,158 L165,168 Q165,178 155,178 L10,178 Q0,178 0,168 Z"
+        android:fillColor="#D6A77A" />
+
+    <!-- Monitor body: partially outside the canvas (right and top edges clipped) -->
+    <path
+        android:pathData="M80,0 L200,0 L200,145 Q200,155 190,155 L80,155 Q70,155 70,145 L70,10 Q70,0 80,0 Z"
+        android:fillColor="#1E293B" />
+
+    <!-- Monitor screen bezel (also partially clipped) -->
+    <path
+        android:pathData="M82,8 L196,8 L196,140 Q196,142 194,142 L82,142 Q80,142 80,140 L80,10 Q80,8 82,8 Z"
+        android:fillColor="#E2E8F0" />
+
+    <!-- Systolic reading (partially visible) -->
+    <path
+        android:pathData="M88,22 L200,22 L200,39 L88,39 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Diastolic / pulse (mostly cropped) -->
+    <path
+        android:pathData="M88,46 L108,46 L108,57 L88,57 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M112,46 L200,46 L200,57 L112,57 Z"
+        android:fillColor="#FFFFFF" />
+
+</vector>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bad example 2: monitor visible but arm missing from the photo -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Background (greyed out to suggest incomplete scene) -->
+    <path
+        android:pathData="M0,0 L200,0 L200,200 L0,200 Z"
+        android:fillColor="#F1F5F9" />
+
+    <!-- Monitor body (centred, no arm beneath it) -->
+    <path
+        android:pathData="M60,35 Q60,25 70,25 L130,25 Q140,25 140,35 L140,155 Q140,165 130,165 L70,165 Q60,165 60,155 Z"
+        android:fillColor="#334155" />
+
+    <!-- Monitor screen bezel -->
+    <path
+        android:pathData="M70,40 Q68,40 68,42 L68,150 Q68,152 70,152 L130,152 Q132,152 132,150 L132,42 Q132,40 130,40 Z"
+        android:fillColor="#CBD5E1" />
+
+    <!-- Systolic reading (dimmed – simulates unreadable display without arm context) -->
+    <path
+        android:pathData="M78,53 L122,53 L122,70 L78,70 Z"
+        android:fillColor="#E2E8F0" />
+
+    <!-- Diastolic / pulse blocks (also dimmed) -->
+    <path
+        android:pathData="M78,77 L98,77 L98,88 L78,88 Z"
+        android:fillColor="#E2E8F0" />
+    <path
+        android:pathData="M102,77 L122,77 L122,88 L102,88 Z"
+        android:fillColor="#E2E8F0" />
+
+    <!-- Label bar -->
+    <path
+        android:pathData="M82,95 L118,95 L118,101 L82,101 Z"
+        android:fillColor="#94A3B8" />
+
+    <!-- "No arm" indicator: dashed placeholder line at bottom -->
+    <path
+        android:pathData="M40,180 L60,180"
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M70,180 L90,180"
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M100,180 L120,180"
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M130,180 L150,180"
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M160,180 L180,180"
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+
+</vector>

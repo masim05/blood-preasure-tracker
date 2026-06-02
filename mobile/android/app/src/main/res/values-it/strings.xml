@@ -12,6 +12,8 @@
     <string name="login_submit">Accedi</string>
     <string name="guide_title">Guida alla misurazione</string>
     <string name="guide_copy">Scatta una foto nitida che mostri l’intero display del misuratore di pressione e il braccio su cui è stata effettuata la misurazione.</string>
+    <string name="guide_example_good">Buon esempio</string>
+    <string name="guide_example_bad">Esempio errato</string>
     <string name="guide_continue">Avanti</string>
     <string name="camera_title">Fotocamera</string>
     <string name="camera_copy">Scatta una foto chiara della misurazione con un tocco.</string>

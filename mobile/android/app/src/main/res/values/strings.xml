@@ -12,6 +12,8 @@
     <string name="login_submit">Log in</string>
     <string name="guide_title">Measurement guide</string>
     <string name="guide_copy">Take a clear photo showing the entire blood pressure monitor display and the arm on which the measurement was taken.</string>
+    <string name="guide_example_good">Good example</string>
+    <string name="guide_example_bad">Bad example</string>
     <string name="guide_continue">Next</string>
     <string name="camera_title">Camera</string>
     <string name="camera_copy">Take a clear measurement picture with one tap.</string>
