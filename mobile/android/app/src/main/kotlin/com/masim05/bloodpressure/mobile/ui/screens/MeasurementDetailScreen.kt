@@ -1,6 +1,8 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -44,6 +50,7 @@ import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.MeasurementDetail
 import com.masim05.bloodpressure.mobile.core.model.MeasurementStatus
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import java.io.ByteArrayInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -109,6 +116,9 @@ fun MeasurementDetailScreen(
             var pulse by remember(measurementDetail.id, measurementDetail.pulse) {
                 mutableStateOf(measurementDetail.pulse?.toString().orEmpty())
             }
+            var armSide by remember(measurementDetail.id, measurementDetail.armSide) {
+                mutableStateOf(measurementDetail.armSide)
+            }
 
             Box(
                 modifier = Modifier
@@ -155,7 +165,10 @@ fun MeasurementDetailScreen(
                         onValueChange = { pulse = it },
                     )
                 }
-                Text(stringResource(R.string.detail_arm_side, stringResource(armLabel(measurementDetail.armSide))))
+                ArmSideDropdown(
+                    selectedArmSide = armSide,
+                    onArmSideSelected = { armSide = it },
+                )
                 Text(stringResource(R.string.detail_status, stringResource(statusLabel(measurementDetail.status))))
                 measurementDetail.recognitionError?.takeIf { it.isNotBlank() }?.let {
                     Text(text = stringResource(R.string.detail_recognition_error, it), color = MaterialTheme.colorScheme.error)
@@ -179,6 +192,7 @@ fun MeasurementDetailScreen(
                                 systolic = systolic.toIntOrNull() ?: measurementDetail.systolic,
                                 diastolic = diastolic.toIntOrNull() ?: measurementDetail.diastolic,
                                 pulse = pulse.toIntOrNull() ?: measurementDetail.pulse,
+                                armSide = armSide,
                             ),
                         )
                     },
@@ -256,11 +270,42 @@ private suspend fun loadMeasurementBitmap(
 ): AppResult<ImageBitmap?> = withContext(Dispatchers.IO) {
     when (val imageResult = loadMeasurementImage(resolvedImageUrl)) {
         is AppResult.Success -> {
+            val rotationDegrees = extractExifRotationDegrees(imageResult.value)
             AppResult.Success(
-                BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size)?.asImageBitmap(),
+                rotateBitmap(
+                    BitmapFactory.decodeByteArray(imageResult.value, 0, imageResult.value.size),
+                    rotationDegrees,
+                )?.asImageBitmap(),
             )
         }
         is AppResult.Failure -> imageResult
+    }
+}
+
+private fun rotateBitmap(bitmap: android.graphics.Bitmap?, rotationDegrees: Float): android.graphics.Bitmap? {
+    if (bitmap == null || rotationDegrees == 0f) {
+        return bitmap
+    }
+    return Matrix().let { matrix ->
+        matrix.postRotate(rotationDegrees)
+        android.graphics.Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+}
+
+private fun extractExifRotationDegrees(imageBytes: ByteArray): Float {
+    val orientation = runCatching {
+        ByteArrayInputStream(imageBytes).use { input ->
+            ExifInterface(input).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED,
+            )
+        }
+    }.getOrDefault(ExifInterface.ORIENTATION_UNDEFINED)
+    return when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+        ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+        ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+        else -> 0f
     }
 }
 
@@ -280,6 +325,45 @@ private fun NumberField(
         label = { Text(label) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ArmSideDropdown(
+    selectedArmSide: ArmSide,
+    onArmSideSelected: (ArmSide) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+                .testTag(TestTags.MeasurementDetailArmSide),
+            value = stringResource(armLabel(selectedArmSide)),
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.detail_arm_side_label)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            listOf(ArmSide.Left, ArmSide.Right, ArmSide.Unknown).forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(armLabel(option))) },
+                    onClick = {
+                        onArmSideSelected(option)
+                        expanded = false
+                    },
+                )
+            }
+        }
+    }
 }
 
 private fun armLabel(armSide: ArmSide): Int = when (armSide) {

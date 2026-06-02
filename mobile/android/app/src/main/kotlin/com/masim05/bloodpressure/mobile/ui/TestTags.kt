@@ -26,6 +26,7 @@ object TestTags {
     const val MeasurementDetailSystolic = "measurement_detail_systolic"
     const val MeasurementDetailDiastolic = "measurement_detail_diastolic"
     const val MeasurementDetailPulse = "measurement_detail_pulse"
+    const val MeasurementDetailArmSide = "measurement_detail_arm_side"
     const val MeasurementDetailSave = "measurement_detail_save"
     const val MeasurementDetailBack = "measurement_detail_back"
     const val BottomNav = "bottom_nav"

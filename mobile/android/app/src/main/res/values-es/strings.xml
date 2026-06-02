@@ -56,6 +56,7 @@
     <string name="detail_diastolic">Diastolica</string>
     <string name="detail_pulse">Pulso</string>
     <string name="detail_arm_side">Brazo: %1$s</string>
+    <string name="detail_arm_side_label">Brazo</string>
     <string name="detail_status">Estado: %1$s</string>
     <string name="detail_recognition_error">Error de reconocimiento: %1$s</string>
     <string name="detail_save">Guardar</string>

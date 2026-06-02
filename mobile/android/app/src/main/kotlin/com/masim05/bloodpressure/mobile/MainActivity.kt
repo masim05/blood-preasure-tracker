@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
             networkMessage = getString(R.string.error_network),
             timeoutMessage = getString(R.string.error_timeout),
             parseMessage = getString(R.string.error_parse),
+            onFailedApiRequest = { requestUrl, statusCode ->
+                if (BuildConfig.DEBUG) {
+                    Log.e(LOG_TAG, "operation=api_request_failed url=$requestUrl statusCode=$statusCode")
+                }
+            },
         )
     }
     private val authFlow by lazy { AuthFlow(apiClient, sessionStore) }

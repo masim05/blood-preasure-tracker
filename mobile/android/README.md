@@ -34,6 +34,7 @@ npm run api
 
 The app reads `BuildConfig.API_BASE_URL` from a Gradle property named `apiBaseUrl`.
 If not provided, it defaults to `http://10.0.2.2:3000`.
+In debug builds, non-2xx API responses are logged with full URL and status code.
 
 One-off override:
 
