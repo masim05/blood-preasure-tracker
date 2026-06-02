@@ -29,3 +29,5 @@ Execution rules:
 - Prioritize actionable, specific feedback tied to exact code locations.
 - Avoid nitpicks unless they affect correctness, security, maintainability, or test reliability.
 - Never approve if blocking issues remain unresolved.
+- Use the `gh` CLI for all pull request discovery, diff inspection, inline comments, and review submission actions.
+- Do not use MCP tools for this workflow.
