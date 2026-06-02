@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Дневник артериального давления</string>
-    <string name="auth_title">Дневник артериального давления</string>
+    <string name="app_name">blood pressure</string>
+    <string name="auth_title">blood pressure</string>
     <string name="auth_mode_login">Войти</string>
     <string name="auth_mode_new_account">Новый аккаунт</string>
     <string name="signin_title">Создать аккаунт</string>
