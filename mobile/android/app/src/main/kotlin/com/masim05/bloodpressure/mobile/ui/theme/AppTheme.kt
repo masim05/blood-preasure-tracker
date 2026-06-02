@@ -6,15 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val AppColorScheme = lightColorScheme(
-    primary = Color(0xFF166534),
+    primary = Color(0xFF1D9E75),
     onPrimary = Color.White,
-    secondary = Color(0xFF0F766E),
+    secondary = Color(0xFF185FA5),
     onSecondary = Color.White,
-    error = Color(0xFFB91C1C),
-    background = Color(0xFFF8FAFC),
-    onBackground = Color(0xFF0F172A),
+    error = Color(0xFFE24B4A),
+    background = Color(0xFFF2F2F7),
+    onBackground = Color(0xFF111111),
     surface = Color.White,
-    onSurface = Color(0xFF0F172A),
+    onSurface = Color(0xFF111111),
 )
 
 @Composable

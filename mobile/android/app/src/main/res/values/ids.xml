@@ -15,6 +15,10 @@
     <item name="camera_preview" type="id" />
     <item name="camera_loading" type="id" />
     <item name="camera_open_settings" type="id" />
+    <item name="bottom_nav" type="id" />
+    <item name="bottom_nav_capture" type="id" />
+    <item name="bottom_nav_history" type="id" />
+    <item name="bottom_nav_profile" type="id" />
     <item name="history_from" type="id" />
     <item name="history_to" type="id" />
     <item name="history_apply_filter" type="id" />

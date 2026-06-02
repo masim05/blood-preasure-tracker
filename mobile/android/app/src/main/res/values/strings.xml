@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Blood Pressure</string>
     <string name="auth_title">Blood Pressure</string>
-    <string name="auth_mode_login">Login</string>
-    <string name="auth_mode_new_account">New Account</string>
+    <string name="auth_mode_login">Log in</string>
+    <string name="auth_mode_new_account">New account</string>
     <string name="signin_title">Create account</string>
     <string name="signin_email_hint">Email</string>
     <string name="signin_password_hint">Password</string>
@@ -17,6 +17,9 @@
     <string name="guide_continue">Next</string>
     <string name="camera_title">Camera</string>
     <string name="camera_copy">Take a clear measurement picture with one tap.</string>
+    <string name="auth_tagline">Track your readings easily</string>
+    <string name="camera_overlay_hint">Point at display</string>
+    <string name="camera_tip">Ensure good lighting and keep the screen steady for best results.</string>
     <string name="camera_upload">Take picture</string>
     <string name="camera_history">History</string>
     <string name="camera_retry">Retry</string>
@@ -29,9 +32,9 @@
     <string name="history_to_hint">To date</string>
     <string name="history_from_selected">From date: %1$s</string>
     <string name="history_to_selected">To date: %1$s</string>
-    <string name="history_apply_filter">Apply filter</string>
-    <string name="history_clear_filter">Clear filter</string>
-    <string name="history_export_csv">Export CSV</string>
+    <string name="history_apply_filter">Apply</string>
+    <string name="history_clear_filter">Clear</string>
+    <string name="history_export_csv">CSV</string>
     <string name="history_export_csv_chooser">Share history CSV</string>
     <string name="history_export_csv_unavailable">No app available to share CSV</string>
     <string name="history_empty">No saved measurements match the selected filter.</string>
@@ -39,7 +42,7 @@
     <string name="history_column_time">Time</string>
     <string name="history_column_systolic">SYS</string>
     <string name="history_column_diastolic">DIA</string>
-    <string name="history_column_pulse">Pulse</string>
+    <string name="history_column_pulse">♥</string>
     <string name="history_column_arm">Arm</string>
     <string name="history_sample_row">2026-05-27 12:00 | 120 | 80 | 68 | left</string>
     <string name="history_row_format">%1$s | %2$d | %3$d | %4$d | %5$s</string>
@@ -68,7 +71,10 @@
     <string name="nav_history">History</string>
     <string name="nav_profile">Profile</string>
     <string name="profile_title">Profile</string>
-    <string name="profile_settings">Settings</string>
+    <string name="profile_settings">PREFERENCES</string>
+    <string name="profile_account">ACCOUNT</string>
+    <string name="history_date_range">DATE RANGE</string>
+    <string name="history_readings">READINGS</string>
     <string name="profile_language_title">Language</string>
     <string name="language_system_default">System default</string>
     <string name="language_name_spanish">Spanish</string>
@@ -110,4 +116,11 @@
     <string name="a11y_history_to">History to date selector</string>
     <string name="a11y_auth_mode">Authentication mode</string>
     <string name="a11y_history_table">Measurement history table</string>
+    <string name="arm_short_left">L</string>
+    <string name="arm_short_right">R</string>
+    <string name="arm_short_unknown">—</string>
+    <string name="profile_logout_confirm_title">Log out?</string>
+    <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
+    <string name="profile_logout_confirm">Log out</string>
+    <string name="cancel">Cancel</string>
 </resources>
