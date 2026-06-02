@@ -93,11 +93,18 @@ describe('measurement use cases', () => {
     });
     await expect(new GetMeasurementImageUseCase(measurements, images).execute({ userId: 'other', measurementId: 'msr_1' })).rejects.toThrow('Measurement was not found');
 
-    const saved = await new SaveMeasurementUseCase(measurements).execute({ userId: 'usr_1', measurementId: 'msr_1', now });
+    const saved = await new SaveMeasurementUseCase(measurements).execute({
+      userId: 'usr_1',
+      measurementId: 'msr_1',
+      armSide: 'right',
+      now,
+    });
     expect(saved.status).toBe('saved');
+    expect(saved.armSide).toBe('right');
 
     const history = await new ListMeasurementsUseCase(measurements).execute({ userId: 'usr_1', page: 1, pageSize: 20 });
     expect(history.items).toHaveLength(1);
+    expect(history.items[0].armSide).toBe('right');
     expect(history.items[0]).not.toHaveProperty('imageUrl');
   });
 

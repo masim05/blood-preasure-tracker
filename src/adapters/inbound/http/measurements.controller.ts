@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -24,6 +25,8 @@ import { MAX_UPLOAD_BYTES } from '../../../domain/services/upload-image-policy';
 import { BearerAuthGuard, type AuthenticatedHttpRequest } from './bearer-auth.guard';
 import {
   type MeasurementQueryDto,
+  type SaveMeasurementDto,
+  parseSaveMeasurement,
   type MeasurementUploadFile,
   parseOptionalPositiveInteger,
 } from './dto/measurement.dto';
@@ -119,9 +122,18 @@ export class MeasurementsController {
   async save(
     @Req() request: AuthenticatedHttpRequest,
     @Param('id') measurementId: string,
+    @Body() body?: SaveMeasurementDto,
   ): Promise<unknown> {
     try {
-      return await this.saveMeasurement.execute({ userId: requireUserId(request), measurementId });
+      const payload = parseSaveMeasurement(body);
+      return await this.saveMeasurement.execute({
+        userId: requireUserId(request),
+        measurementId,
+        systolic: payload.systolic,
+        diastolic: payload.diastolic,
+        pulse: payload.pulse,
+        armSide: payload.armSide,
+      });
     } catch (error) {
       throw toHttpException(error);
     }

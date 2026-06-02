@@ -114,9 +114,12 @@ describe('mobile API contract controllers', () => {
         armSide: 'left',
       }),
     );
-    await expect(controller.save(request, measurementId)).resolves.toMatchObject({ status: 'saved' });
+    await expect(controller.save(request, measurementId, { armSide: 'right' })).resolves.toMatchObject({
+      status: 'saved',
+      armSide: 'right',
+    });
     await expect(controller.list(request, { page: '1', pageSize: '20' })).resolves.toMatchObject({
-      items: [expect.objectContaining({ id: measurementId, status: 'saved' })],
+      items: [expect.objectContaining({ id: measurementId, status: 'saved', armSide: 'right' })],
       hasNextPage: false,
     });
 
