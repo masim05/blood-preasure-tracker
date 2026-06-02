@@ -1,0 +1,28 @@
+appId: com.masim05.bloodpressure.mobile
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: auth_mode_login
+- tapOn:
+    id: login_email
+- inputText: us5@example.com
+- hideKeyboard
+- tapOn:
+    id: login_password
+- inputText: password123
+- hideKeyboard
+- tapOn:
+    id: login_submit
+- assertVisible:
+    id: bottom_nav_profile
+- tapOn:
+    id: bottom_nav_profile
+- assertVisible:
+    id: profile_screen
+- tapOn:
+    id: profile_language_selector
+- tapOn:
+    id: profile_language_option_fr
+- assertVisible:
+    id: profile_logout
