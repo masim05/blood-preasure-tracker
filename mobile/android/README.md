@@ -70,12 +70,14 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" scripts/
 
 ## Maestro
 
-The happy-path flows for US1 through US6 live under `mobile/android/maestro`.
-For the updated US4 camera journey, validation now covers:
+The happy-path flows for US1 through US7 live under `mobile/android/maestro`.
+Current validation covers:
 
+- new account signup opening the guide before capture
 - live camera preview after auth
 - one-tap capture triggering upload flow
 - permission-recovery fallback path to History
+- profile language settings reopening the guide before returning to camera
 
 Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
 
