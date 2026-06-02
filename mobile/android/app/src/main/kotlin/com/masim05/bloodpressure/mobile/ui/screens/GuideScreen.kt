@@ -47,10 +47,10 @@ internal data class GuideExamplePanel(
 )
 
 internal fun guideExamplePanels(): List<GuideExamplePanel> = listOf(
-    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_example_good1),
-    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_example_good2),
-    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_example_bad1),
-    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_example_bad2),
+    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_1),
+    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_2),
+    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_3),
+    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_4),
 )
 
 @OptIn(ExperimentalComposeUiApi::class)
