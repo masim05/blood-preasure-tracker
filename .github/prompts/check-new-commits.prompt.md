@@ -31,3 +31,5 @@ Execution rules:
 - Prefer reviewing only the delta from newly pushed commits, but include surrounding context needed to judge correctness.
 - Keep comments actionable and specific to code locations.
 - Never approve while unresolved blocking threads or fresh blocking issues still exist.
+- Use the `gh` CLI for all GitHub interactions required by this workflow.
+- Do not use MCP tools for pull request, review, or thread operations in this workflow.
