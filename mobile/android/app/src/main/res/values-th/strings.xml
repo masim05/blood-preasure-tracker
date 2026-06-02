@@ -11,7 +11,7 @@
     <string name="login_title">เข้าสู่ระบบ</string>
     <string name="login_submit">เข้าสู่ระบบ</string>
     <string name="guide_title">คู่มือการวัด</string>
-    <string name="guide_copy">ถ่ายภาพให้ชัดเจนโดยให้เห็นเครื่องวัดความดันและแขน</string>
+    <string name="guide_copy">ถ่ายภาพให้ชัดเจน โดยให้เห็นหน้าจอเครื่องวัดความดันโลหิตทั้งหมดและแขนที่ใช้วัด</string>
     <string name="guide_continue">ถัดไป</string>
     <string name="camera_title">กล้อง</string>
     <string name="camera_copy">แตะครั้งเดียวเพื่อถ่ายภาพการวัดที่ชัดเจน</string>

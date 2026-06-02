@@ -11,7 +11,7 @@
     <string name="login_title">Đăng nhập</string>
     <string name="login_submit">Đăng nhập</string>
     <string name="guide_title">Hướng dẫn đo</string>
-    <string name="guide_copy">Chụp ảnh rõ nét với máy đo và cánh tay hiển thị rõ.</string>
+    <string name="guide_copy">Chụp một bức ảnh rõ nét cho thấy toàn bộ màn hình máy đo huyết áp và cánh tay được đo.</string>
     <string name="guide_continue">Tiếp theo</string>
     <string name="camera_title">Máy ảnh</string>
     <string name="camera_copy">Chạm một lần để chụp ảnh đo rõ nét.</string>

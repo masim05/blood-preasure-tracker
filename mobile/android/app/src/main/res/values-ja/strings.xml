@@ -11,7 +11,7 @@
     <string name="login_title">ログイン</string>
     <string name="login_submit">ログイン</string>
     <string name="guide_title">測定ガイド</string>
-    <string name="guide_copy">血圧計と腕が見えるように、はっきりした写真を撮ってください。</string>
+    <string name="guide_copy">血圧計の表示全体と、測定した腕が写るように、はっきりとした写真を撮ってください。</string>
     <string name="guide_continue">次へ</string>
     <string name="camera_title">カメラ</string>
     <string name="camera_copy">1回のタップで鮮明な測定写真を撮影します。</string>

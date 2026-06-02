@@ -11,7 +11,7 @@
     <string name="login_title">Logga in</string>
     <string name="login_submit">Logga in</string>
     <string name="guide_title">Mätguide</string>
-    <string name="guide_copy">Ta en tydlig bild där blodtrycksmätaren och armen syns.</string>
+    <string name="guide_copy">Ta ett tydligt foto som visar hela blodtrycksmätarens display och armen där mätningen togs.</string>
     <string name="guide_continue">Nästa</string>
     <string name="camera_title">Kamera</string>
     <string name="camera_copy">Ta en tydlig bild av mätningen med ett tryck.</string>
