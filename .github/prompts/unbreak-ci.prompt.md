@@ -22,6 +22,8 @@ Process:
 
 Execution rules:
 - Prioritize correctness and minimal-risk changes over refactors.
+- Use `gh` CLI commands for GitHub operations (PR lookup, checks, logs, reviews, comments, status).
+- Never use MCP tools for GitHub/PR/CI actions in this workflow.
 - Do not skip local verification before pushing.
 - Keep commit scope focused on CI-fix changes only.
 - Do not force-push unless explicitly requested.
