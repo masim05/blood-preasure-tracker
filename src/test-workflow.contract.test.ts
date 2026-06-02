@@ -38,6 +38,8 @@ describe('test workflow contract', () => {
 
   it('runs migrations through runDbCommand migrate branch during db:init', () => {
     expect(dbInitScript).toContain("await runDbCommand('migrate', args);");
+    expect(dbInitScript).toContain("import { migrate } from 'postgres-migrations';");
+    expect(dbInitScript).toContain('await migrate({ client }, migrationsDirectory);');
   });
 
   it('rejects db:migrate arguments to avoid overriding .env', () => {

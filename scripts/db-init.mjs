@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { migrate } from 'postgres-migrations';
 
 const { Client } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -305,11 +306,8 @@ async function runMigrations(connectionString) {
   const client = new Client({ connectionString });
   await client.connect();
   try {
-    for (const fileName of migrationFiles) {
-      const sql = readFileSync(path.join(migrationsDirectory, fileName), 'utf8');
-      await client.query(sql);
-      console.log(`Applied migration: ${fileName}`);
-    }
+    await migrate({ client }, migrationsDirectory);
+    console.log(`Processed migrations with re-run protection: ${migrationFiles.length}`);
   } finally {
     await client.end();
   }
