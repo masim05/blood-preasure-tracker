@@ -160,6 +160,14 @@ class MainActivityTest {
         assertEquals("fr", readPreferredLanguageCode("fr"))
     }
 
+    @Test
+    fun supportedLanguageOptionsExposeExpectedCodes() {
+        assertEquals(
+            listOf("system", "es", "fr", "pt", "it", "sv", "ru", "zh", "ko", "ja", "th", "vi"),
+            supportedLanguageOptions.map { it.code },
+        )
+    }
+
     private fun session(email: String, expiresAt: String = "2026-12-31T00:00:00.000Z") = Session(
         accessToken = "token",
         tokenType = "Bearer",

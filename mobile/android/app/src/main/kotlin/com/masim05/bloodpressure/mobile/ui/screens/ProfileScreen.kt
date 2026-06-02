@@ -1,6 +1,7 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.masim05.bloodpressure.mobile.R
+import com.masim05.bloodpressure.mobile.supportedLanguageOptions
 import com.masim05.bloodpressure.mobile.ui.TestTags
 
 @Composable
@@ -31,8 +33,9 @@ fun ProfileScreen(
     onLogout: () -> Unit,
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
-    val languageOptions = remember { profileLanguageOptions() }
-    val selectedLanguage = languageOptions.firstOrNull { it.code == selectedLanguageCode } ?: languageOptions.first()
+    val selectedLanguage = supportedLanguageOptions
+        .firstOrNull { it.code == selectedLanguageCode }
+        ?: supportedLanguageOptions.first()
 
     Column(
         modifier = Modifier
@@ -47,25 +50,27 @@ fun ProfileScreen(
         Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.profile_language_title), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
-        OutlinedButton(
-            modifier = Modifier.testTag(TestTags.ProfileLanguageSelector),
-            onClick = { languageMenuExpanded = true },
-        ) {
-            Text(stringResource(selectedLanguage.labelRes))
-        }
-        DropdownMenu(
-            expanded = languageMenuExpanded,
-            onDismissRequest = { languageMenuExpanded = false },
-        ) {
-            languageOptions.forEach { option ->
-                DropdownMenuItem(
-                    modifier = Modifier.testTag("${TestTags.ProfileLanguageOptionPrefix}${option.code}"),
-                    text = { Text(stringResource(option.labelRes)) },
-                    onClick = {
-                        languageMenuExpanded = false
-                        onLanguageSelected(option.code)
-                    },
-                )
+        Box {
+            OutlinedButton(
+                modifier = Modifier.testTag(TestTags.ProfileLanguageSelector),
+                onClick = { languageMenuExpanded = true },
+            ) {
+                Text(stringResource(selectedLanguage.labelRes))
+            }
+            DropdownMenu(
+                expanded = languageMenuExpanded,
+                onDismissRequest = { languageMenuExpanded = false },
+            ) {
+                supportedLanguageOptions.forEach { option ->
+                    DropdownMenuItem(
+                        modifier = Modifier.testTag("${TestTags.ProfileLanguageOptionPrefix}${option.code}"),
+                        text = { Text(stringResource(option.labelRes)) },
+                        onClick = {
+                            languageMenuExpanded = false
+                            onLanguageSelected(option.code)
+                        },
+                    )
+                }
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -76,26 +81,4 @@ fun ProfileScreen(
             Text(stringResource(R.string.profile_logout))
         }
     }
-}
-
-private data class LanguageOption(
-    val code: String,
-    val labelRes: Int,
-)
-
-private fun profileLanguageOptions(): List<LanguageOption> {
-    return listOf(
-        LanguageOption("system", R.string.language_system_default),
-        LanguageOption("es", R.string.language_name_spanish),
-        LanguageOption("fr", R.string.language_name_french),
-        LanguageOption("pt", R.string.language_name_portuguese),
-        LanguageOption("it", R.string.language_name_italian),
-        LanguageOption("sv", R.string.language_name_swedish),
-        LanguageOption("ru", R.string.language_name_russian),
-        LanguageOption("zh", R.string.language_name_chinese),
-        LanguageOption("ko", R.string.language_name_korean),
-        LanguageOption("ja", R.string.language_name_japanese),
-        LanguageOption("th", R.string.language_name_thai),
-        LanguageOption("vi", R.string.language_name_vietnamese),
-    )
 }

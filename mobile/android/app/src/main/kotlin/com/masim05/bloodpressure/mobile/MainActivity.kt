@@ -696,25 +696,9 @@ private fun csvEscape(value: String): String {
 
 internal const val LANGUAGE_PREFERENCES_NAME = "app_preferences"
 internal const val LANGUAGE_CODE_PREFERENCE_KEY = "language_code"
-internal const val SYSTEM_LANGUAGE_CODE = "system"
-
-private val SUPPORTED_LANGUAGE_CODES = setOf(
-    SYSTEM_LANGUAGE_CODE,
-    "es",
-    "fr",
-    "pt",
-    "it",
-    "sv",
-    "ru",
-    "zh",
-    "ko",
-    "ja",
-    "th",
-    "vi",
-)
 
 internal fun readPreferredLanguageCode(languageCode: String?): String {
-    return languageCode?.takeIf { it in SUPPORTED_LANGUAGE_CODES } ?: SYSTEM_LANGUAGE_CODE
+    return languageCode?.takeIf { it in supportedLanguageCodes } ?: SYSTEM_LANGUAGE_CODE
 }
 
 internal fun withLanguageContext(baseContext: Context, languageCode: String): Context {
