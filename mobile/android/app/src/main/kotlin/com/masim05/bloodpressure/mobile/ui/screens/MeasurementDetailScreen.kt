@@ -49,8 +49,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.core.model.AppResult
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
@@ -159,12 +161,9 @@ fun MeasurementDetailScreen(
             Spacer(Modifier.height(12.dp))
             SectionLabel(stringResource(R.string.detail_title))
             Spacer(Modifier.height(6.dp))
-            Column(
+            CardContainer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
-                    .background(Color.White, RoundedCornerShape(12.dp))
-                    .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -235,18 +234,25 @@ private fun SectionLabel(text: String) {
     Text(
         text = text,
         color = LabelColor,
-        style = MaterialTheme.typography.labelSmall,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Medium,
+        letterSpacing = 0.6.sp,
     )
 }
 
 @Composable
-private fun CardContainer(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+private fun CardContainer(
+    modifier: Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
             .background(Color.White, RoundedCornerShape(12.dp))
             .padding(12.dp),
+        verticalArrangement = verticalArrangement,
         content = content,
     )
 }
