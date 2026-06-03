@@ -115,7 +115,7 @@
     <string name="camera_overlay_hint">Punta verso il display</string>
     <string name="camera_tip">Assicura una buona illuminazione e tieni lo schermo fermo per i migliori risultati.</string>
     <string name="detail_arm_side_label">Braccio</string>
-    <string name="profile_account">ACCOUNT</string>
+    <string name="profile_account">PROFILO</string>
     <string name="history_date_range">INTERVALLO DATE</string>
     <string name="history_readings">MISURAZIONI</string>
     <string name="arm_short_left">L</string>
