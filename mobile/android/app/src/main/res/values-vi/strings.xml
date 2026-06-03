@@ -111,17 +111,17 @@
     <string name="a11y_auth_mode">Chế độ xác thực</string>
     <string name="a11y_history_table">Bảng lịch sử đo</string>
 
-    <string name="auth_tagline">Track your readings easily</string>
-    <string name="camera_overlay_hint">Point at display</string>
-    <string name="camera_tip">Ensure good lighting and keep the screen steady for best results.</string>
+    <string name="auth_tagline">Theo dõi chỉ số của bạn dễ dàng</string>
+    <string name="camera_overlay_hint">Chỉ vào màn hình</string>
+    <string name="camera_tip">Đảm bảo ánh sáng tốt và giữ màn hình ổn định để có kết quả tốt nhất.</string>
     <string name="detail_arm_side_label">Cánh tay</string>
-    <string name="profile_account">ACCOUNT</string>
-    <string name="history_date_range">DATE RANGE</string>
-    <string name="history_readings">READINGS</string>
+    <string name="profile_account">TÀI KHOẢN</string>
+    <string name="history_date_range">KHOẢNG THỜI GIAN</string>
+    <string name="history_readings">CHỈ SỐ</string>
     <string name="arm_short_left">L</string>
     <string name="arm_short_right">R</string>
     <string name="arm_short_unknown">—</string>
-    <string name="profile_logout_confirm_title">Log out?</string>
-    <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
-    <string name="profile_logout_confirm">Log out</string>
+    <string name="profile_logout_confirm_title">Đăng xuất?</string>
+    <string name="profile_logout_confirm_message">Bạn sẽ cần đăng nhập lại để tiếp tục.</string>
+    <string name="profile_logout_confirm">Đăng xuất</string>
 </resources>

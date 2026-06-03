@@ -110,17 +110,17 @@
     <string name="a11y_history_to">기록 종료 날짜 선택기</string>
     <string name="a11y_auth_mode">인증 모드</string>
     <string name="a11y_history_table">측정 기록 표</string>
-    <string name="auth_tagline">Track your readings easily</string>
-    <string name="camera_overlay_hint">Point at display</string>
-    <string name="camera_tip">Ensure good lighting and keep the screen steady for best results.</string>
+    <string name="auth_tagline">측정값을 쉽게 기록하세요</string>
+    <string name="camera_overlay_hint">화면을 향하세요</string>
+    <string name="camera_tip">좋은 조명에서 화면을 안정적으로 유지하면 최상의 결과를 얻을 수 있습니다.</string>
     <string name="detail_arm_side_label">팔</string>
-    <string name="profile_account">ACCOUNT</string>
-    <string name="history_date_range">DATE RANGE</string>
-    <string name="history_readings">READINGS</string>
+    <string name="profile_account">계정</string>
+    <string name="history_date_range">날짜 범위</string>
+    <string name="history_readings">측정값</string>
     <string name="arm_short_left">L</string>
     <string name="arm_short_right">R</string>
     <string name="arm_short_unknown">—</string>
-    <string name="profile_logout_confirm_title">Log out?</string>
-    <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
-    <string name="profile_logout_confirm">Log out</string>
+    <string name="profile_logout_confirm_title">로그아웃하시겠습니까?</string>
+    <string name="profile_logout_confirm_message">계속하려면 다시 로그인해야 합니다.</string>
+    <string name="profile_logout_confirm">로그아웃</string>
 </resources>
