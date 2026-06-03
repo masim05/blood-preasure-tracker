@@ -150,10 +150,41 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  android-mobile:
-    name: Android Mobile Tests
+  android-mobile-build:
+    name: Android Mobile Build
     runs-on: ubuntu-latest
     needs: changes
+    if: needs.changes.outputs.android == 'true'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Android debug APK
+        run: ./gradlew --no-daemon :app:assembleDebug
+        working-directory: mobile/android
+
+      - name: Upload Android debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+
+  android-mobile-maestro:
+    name: Android Mobile Maestro Tests
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - android-mobile-build
     if: needs.changes.outputs.android == 'true'
     services:
       postgres:
@@ -210,9 +241,11 @@ jobs:
         run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify
         working-directory: mobile/android
 
-      - name: Build Android debug APK
-        run: ./gradlew --no-daemon :app:assembleDebug
-        working-directory: mobile/android
+      - name: Download Android debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug
 
       - name: Install Maestro
         run: |
