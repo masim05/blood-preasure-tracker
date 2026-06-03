@@ -111,17 +111,17 @@
     <string name="a11y_auth_mode">Modalità di autenticazione</string>
     <string name="a11y_history_table">Tabella cronologia misurazioni</string>
 
-    <string name="auth_tagline">Track your readings easily</string>
-    <string name="camera_overlay_hint">Point at display</string>
-    <string name="camera_tip">Ensure good lighting and keep the screen steady for best results.</string>
+    <string name="auth_tagline">Monitora le tue letture facilmente</string>
+    <string name="camera_overlay_hint">Punta verso il display</string>
+    <string name="camera_tip">Assicura una buona illuminazione e tieni lo schermo fermo per i migliori risultati.</string>
     <string name="detail_arm_side_label">Braccio</string>
     <string name="profile_account">ACCOUNT</string>
-    <string name="history_date_range">DATE RANGE</string>
-    <string name="history_readings">READINGS</string>
+    <string name="history_date_range">INTERVALLO DATE</string>
+    <string name="history_readings">MISURAZIONI</string>
     <string name="arm_short_left">L</string>
     <string name="arm_short_right">R</string>
     <string name="arm_short_unknown">—</string>
-    <string name="profile_logout_confirm_title">Log out?</string>
-    <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
-    <string name="profile_logout_confirm">Log out</string>
+    <string name="profile_logout_confirm_title">Disconnettersi?</string>
+    <string name="profile_logout_confirm_message">Dovrai accedere di nuovo per continuare.</string>
+    <string name="profile_logout_confirm">Disconnettersi</string>
 </resources>
