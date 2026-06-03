@@ -25,8 +25,8 @@ appId: com.masim05.bloodpressure.mobile
     id: camera_open_settings
     optional: true
 - assertVisible:
-    id: camera_history
+    id: bottom_nav_history
 - tapOn:
-    id: camera_history
+    id: bottom_nav_history
 - assertVisible:
     id: history_screen

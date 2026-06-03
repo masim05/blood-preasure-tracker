@@ -8,13 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,9 +27,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -109,6 +121,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(
+                    containerColor = Color(0xFFF2F2F7),
                     bottomBar = {
                         if (showBottomNavigation(currentDestination)) {
                             MainBottomNavigation(
@@ -145,13 +158,11 @@ class MainActivity : ComponentActivity() {
                                     onUpload = ::captureAndUpload,
                                     onCaptureReady = { image ->
                                         cameraGateway.publishCapture(image)
-                                        captureAndUpload()
                                     },
                                     onCaptureFailure = { message ->
                                         cameraGateway.publishFailure(message)
                                         uiState = uiState.copy(errorText = message)
                                     },
-                                    onHistory = { openHistory(HistoryFilter()) },
                                 )
                             }
 
@@ -561,34 +572,125 @@ internal enum class MainTab {
 }
 
 @Composable
+@OptIn(ExperimentalComposeUiApi::class)
 private fun MainBottomNavigation(
     selectedTab: MainTab,
     onCaptureSelected: () -> Unit,
     onHistorySelected: () -> Unit,
     onProfileSelected: () -> Unit,
 ) {
-    NavigationBar(modifier = Modifier.testTag(TestTags.BottomNav)) {
+    val activeColor = Color(0xFF1D9E75)
+    val inactiveColor = Color(0xFFAAAAAA)
+    val activePill = Color(0xFFE1F5EE)
+    NavigationBar(
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag(TestTags.BottomNav)
+            .padding(top = 8.dp, bottom = 12.dp),
+        containerColor = Color.White,
+        tonalElevation = 0.dp,
+    ) {
         NavigationBarItem(
             selected = selectedTab == MainTab.Capture,
             onClick = onCaptureSelected,
-            icon = { androidx.compose.material3.Icon(Icons.Filled.CameraAlt, contentDescription = null) },
-            label = { Text(stringResource(R.string.nav_capture)) },
+            icon = {
+                BottomNavIcon(
+                    selected = selectedTab == MainTab.Capture,
+                    icon = { Icon(Icons.Outlined.CameraAlt, contentDescription = null) },
+                    activePill = activePill,
+                )
+            },
+            label = {
+                Text(
+                    stringResource(R.string.nav_capture),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
+                )
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = activeColor,
+                selectedTextColor = activeColor,
+                unselectedIconColor = inactiveColor,
+                unselectedTextColor = inactiveColor,
+                indicatorColor = Color.Transparent,
+            ),
             modifier = Modifier.testTag(TestTags.BottomNavCapture),
         )
         NavigationBarItem(
             selected = selectedTab == MainTab.History,
             onClick = onHistorySelected,
-            icon = { androidx.compose.material3.Icon(Icons.Filled.History, contentDescription = null) },
-            label = { Text(stringResource(R.string.nav_history)) },
+            icon = {
+                BottomNavIcon(
+                    selected = selectedTab == MainTab.History,
+                    icon = { Icon(Icons.Outlined.History, contentDescription = null) },
+                    activePill = activePill,
+                )
+            },
+            label = {
+                Text(
+                    stringResource(R.string.nav_history),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
+                )
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = activeColor,
+                selectedTextColor = activeColor,
+                unselectedIconColor = inactiveColor,
+                unselectedTextColor = inactiveColor,
+                indicatorColor = Color.Transparent,
+            ),
             modifier = Modifier.testTag(TestTags.BottomNavHistory),
         )
         NavigationBarItem(
             selected = selectedTab == MainTab.Profile,
             onClick = onProfileSelected,
-            icon = { androidx.compose.material3.Icon(Icons.Filled.AccountCircle, contentDescription = null) },
-            label = { Text(stringResource(R.string.nav_profile)) },
+            icon = {
+                BottomNavIcon(
+                    selected = selectedTab == MainTab.Profile,
+                    icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                    activePill = activePill,
+                )
+            },
+            label = {
+                Text(
+                    stringResource(R.string.nav_profile),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
+                )
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = activeColor,
+                selectedTextColor = activeColor,
+                unselectedIconColor = inactiveColor,
+                unselectedTextColor = inactiveColor,
+                indicatorColor = Color.Transparent,
+            ),
             modifier = Modifier.testTag(TestTags.BottomNavProfile),
         )
+    }
+}
+
+@Composable
+private fun BottomNavIcon(
+    selected: Boolean,
+    icon: @Composable () -> Unit,
+    activePill: Color,
+) {
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .then(
+                if (selected) {
+                    Modifier
+                        .background(activePill)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                } else {
+                    Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                },
+            ),
+    ) {
+        icon()
     }
 }
 

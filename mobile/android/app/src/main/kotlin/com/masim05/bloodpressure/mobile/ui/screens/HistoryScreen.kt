@@ -1,18 +1,29 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,12 +41,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.core.model.ArmSide
 import com.masim05.bloodpressure.mobile.core.model.HistoryFilter
@@ -46,6 +60,16 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+private val PageBg = Color(0xFFF2F2F7)
+private val CardBorder = Color(0xFFE5E5E5)
+private val InputBorder = Color(0xFFE0E0E0)
+private val LabelColor = Color(0xFF999999)
+private val SecondaryText = Color(0xFF888888)
+private val PrimaryGreen = Color(0xFF1D9E75)
+private val Blue = Color(0xFF185FA5)
+private val ElevatedRed = Color(0xFFE24B4A)
+private val NormalGreen = Color(0xFF639922)
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -73,64 +97,81 @@ fun HistoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(PageBg)
                 .semantics { testTagsAsResourceId = true }
                 .padding(16.dp)
                 .testTag(TestTags.HistoryScreen),
         ) {
-            Text(stringResource(R.string.history_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.history_title), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                DateSelectorButton(
-                    modifier = Modifier.weight(1f),
-                    labelRes = R.string.history_from_hint,
-                    selectedFormatRes = R.string.history_from_selected,
-                    titleRes = R.string.date_picker_from_title,
-                    value = from,
-                    testTag = TestTags.HistoryFromDate,
-                    onSelected = { from = it },
-                )
-                DateSelectorButton(
-                    modifier = Modifier.weight(1f),
-                    labelRes = R.string.history_to_hint,
-                    selectedFormatRes = R.string.history_to_selected,
-                    titleRes = R.string.date_picker_to_title,
-                    value = to,
-                    testTag = TestTags.HistoryToDate,
-                    onSelected = { to = it },
-                )
+
+            SectionLabel(stringResource(R.string.history_date_range))
+            Spacer(Modifier.height(6.dp))
+            CardContainer {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DateSelectorButton(
+                        modifier = Modifier.weight(1f),
+                        labelRes = R.string.history_from_hint,
+                        selectedFormatRes = R.string.history_from_selected,
+                        titleRes = R.string.date_picker_from_title,
+                        value = from,
+                        testTag = TestTags.HistoryFromDate,
+                        onSelected = { from = it },
+                    )
+                    DateSelectorButton(
+                        modifier = Modifier.weight(1f),
+                        labelRes = R.string.history_to_hint,
+                        selectedFormatRes = R.string.history_to_selected,
+                        titleRes = R.string.date_picker_to_title,
+                        value = to,
+                        testTag = TestTags.HistoryToDate,
+                        onSelected = { to = it },
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("history_apply_filter"),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen, contentColor = Color.White),
+                        onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
+                    ) {
+                        Text(stringResource(R.string.history_apply_filter))
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("history_clear_filter"),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(0.5.dp, InputBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SecondaryText),
+                        onClick = onClearFilter,
+                    ) {
+                        Text(stringResource(R.string.history_clear_filter))
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag(TestTags.HistoryExportCsv),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(0.5.dp, InputBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Blue),
+                        onClick = onExportCsv,
+                        enabled = measurements.isNotEmpty() && !isLoading,
+                    ) {
+                        androidx.compose.material3.Icon(Icons.Outlined.FileUpload, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.size(4.dp))
+                        Text(stringResource(R.string.history_export_csv))
+                    }
+                }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-            ) {
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("history_apply_filter"),
-                    onClick = { onApplyFilter(HistoryFilter(from = from, to = to)) },
-                ) {
-                    Text(stringResource(R.string.history_apply_filter))
-                }
-                OutlinedButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("history_clear_filter"),
-                    onClick = onClearFilter,
-                ) {
-                    Text(stringResource(R.string.history_clear_filter))
-                }
-                OutlinedButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag(TestTags.HistoryExportCsv),
-                    onClick = onExportCsv,
-                    enabled = measurements.isNotEmpty() && !isLoading,
-                ) {
-                    Text(stringResource(R.string.history_export_csv))
-                }
-            }
+
             if (errorText != null) {
                 Text(
                     modifier = Modifier
@@ -140,24 +181,59 @@ fun HistoryScreen(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            if (showHistoryRefreshLoadingIndicator(isLoading, measurements)) {
-                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
-            }
+
+            Spacer(Modifier.height(12.dp))
+            SectionLabel(stringResource(R.string.history_readings))
+            Spacer(Modifier.height(6.dp))
+
             val statusRes = historyStatusTextRes(isLoading, measurements)
             if (statusRes != null) {
-                Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(statusRes))
+                CardContainer {
+                    Text(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        text = stringResource(statusRes),
+                        color = SecondaryText,
+                    )
+                }
             } else {
-                HistoryTable(measurements, onMeasurementSelected)
+                CardContainer(modifier = Modifier.weight(1f, fill = false)) {
+                    HistoryTable(measurements, onMeasurementSelected)
+                }
+                if (showHistoryRefreshLoadingIndicator(isLoading, measurements)) {
+                    Text(modifier = Modifier.padding(top = 8.dp), text = stringResource(R.string.status_loading))
+                }
             }
         }
     }
 }
 
 @Composable
+private fun CardContainer(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
+            .background(Color.White, RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        content = content,
+    )
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        color = LabelColor,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Medium,
+        letterSpacing = 0.6.sp,
+    )
+}
+
+@Composable
 private fun HistoryTable(measurements: List<Measurement>, onMeasurementSelected: (Measurement) -> Unit) {
     LazyColumn(
         modifier = Modifier
-            .padding(top = 16.dp)
             .testTag(TestTags.HistoryTable),
     ) {
         item { HistoryHeader() }
@@ -167,7 +243,12 @@ private fun HistoryTable(measurements: List<Measurement>, onMeasurementSelected:
 
 @Composable
 private fun HistoryHeader() {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         HistoryCell(stringResource(R.string.history_column_time), 2f, true)
         HistoryCell(stringResource(R.string.history_column_systolic), 1f, true)
         HistoryCell(stringResource(R.string.history_column_diastolic), 1f, true)
@@ -178,29 +259,54 @@ private fun HistoryHeader() {
 
 @Composable
 private fun HistoryRow(measurement: Measurement, onMeasurementSelected: (Measurement) -> Unit) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onMeasurementSelected(measurement) }
-            .padding(top = 8.dp)
+            .defaultMinSize(minHeight = 48.dp)
             .testTag(TestTags.HistoryRow),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.Center,
     ) {
-        HistoryCell(formatHistoryTime(measurement.measurementTime.ifBlank { measurement.savedAt }), 2f)
-        HistoryCell(measurement.systolic.toString(), 1f)
-        HistoryCell(measurement.diastolic.toString(), 1f)
-        HistoryCell(measurement.pulse.toString(), 1f)
-        HistoryCell(stringResource(armLabel(measurement.armSide)), 1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            HistoryCell(formatHistoryTime(measurement.measurementTime.ifBlank { measurement.savedAt }), 2f)
+            HistoryCell(measurement.systolic.toString(), 1f, color = if (measurement.systolic >= 130) ElevatedRed else NormalGreen, medium = true)
+            HistoryCell(measurement.diastolic.toString(), 1f, color = Color(0xFF111111), medium = true)
+            HistoryCell(measurement.pulse.toString(), 1f, color = SecondaryText)
+            HistoryCell(stringResource(armShortLabel(measurement.armSide)), 1f, color = SecondaryText)
+        }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(0.5.dp)
+                .background(Color(0xFFF8F8F8)),
+        )
     }
 }
 
 @Composable
-private fun RowScope.HistoryCell(value: String, weight: Float, header: Boolean = false) {
+private fun RowScope.HistoryCell(
+    value: String,
+    weight: Float,
+    header: Boolean = false,
+    color: Color = SecondaryText,
+    medium: Boolean = false,
+) {
     Text(
         modifier = Modifier.weight(weight),
         text = value,
-        style = MaterialTheme.typography.bodySmall,
-        fontWeight = if (header) FontWeight.Bold else FontWeight.Normal,
+        textAlign = TextAlign.Start,
+        color = if (header) LabelColor else color,
+        fontSize = if (header) 10.sp else if (medium) 12.sp else 11.sp,
+        fontWeight = when {
+            header -> FontWeight.Medium
+            medium -> FontWeight.Medium
+            else -> FontWeight.Normal
+        },
     )
 }
 
@@ -219,8 +325,12 @@ private fun DateSelectorButton(
     val text = if (value.isBlank()) stringResource(labelRes) else stringResource(selectedFormatRes, value)
     OutlinedButton(
         modifier = modifier.testTag(testTag),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(0.5.dp, InputBorder),
         onClick = { showDialog = true },
-    ) { Text(text) }
+    ) {
+        Text(text, color = SecondaryText, fontSize = 12.sp)
+    }
     if (showDialog) {
         val pickerState = rememberDatePickerState(initialSelectedDateMillis = value.toDateMillis())
         DatePickerDialog(
@@ -255,7 +365,8 @@ private fun String.toDateMillis(): Long? = runCatching {
 
 private fun Long.toIsoDate(): String = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate().toString()
 
-private val historyTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+private val historyTimeFormatterInput: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+private val historyTimeFormatterOutput: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd HH:mm")
 
 internal fun formatHistoryTime(
     value: String,
@@ -263,19 +374,19 @@ internal fun formatHistoryTime(
 ): String {
     if (value.isBlank()) return value
     val isoInstant = runCatching {
-        Instant.parse(value).atZone(deviceZoneId).format(historyTimeFormatter)
+        Instant.parse(value).atZone(deviceZoneId).format(historyTimeFormatterOutput)
     }.getOrNull()
     if (isoInstant != null) {
         return isoInstant
     }
-    return runCatching { LocalDateTime.parse(value, historyTimeFormatter).format(historyTimeFormatter) }
+    return runCatching { LocalDateTime.parse(value, historyTimeFormatterInput).format(historyTimeFormatterOutput) }
         .getOrDefault(value)
 }
 
-private fun armLabel(armSide: ArmSide): Int = when (armSide) {
-    ArmSide.Left -> R.string.arm_left
-    ArmSide.Right -> R.string.arm_right
-    ArmSide.Unknown -> R.string.arm_unknown
+private fun armShortLabel(armSide: ArmSide): Int = when (armSide) {
+    ArmSide.Left -> R.string.arm_short_left
+    ArmSide.Right -> R.string.arm_short_right
+    ArmSide.Unknown -> R.string.arm_short_unknown
 }
 
 internal fun showHistoryRefreshLoadingIndicator(isLoading: Boolean, measurements: List<Measurement>): Boolean {

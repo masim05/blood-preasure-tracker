@@ -110,4 +110,16 @@
     <string name="a11y_history_to">Selector de fecha final del historial</string>
     <string name="a11y_auth_mode">Modo de autenticación</string>
     <string name="a11y_history_table">Tabla del historial de mediciones</string>
+    <string name="auth_tagline">Track your readings easily</string>
+    <string name="camera_overlay_hint">Point at display</string>
+    <string name="camera_tip">Ensure good lighting and keep the screen steady for best results.</string>
+    <string name="profile_account">ACCOUNT</string>
+    <string name="history_date_range">DATE RANGE</string>
+    <string name="history_readings">READINGS</string>
+    <string name="arm_short_left">L</string>
+    <string name="arm_short_right">R</string>
+    <string name="arm_short_unknown">—</string>
+    <string name="profile_logout_confirm_title">Log out?</string>
+    <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
+    <string name="profile_logout_confirm">Log out</string>
 </resources>

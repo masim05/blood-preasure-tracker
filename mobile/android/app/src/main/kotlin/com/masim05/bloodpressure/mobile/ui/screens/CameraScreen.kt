@@ -12,15 +12,26 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -35,21 +46,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.core.model.MeasurementImage
 import com.masim05.bloodpressure.mobile.ui.TestTags
-import androidx.core.content.ContextCompat
 import java.io.File
+
+private val PrimaryGreen = Color(0xFF1D9E75)
+private val CardBorder = Color(0xFFE5E5E5)
+private val CameraBg = Color(0xFF1A1A1A)
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -59,7 +79,6 @@ fun CameraScreen(
     onUpload: () -> Unit,
     onCaptureReady: (MeasurementImage) -> Unit,
     onCaptureFailure: (String) -> Unit,
-    onHistory: () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -157,6 +176,7 @@ fun CameraScreen(
                         sizeBytes = outputFile.length(),
                     )
                     onCaptureReady(image)
+                    onUpload()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -173,23 +193,23 @@ fun CameraScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true }
-            .padding(24.dp)
+            .padding(16.dp)
             .testTag(TestTags.CameraScreen),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.camera_title), style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
-        Text(stringResource(R.string.camera_copy), style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(R.string.camera_title), style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(12.dp))
 
-        if (permissionGranted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(260.dp)
-                    .padding(top = 16.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .testTag(TestTags.CameraPreview),
-            ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(340.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(CameraBg)
+                .border(0.5.dp, CardBorder, RoundedCornerShape(14.dp))
+                .testTag(TestTags.CameraPreview),
+        ) {
+            if (permissionGranted) {
                 key(previewBindingAttempt) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
@@ -207,15 +227,66 @@ fun CameraScreen(
                     )
                 }
             }
+
+            CornerGuides()
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(Color(0x80000000))
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.camera_overlay_hint),
+                    color = Color.White,
+                    fontSize = 11.sp,
+                )
+            }
+
+            Button(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+                    .testTag(if ((errorText ?: localError) == null) TestTags.CameraCapture else "camera_retry"),
+                enabled = permissionGranted && cameraReady && !isUploading && !isCapturing,
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen, contentColor = Color.White),
+                onClick = {
+                    if (permissionGranted) captureNow() else permissionLauncher.launch(Manifest.permission.CAMERA)
+                },
+            ) {
+                Icon(Icons.Outlined.CameraAlt, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.size(6.dp))
+                Text(
+                    stringResource(if ((errorText ?: localError) == null) R.string.camera_upload else R.string.camera_retry),
+                    fontWeight = FontWeight.Medium,
+                )
+            }
         }
 
-        if (!permissionGranted) {
+        Spacer(Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFFE1F5EE))
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = Color(0xFF0F6E56),
+                modifier = Modifier.size(15.dp),
+            )
             Text(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .testTag(TestTags.CameraError),
-                text = stringResource(R.string.camera_permission_denied),
-                color = MaterialTheme.colorScheme.error,
+                text = stringResource(R.string.camera_tip),
+                color = Color(0xFF0F6E56),
+                fontSize = 11.sp,
+                lineHeight = 14.sp,
             )
         }
 
@@ -248,9 +319,16 @@ fun CameraScreen(
             )
         }
 
-        Spacer(Modifier.weight(1f))
-
-        if (permissionDenied) {
+        if (!permissionGranted) {
+            if (shownError == null) {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag(TestTags.CameraError),
+                    text = stringResource(R.string.camera_permission_denied),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             OutlinedButton(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -260,33 +338,6 @@ fun CameraScreen(
             ) {
                 Text(stringResource(R.string.camera_open_settings))
             }
-        }
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp)
-                .testTag(if (shownError == null) TestTags.CameraCapture else "camera_retry"),
-            enabled = permissionGranted && cameraReady && !isUploading && !isCapturing,
-            onClick = {
-                if (permissionGranted) {
-                    captureNow()
-                } else {
-                    permissionLauncher.launch(Manifest.permission.CAMERA)
-                }
-            },
-        ) {
-            Text(stringResource(if (shownError == null) R.string.camera_upload else R.string.camera_retry))
-        }
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .testTag(TestTags.CameraHistory),
-            enabled = !isUploading && !isCapturing,
-            onClick = onHistory,
-        ) {
-            Text(stringResource(R.string.camera_history))
         }
 
         if (permissionGranted && !cameraReady && !isUploading) {
@@ -302,5 +353,29 @@ fun CameraScreen(
                 Text(stringResource(R.string.camera_retry))
             }
         }
+    }
+}
+
+@Composable
+private fun CornerGuides() {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val stroke = 2.dp.toPx()
+        val guide = 28.dp.toPx()
+        val alpha = 0.7f
+        val color = Color.White.copy(alpha = alpha)
+        val w = size.width
+        val h = size.height
+
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(14f, 14f), end = androidx.compose.ui.geometry.Offset(14f + guide, 14f), strokeWidth = stroke, cap = StrokeCap.Round)
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(14f, 14f), end = androidx.compose.ui.geometry.Offset(14f, 14f + guide), strokeWidth = stroke, cap = StrokeCap.Round)
+
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(w - 14f - guide, 14f), end = androidx.compose.ui.geometry.Offset(w - 14f, 14f), strokeWidth = stroke, cap = StrokeCap.Round)
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(w - 14f, 14f), end = androidx.compose.ui.geometry.Offset(w - 14f, 14f + guide), strokeWidth = stroke, cap = StrokeCap.Round)
+
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(14f, h - 14f), end = androidx.compose.ui.geometry.Offset(14f + guide, h - 14f), strokeWidth = stroke, cap = StrokeCap.Round)
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(14f, h - 14f - guide), end = androidx.compose.ui.geometry.Offset(14f, h - 14f), strokeWidth = stroke, cap = StrokeCap.Round)
+
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(w - 14f - guide, h - 14f), end = androidx.compose.ui.geometry.Offset(w - 14f, h - 14f), strokeWidth = stroke, cap = StrokeCap.Round)
+        drawLine(color, start = androidx.compose.ui.geometry.Offset(w - 14f, h - 14f - guide), end = androidx.compose.ui.geometry.Offset(w - 14f, h - 14f), strokeWidth = stroke, cap = StrokeCap.Round)
     }
 }
