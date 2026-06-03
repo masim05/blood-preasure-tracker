@@ -15,7 +15,7 @@ val localProperties = Properties().apply {
 }
 val apiBaseUrl = localProperties.getProperty("apiBaseUrl")
     ?.takeIf { value -> value.isNotBlank() }
-    ?: providers.gradleProperty("apiBaseUrl").orElse("http://10.0.2.2:3000").get()
+    ?: providers.gradleProperty("apiBaseUrl").orElse("https://bpt.crptmax.com/").get()
 
 android {
     namespace = "com.masim05.bloodpressure.mobile"
@@ -38,6 +38,9 @@ android {
     buildTypes {
         debug {
             enableUnitTestCoverage = true
+        }
+        release {
+            isMinifyEnabled = false
         }
     }
 

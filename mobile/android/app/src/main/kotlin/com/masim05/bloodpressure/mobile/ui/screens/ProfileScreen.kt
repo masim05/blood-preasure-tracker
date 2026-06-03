@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Straighten
@@ -57,6 +58,7 @@ fun ProfileScreen(
     selectedLanguageCode: String,
     onLanguageSelected: (String) -> Unit,
     onOpenGuide: () -> Unit,
+    onOpenAbout: () -> Unit,
     onLogout: () -> Unit,
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -113,9 +115,19 @@ fun ProfileScreen(
                 iconTint = Color(0xFF185FA5),
                 label = stringResource(R.string.guide_title),
                 showChevron = true,
-                divider = false,
+                divider = true,
                 modifier = Modifier.testTag(TestTags.ProfileGuide),
                 onClick = onOpenGuide,
+            )
+            ProfileRow(
+                icon = Icons.Outlined.Info,
+                iconChipBg = Color(0xFFEDE8FD),
+                iconTint = Color(0xFF6C4DD8),
+                label = stringResource(R.string.profile_about_title),
+                showChevron = true,
+                divider = false,
+                modifier = Modifier.testTag(TestTags.ProfileAbout),
+                onClick = onOpenAbout,
             )
         }
 

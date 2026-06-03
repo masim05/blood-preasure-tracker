@@ -25,6 +25,7 @@ enum class Route {
     History,
     MeasurementDetail,
     Profile,
+    About,
 }
 
 data class ScreenState(

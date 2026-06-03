@@ -67,6 +67,7 @@ import com.masim05.bloodpressure.mobile.core.ports.SessionStore
 import com.masim05.bloodpressure.mobile.core.validation.ValidationError
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import com.masim05.bloodpressure.mobile.ui.screens.AuthScreen
+import com.masim05.bloodpressure.mobile.ui.screens.AboutScreen
 import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
 import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
@@ -198,8 +199,12 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     onOpenGuide = ::openGuide,
+                                    onOpenAbout = ::openAbout,
                                     onLogout = ::logout,
                                 )
+                            }
+                            composable(MainDestination.About.route) {
+                                AboutScreen(onBack = ::openProfile)
                             }
 
                             composable(MainDestination.MeasurementDetail.route) {
@@ -299,6 +304,14 @@ class MainActivity : ComponentActivity() {
         }
         historyRequestVersion += 1
         uiState = uiState.copy(route = Route.Profile, errorText = null)
+    }
+
+    private fun openAbout() {
+        if (captureFlow.enterCamera().route == Route.Auth) {
+            uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
+            return
+        }
+        uiState = uiState.copy(route = Route.About, errorText = null)
     }
 
     private fun captureAndUpload() {
@@ -563,6 +576,7 @@ internal enum class MainDestination(val route: String) {
     History("main/history"),
     MeasurementDetail("main/history/detail"),
     Profile("main/profile"),
+    About("main/profile/about"),
 }
 
 internal enum class MainTab {
@@ -703,7 +717,8 @@ private fun showBottomNavigation(currentDestination: NavDestination?): Boolean {
     val isMainGraphDestination = currentDestination.hierarchy.any { it.route == RootGraph.Main.route }
     val isDetailDestination = currentDestination.route == MainDestination.MeasurementDetail.route
     val isGuideDestination = currentDestination.route == MainDestination.Guide.route
-    return isMainGraphDestination && !isDetailDestination && !isGuideDestination
+    val isAboutDestination = currentDestination.route == MainDestination.About.route
+    return isMainGraphDestination && !isDetailDestination && !isGuideDestination && !isAboutDestination
 }
 
 private fun syncNavigationState(
@@ -732,6 +747,7 @@ private fun syncNavigationState(
             }
         }
         Route.Profile -> navController.navigateToMainTopLevel(MainDestination.Profile.route)
+        Route.About -> navController.navigate(MainDestination.About.route) { launchSingleTop = true }
     }
 }
 
@@ -753,7 +769,7 @@ private fun NavHostController.navigateToMainTopLevel(destinationRoute: String) {
 internal fun topLevelMainTab(route: Route): MainTab {
     return when (route) {
         Route.History, Route.MeasurementDetail -> MainTab.History
-        Route.Profile -> MainTab.Profile
+        Route.Profile, Route.About -> MainTab.Profile
         else -> MainTab.Capture
     }
 }
@@ -762,7 +778,7 @@ internal fun topLevelMainTabForDestinationRoute(destinationRoute: String?, fallb
     return when (destinationRoute) {
         MainDestination.Guide.route, MainDestination.Capture.route -> MainTab.Capture
         MainDestination.History.route, MainDestination.MeasurementDetail.route -> MainTab.History
-        MainDestination.Profile.route -> MainTab.Profile
+        MainDestination.Profile.route, MainDestination.About.route -> MainTab.Profile
         else -> topLevelMainTab(fallbackRoute)
     }
 }

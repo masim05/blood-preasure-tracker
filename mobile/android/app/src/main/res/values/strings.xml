@@ -76,6 +76,11 @@
     <string name="history_date_range">DATE RANGE</string>
     <string name="history_readings">READINGS</string>
     <string name="profile_language_title">Language</string>
+    <string name="profile_about_title">About</string>
+    <string name="profile_about_medical_disclaimer">This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition.</string>
+    <string name="profile_about_privacy_title">Privacy Policy</string>
+    <string name="profile_about_privacy_summary">We collect account email/login, blood pressure monitor photos, blood pressure values, and measurement date/time to provide history, recognition, and upload features. Data is stored on our secured API infrastructure. You can request deletion of your account and related data by contacting support@bpt.crptmax.com.</string>
+    <string name="profile_about_privacy_link">Privacy Policy URL: https://bpt.crptmax.com/</string>
     <string name="language_system_default">System default</string>
     <string name="language_name_spanish">Spanish</string>
     <string name="language_name_french">French</string>

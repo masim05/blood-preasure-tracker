@@ -129,6 +129,11 @@ class MainActivityTest {
     }
 
     @Test
+    fun topLevelMainTabMapsAboutRouteToProfileTab() {
+        assertEquals(MainTab.Profile, topLevelMainTab(Route.About))
+    }
+
+    @Test
     fun topLevelMainTabForDestinationRouteUsesDestinationWhenPresent() {
         assertEquals(
             MainTab.History,
@@ -157,6 +162,17 @@ class MainActivityTest {
             topLevelMainTabForDestinationRoute(
                 destinationRoute = MainDestination.Guide.route,
                 fallbackRoute = Route.Profile,
+            ),
+        )
+    }
+
+    @Test
+    fun topLevelMainTabForDestinationRouteMapsAboutToProfileTab() {
+        assertEquals(
+            MainTab.Profile,
+            topLevelMainTabForDestinationRoute(
+                destinationRoute = MainDestination.About.route,
+                fallbackRoute = Route.Camera,
             ),
         )
     }

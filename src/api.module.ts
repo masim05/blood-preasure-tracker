@@ -5,6 +5,7 @@ import { AuthRateLimitGuard } from './adapters/inbound/http/auth-rate-limit.guar
 import { BearerAuthGuard } from './adapters/inbound/http/bearer-auth.guard';
 import { HttpRequestLoggingMiddleware } from './adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from './adapters/inbound/http/measurements.controller';
+import { PrivacyPolicyController } from './adapters/inbound/http/privacy-policy.controller';
 import { RecognitionTaskWorker } from './adapters/inbound/worker/recognition-task.worker';
 import { NodeBearerTokenAdapter } from './adapters/outbound/crypto/node-bearer-token.adapter';
 import { NodePasswordHasherAdapter } from './adapters/outbound/crypto/node-password-hasher.adapter';
@@ -35,7 +36,7 @@ import { ApiConfigService } from './infrastructure/config/api-config';
 import { EnvConfigService } from './infrastructure/config/env-config';
 
 @Module({
-  controllers: [AuthController, MeasurementsController],
+  controllers: [AuthController, MeasurementsController, PrivacyPolicyController],
   providers: [
     ApiConfigService,
     EnvConfigService,
