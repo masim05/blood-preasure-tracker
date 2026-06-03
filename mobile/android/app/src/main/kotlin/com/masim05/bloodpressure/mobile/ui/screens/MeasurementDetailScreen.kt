@@ -163,7 +163,7 @@ fun MeasurementDetailScreen(
             Spacer(Modifier.height(6.dp))
             CardContainer(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
