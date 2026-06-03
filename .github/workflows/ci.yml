@@ -41,13 +41,7 @@ jobs:
             api:
               - 'src/**'
             android_app:
-              - 'mobile/android/app/**'
-              - 'mobile/android/gradle/**'
-              - 'mobile/android/gradlew'
-              - 'mobile/android/gradlew.bat'
-              - 'mobile/android/build.gradle.kts'
-              - 'mobile/android/settings.gradle.kts'
-              - 'mobile/android/gradle.properties'
+              - 'mobile/android/**'
 
   build:
     name: Build
