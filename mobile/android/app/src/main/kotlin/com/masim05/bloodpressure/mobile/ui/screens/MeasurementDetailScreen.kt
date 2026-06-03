@@ -4,18 +4,24 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.exifinterface.media.ExifInterface
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.semantics
@@ -53,6 +60,12 @@ import com.masim05.bloodpressure.mobile.ui.TestTags
 import java.io.ByteArrayInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+private val PageBg = Color(0xFFF2F2F7)
+private val CardBorder = Color(0xFFE5E5E5)
+private val InputBorder = Color(0xFFE0E0E0)
+private val LabelColor = Color(0xFF999999)
+private val PrimaryGreen = Color(0xFF1D9E75)
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -76,11 +89,13 @@ fun MeasurementDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(PageBg)
+                .verticalScroll(rememberScrollState())
                 .semantics { testTagsAsResourceId = true }
                 .padding(16.dp)
                 .testTag(TestTags.MeasurementDetailScreen),
         ) {
-            Text(stringResource(R.string.detail_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.detail_title), style = MaterialTheme.typography.headlineSmall)
             if (errorText != null) {
                 Text(
                     modifier = Modifier
@@ -92,7 +107,6 @@ fun MeasurementDetailScreen(
             }
             if (shouldShowDetailLoadingPlaceholder(detail)) {
                 Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(R.string.status_loading))
-                Spacer(Modifier.weight(1f))
                 OutlinedButton(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,26 +134,37 @@ fun MeasurementDetailScreen(
                 mutableStateOf(measurementDetail.armSide)
             }
 
-            Box(
+            Spacer(Modifier.height(12.dp))
+            SectionLabel(stringResource(R.string.detail_image_content_description))
+            Spacer(Modifier.height(6.dp))
+            CardContainer(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(3f)
-                    .padding(top = 16.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .testTag(TestTags.MeasurementDetailImage),
-                contentAlignment = Alignment.Center,
             ) {
-                MeasurementImage(
-                    imageUrl = measurementDetail.imageUrl,
-                    apiBaseUrl = apiBaseUrl,
-                    loadMeasurementImage = loadMeasurementImage,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(260.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    MeasurementImage(
+                        imageUrl = measurementDetail.imageUrl,
+                        apiBaseUrl = apiBaseUrl,
+                        loadMeasurementImage = loadMeasurementImage,
+                    )
+                }
             }
 
+            Spacer(Modifier.height(12.dp))
+            SectionLabel(stringResource(R.string.detail_title))
+            Spacer(Modifier.height(6.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -179,12 +204,15 @@ fun MeasurementDetailScreen(
                     modifier = Modifier
                         .weight(1f)
                         .testTag(TestTags.MeasurementDetailBack),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, InputBorder),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LabelColor),
                     onClick = onBack,
                 ) { Text(stringResource(R.string.detail_back)) }
                 Button(
                     modifier = Modifier
                         .weight(1f)
                         .testTag(TestTags.MeasurementDetailSave),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen, contentColor = Color.White),
                     enabled = !isSaving,
                     onClick = {
                         onSave(
@@ -200,6 +228,27 @@ fun MeasurementDetailScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        color = LabelColor,
+        style = MaterialTheme.typography.labelSmall,
+    )
+}
+
+@Composable
+private fun CardContainer(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
+            .background(Color.White, RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        content = content,
+    )
 }
 
 @Composable
