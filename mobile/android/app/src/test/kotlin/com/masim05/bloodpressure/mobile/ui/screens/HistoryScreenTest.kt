@@ -18,7 +18,7 @@ class HistoryScreenTest {
     }
 
     @Test
-    fun keepsAlreadyFormattedTimestamp() {
+    fun formatsSpaceSeparatedTimestampToHistoryDisplayFormat() {
         assertEquals("05-31 17:31", formatHistoryTime("2026-05-31 17:31"))
     }
 

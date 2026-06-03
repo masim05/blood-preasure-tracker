@@ -155,7 +155,7 @@ fun ProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutConfirmation = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.date_picker_cancel))
                 }
             },
         )

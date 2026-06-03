@@ -320,13 +320,15 @@ fun CameraScreen(
         }
 
         if (!permissionGranted) {
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .testTag(TestTags.CameraError),
-                text = stringResource(R.string.camera_permission_denied),
-                color = MaterialTheme.colorScheme.error,
-            )
+            if (shownError == null) {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag(TestTags.CameraError),
+                    text = stringResource(R.string.camera_permission_denied),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             OutlinedButton(
                 modifier = Modifier
                     .fillMaxWidth()

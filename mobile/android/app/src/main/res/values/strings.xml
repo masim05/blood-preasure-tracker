@@ -122,5 +122,4 @@
     <string name="profile_logout_confirm_title">Log out?</string>
     <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
     <string name="profile_logout_confirm">Log out</string>
-    <string name="cancel">Cancel</string>
 </resources>
