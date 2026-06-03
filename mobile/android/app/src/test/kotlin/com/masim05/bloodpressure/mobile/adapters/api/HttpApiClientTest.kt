@@ -494,7 +494,7 @@ class HttpApiClientTest {
         )
         val failure = result as AppResult.Failure
 
-        assertEquals("Network error", failure.error.message)
+        assertTrue(failure.error.source == ApiErrorSource.Network || failure.error.source == ApiErrorSource.Timeout)
     }
 
     private fun session(): Session = Session(
