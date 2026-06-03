@@ -206,7 +206,7 @@ Run Android unit tests and coverage gate:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:androidCoverageVerify
 ```
 
-The app defaults to local emulator API host `http://10.0.2.2:3000`. Start API from repository root with:
+The app defaults to production API host `https://bpt.crptmax.com/`. To validate against a local emulator API host (`http://10.0.2.2:3000`), override `apiBaseUrl` as described below, then start API from repository root with:
 
 ```bash
 npm run api

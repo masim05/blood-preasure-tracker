@@ -24,7 +24,7 @@ Build from the repository root with the Android Gradle wrapper:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:assembleDebug
 ```
 
-The app targets the local API at `http://10.0.2.2:3000` for emulator validation. Start the API from the repository root with:
+The app defaults to production API host `https://bpt.crptmax.com/`. For emulator validation, override `apiBaseUrl` to `http://10.0.2.2:3000` and start the API from the repository root with:
 
 ```bash
 npm run api
