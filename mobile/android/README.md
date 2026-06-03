@@ -33,7 +33,7 @@ npm run api
 ### Configure API host per environment
 
 The app reads `BuildConfig.API_BASE_URL` from a Gradle property named `apiBaseUrl`.
-If not provided, it defaults to `https://bpt.crptmax.com/`.
+If not provided, debug defaults to `http://10.0.2.2:3000` and release defaults to `https://bpt.crptmax.com/`.
 In debug builds, non-2xx API responses are logged with full URL and status code.
 
 One-off override:
@@ -44,7 +44,7 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/a
 
 Common values:
 
-- Emulator: `http://10.0.2.2:3000`
+- Emulator/debug default: `http://10.0.2.2:3000`
 - Physical device on Wi-Fi: `http://<your-mac-lan-ip>:3000`
 - Physical device via USB reverse: `http://127.0.0.1:3000` (run `adb reverse tcp:3000 tcp:3000` first)
 

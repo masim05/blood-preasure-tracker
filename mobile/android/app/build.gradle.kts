@@ -13,9 +13,9 @@ val localProperties = Properties().apply {
         localPropertiesFile.inputStream().use { input -> load(input) }
     }
 }
-val apiBaseUrl = localProperties.getProperty("apiBaseUrl")
+val apiBaseUrlOverride = localProperties.getProperty("apiBaseUrl")
     ?.takeIf { value -> value.isNotBlank() }
-    ?: providers.gradleProperty("apiBaseUrl").orElse("https://bpt.crptmax.com/").get()
+    ?: providers.gradleProperty("apiBaseUrl").orNull
 
 android {
     namespace = "com.masim05.bloodpressure.mobile"
@@ -27,7 +27,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
-        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildFeatures {
@@ -38,9 +37,19 @@ android {
     buildTypes {
         debug {
             enableUnitTestCoverage = true
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"${apiBaseUrlOverride ?: "http://10.0.2.2:3000"}\"",
+            )
         }
         release {
             isMinifyEnabled = false
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"${apiBaseUrlOverride ?: "https://bpt.crptmax.com/"}\"",
+            )
         }
     }
 

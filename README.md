@@ -215,7 +215,7 @@ npm run api
 ### Configuration Options
 
 - App API base URL comes from Gradle property `apiBaseUrl` and maps to `BuildConfig.API_BASE_URL`
-- Default `apiBaseUrl`: `https://bpt.crptmax.com/`
+- Default `apiBaseUrl`: debug uses `http://10.0.2.2:3000`, release uses `https://bpt.crptmax.com/`
 - One-off override example:
 
 ```bash
