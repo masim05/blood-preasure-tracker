@@ -29,7 +29,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -151,7 +150,7 @@ fun HistoryScreen(
                             .testTag("history_clear_filter"),
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(0.5.dp, InputBorder),
-                        colors = OutlinedButtonDefaults.outlinedButtonColors(contentColor = SecondaryText),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SecondaryText),
                         onClick = onClearFilter,
                     ) {
                         Text(stringResource(R.string.history_clear_filter))
@@ -162,7 +161,7 @@ fun HistoryScreen(
                             .testTag(TestTags.HistoryExportCsv),
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(0.5.dp, InputBorder),
-                        colors = OutlinedButtonDefaults.outlinedButtonColors(contentColor = Blue),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Blue),
                         onClick = onExportCsv,
                         enabled = measurements.isNotEmpty() && !isLoading,
                     ) {
