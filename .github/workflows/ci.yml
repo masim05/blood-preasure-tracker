@@ -206,8 +206,12 @@ jobs:
       - name: Bootstrap Android Maestro fixtures
         run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts
 
-      - name: Android unit tests, coverage, and build
-        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug
+      - name: Android unit tests and coverage
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify
+        working-directory: mobile/android
+
+      - name: Build Android debug APK
+        run: ./gradlew --no-daemon :app:assembleDebug
         working-directory: mobile/android
 
       - name: Install Maestro
