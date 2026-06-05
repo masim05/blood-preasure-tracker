@@ -6,7 +6,7 @@ const COLORS = {
   background: '#F2F2F7',
   surface: '#FFFFFF',
   onBackground: '#111111',
-  muted: '#999999',
+  muted: '#6B6B6B',
   border: '#E5E5E5',
   error: '#E24B4A',
 } as const;

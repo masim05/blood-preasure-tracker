@@ -97,7 +97,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Datos que recopilamos',
-          content: 'Recopilamos la siguiente información cuando usas la aplicación: tu dirección de correo electrónico y contraseña (cifrada) para crear tu cuenta; fotos de tu tensiómetro que envías para reconocimiento; valores de presión arterial (sistólica, diastólica, pulso, lado del brazo) extraídos de esas fotos o introducidos manualmente; y la fecha y hora de cada medición.',
+          content: 'Recopilamos la siguiente información cuando usas la aplicación: tu dirección de correo electrónico y contraseña (procesada con hash) para crear tu cuenta; fotos de tu tensiómetro que envías para reconocimiento; valores de presión arterial (sistólica, diastólica, pulso, lado del brazo) extraídos de esas fotos o introducidos manualmente; y la fecha y hora de cada medición.',
         },
         {
           heading: 'Cómo usamos tus datos',
@@ -597,7 +597,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Dữ liệu chúng tôi thu thập',
-          content: 'Chúng tôi thu thập các thông tin sau khi bạn sử dụng ứng dụng: địa chỉ email và mật khẩu (đã mã hóa) để tạo tài khoản; ảnh máy đo huyết áp bạn gửi để nhận dạng; các chỉ số huyết áp (tâm thu, tâm trương, mạch, cánh tay đo) được trích xuất từ ảnh hoặc nhập thủ công; và ngày giờ của từng lần đo.',
+          content: 'Chúng tôi thu thập các thông tin sau khi bạn sử dụng ứng dụng: địa chỉ email và mật khẩu (được băm) để tạo tài khoản; ảnh máy đo huyết áp bạn gửi để nhận dạng; các chỉ số huyết áp (tâm thu, tâm trương, mạch, cánh tay đo) được trích xuất từ ảnh hoặc nhập thủ công; và ngày giờ của từng lần đo.',
         },
         {
           heading: 'Cách chúng tôi sử dụng dữ liệu của bạn',
