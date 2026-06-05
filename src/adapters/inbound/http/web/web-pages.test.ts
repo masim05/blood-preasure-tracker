@@ -1,5 +1,7 @@
 import { resolveTranslations } from './web-i18n';
 import { renderHomePage, renderPolicyPage } from './web-layout';
+import { HomeController } from './home.controller';
+import { PolicyController } from './policy.controller';
 
 describe('web i18n – resolveTranslations', () => {
   it('returns English when Accept-Language is absent', () => {
@@ -30,6 +32,14 @@ describe('web i18n – resolveTranslations', () => {
     expect(resolveTranslations('de, fr-FR;q=0.9').lang).toBe('fr');
   });
 
+  it('respects q weights when selecting language', () => {
+    expect(resolveTranslations('fr;q=0.1, en;q=0.9').lang).toBe('en');
+  });
+
+  it('respects q weights with multiple supported languages', () => {
+    expect(resolveTranslations('ru;q=0.3, es;q=0.7, en;q=0.5').lang).toBe('es');
+  });
+
   it('resolves Portuguese', () => {
     expect(resolveTranslations('pt-BR').lang).toBe('pt');
   });
@@ -52,6 +62,106 @@ describe('web i18n – resolveTranslations', () => {
 
   it('resolves Vietnamese', () => {
     expect(resolveTranslations('vi-VN').lang).toBe('vi');
+  });
+});
+
+describe('HomeController', () => {
+  let controller: HomeController;
+
+  beforeEach(() => {
+    controller = new HomeController();
+  });
+
+  it('returns HTML for home page with English when no Accept-Language header', () => {
+    const result = controller.getHome(undefined);
+    expect(result).toContain('<!DOCTYPE html>');
+    expect(result).toContain('<html lang="en"');
+    expect(result).toContain('Blood Pressure');
+  });
+
+  it('returns Spanish home page when Accept-Language is es', () => {
+    const result = controller.getHome('es');
+    expect(result).toContain('<html lang="es"');
+    expect(result).toContain('Controla tus mediciones fácilmente');
+  });
+
+  it('returns Russian home page when Accept-Language is ru-RU', () => {
+    const result = controller.getHome('ru-RU');
+    expect(result).toContain('<html lang="ru"');
+    expect(result).toContain('Отслеживайте показания с лёгкостью');
+  });
+
+  it('respects q-weights in Accept-Language header', () => {
+    const result = controller.getHome('fr;q=0.1, en;q=0.9');
+    expect(result).toContain('<html lang="en"');
+  });
+
+  it('contains Google Play CTA', () => {
+    const result = controller.getHome(undefined);
+    expect(result).toContain('Google Play');
+  });
+
+  it('contains footer with navigation links', () => {
+    const result = controller.getHome(undefined);
+    expect(result).toContain('href="/"');
+    expect(result).toContain('href="/policy"');
+  });
+
+  it('marks home link as active', () => {
+    const result = controller.getHome(undefined);
+    expect(result).toMatch(/href="\/"[^>]*class="active"|class="active"[^>]*href="\/"/);
+  });
+});
+
+describe('PolicyController', () => {
+  let controller: PolicyController;
+
+  beforeEach(() => {
+    controller = new PolicyController();
+  });
+
+  it('returns HTML for policy page with English when no Accept-Language header', () => {
+    const result = controller.getPolicy(undefined);
+    expect(result).toContain('<!DOCTYPE html>');
+    expect(result).toContain('<html lang="en"');
+    expect(result).toContain('Privacy Policy');
+  });
+
+  it('returns Spanish policy page when Accept-Language is es', () => {
+    const result = controller.getPolicy('es');
+    expect(result).toContain('<html lang="es"');
+    expect(result).toContain('Política de privacidad');
+  });
+
+  it('returns Russian policy page when Accept-Language is ru-RU', () => {
+    const result = controller.getPolicy('ru-RU');
+    expect(result).toContain('<html lang="ru"');
+    expect(result).toContain('Политика конфиденциальности');
+  });
+
+  it('respects q-weights in Accept-Language header', () => {
+    const result = controller.getPolicy('ru;q=0.3, es;q=0.7, en;q=0.5');
+    expect(result).toContain('<html lang="es"');
+  });
+
+  it('contains all required policy sections', () => {
+    const result = controller.getPolicy(undefined);
+    expect(result).toContain('email address');
+    expect(result).toContain('blood pressure monitor');
+    expect(result).toContain('OpenAI');
+    expect(result).toContain('not a medical device');
+    expect(result).toContain('support@bloodpressure.app');
+  });
+
+  it('contains footer with navigation links', () => {
+    const result = controller.getPolicy(undefined);
+    expect(result).toContain('href="/"');
+    expect(result).toContain('href="/policy"');
+  });
+
+  it('marks policy link as active', () => {
+    const result = controller.getPolicy(undefined);
+    expect(result).toMatch(/href="\/policy"[^>]*class="active"|class="active"[^>]*href="\/policy"/);
   });
 });
 

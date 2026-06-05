@@ -634,13 +634,15 @@ export function resolveTranslations(acceptLanguage: string | undefined): WebTran
   const candidates = acceptLanguage
     .split(',')
     .map((part) => {
-      const [tag] = part.trim().split(';');
-      return tag.trim().toLowerCase();
+      const [tag, qPart] = part.trim().split(';');
+      const q = qPart ? parseFloat(qPart.split('=')[1] || '1') : 1;
+      return { tag: tag.trim().toLowerCase(), q: isNaN(q) ? 1 : q };
     })
-    .filter(Boolean);
+    .filter((c) => c.tag)
+    .sort((a, b) => b.q - a.q);
 
   for (const candidate of candidates) {
-    const lang = candidate.split('-')[0];
+    const lang = candidate.tag.split('-')[0];
     if (lang && lang in translations) {
       return translations[lang as SupportedLang];
     }
