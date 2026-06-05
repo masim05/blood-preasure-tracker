@@ -90,9 +90,7 @@ describe('test workflow contract', () => {
   it('runs Android bootstrap after db init and before Android Gradle tasks', () => {
     const dbInitIndex = workflow.indexOf('run: npm run db:init -- --env .env.test');
     const bootstrapIndex = workflow.indexOf('run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts');
-    const gradleIndex = workflow.indexOf(
-      'run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify :app:assembleDebug',
-    );
+    const gradleIndex = workflow.indexOf('run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify');
 
     expect(dbInitIndex).toBeGreaterThan(-1);
     expect(bootstrapIndex).toBeGreaterThan(dbInitIndex);
@@ -108,7 +106,7 @@ describe('test workflow contract', () => {
 
   it('does not invoke android bootstrap outside android-mobile job', () => {
     const bootstrapCommand = 'run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts';
-    const androidJobStart = workflow.indexOf('  android-mobile:\n');
+    const androidJobStart = workflow.indexOf('  android-mobile-maestro:\n');
 
     expect(androidJobStart).toBeGreaterThan(-1);
     const firstIndex = workflow.indexOf(bootstrapCommand);
@@ -123,11 +121,16 @@ describe('test workflow contract', () => {
       workflow.indexOf('  integration-tests:\n'),
     );
     const integrationJobBlock = workflow.slice(workflow.indexOf('  integration-tests:\n'), workflow.indexOf('  lint:\n'));
-    const lintJobBlock = workflow.slice(workflow.indexOf('  lint:\n'), workflow.indexOf('  android-mobile:\n'));
+    const lintJobBlock = workflow.slice(workflow.indexOf('  lint:\n'), workflow.indexOf('  android-mobile-build:\n'));
+    const androidBuildJobBlock = workflow.slice(
+      workflow.indexOf('  android-mobile-build:\n'),
+      workflow.indexOf('  android-mobile-maestro:\n'),
+    );
 
     expect(buildJobBlock).not.toContain(bootstrapCommand);
     expect(coverageJobBlock).not.toContain(bootstrapCommand);
     expect(integrationJobBlock).not.toContain(bootstrapCommand);
     expect(lintJobBlock).not.toContain(bootstrapCommand);
+    expect(androidBuildJobBlock).not.toContain(bootstrapCommand);
   });
 });
