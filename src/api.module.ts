@@ -2,6 +2,8 @@ import { MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 
 import { AuthController } from './adapters/inbound/http/auth.controller';
 import { AuthRateLimitGuard } from './adapters/inbound/http/auth-rate-limit.guard';
+import { HomeController } from './adapters/inbound/http/web/home.controller';
+import { PolicyController } from './adapters/inbound/http/web/policy.controller';
 import { BearerAuthGuard } from './adapters/inbound/http/bearer-auth.guard';
 import { HttpRequestLoggingMiddleware } from './adapters/inbound/http/http-request-logging';
 import { MeasurementsController } from './adapters/inbound/http/measurements.controller';
@@ -35,7 +37,7 @@ import { ApiConfigService } from './infrastructure/config/api-config';
 import { EnvConfigService } from './infrastructure/config/env-config';
 
 @Module({
-  controllers: [AuthController, MeasurementsController],
+  controllers: [HomeController, PolicyController, AuthController, MeasurementsController],
   providers: [
     ApiConfigService,
     EnvConfigService,
