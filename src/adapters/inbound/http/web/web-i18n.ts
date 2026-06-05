@@ -635,10 +635,12 @@ export function resolveTranslations(acceptLanguage: string | undefined): WebTran
     .split(',')
     .map((part) => {
       const [tag, qPart] = part.trim().split(';');
-      const q = qPart ? parseFloat(qPart.split('=')[1] || '1') : 1;
-      return { tag: tag.trim().toLowerCase(), q: isNaN(q) ? 1 : q };
+      const rawQ = qPart ? parseFloat(qPart.split('=')[1] || '1') : 1;
+      // Clamp q to [0, 1] and treat NaN as 1
+      const q = isNaN(rawQ) ? 1 : Math.max(0, Math.min(1, rawQ));
+      return { tag: tag.trim().toLowerCase(), q };
     })
-    .filter((c) => c.tag)
+    .filter((c) => c.tag && c.q > 0) // Exclude q <= 0 (not acceptable per RFC 9110)
     .sort((a, b) => b.q - a.q);
 
   for (const candidate of candidates) {

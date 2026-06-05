@@ -40,6 +40,22 @@ describe('web i18n – resolveTranslations', () => {
     expect(resolveTranslations('ru;q=0.3, es;q=0.7, en;q=0.5').lang).toBe('es');
   });
 
+  it('excludes languages with q=0 (not acceptable)', () => {
+    expect(resolveTranslations('en;q=0, de;q=1').lang).toBe('en'); // de unsupported, falls back to default
+  });
+
+  it('excludes languages with q=0 even if they are the only supported option', () => {
+    expect(resolveTranslations('en;q=0, es;q=0, de;q=1').lang).toBe('en'); // all supported langs rejected, falls back to default
+  });
+
+  it('handles negative q values by clamping to 0 and excluding', () => {
+    expect(resolveTranslations('en;q=-1, de;q=1').lang).toBe('en'); // negative q clamped to 0, excluded
+  });
+
+  it('clamps q values greater than 1', () => {
+    expect(resolveTranslations('fr;q=5, en;q=1.5').lang).toBe('fr'); // both clamped to 1, first wins
+  });
+
   it('resolves Portuguese', () => {
     expect(resolveTranslations('pt-BR').lang).toBe('pt');
   });
