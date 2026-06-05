@@ -24,8 +24,15 @@ function heartSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${COLORS.primary}" width="24" height="24" aria-hidden="true"><path d="M12 21.593c-.525-.445-4.52-3.888-6.55-5.86C3.15 13.46 2 11.56 2 9.5 2 6.42 4.42 4 7.5 4c1.74 0 3.41.81 4.5 2.09C13.09 4.81 14.76 4 16.5 4 19.58 4 22 6.42 22 9.5c0 2.06-1.15 3.96-3.45 6.233-2.03 1.972-6.025 5.415-6.55 5.86z"/></svg>`;
 }
 
-function googlePlaySvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M3.18 23.76c.33.18.72.2 1.07.04l11.7-6.74-2.5-2.5-10.27 9.2zM.5 1.1C.19 1.46 0 1.99 0 2.69v18.62c0 .7.19 1.23.5 1.59l.08.08 10.43-10.43v-.24L.58 1.03.5 1.1zM20.66 10.23l-2.96-1.71-2.78 2.78 2.78 2.78 2.97-1.71c.85-.49.85-1.28-.01-1.14zM4.25.24L15.95 6.97l-2.5 2.5L3.18.27C3.53.1 3.92.07 4.25.24z"/></svg>`;
+const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
+
+function linkifySupportEmail(text: string): string {
+  const escapedEmail = escapeHtml(SUPPORT_EMAIL);
+  const mailto = `mailto:${SUPPORT_EMAIL}`;
+  return text.replaceAll(
+    escapedEmail,
+    `<a href="${mailto}">${escapedEmail}</a>`,
+  );
 }
 
 export function renderLayout(
@@ -212,10 +219,6 @@ export function renderHomePage(t: WebTranslations): string {
   <div class="story">
 ${storyParagraphs}
   </div>
-  <a class="google-play-btn" href="https://play.google.com/store/apps/details?id=com.masim05.bloodpressure.mobile" target="_blank" rel="noopener noreferrer">
-    ${googlePlaySvg()}
-    ${escapeHtml(t.home.googlePlay)}
-  </a>
 </div>`;
 
   return renderLayout(t, t.home.metaTitle, body, '/');
@@ -227,7 +230,7 @@ export function renderPolicyPage(t: WebTranslations): string {
       (section) => `
   <div class="policy-section">
     <h2>${escapeHtml(section.heading)}</h2>
-    <p>${escapeHtml(section.content)}</p>
+    <p>${linkifySupportEmail(escapeHtml(section.content))}</p>
   </div>`,
     )
     .join('');
