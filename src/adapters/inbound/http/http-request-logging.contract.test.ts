@@ -1,5 +1,7 @@
+import { EventEmitter } from 'node:events';
+
 import { loadApiLoggingConfig } from '../../../infrastructure/config/api-logging-config';
-import { createHttpRequestLogEntry } from './http-request-logging';
+import { createHttpRequestLogEntry, HttpRequestLoggingMiddleware } from './http-request-logging';
 
 describe('mobile API logging contract', () => {
   it('selects development debug logging for unset and non-production NODE_ENV values', () => {
@@ -66,5 +68,40 @@ describe('mobile API logging contract', () => {
     expect(serialized).not.toContain('multipart');
     expect(serialized).not.toContain('systolic');
     expect(serialized).not.toContain('image');
+  });
+
+  it('writes error request logs in production mode while suppressing debug entries', () => {
+    const productionLogging = loadApiLoggingConfig({ NODE_ENV: 'production' });
+    const writtenLogs: string[] = [];
+    const requestLogging = HttpRequestLoggingMiddleware.withLogger({
+      debug: (message: string): void => {
+        if (productionLogging.levels.includes('debug')) {
+          writtenLogs.push(message);
+        }
+      },
+      error: (message: string): void => {
+        if (productionLogging.levels.includes('error')) {
+          writtenLogs.push(message);
+        }
+      },
+    });
+
+    const successResponse = new EventEmitter() as EventEmitter & { statusCode: number; once: EventEmitter['once'] };
+    successResponse.statusCode = 200;
+    requestLogging.use({ method: 'GET', originalUrl: '/api/v1/measurements', url: '/measurements' }, successResponse, jest.fn());
+    successResponse.emit('finish');
+
+    const errorResponse = new EventEmitter() as EventEmitter & { statusCode: number; once: EventEmitter['once'] };
+    errorResponse.statusCode = 500;
+    requestLogging.use({ method: 'GET', originalUrl: '/api/v1/measurements', url: '/measurements' }, errorResponse, jest.fn());
+    errorResponse.emit('finish');
+
+    expect(writtenLogs).toHaveLength(1);
+    expect(JSON.parse(writtenLogs[0]) as unknown).toMatchObject({
+      level: 'error',
+      method: 'GET',
+      path: '/api/v1/measurements',
+      statusCode: 500,
+    });
   });
 });
