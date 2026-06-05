@@ -63,7 +63,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Deleting Your Account and Data',
-          content: 'You can request deletion of your account and all associated data at any time by emailing support@bloodpressure.app. We will process your request within 30 days.',
+          content: 'You can request deletion of your account and all associated data at any time by emailing blood.pressure.by.max@gmail.com. We will process your request within 30 days.',
         },
         {
           heading: 'Medical Disclaimer',
@@ -71,7 +71,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Contact',
-          content: 'For privacy-related questions, contact us at support@bloodpressure.app.',
+          content: 'For privacy-related questions, contact us at blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -113,7 +113,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Eliminar tu cuenta y datos',
-          content: 'Puedes solicitar la eliminación de tu cuenta y todos los datos asociados en cualquier momento enviando un correo a support@bloodpressure.app. Procesaremos tu solicitud en un plazo de 30 días.',
+          content: 'Puedes solicitar la eliminación de tu cuenta y todos los datos asociados en cualquier momento enviando un correo a blood.pressure.by.max@gmail.com. Procesaremos tu solicitud en un plazo de 30 días.',
         },
         {
           heading: 'Aviso médico',
@@ -121,7 +121,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Contacto',
-          content: 'Para consultas relacionadas con la privacidad, contáctanos en support@bloodpressure.app.',
+          content: 'Para consultas relacionadas con la privacidad, contáctanos en blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -163,7 +163,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Suppression de votre compte et de vos données',
-          content: 'Vous pouvez demander la suppression de votre compte et de toutes les données associées à tout moment en écrivant à support@bloodpressure.app. Nous traiterons votre demande dans un délai de 30 jours.',
+          content: 'Vous pouvez demander la suppression de votre compte et de toutes les données associées à tout moment en écrivant à blood.pressure.by.max@gmail.com. Nous traiterons votre demande dans un délai de 30 jours.',
         },
         {
           heading: 'Avertissement médical',
@@ -171,7 +171,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Contact',
-          content: 'Pour toute question relative à la confidentialité, contactez-nous à support@bloodpressure.app.',
+          content: 'Pour toute question relative à la confidentialité, contactez-nous à blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -213,7 +213,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Excluir sua conta e dados',
-          content: 'Você pode solicitar a exclusão de sua conta e de todos os dados associados a qualquer momento enviando um e-mail para support@bloodpressure.app. Processaremos sua solicitação em até 30 dias.',
+          content: 'Você pode solicitar a exclusão de sua conta e de todos os dados associados a qualquer momento enviando um e-mail para blood.pressure.by.max@gmail.com. Processaremos sua solicitação em até 30 dias.',
         },
         {
           heading: 'Aviso médico',
@@ -221,7 +221,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Contato',
-          content: 'Para dúvidas relacionadas à privacidade, entre em contato pelo e-mail support@bloodpressure.app.',
+          content: 'Para dúvidas relacionadas à privacidade, entre em contato pelo e-mail blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -263,7 +263,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Eliminazione del tuo account e dei tuoi dati',
-          content: 'Puoi richiedere la cancellazione del tuo account e di tutti i dati associati in qualsiasi momento inviando una e-mail a support@bloodpressure.app. Elaboreremo la tua richiesta entro 30 giorni.',
+          content: 'Puoi richiedere la cancellazione del tuo account e di tutti i dati associati in qualsiasi momento inviando una e-mail a blood.pressure.by.max@gmail.com. Elaboreremo la tua richiesta entro 30 giorni.',
         },
         {
           heading: 'Dichiarazione medica',
@@ -271,7 +271,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Contatti',
-          content: 'Per domande relative alla privacy, contattaci all\'indirizzo support@bloodpressure.app.',
+          content: 'Per domande relative alla privacy, contattaci all\'indirizzo blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -313,7 +313,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Ta bort ditt konto och dina uppgifter',
-          content: 'Du kan begära radering av ditt konto och alla tillhörande uppgifter när som helst genom att skicka e-post till support@bloodpressure.app. Vi behandlar din begäran inom 30 dagar.',
+          content: 'Du kan begära radering av ditt konto och alla tillhörande uppgifter när som helst genom att skicka e-post till blood.pressure.by.max@gmail.com. Vi behandlar din begäran inom 30 dagar.',
         },
         {
           heading: 'Medicinsk ansvarsfriskrivning',
@@ -321,7 +321,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Kontakt',
-          content: 'För integritetsrelaterade frågor, kontakta oss på support@bloodpressure.app.',
+          content: 'För integritetsrelaterade frågor, kontakta oss på blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -363,7 +363,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Удаление аккаунта и данных',
-          content: 'Вы можете в любое время запросить удаление аккаунта и всех связанных данных, написав на support@bloodpressure.app. Мы обработаем ваш запрос в течение 30 дней.',
+          content: 'Вы можете в любое время запросить удаление аккаунта и всех связанных данных, написав на blood.pressure.by.max@gmail.com. Мы обработаем ваш запрос в течение 30 дней.',
         },
         {
           heading: 'Медицинское предупреждение',
@@ -371,7 +371,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Контакты',
-          content: 'По вопросам конфиденциальности пишите на support@bloodpressure.app.',
+          content: 'По вопросам конфиденциальности пишите на blood.pressure.by.max@gmail.com.',
         },
       ],
     },
@@ -413,7 +413,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '删除账户和数据',
-          content: '您可以随时通过发送电子邮件至 support@bloodpressure.app 申请删除账户及所有相关数据。我们将在 30 天内处理您的申请。',
+          content: '您可以随时通过发送电子邮件至 blood.pressure.by.max@gmail.com 申请删除账户及所有相关数据。我们将在 30 天内处理您的申请。',
         },
         {
           heading: '医疗免责声明',
@@ -421,7 +421,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '联系方式',
-          content: '如有隐私相关问题，请发送邮件至 support@bloodpressure.app。',
+          content: '如有隐私相关问题，请发送邮件至 blood.pressure.by.max@gmail.com。',
         },
       ],
     },
@@ -463,7 +463,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '계정 및 데이터 삭제',
-          content: 'support@bloodpressure.app으로 이메일을 보내 언제든지 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다. 요청은 30일 이내에 처리됩니다.',
+          content: 'blood.pressure.by.max@gmail.com으로 이메일을 보내 언제든지 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다. 요청은 30일 이내에 처리됩니다.',
         },
         {
           heading: '의료 면책 조항',
@@ -471,7 +471,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '문의',
-          content: '개인정보 관련 문의는 support@bloodpressure.app으로 연락하시기 바랍니다.',
+          content: '개인정보 관련 문의는 blood.pressure.by.max@gmail.com으로 연락하시기 바랍니다.',
         },
       ],
     },
@@ -513,7 +513,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'アカウントとデータの削除',
-          content: 'support@bloodpressure.app にメールを送ることで、いつでもアカウントおよびすべての関連データの削除を依頼できます。リクエストは30日以内に処理されます。',
+          content: 'blood.pressure.by.max@gmail.com にメールを送ることで、いつでもアカウントおよびすべての関連データの削除を依頼できます。リクエストは30日以内に処理されます。',
         },
         {
           heading: '医療上の免責事項',
@@ -521,7 +521,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'お問い合わせ',
-          content: 'プライバシーに関するご質問は support@bloodpressure.app までご連絡ください。',
+          content: 'プライバシーに関するご質問は blood.pressure.by.max@gmail.com までご連絡ください。',
         },
       ],
     },
@@ -563,7 +563,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'การลบบัญชีและข้อมูลของคุณ',
-          content: 'คุณสามารถขอลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดได้ตลอดเวลาโดยส่งอีเมลมาที่ support@bloodpressure.app เราจะดำเนินการตามคำขอภายใน 30 วัน',
+          content: 'คุณสามารถขอลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดได้ตลอดเวลาโดยส่งอีเมลมาที่ blood.pressure.by.max@gmail.com เราจะดำเนินการตามคำขอภายใน 30 วัน',
         },
         {
           heading: 'ข้อจำกัดความรับผิดชอบทางการแพทย์',
@@ -571,7 +571,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'ติดต่อเรา',
-          content: 'สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อเราได้ที่ support@bloodpressure.app',
+          content: 'สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อเราได้ที่ blood.pressure.by.max@gmail.com',
         },
       ],
     },
@@ -613,7 +613,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Xóa tài khoản và dữ liệu',
-          content: 'Bạn có thể yêu cầu xóa tài khoản và toàn bộ dữ liệu liên quan bất kỳ lúc nào bằng cách gửi email đến support@bloodpressure.app. Chúng tôi sẽ xử lý yêu cầu của bạn trong vòng 30 ngày.',
+          content: 'Bạn có thể yêu cầu xóa tài khoản và toàn bộ dữ liệu liên quan bất kỳ lúc nào bằng cách gửi email đến blood.pressure.by.max@gmail.com. Chúng tôi sẽ xử lý yêu cầu của bạn trong vòng 30 ngày.',
         },
         {
           heading: 'Tuyên bố miễn trách nhiệm y tế',
@@ -621,7 +621,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Liên hệ',
-          content: 'Với các câu hỏi liên quan đến quyền riêng tư, vui lòng liên hệ với chúng tôi tại support@bloodpressure.app.',
+          content: 'Với các câu hỏi liên quan đến quyền riêng tư, vui lòng liên hệ với chúng tôi tại blood.pressure.by.max@gmail.com.',
         },
       ],
     },

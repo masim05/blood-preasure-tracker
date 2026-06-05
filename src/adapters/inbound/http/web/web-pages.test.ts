@@ -166,7 +166,7 @@ describe('PolicyController', () => {
     expect(result).toContain('blood pressure monitor');
     expect(result).toContain('OpenAI');
     expect(result).toContain('not a medical device');
-    expect(result).toContain('support@bloodpressure.app');
+    expect(result).toContain('blood.pressure.by.max@gmail.com');
   });
 
   it('contains footer with navigation links', () => {
@@ -234,7 +234,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('blood pressure monitor');
     expect(html).toContain('OpenAI');
     expect(html).toContain('not a medical device');
-    expect(html).toContain('support@bloodpressure.app');
+    expect(html).toContain('blood.pressure.by.max@gmail.com');
     expect(html).toContain('<footer');
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/policy"');
@@ -248,7 +248,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('Политика конфиденциальности');
     expect(html).toContain('OpenAI');
     expect(html).toContain('медицинским устройством');
-    expect(html).toContain('support@bloodpressure.app');
+    expect(html).toContain('blood.pressure.by.max@gmail.com');
   });
 
   it('marks the policy link as active on the policy page', () => {
