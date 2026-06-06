@@ -1,28 +1,21 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,17 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.ui.TestTags
 
-internal data class GuideExamplePanel(
-    val isGood: Boolean,
-    @DrawableRes val drawableRes: Int,
-)
-
-internal fun guideExamplePanels(): List<GuideExamplePanel> = listOf(
-    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_1),
-    GuideExamplePanel(isGood = true, drawableRes = R.drawable.guide_2),
-    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_3),
-    GuideExamplePanel(isGood = false, drawableRes = R.drawable.guide_4),
-)
+internal fun guideReferenceDrawableRes(): Int = R.drawable.guide_screenshot_pr34
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -79,8 +62,7 @@ fun GuideScreen(onNext: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
         )
-        GuideExampleCollage(
-            examples = guideExamplePanels(),
+        GuideReferenceImage(
             modifier = Modifier.fillMaxWidth(),
         )
         Button(
@@ -96,58 +78,25 @@ fun GuideScreen(onNext: () -> Unit) {
 }
 
 @Composable
-private fun GuideExampleCollage(examples: List<GuideExamplePanel>, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        examples.chunked(2).forEach { rowExamples ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                rowExamples.forEach { example ->
-                    GuideExampleCard(
-                        example = example,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun GuideExampleCard(example: GuideExamplePanel, modifier: Modifier = Modifier) {
-    val borderColor = if (example.isGood) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
-    val iconTint = if (example.isGood) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-    val badgeContentDescription = stringResource(
-        if (example.isGood) R.string.guide_example_good else R.string.guide_example_bad
-    )
-
+private fun GuideReferenceImage(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .aspectRatio(1f)
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .border(width = 2.dp, color = borderColor, shape = RoundedCornerShape(20.dp)),
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = RoundedCornerShape(20.dp),
+            ),
     ) {
         Image(
-            painter = painterResource(example.drawableRes),
+            painter = painterResource(guideReferenceDrawableRes()),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(20.dp)),
-        )
-        Icon(
-            imageVector = if (example.isGood) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-            contentDescription = badgeContentDescription,
-            tint = iconTint,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(10.dp)
-                .size(28.dp),
         )
     }
 }
