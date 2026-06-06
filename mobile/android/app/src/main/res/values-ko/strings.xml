@@ -123,4 +123,27 @@
     <string name="profile_logout_confirm_title">로그아웃하시겠습니까?</string>
     <string name="profile_logout_confirm_message">계속하려면 다시 로그인해야 합니다.</string>
     <string name="profile_logout_confirm">로그아웃</string>
+
+    <string name="profile_about">정보</string>
+    <string name="profile_story">스토리</string>
+    <string name="profile_policy">개인정보 처리방침</string>
+    <string name="profile_story_paragraph_1">혈압을 정기적으로 측정하기 시작하면서 가장 번거로운 일이 측정 자체가 아니라는 걸 금방 깨달았습니다. 바로 혈압계 사진에서 숫자를 스프레드시트에 일일이 입력하는 일이었죠.</string>
+    <string name="profile_story_paragraph_2">요즘 AI는 이미지에서 텍스트를 꽤 잘 읽기 때문에 이 과정을 자동화할 수 있다고 생각했습니다. 그래서 혈압계 사진을 몇 번의 탭만으로 측정 기록으로 변환해 주는 간단한 앱을 만들었습니다.</string>
+    <string name="profile_story_paragraph_3">직접 사용해 보고 나서 이런 불편함을 겪는 사람이 저뿐만은 아닐 것이라고 생각했습니다. 그래서 Google Play에 앱을 출시하기로 결심했습니다.</string>
+    <string name="profile_policy_page_title">개인정보 처리방침</string>
+    <string name="profile_policy_intro">귀하의 개인정보는 중요합니다. 이 방침은 Blood Pressure가 어떤 데이터를 수집하고, 왜 수집하며, 어떻게 처리하는지를 설명합니다.</string>
+    <string name="profile_policy_heading_data_collect">수집하는 데이터</string>
+    <string name="profile_policy_content_data_collect">앱 사용 시 다음 정보를 수집합니다: 계정 생성에 사용하는 이메일 주소 및 비밀번호(해시 처리됨); 인식을 위해 제출하는 혈압계 사진; 해당 사진에서 추출되거나 수동으로 입력된 혈압 수치(수축기, 이완기, 맥박, 팔 측); 각 측정의 날짜 및 시간.</string>
+    <string name="profile_policy_heading_data_use">데이터 사용 방법</string>
+    <string name="profile_policy_content_data_use">귀하의 데이터는 앱 기능 제공에만 사용됩니다: 계정 인증, 검토할 수 있도록 측정 기록 저장, 혈압 수치 자동 추출을 위한 사진 처리.</string>
+    <string name="profile_policy_heading_third_party">제3자 서비스</string>
+    <string name="profile_policy_content_third_party">사진에서 혈압 수치를 인식하기 위해 이미지는 제3자 AI API(예: OpenAI)로 전송됩니다. 이미지는 인식 목적으로만 전송되며, 해당 제3자가 저장하거나 학습에 사용하지 않습니다. 귀하의 개인 데이터는 다른 제3자에게 판매되거나 공유되지 않습니다.</string>
+    <string name="profile_policy_heading_storage">데이터 저장</string>
+    <string name="profile_policy_content_storage">귀하의 데이터는 안전한 클라우드 서버에 저장됩니다. 당사는 무단 접근으로부터 보호하기 위해 업계 표준 조치를 적용합니다.</string>
+    <string name="profile_policy_heading_delete">계정 및 데이터 삭제</string>
+    <string name="profile_policy_content_delete">blood.pressure.by.max@gmail.com으로 이메일을 보내 언제든지 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다. 요청은 30일 이내에 처리됩니다.</string>
+    <string name="profile_policy_heading_medical">의료 면책 조항</string>
+    <string name="profile_policy_content_medical">이 앱은 의료 기기가 아니며, 어떠한 질병도 진단, 치료, 치유 또는 예방하지 않습니다. 혈압 및 건강 문제에 관해서는 항상 자격을 갖춘 의료 전문가와 상담하십시오.</string>
+    <string name="profile_policy_heading_contact">문의</string>
+    <string name="profile_policy_content_contact">개인정보 관련 문의는 blood.pressure.by.max@gmail.com으로 연락하시기 바랍니다.</string>
 </resources>

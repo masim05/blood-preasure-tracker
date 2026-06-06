@@ -124,4 +124,27 @@
     <string name="profile_logout_confirm_title">Logga ut?</string>
     <string name="profile_logout_confirm_message">Du måste logga in igen för att fortsätta.</string>
     <string name="profile_logout_confirm">Logga ut</string>
+
+    <string name="profile_about">OM</string>
+    <string name="profile_story">Berättelse</string>
+    <string name="profile_policy">Integritetspolicy</string>
+    <string name="profile_story_paragraph_1">Jag började mäta mitt blodtryck regelbundet och insåg snabbt att det jobbigaste inte var att ta mätningarna – det var att knappa in siffrorna från foton på min blodtrycksapparat i ett kalkylblad.</string>
+    <string name="profile_story_paragraph_2">Eftersom modern AI är ganska bra på att läsa text från bilder tänkte jag att det här skulle kunna automatiseras. Så jag byggde en enkel app som omvandlar ett foto av en blodtrycksapparat till ett mätrekord med några tryckningar.</string>
+    <string name="profile_story_paragraph_3">Efter att ha använt den själv tänkte jag: kanske är jag inte den enda med det här problemet. Det är därför jag bestämde mig för att publicera den på Google Play.</string>
+    <string name="profile_policy_page_title">Integritetspolicy</string>
+    <string name="profile_policy_intro">Din integritet är viktig. Denna policy förklarar vilka uppgifter Blood Pressure samlar in, varför och hur de hanteras.</string>
+    <string name="profile_policy_heading_data_collect">Uppgifter vi samlar in</string>
+    <string name="profile_policy_content_data_collect">Vi samlar in följande information när du använder appen: din e-postadress och ditt lösenord (hashat) för att skapa ditt konto; foton av din blodtrycksapparat som du skickar in för igenkänning; blodtrycksvärden (systoliskt, diastoliskt, puls, armens sida) extraherade från dessa foton eller angivna manuellt; samt datum och tid för varje mätning.</string>
+    <string name="profile_policy_heading_data_use">Hur vi använder dina uppgifter</string>
+    <string name="profile_policy_content_data_use">Dina uppgifter används enbart för att tillhandahålla appens funktioner: autentisera ditt konto, lagra din mäthistorik så att du kan granska den och bearbeta foton för att automatiskt extrahera blodtrycksvärden.</string>
+    <string name="profile_policy_heading_third_party">Tjänster från tredje part</string>
+    <string name="profile_policy_content_third_party">För att känna igen blodtrycksvärden från foton skickas bilder till AI-API:er från tredje part (t.ex. OpenAI). Bilder överförs enbart i igenkänningssyfte och lagras eller används inte för träning av dessa tredje parter. Vi säljer eller delar inte dina personuppgifter med andra tredje parter.</string>
+    <string name="profile_policy_heading_storage">Datalagring</string>
+    <string name="profile_policy_content_storage">Dina uppgifter lagras på säkra molnservrar. Vi tillämpar branschstandardiserade åtgärder för att skydda dem mot obehörig åtkomst.</string>
+    <string name="profile_policy_heading_delete">Ta bort ditt konto och dina uppgifter</string>
+    <string name="profile_policy_content_delete">Du kan begära radering av ditt konto och alla tillhörande uppgifter när som helst genom att skicka e-post till blood.pressure.by.max@gmail.com. Vi behandlar din begäran inom 30 dagar.</string>
+    <string name="profile_policy_heading_medical">Medicinsk ansvarsfriskrivning</string>
+    <string name="profile_policy_content_medical">Denna app är inte en medicinsk enhet och diagnostiserar, behandlar, botar eller förebygger inte några medicinska tillstånd. Rådfråga alltid en kvalificerad sjukvårdspersonal angående ditt blodtryck och eventuella hälsoproblem.</string>
+    <string name="profile_policy_heading_contact">Kontakt</string>
+    <string name="profile_policy_content_contact">För integritetsrelaterade frågor, kontakta oss på blood.pressure.by.max@gmail.com.</string>
 </resources>

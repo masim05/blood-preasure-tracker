@@ -123,4 +123,27 @@
     <string name="profile_logout_confirm_title">Выйти?</string>
     <string name="profile_logout_confirm_message">Для продолжения нужно войти снова.</string>
     <string name="profile_logout_confirm">Выйти</string>
+
+    <string name="profile_about">О ПРИЛОЖЕНИИ</string>
+    <string name="profile_story">История</string>
+    <string name="profile_policy">Политика конфиденциальности</string>
+    <string name="profile_story_paragraph_1">Я начал регулярно измерять давление и быстро понял: самое раздражающее — не само измерение, а то, что нужно вручную вводить цифры с фотографий тонометра в таблицу.</string>
+    <string name="profile_story_paragraph_2">Современный ИИ хорошо распознаёт текст на изображениях, поэтому я решил автоматизировать этот процесс. Так появилось простое приложение, которое за несколько нажатий превращает фото тонометра в запись измерения.</string>
+    <string name="profile_story_paragraph_3">Попользовавшись им сам, я подумал: наверное, я не единственный с такой проблемой. Именно поэтому я решил опубликовать приложение в Google Play.</string>
+    <string name="profile_policy_page_title">Политика конфиденциальности</string>
+    <string name="profile_policy_intro">Ваша конфиденциальность важна для нас. В этой политике описано, какие данные собирает Blood Pressure, для чего и как они используются.</string>
+    <string name="profile_policy_heading_data_collect">Какие данные мы собираем</string>
+    <string name="profile_policy_content_data_collect">При использовании приложения мы собираем следующие данные: ваш адрес электронной почты и хэш пароля для создания аккаунта; фотографии тонометра, которые вы отправляете для распознавания; значения артериального давления (систолическое, диастолическое, пульс, рука) — извлечённые с фотографий или введённые вручную; а также дату и время каждого измерения.</string>
+    <string name="profile_policy_heading_data_use">Как мы используем ваши данные</string>
+    <string name="profile_policy_content_data_use">Ваши данные используются исключительно для работы приложения: для аутентификации вашего аккаунта, хранения истории измерений и автоматического извлечения значений давления из фотографий.</string>
+    <string name="profile_policy_heading_third_party">Сторонние сервисы</string>
+    <string name="profile_policy_content_third_party">Для распознавания значений давления на фотографиях изображения передаются сторонним API на основе ИИ (например, OpenAI). Изображения передаются исключительно для целей распознавания и не сохраняются и не используются для обучения моделей этими сторонними сервисами. Мы не продаём и не передаём ваши персональные данные третьим лицам.</string>
+    <string name="profile_policy_heading_storage">Хранение данных</string>
+    <string name="profile_policy_content_storage">Ваши данные хранятся на защищённых облачных серверах. Мы применяем отраслевые стандарты безопасности для защиты от несанкционированного доступа.</string>
+    <string name="profile_policy_heading_delete">Удаление аккаунта и данных</string>
+    <string name="profile_policy_content_delete">Вы можете в любое время запросить удаление аккаунта и всех связанных данных, написав на blood.pressure.by.max@gmail.com. Мы обработаем ваш запрос в течение 30 дней.</string>
+    <string name="profile_policy_heading_medical">Медицинское предупреждение</string>
+    <string name="profile_policy_content_medical">Это приложение не является медицинским устройством и не предназначено для диагностики, лечения или профилактики каких-либо заболеваний. По всем вопросам, связанным с артериальным давлением и состоянием здоровья, обращайтесь к квалифицированному медицинскому специалисту.</string>
+    <string name="profile_policy_heading_contact">Контакты</string>
+    <string name="profile_policy_content_contact">По вопросам конфиденциальности пишите на blood.pressure.by.max@gmail.com.</string>
 </resources>

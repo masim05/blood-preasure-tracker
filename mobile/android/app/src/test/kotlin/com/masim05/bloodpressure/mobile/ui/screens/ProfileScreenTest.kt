@@ -1,10 +1,23 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.masim05.bloodpressure.mobile.R
+import com.masim05.bloodpressure.mobile.ui.TestTags
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.Rule
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class ProfileScreenTest {
+    @get:Rule
+    val composeRule = createComposeRule()
+
     @Test
     fun profileSectionsKeepPreferencesAboutAccountOrder() {
         assertEquals(
@@ -48,5 +61,60 @@ class ProfileScreenTest {
         assertEquals(7, sections.size)
         assertEquals(R.string.profile_policy_heading_data_collect, sections.first().headingRes)
         assertEquals(R.string.profile_policy_heading_contact, sections.last().headingRes)
+    }
+
+    @Test
+    fun storyPolicyAndBackFlowRendersInteractiveAboutPages() {
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = {},
+                onLogout = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfileStory).performClick()
+        composeRule.onNodeWithTag(TestTags.ProfileAboutBack).assertIsDisplayed()
+        composeRule.onNodeWithText("Track your readings easily").assertIsDisplayed()
+
+        composeRule.onNodeWithTag(TestTags.ProfileAboutBack).performClick()
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
+        composeRule.onNodeWithText("Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.").assertIsDisplayed()
+    }
+
+    @Test
+    fun profileGuideRowInvokesGuideCallback() {
+        var guideOpenCount = 0
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = { guideOpenCount += 1 },
+                onLogout = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfileGuide).performClick()
+
+        assertEquals(1, guideOpenCount)
+    }
+
+    @Test
+    fun languageSelectorInvokesLanguageCallbackWithSelectedCode() {
+        var selectedLanguageCode: String? = null
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = { selectedLanguageCode = it },
+                onOpenGuide = {},
+                onLogout = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfileLanguageSelector).performClick()
+        composeRule.onNodeWithTag("${TestTags.ProfileLanguageOptionPrefix}es", useUnmergedTree = true).performClick()
+
+        assertEquals("es", selectedLanguageCode)
     }
 }

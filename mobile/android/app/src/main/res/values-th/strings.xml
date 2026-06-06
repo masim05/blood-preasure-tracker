@@ -123,4 +123,27 @@
     <string name="profile_logout_confirm_title">ออกจากระบบ?</string>
     <string name="profile_logout_confirm_message">คุณต้องเข้าสู่ระบบอีกครั้งเพื่อดำเนินการต่อ</string>
     <string name="profile_logout_confirm">ออกจากระบบ</string>
+
+    <string name="profile_about">เกี่ยวกับ</string>
+    <string name="profile_story">เรื่องราว</string>
+    <string name="profile_policy">นโยบายความเป็นส่วนตัว</string>
+    <string name="profile_story_paragraph_1">ฉันเริ่มวัดความดันโลหิตเป็นประจำ และรู้สึกได้ทันทีว่าส่วนที่น่าหงุดหงิดที่สุดไม่ใช่การวัดเอง แต่คือการพิมพ์ตัวเลขจากรูปถ่ายเครื่องวัดความดันลงในสเปรดชีต</string>
+    <string name="profile_story_paragraph_2">เนื่องจาก AI ยุคใหม่อ่านข้อความจากรูปภาพได้ดีมาก ฉันจึงคิดว่าขั้นตอนนี้น่าจะทำให้อัตโนมัติได้ ฉันจึงสร้างแอปง่ายๆ ที่แปลงรูปถ่ายเครื่องวัดความดันโลหิตให้กลายเป็นบันทึกการวัดเพียงไม่กี่แตะ</string>
+    <string name="profile_story_paragraph_3">หลังจากใช้งานด้วยตัวเองแล้ว ฉันคิดว่าคงไม่ใช่คนเดียวที่มีปัญหานี้ นั่นจึงเป็นเหตุผลที่ฉันตัดสินใจเผยแพร่แอปนี้บน Google Play</string>
+    <string name="profile_policy_page_title">นโยบายความเป็นส่วนตัว</string>
+    <string name="profile_policy_intro">ความเป็นส่วนตัวของคุณมีความสำคัญ นโยบายนี้อธิบายว่า Blood Pressure เก็บรวบรวมข้อมูลใด เพราะเหตุใด และข้อมูลได้รับการจัดการอย่างไร</string>
+    <string name="profile_policy_heading_data_collect">ข้อมูลที่เราเก็บรวบรวม</string>
+    <string name="profile_policy_content_data_collect">เราเก็บรวบรวมข้อมูลต่อไปนี้เมื่อคุณใช้แอป: อีเมลและรหัสผ่าน (แบบ hash) สำหรับสร้างบัญชี รูปถ่ายเครื่องวัดความดันโลหิตที่คุณส่งมาเพื่อการจดจำ ค่าความดันโลหิต (systolic, diastolic, ชีพจร, แขนข้าง) ที่ดึงมาจากรูปถ่ายหรือกรอกเอง และวันที่และเวลาของการวัดแต่ละครั้ง</string>
+    <string name="profile_policy_heading_data_use">วิธีที่เราใช้ข้อมูลของคุณ</string>
+    <string name="profile_policy_content_data_use">ข้อมูลของคุณใช้เฉพาะเพื่อให้บริการฟีเจอร์ของแอป: การยืนยันตัวตนในบัญชี การจัดเก็บประวัติการวัดเพื่อให้คุณทบทวน และการประมวลผลรูปถ่ายเพื่อดึงค่าความดันโลหิตอัตโนมัติ</string>
+    <string name="profile_policy_heading_third_party">บริการของบุคคลที่สาม</string>
+    <string name="profile_policy_content_third_party">เพื่อจดจำค่าความดันโลหิตจากรูปถ่าย รูปภาพจะถูกส่งไปยัง AI API ของบุคคลที่สาม (เช่น OpenAI) รูปภาพถูกส่งเพื่อวัตถุประสงค์การจดจำเท่านั้น ไม่ถูกเก็บหรือนำไปฝึกโมเดลโดยบุคคลที่สาม เราไม่ขายหรือแบ่งปันข้อมูลส่วนตัวของคุณกับบุคคลที่สามอื่น</string>
+    <string name="profile_policy_heading_storage">การจัดเก็บข้อมูล</string>
+    <string name="profile_policy_content_storage">ข้อมูลของคุณถูกเก็บบนเซิร์ฟเวอร์คลาวด์ที่ปลอดภัย เราใช้มาตรการมาตรฐานอุตสาหกรรมเพื่อปกป้องข้อมูลจากการเข้าถึงโดยไม่ได้รับอนุญาต</string>
+    <string name="profile_policy_heading_delete">การลบบัญชีและข้อมูลของคุณ</string>
+    <string name="profile_policy_content_delete">คุณสามารถขอลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดได้ตลอดเวลาโดยส่งอีเมลมาที่ blood.pressure.by.max@gmail.com เราจะดำเนินการตามคำขอภายใน 30 วัน</string>
+    <string name="profile_policy_heading_medical">ข้อจำกัดความรับผิดชอบทางการแพทย์</string>
+    <string name="profile_policy_content_medical">แอปนี้ไม่ใช่อุปกรณ์ทางการแพทย์ และไม่ได้วินิจฉัย รักษา บำบัด หรือป้องกันภาวะทางการแพทย์ใดๆ โปรดปรึกษาผู้เชี่ยวชาญด้านสุขภาพที่มีคุณสมบัติเกี่ยวกับความดันโลหิตและข้อกังวลด้านสุขภาพเสมอ</string>
+    <string name="profile_policy_heading_contact">ติดต่อเรา</string>
+    <string name="profile_policy_content_contact">สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อเราได้ที่ blood.pressure.by.max@gmail.com</string>
 </resources>

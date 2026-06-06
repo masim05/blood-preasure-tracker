@@ -124,4 +124,27 @@
     <string name="profile_logout_confirm_title">Disconnettersi?</string>
     <string name="profile_logout_confirm_message">Dovrai accedere di nuovo per continuare.</string>
     <string name="profile_logout_confirm">Disconnettersi</string>
+
+    <string name="profile_about">INFORMAZIONI</string>
+    <string name="profile_story">Storia</string>
+    <string name="profile_policy">Informativa sulla privacy</string>
+    <string name="profile_story_paragraph_1">Ho iniziato a monitorare regolarmente la mia pressione sanguigna e ho capito subito che la parte più fastidiosa non era effettuare le misurazioni, ma trascrivere i numeri dalle foto del mio sfigmomanometro in un foglio di calcolo.</string>
+    <string name="profile_story_paragraph_2">Poiché la moderna IA è piuttosto brava a leggere il testo nelle immagini, ho pensato che questo potesse essere automatizzato. Ho quindi creato una semplice app che trasforma la foto di un misuratore di pressione in un record di misurazione in pochi tocchi.</string>
+    <string name="profile_story_paragraph_3">Dopo averla usata io stesso, ho pensato: forse non sono l&apos;unico ad avere questo problema. Per questo ho deciso di pubblicarla su Google Play.</string>
+    <string name="profile_policy_page_title">Informativa sulla privacy</string>
+    <string name="profile_policy_intro">La tua privacy è importante. Questa informativa spiega quali dati raccoglie Blood Pressure, perché e come vengono gestiti.</string>
+    <string name="profile_policy_heading_data_collect">Dati che raccogliamo</string>
+    <string name="profile_policy_content_data_collect">Raccogliamo le seguenti informazioni quando usi l&apos;app: il tuo indirizzo e-mail e la password (con hash) per creare il tuo account; le foto del tuo misuratore di pressione inviate per il riconoscimento; i valori della pressione sanguigna (sistolica, diastolica, polso, lato del braccio) estratti da quelle foto o inseriti manualmente; e la data e l&apos;ora di ogni misurazione.</string>
+    <string name="profile_policy_heading_data_use">Come utilizziamo i tuoi dati</string>
+    <string name="profile_policy_content_data_use">I tuoi dati vengono utilizzati esclusivamente per fornire le funzionalità dell&apos;app: autenticare il tuo account, archiviare la cronologia delle misurazioni per consentirti di consultarla e elaborare le foto per estrarre automaticamente i valori della pressione sanguigna.</string>
+    <string name="profile_policy_heading_third_party">Servizi di terze parti</string>
+    <string name="profile_policy_content_third_party">Per riconoscere i valori della pressione sanguigna nelle foto, le immagini vengono inviate ad API AI di terze parti (come OpenAI). Le immagini vengono trasmesse esclusivamente per il riconoscimento e non vengono archiviate o utilizzate per l&apos;addestramento da tali terze parti. Non vendiamo né condividiamo i tuoi dati personali con altre terze parti.</string>
+    <string name="profile_policy_heading_storage">Archiviazione dei dati</string>
+    <string name="profile_policy_content_storage">I tuoi dati sono archiviati su server cloud sicuri. Applichiamo misure standard del settore per proteggerli da accessi non autorizzati.</string>
+    <string name="profile_policy_heading_delete">Eliminazione del tuo account e dei tuoi dati</string>
+    <string name="profile_policy_content_delete">Puoi richiedere la cancellazione del tuo account e di tutti i dati associati in qualsiasi momento inviando una e-mail a blood.pressure.by.max@gmail.com. Elaboreremo la tua richiesta entro 30 giorni.</string>
+    <string name="profile_policy_heading_medical">Dichiarazione medica</string>
+    <string name="profile_policy_content_medical">Questa app non è un dispositivo medico e non diagnostica, tratta, cura né previene alcuna condizione medica. Consulta sempre un medico qualificato riguardo alla tua pressione sanguigna e a qualsiasi preoccupazione di salute.</string>
+    <string name="profile_policy_heading_contact">Contatti</string>
+    <string name="profile_policy_content_contact">Per domande relative alla privacy, contattaci all&apos;indirizzo blood.pressure.by.max@gmail.com.</string>
 </resources>
