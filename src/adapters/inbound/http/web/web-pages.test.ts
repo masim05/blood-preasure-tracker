@@ -194,6 +194,7 @@ describe('PolicyController', () => {
 
   it('contains all required policy sections', () => {
     const result = controller.getPolicy(undefined);
+    expect(result).toContain('Last updated: June 6, 2026');
     expect(result).toContain('email address');
     expect(result).toContain('blood pressure monitor');
     expect(result).toContain('OpenAI');
@@ -276,6 +277,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('<html lang="en"');
     expect(html).toContain('Privacy Policy');
+    expect(html).toContain('Last updated: June 6, 2026');
     expect(html).toContain('email address');
     expect(html).toContain('blood pressure monitor');
     expect(html).toContain('OpenAI');
