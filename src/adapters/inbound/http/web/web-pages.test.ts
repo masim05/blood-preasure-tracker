@@ -169,6 +169,7 @@ describe('PolicyController', () => {
     const result = controller.getPolicy('es');
     expect(result).toContain('<html lang="es"');
     expect(result).toContain('Política de privacidad');
+    expect(result).toContain('Última actualización: 6 de junio de 2026');
   });
 
   it('returns Russian policy page when Accept-Language is ru-RU', () => {
@@ -297,6 +298,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('OpenAI');
     expect(html).toContain('медицинским устройством');
     expect(html).toContain('blood.pressure.by.max@gmail.com');
+    expect(html).toContain('Последнее обновление: 6 июня 2026 г.');
   });
 
   it('preserves Russian footer language links on the policy page', () => {

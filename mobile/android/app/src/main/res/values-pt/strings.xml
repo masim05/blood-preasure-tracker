@@ -133,6 +133,7 @@
     <string name="profile_story_paragraph_3">Depois de usar por conta própria, pensei: talvez eu não seja o único com esse problema. Por isso decidi publicar no Google Play.</string>
     <string name="profile_policy_page_title">Política de privacidade</string>
     <string name="profile_policy_intro">Sua privacidade é importante. Esta política explica quais dados o Blood Pressure coleta, por quê e como são tratados.</string>
+    <string name="profile_policy_last_updated">Última atualização: 6 de junho de 2026</string>
     <string name="profile_policy_heading_data_collect">Dados que coletamos</string>
     <string name="profile_policy_content_data_collect">Coletamos as seguintes informações ao usar o aplicativo: seu endereço de e-mail e senha (com hash) para criar sua conta; fotos do seu monitor de pressão arterial enviadas para reconhecimento; valores de pressão arterial (sistólica, diastólica, pulso, lado do braço) extraídos dessas fotos ou inseridos manualmente; e a data e hora de cada medição.</string>
     <string name="profile_policy_heading_data_use">Como usamos seus dados</string>

@@ -7,14 +7,25 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Test
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.RobolectricTestRunner
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 class ProfileScreenTest {
+    private val originalLocale: Locale = Locale.getDefault()
+
+    @After
+    fun restoreLocale() {
+        Locale.setDefault(originalLocale)
+        RuntimeEnvironment.setQualifiers(originalLocale.language)
+    }
+
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -58,6 +69,25 @@ class ProfileScreenTest {
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
         composeRule.onNodeWithText("Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.").assertIsDisplayed()
         composeRule.onNodeWithText("Last updated: June 6, 2026").assertIsDisplayed()
+    }
+
+
+    @Test
+    fun localizedPolicyPageShowsTranslatedLastUpdatedLine() {
+        Locale.setDefault(Locale("es"))
+        RuntimeEnvironment.setQualifiers("es")
+
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = {},
+                onLogout = {},
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
+        composeRule.onNodeWithText("Última actualización: 6 de junio de 2026").assertIsDisplayed()
     }
 
     @Test
