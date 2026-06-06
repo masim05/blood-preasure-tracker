@@ -124,4 +124,29 @@
     <string name="profile_logout_confirm_title">Sair?</string>
     <string name="profile_logout_confirm_message">Você precisará fazer login novamente para continuar.</string>
     <string name="profile_logout_confirm">Sair</string>
+
+    <string name="profile_about">SOBRE</string>
+    <string name="profile_story">História</string>
+    <string name="profile_policy">Política de privacidade</string>
+    <string name="profile_story_paragraph_1">Comecei a monitorar minha pressão arterial regularmente e percebi rapidamente que a parte mais irritante não era fazer as medições — era digitar os números das fotos do meu medidor de pressão numa planilha.</string>
+    <string name="profile_story_paragraph_2">Como a IA moderna é bastante boa em ler texto de imagens, achei que isso poderia ser automatizado. Então criei um aplicativo simples que transforma uma foto de um monitor de pressão arterial em um registro de medição com alguns toques.</string>
+    <string name="profile_story_paragraph_3">Depois de usar por conta própria, pensei: talvez eu não seja o único com esse problema. Por isso decidi publicar no Google Play.</string>
+    <string name="profile_policy_page_title">Política de privacidade</string>
+    <string name="profile_policy_intro">Sua privacidade é importante. Esta política explica quais dados o Blood Pressure coleta, por quê e como são tratados.</string>
+    <string name="profile_policy_heading_data_collect">Dados que coletamos</string>
+    <string name="profile_policy_content_data_collect">Coletamos as seguintes informações ao usar o aplicativo: seu endereço de e-mail e senha (com hash) para criar sua conta; fotos do seu monitor de pressão arterial enviadas para reconhecimento; valores de pressão arterial (sistólica, diastólica, pulso, lado do braço) extraídos dessas fotos ou inseridos manualmente; e a data e hora de cada medição.</string>
+    <string name="profile_policy_heading_data_use">Como usamos seus dados</string>
+    <string name="profile_policy_content_data_use">Seus dados são usados exclusivamente para fornecer os recursos do aplicativo: autenticar sua conta, armazenar seu histórico de medições para revisão e processar fotos para extrair automaticamente os valores de pressão arterial.</string>
+    <string name="profile_policy_heading_third_party">Serviços de terceiros</string>
+    <string name="profile_policy_content_third_party">Para reconhecer valores de pressão arterial em fotos, as imagens são enviadas a APIs de IA de terceiros (como OpenAI). As imagens são transmitidas apenas para fins de reconhecimento e não são armazenadas ou usadas para treinamento por esses terceiros. Não vendemos nem compartilhamos seus dados pessoais com outros terceiros.</string>
+    <string name="profile_policy_heading_storage">Armazenamento de dados</string>
+    <string name="profile_policy_content_storage">Seus dados são armazenados em servidores cloud seguros. Aplicamos medidas padrão do setor para protegê-los contra acesso não autorizado.</string>
+    <string name="profile_policy_heading_delete">Excluir sua conta e dados</string>
+    <string name="profile_policy_content_delete">Você pode solicitar a exclusão de sua conta e de todos os dados associados a qualquer momento enviando um e-mail para blood.pressure.by.max@gmail.com. Processaremos sua solicitação em até 30 dias.</string>
+    <string name="profile_policy_heading_medical">Aviso médico</string>
+    <string name="profile_policy_content_medical">Este aplicativo não é um dispositivo médico e não diagnostica, trata, cura ou previne nenhuma condição médica. Consulte sempre um profissional de saúde qualificado sobre sua pressão arterial e quaisquer preocupações de saúde.</string>
+    <string name="profile_policy_heading_contact">Contato</string>
+    <string name="profile_policy_content_contact">Para dúvidas relacionadas à privacidade, entre em contato pelo e-mail blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Acompanhe suas leituras facilmente</string>
 </resources>

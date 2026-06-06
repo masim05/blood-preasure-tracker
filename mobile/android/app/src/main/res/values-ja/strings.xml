@@ -124,4 +124,29 @@
     <string name="profile_logout_confirm_title">ログアウトしますか？</string>
     <string name="profile_logout_confirm_message">続けるには再度サインインが必要です。</string>
     <string name="profile_logout_confirm">ログアウト</string>
+
+    <string name="profile_about">概要</string>
+    <string name="profile_story">ストーリー</string>
+    <string name="profile_policy">プライバシーポリシー</string>
+    <string name="profile_story_paragraph_1">血圧を定期的に測り始めたとき、一番面倒だったのは測定そのものではなく、血圧計の写真から数値をスプレッドシートに手入力することだと気づきました。</string>
+    <string name="profile_story_paragraph_2">最近のAIは画像からテキストを読み取るのが得意なので、これを自動化できるはずだと考えました。そこで、血圧計の写真を数回タップするだけで測定記録に変換できるシンプルなアプリを作りました。</string>
+    <string name="profile_story_paragraph_3">自分で使ってみて思ったのは、この問題を抱えているのは自分だけではないかもしれないということです。だからこそ、Google Playに公開することにしました。</string>
+    <string name="profile_policy_page_title">プライバシーポリシー</string>
+    <string name="profile_policy_intro">お客様のプライバシーは重要です。このポリシーでは、Blood Pressureが収集するデータ、その目的、および取り扱い方法について説明します。</string>
+    <string name="profile_policy_heading_data_collect">収集するデータ</string>
+    <string name="profile_policy_content_data_collect">アプリ使用時に以下の情報を収集します：アカウント作成に使用するメールアドレスおよびパスワード（ハッシュ化）、認識のために送信する血圧計の写真、それらの写真から抽出または手動入力された血圧値（収縮期・拡張期・脈拍・腕の左右）、各測定の日時。</string>
+    <string name="profile_policy_heading_data_use">データの利用方法</string>
+    <string name="profile_policy_content_data_use">お客様のデータは、アプリの機能提供にのみ使用されます：アカウント認証、測定履歴の保存と閲覧、写真からの血圧値の自動抽出。</string>
+    <string name="profile_policy_heading_third_party">サードパーティサービス</string>
+    <string name="profile_policy_content_third_party">写真から血圧値を認識するために、画像はサードパーティのAI API（OpenAI等）に送信されます。画像は認識目的のみに送信され、それらのサードパーティによって保存または学習に使用されることはありません。お客様の個人データを他のサードパーティに販売・共有することはありません。</string>
+    <string name="profile_policy_heading_storage">データの保管</string>
+    <string name="profile_policy_content_storage">お客様のデータは安全なクラウドサーバーに保管されます。不正アクセスを防ぐために業界標準のセキュリティ対策を講じています。</string>
+    <string name="profile_policy_heading_delete">アカウントとデータの削除</string>
+    <string name="profile_policy_content_delete">blood.pressure.by.max@gmail.com にメールを送ることで、いつでもアカウントおよびすべての関連データの削除を依頼できます。リクエストは30日以内に処理されます。</string>
+    <string name="profile_policy_heading_medical">医療上の免責事項</string>
+    <string name="profile_policy_content_medical">このアプリは医療機器ではなく、いかなる疾患の診断・治療・治癒・予防も行いません。血圧やその他の健康上の懸念については、必ず資格を持つ医療専門家にご相談ください。</string>
+    <string name="profile_policy_heading_contact">お問い合わせ</string>
+    <string name="profile_policy_content_contact">プライバシーに関するご質問は blood.pressure.by.max@gmail.com までご連絡ください。</string>
+
+    <string name="profile_story_page_title">血圧の記録を手軽に</string>
 </resources>

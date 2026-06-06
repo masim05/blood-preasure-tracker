@@ -51,6 +51,7 @@ android {
     }
 
     testOptions {
+        unitTests.isIncludeAndroidResources = true
         unitTests.all {
             it.useJUnit()
         }
@@ -71,6 +72,10 @@ dependencies {
     implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.robolectric)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 jacoco {

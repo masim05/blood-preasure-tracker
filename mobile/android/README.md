@@ -77,7 +77,7 @@ Current validation covers:
 - live camera preview after auth
 - one-tap capture triggering upload flow
 - permission-recovery fallback path to History
-- profile language settings reopening the guide before returning to camera
+- profile language settings plus About (Story/Policy/Guide) actions
 
 Start the API on `http://localhost:3000`, install the debug app on an emulator, then run:
 

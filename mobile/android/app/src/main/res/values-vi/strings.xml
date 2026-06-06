@@ -124,4 +124,29 @@
     <string name="profile_logout_confirm_title">Đăng xuất?</string>
     <string name="profile_logout_confirm_message">Bạn sẽ cần đăng nhập lại để tiếp tục.</string>
     <string name="profile_logout_confirm">Đăng xuất</string>
+
+    <string name="profile_about">GIỚI THIỆU</string>
+    <string name="profile_story">Câu chuyện</string>
+    <string name="profile_policy">Chính sách quyền riêng tư</string>
+    <string name="profile_story_paragraph_1">Tôi bắt đầu đo huyết áp thường xuyên và nhanh chóng nhận ra phần phiền toái nhất không phải là đo đạc — mà là phải gõ tay các con số từ ảnh chụp máy đo huyết áp vào bảng tính.</string>
+    <string name="profile_story_paragraph_2">Vì AI hiện đại khá giỏi trong việc đọc văn bản từ hình ảnh, tôi nghĩ việc này có thể tự động hóa được. Vì vậy, tôi đã xây dựng một ứng dụng đơn giản chuyển đổi ảnh chụp máy đo huyết áp thành bản ghi đo lường chỉ bằng vài thao tác chạm.</string>
+    <string name="profile_story_paragraph_3">Sau khi tự dùng thử, tôi nghĩ: có lẽ không chỉ mình tôi có vấn đề này. Đó là lý do tôi quyết định đăng ứng dụng lên Google Play.</string>
+    <string name="profile_policy_page_title">Chính sách quyền riêng tư</string>
+    <string name="profile_policy_intro">Quyền riêng tư của bạn rất quan trọng. Chính sách này giải thích Blood Pressure thu thập dữ liệu gì, tại sao và cách xử lý dữ liệu đó.</string>
+    <string name="profile_policy_heading_data_collect">Dữ liệu chúng tôi thu thập</string>
+    <string name="profile_policy_content_data_collect">Chúng tôi thu thập các thông tin sau khi bạn sử dụng ứng dụng: địa chỉ email và mật khẩu (được băm) để tạo tài khoản; ảnh máy đo huyết áp bạn gửi để nhận dạng; các chỉ số huyết áp (tâm thu, tâm trương, mạch, cánh tay đo) được trích xuất từ ảnh hoặc nhập thủ công; và ngày giờ của từng lần đo.</string>
+    <string name="profile_policy_heading_data_use">Cách chúng tôi sử dụng dữ liệu của bạn</string>
+    <string name="profile_policy_content_data_use">Dữ liệu của bạn chỉ được dùng để cung cấp các tính năng của ứng dụng: xác thực tài khoản, lưu trữ lịch sử đo để bạn xem lại, và xử lý ảnh để tự động trích xuất chỉ số huyết áp.</string>
+    <string name="profile_policy_heading_third_party">Dịch vụ bên thứ ba</string>
+    <string name="profile_policy_content_third_party">Để nhận dạng chỉ số huyết áp từ ảnh, hình ảnh được gửi đến các API AI của bên thứ ba (như OpenAI). Hình ảnh chỉ được truyền cho mục đích nhận dạng và không được bên thứ ba lưu trữ hay dùng để huấn luyện mô hình. Chúng tôi không bán hoặc chia sẻ dữ liệu cá nhân của bạn với bên thứ ba khác.</string>
+    <string name="profile_policy_heading_storage">Lưu trữ dữ liệu</string>
+    <string name="profile_policy_content_storage">Dữ liệu của bạn được lưu trữ trên các máy chủ đám mây an toàn. Chúng tôi áp dụng các biện pháp bảo mật chuẩn ngành để bảo vệ dữ liệu khỏi truy cập trái phép.</string>
+    <string name="profile_policy_heading_delete">Xóa tài khoản và dữ liệu</string>
+    <string name="profile_policy_content_delete">Bạn có thể yêu cầu xóa tài khoản và toàn bộ dữ liệu liên quan bất kỳ lúc nào bằng cách gửi email đến blood.pressure.by.max@gmail.com. Chúng tôi sẽ xử lý yêu cầu của bạn trong vòng 30 ngày.</string>
+    <string name="profile_policy_heading_medical">Tuyên bố miễn trách nhiệm y tế</string>
+    <string name="profile_policy_content_medical">Ứng dụng này không phải là thiết bị y tế và không chẩn đoán, điều trị, chữa khỏi hay phòng ngừa bất kỳ tình trạng y tế nào. Hãy luôn tham khảo ý kiến chuyên gia y tế có chuyên môn về huyết áp và các vấn đề sức khỏe của bạn.</string>
+    <string name="profile_policy_heading_contact">Liên hệ</string>
+    <string name="profile_policy_content_contact">Với các câu hỏi liên quan đến quyền riêng tư, vui lòng liên hệ với chúng tôi tại blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Theo dõi chỉ số huyết áp dễ dàng</string>
 </resources>

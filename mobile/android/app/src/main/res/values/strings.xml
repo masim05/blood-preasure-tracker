@@ -72,7 +72,10 @@
     <string name="nav_profile">Profile</string>
     <string name="profile_title">Profile</string>
     <string name="profile_settings">PREFERENCES</string>
+    <string name="profile_about">ABOUT</string>
     <string name="profile_account">ACCOUNT</string>
+    <string name="profile_story">Story</string>
+    <string name="profile_policy">Policy</string>
     <string name="history_date_range">DATE RANGE</string>
     <string name="history_readings">READINGS</string>
     <string name="profile_language_title">Language</string>
@@ -122,4 +125,25 @@
     <string name="profile_logout_confirm_title">Log out?</string>
     <string name="profile_logout_confirm_message">You will need to sign in again to continue.</string>
     <string name="profile_logout_confirm">Log out</string>
+    <string name="profile_story_paragraph_1">I started tracking my blood pressure regularly and quickly realized the most annoying part wasn\'t taking the measurements — it was typing the numbers from photos of my blood pressure monitor into a spreadsheet.</string>
+    <string name="profile_story_paragraph_2">Since modern AI is pretty good at reading text from images, I figured this could be automated. So I built a simple app that turns a photo of a blood pressure monitor into a measurement record in a few taps.</string>
+    <string name="profile_story_paragraph_3">After using it myself, I thought: maybe I\'m not the only one with this problem. That\'s why I decided to publish it on Google Play.</string>
+    <string name="profile_policy_page_title">Privacy Policy</string>
+    <string name="profile_policy_intro">Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.</string>
+    <string name="profile_policy_heading_data_collect">Data We Collect</string>
+    <string name="profile_policy_content_data_collect">We collect the following information when you use the app: your email address and password (hashed) used to create your account; photos of your blood pressure monitor that you submit for recognition; blood pressure values (systolic, diastolic, pulse, arm side) extracted from those photos or entered manually; and the date and time of each measurement.</string>
+    <string name="profile_policy_heading_data_use">How We Use Your Data</string>
+    <string name="profile_policy_content_data_use">Your data is used solely to provide the app\'s features: authenticating your account, storing your measurement history so you can review it, and processing photos to extract blood pressure readings automatically.</string>
+    <string name="profile_policy_heading_third_party">Third-Party Services</string>
+    <string name="profile_policy_content_third_party">To recognise blood pressure values from photos, images are sent to third-party AI APIs (such as OpenAI). Images are transmitted for recognition purposes only and are not stored or used for training by those third parties. We do not sell or share your personal data with any other third parties.</string>
+    <string name="profile_policy_heading_storage">Data Storage</string>
+    <string name="profile_policy_content_storage">Your data is stored on secure cloud servers. We apply industry-standard measures to protect it from unauthorised access.</string>
+    <string name="profile_policy_heading_delete">Deleting Your Account and Data</string>
+    <string name="profile_policy_content_delete">You can request deletion of your account and all associated data at any time by emailing blood.pressure.by.max@gmail.com. We will process your request within 30 days.</string>
+    <string name="profile_policy_heading_medical">Medical Disclaimer</string>
+    <string name="profile_policy_content_medical">This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Always consult a qualified healthcare professional regarding your blood pressure and any health concerns.</string>
+    <string name="profile_policy_heading_contact">Contact</string>
+    <string name="profile_policy_content_contact">For privacy-related questions, contact us at blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Track your readings easily</string>
 </resources>

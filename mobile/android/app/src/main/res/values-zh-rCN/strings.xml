@@ -123,4 +123,29 @@
     <string name="profile_logout_confirm_title">退出登录？</string>
     <string name="profile_logout_confirm_message">您需要重新登录才能继续。</string>
     <string name="profile_logout_confirm">退出登录</string>
+
+    <string name="profile_about">关于</string>
+    <string name="profile_story">故事</string>
+    <string name="profile_policy">隐私政策</string>
+    <string name="profile_story_paragraph_1">我开始定期测量血压，很快就发现最烦人的地方不是测量本身——而是要把血压计照片上的数字手动输入到电子表格中。</string>
+    <string name="profile_story_paragraph_2">现代 AI 非常擅长从图像中识别文字，于是我觉得这个过程可以自动化。我开发了一款简单的应用，只需几次点击，就能把血压计的照片转化为一条测量记录。</string>
+    <string name="profile_story_paragraph_3">自己用了一段时间后，我想：也许不止我一个人有这个困扰。于是我决定将这款应用发布到 Google Play。</string>
+    <string name="profile_policy_page_title">隐私政策</string>
+    <string name="profile_policy_intro">您的隐私非常重要。本政策说明 Blood Pressure 收集哪些数据、原因及处理方式。</string>
+    <string name="profile_policy_heading_data_collect">我们收集的数据</string>
+    <string name="profile_policy_content_data_collect">使用本应用时，我们会收集以下信息：您的电子邮件地址和密码（哈希值）用于创建账户；您提交用于识别的血压计照片；从照片中提取或手动输入的血压值（收缩压、舒张压、脉搏、测量手臂）；以及每次测量的日期和时间。</string>
+    <string name="profile_policy_heading_data_use">我们如何使用您的数据</string>
+    <string name="profile_policy_content_data_use">您的数据仅用于提供应用功能：账户身份验证、存储测量历史记录供您查阅，以及处理照片以自动提取血压值。</string>
+    <string name="profile_policy_heading_third_party">第三方服务</string>
+    <string name="profile_policy_content_third_party">为了从照片中识别血压值，图像会被发送至第三方 AI API（如 OpenAI）。图像仅用于识别目的，第三方不会存储或用于模型训练。我们不会向任何其他第三方出售或共享您的个人数据。</string>
+    <string name="profile_policy_heading_storage">数据存储</string>
+    <string name="profile_policy_content_storage">您的数据存储在安全的云服务器上。我们采用行业标准措施防止未经授权的访问。</string>
+    <string name="profile_policy_heading_delete">删除账户和数据</string>
+    <string name="profile_policy_content_delete">您可以随时通过发送电子邮件至 blood.pressure.by.max@gmail.com 申请删除账户及所有相关数据。我们将在 30 天内处理您的申请。</string>
+    <string name="profile_policy_heading_medical">医疗免责声明</string>
+    <string name="profile_policy_content_medical">本应用不是医疗设备，不用于诊断、治疗、治愈或预防任何疾病。请就您的血压及任何健康问题咨询具有资质的医疗专业人员。</string>
+    <string name="profile_policy_heading_contact">联系方式</string>
+    <string name="profile_policy_content_contact">如有隐私相关问题，请发送邮件至 blood.pressure.by.max@gmail.com。</string>
+
+    <string name="profile_story_page_title">轻松追踪您的血压读数</string>
 </resources>
