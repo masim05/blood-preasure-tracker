@@ -98,13 +98,13 @@ fun AuthScreen(
             modifier = Modifier
                 .size(52.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(PrimaryGreen),
+                .background(Color.White),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(authBrandIconRes()),
                 contentDescription = null,
-                tint = Color.White,
+                tint = Color.Unspecified,
                 modifier = Modifier.size(26.dp),
             )
         }
