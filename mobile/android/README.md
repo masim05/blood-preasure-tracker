@@ -24,7 +24,7 @@ Build from the repository root with the Android Gradle wrapper:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:assembleDebug
 ```
 
-The app targets the local API at `http://10.0.2.2:3000` for emulator validation. Start the API from the repository root with:
+Debug builds target the local API at `http://10.0.2.2:3000` for emulator validation by default, while release builds default to `https://bpt.crptmax.com`. Start the API from the repository root with:
 
 ```bash
 npm run api
@@ -32,8 +32,8 @@ npm run api
 
 ### Configure API host per environment
 
-The app reads `BuildConfig.API_BASE_URL` from a Gradle property named `apiBaseUrl`.
-If not provided, it defaults to `http://10.0.2.2:3000`.
+The app reads `BuildConfig.API_BASE_URL` from `apiBaseUrl` in `mobile/android/local.properties` or from a Gradle property with the same name.
+If not provided, debug builds default to `http://10.0.2.2:3000` and release builds default to `https://bpt.crptmax.com`.
 In debug builds, non-2xx API responses are logged with full URL and status code.
 
 One-off override:

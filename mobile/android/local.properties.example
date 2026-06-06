@@ -5,5 +5,5 @@
 sdk.dir=/Users/your-user/Library/Android/sdk
 
 # Android app API base URL override consumed by app/build.gradle.kts.
-# Defaults to http://10.0.2.2:3000 when omitted.
+# When omitted, debug builds default to http://10.0.2.2:3000 and release builds default to https://bpt.crptmax.com.
 apiBaseUrl=http://10.0.2.2:3000

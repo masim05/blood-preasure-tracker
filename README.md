@@ -206,7 +206,7 @@ Run Android unit tests and coverage gate:
 JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/android/gradlew -p mobile/android :app:testDebugUnitTest :app:androidCoverageVerify
 ```
 
-The app defaults to local emulator API host `http://10.0.2.2:3000`. Start API from repository root with:
+Debug builds default to local emulator API host `http://10.0.2.2:3000` (release builds default to `https://bpt.crptmax.com`). Start API from repository root with:
 
 ```bash
 npm run api
@@ -214,8 +214,8 @@ npm run api
 
 ### Configuration Options
 
-- App API base URL comes from Gradle property `apiBaseUrl` and maps to `BuildConfig.API_BASE_URL`
-- Default `apiBaseUrl`: `http://10.0.2.2:3000`
+- App API base URL comes from `apiBaseUrl` in `mobile/android/local.properties` or Gradle property `apiBaseUrl`, and maps to `BuildConfig.API_BASE_URL`
+- Default `apiBaseUrl` when unset: debug builds use `http://10.0.2.2:3000`, release builds use `https://bpt.crptmax.com`
 - One-off override example:
 
 ```bash
