@@ -10,7 +10,7 @@ export class HomeController {
   @Header('Content-Type', 'text/html; charset=utf-8')
   getHome(
     @Headers('accept-language') acceptLanguage: string | undefined,
-    @Query('lang') preferredLanguage: string | undefined,
+    @Query('lang') preferredLanguage: string | string[] | undefined,
   ): string {
     const t = resolveTranslations(acceptLanguage, preferredLanguage);
     return renderHomePage(t);

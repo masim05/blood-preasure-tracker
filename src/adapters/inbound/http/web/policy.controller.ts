@@ -10,7 +10,7 @@ export class PolicyController {
   @Header('Content-Type', 'text/html; charset=utf-8')
   getPolicy(
     @Headers('accept-language') acceptLanguage: string | undefined,
-    @Query('lang') preferredLanguage: string | undefined,
+    @Query('lang') preferredLanguage: string | string[] | undefined,
   ): string {
     const t = resolveTranslations(acceptLanguage, preferredLanguage);
     return renderPolicyPage(t);

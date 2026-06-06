@@ -634,9 +634,15 @@ function isSupportedLang(lang: string): lang is SupportedLang {
 
 export function resolveTranslations(
   acceptLanguage: string | undefined,
-  preferredLanguage: string | undefined = undefined,
+  preferredLanguage: string | string[] | undefined = undefined,
 ): WebTranslations {
-  const normalizedPreferredLanguage = preferredLanguage?.trim().toLowerCase();
+  const rawPreferredLanguage = Array.isArray(preferredLanguage)
+    ? preferredLanguage[0]
+    : preferredLanguage;
+  const normalizedPreferredLanguage =
+    typeof rawPreferredLanguage === 'string'
+      ? rawPreferredLanguage.trim().toLowerCase()
+      : undefined;
   if (normalizedPreferredLanguage && isSupportedLang(normalizedPreferredLanguage)) {
     return translations[normalizedPreferredLanguage];
   }

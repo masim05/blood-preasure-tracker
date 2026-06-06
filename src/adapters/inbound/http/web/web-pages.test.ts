@@ -87,6 +87,10 @@ describe('web i18n – resolveTranslations', () => {
   it('ignores unsupported explicit language and falls back to Accept-Language', () => {
     expect(resolveTranslations('fr-FR, fr;q=0.9', 'de').lang).toBe('fr');
   });
+
+  it('uses the first repeated explicit language value without crashing', () => {
+    expect(resolveTranslations('en-US, en;q=0.9', ['es', 'ru']).lang).toBe('es');
+  });
 });
 
 describe('HomeController', () => {
@@ -123,6 +127,11 @@ describe('HomeController', () => {
   it('uses explicit language query over Accept-Language header', () => {
     const result = controller.getHome('en-US, en;q=0.9', 'ru');
     expect(result).toContain('<html lang="ru"');
+  });
+
+  it('uses the first repeated explicit language query value without crashing', () => {
+    const result = controller.getHome('en-US, en;q=0.9', ['es', 'ru']);
+    expect(result).toContain('<html lang="es"');
   });
 
   it.skip('contains Google Play CTA', () => {
@@ -175,6 +184,11 @@ describe('PolicyController', () => {
 
   it('uses explicit language query over Accept-Language header', () => {
     const result = controller.getPolicy('en-US, en;q=0.9', 'ja');
+    expect(result).toContain('<html lang="ja"');
+  });
+
+  it('falls back from an unsupported first repeated explicit language query value', () => {
+    const result = controller.getPolicy('ja-JP, ja;q=0.9', ['de', 'es']);
     expect(result).toContain('<html lang="ja"');
   });
 
