@@ -195,8 +195,11 @@ describe('PolicyController', () => {
   it('contains all required policy sections', () => {
     const result = controller.getPolicy(undefined);
     expect(result).toContain('email address');
+    expect(result).toContain('securely hashed representation of your password');
     expect(result).toContain('blood pressure monitor');
     expect(result).toContain('OpenAI');
+    expect(result).toContain('We do not use submitted images to train our own models.');
+    expect(result).toContain('not intended for use by children under 13 years of age');
     expect(result).toContain('not a medical device');
     expect(result).toContain('blood.pressure.by.max@gmail.com');
   });
@@ -277,8 +280,11 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('<html lang="en"');
     expect(html).toContain('Privacy Policy');
     expect(html).toContain('email address');
+    expect(html).toContain('securely hashed representation of your password');
     expect(html).toContain('blood pressure monitor');
     expect(html).toContain('OpenAI');
+    expect(html).toContain('We do not use submitted images to train our own models.');
+    expect(html).toContain('not intended for use by children under 13 years of age');
     expect(html).toContain('not a medical device');
     expect(html).toContain('blood.pressure.by.max@gmail.com');
     expect(html).toContain('<footer');

@@ -47,7 +47,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Data We Collect',
-          content: 'We collect the following information when you use the app: your email address and password (hashed) used to create your account; photos of your blood pressure monitor that you submit for recognition; blood pressure values (systolic, diastolic, pulse, arm side) extracted from those photos or entered manually; and the date and time of each measurement.',
+          content: 'We collect the following information when you use the app: your email address and a securely hashed representation of your password used to create your account; photos of your blood pressure monitor that you submit for recognition; blood pressure values (systolic, diastolic, pulse, arm side) extracted from those photos or entered manually; and the date and time of each measurement.',
         },
         {
           heading: 'How We Use Your Data',
@@ -55,7 +55,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Third-Party Services',
-          content: 'To recognise blood pressure values from photos, images are sent to third-party AI APIs (such as OpenAI). Images are transmitted for recognition purposes only and are not stored or used for training by those third parties. We do not sell or share your personal data with any other third parties.',
+          content: 'To recognise blood pressure values from photos, images are sent to third-party AI APIs (such as OpenAI). Images are transmitted solely for recognition purposes. We do not use submitted images to train our own models. We do not sell or share your personal data with any other third parties.',
         },
         {
           heading: 'Data Storage',
@@ -67,7 +67,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Medical Disclaimer',
-          content: 'This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Always consult a qualified healthcare professional regarding your blood pressure and any health concerns.',
+          content: 'This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. The app is not intended for use by children under 13 years of age. Always consult a qualified healthcare professional regarding your blood pressure and any health concerns.',
         },
         {
           heading: 'Contact',
