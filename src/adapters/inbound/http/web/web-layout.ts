@@ -252,6 +252,7 @@ export function renderLayout(
       <select id="lang-picker" name="lang" class="language-picker-select" aria-label="Language" onchange="this.form.submit()">
         ${languageOptions(t.lang as SupportedLang)}
       </select>
+      <noscript><button type="submit">OK</button></noscript>
     </form>
   </header>
 

@@ -231,6 +231,7 @@ describe('web layout – renderHomePage', () => {
     expect(html).toContain('material-icons-outlined');
     expect(html).toContain('>language<');
     expect(html).toContain('name="lang"');
+    expect(html).toContain('<noscript><button type="submit">OK</button></noscript>');
   });
 
   it('renders Russian home page', () => {
@@ -241,6 +242,15 @@ describe('web layout – renderHomePage', () => {
     expect(html).toContain('Отслеживайте показания с лёгкостью');
     expect(html).toContain('тонометра');
     expect(html).toContain('Google Play');
+  });
+
+  it('preserves Russian footer language links on the home page', () => {
+    const t = resolveTranslations('ru');
+    const html = renderHomePage(t);
+
+    expect(html).toContain('href="/?lang=ru"');
+    expect(html).toContain('href="/policy?lang=ru"');
+    expect(html).toMatch(/href="\/\?lang=ru"[^>]*class="active"|class="active"[^>]*href="\/\?lang=ru"/);
   });
 
   it('renders Chinese home page', () => {
@@ -285,6 +295,15 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('OpenAI');
     expect(html).toContain('медицинским устройством');
     expect(html).toContain('blood.pressure.by.max@gmail.com');
+  });
+
+  it('preserves Russian footer language links on the policy page', () => {
+    const t = resolveTranslations('ru');
+    const html = renderPolicyPage(t);
+
+    expect(html).toContain('href="/?lang=ru"');
+    expect(html).toContain('href="/policy?lang=ru"');
+    expect(html).toMatch(/href="\/policy\?lang=ru"[^>]*class="active"|class="active"[^>]*href="\/policy\?lang=ru"/);
   });
 
   it('marks the policy link as active on the policy page', () => {
