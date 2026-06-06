@@ -23,7 +23,7 @@ export interface WebTranslations {
   };
 }
 
-const SUPPORTED_LANGS = ['en', 'es', 'fr', 'pt', 'it', 'sv', 'ru', 'zh', 'ko', 'ja', 'th', 'vi'] as const;
+export const SUPPORTED_LANGS = ['en', 'es', 'fr', 'pt', 'it', 'sv', 'ru', 'zh', 'ko', 'ja', 'th', 'vi'] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
 const translations: Record<SupportedLang, WebTranslations> = {
@@ -628,7 +628,25 @@ const translations: Record<SupportedLang, WebTranslations> = {
   },
 };
 
-export function resolveTranslations(acceptLanguage: string | undefined): WebTranslations {
+function resolveRequestedLanguage(language: string | undefined): SupportedLang | undefined {
+  if (!language) return undefined;
+
+  const requested = language.trim().toLowerCase().split('-')[0];
+  if (!requested) return undefined;
+  if (!SUPPORTED_LANGS.includes(requested as SupportedLang)) return undefined;
+
+  return requested as SupportedLang;
+}
+
+export function resolveTranslations(
+  acceptLanguage: string | undefined,
+  requestedLanguage?: string,
+): WebTranslations {
+  const explicitLanguage = resolveRequestedLanguage(requestedLanguage);
+  if (explicitLanguage) {
+    return translations[explicitLanguage];
+  }
+
   if (!acceptLanguage) return translations.en;
 
   const candidates = acceptLanguage

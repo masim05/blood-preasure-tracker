@@ -79,6 +79,14 @@ describe('web i18n – resolveTranslations', () => {
   it('resolves Vietnamese', () => {
     expect(resolveTranslations('vi-VN').lang).toBe('vi');
   });
+
+  it('uses explicit requested language when provided', () => {
+    expect(resolveTranslations('en', 'fr').lang).toBe('fr');
+  });
+
+  it('ignores unsupported requested language and falls back to header', () => {
+    expect(resolveTranslations('es', 'de').lang).toBe('es');
+  });
 });
 
 describe('HomeController', () => {
@@ -89,42 +97,48 @@ describe('HomeController', () => {
   });
 
   it('returns HTML for home page with English when no Accept-Language header', () => {
-    const result = controller.getHome(undefined);
+    const result = controller.getHome(undefined, undefined);
     expect(result).toContain('<!DOCTYPE html>');
     expect(result).toContain('<html lang="en"');
     expect(result).toContain('Blood Pressure');
   });
 
   it('returns Spanish home page when Accept-Language is es', () => {
-    const result = controller.getHome('es');
+    const result = controller.getHome('es', undefined);
     expect(result).toContain('<html lang="es"');
     expect(result).toContain('Controla tus mediciones fácilmente');
   });
 
   it('returns Russian home page when Accept-Language is ru-RU', () => {
-    const result = controller.getHome('ru-RU');
+    const result = controller.getHome('ru-RU', undefined);
     expect(result).toContain('<html lang="ru"');
     expect(result).toContain('Отслеживайте показания с лёгкостью');
   });
 
   it('respects q-weights in Accept-Language header', () => {
-    const result = controller.getHome('fr;q=0.1, en;q=0.9');
+    const result = controller.getHome('fr;q=0.1, en;q=0.9', undefined);
     expect(result).toContain('<html lang="en"');
   });
 
+  it('supports explicit language selection via query param', () => {
+    const result = controller.getHome('en', 'ru');
+    expect(result).toContain('<html lang="ru"');
+    expect(result).toContain('Отслеживайте показания с лёгкостью');
+  });
+
   it.skip('contains Google Play CTA', () => {
-    const result = controller.getHome(undefined);
+    const result = controller.getHome(undefined, undefined);
     expect(result).toContain('Google Play');
   });
 
   it('contains footer with navigation links', () => {
-    const result = controller.getHome(undefined);
+    const result = controller.getHome(undefined, undefined);
     expect(result).toContain('href="/"');
     expect(result).toContain('href="/policy"');
   });
 
   it('marks home link as active', () => {
-    const result = controller.getHome(undefined);
+    const result = controller.getHome(undefined, undefined);
     expect(result).toMatch(/href="\/"[^>]*class="active"|class="active"[^>]*href="\/"/);
   });
 });
@@ -137,31 +151,37 @@ describe('PolicyController', () => {
   });
 
   it('returns HTML for policy page with English when no Accept-Language header', () => {
-    const result = controller.getPolicy(undefined);
+    const result = controller.getPolicy(undefined, undefined);
     expect(result).toContain('<!DOCTYPE html>');
     expect(result).toContain('<html lang="en"');
     expect(result).toContain('Privacy Policy');
   });
 
   it('returns Spanish policy page when Accept-Language is es', () => {
-    const result = controller.getPolicy('es');
+    const result = controller.getPolicy('es', undefined);
     expect(result).toContain('<html lang="es"');
     expect(result).toContain('Política de privacidad');
   });
 
   it('returns Russian policy page when Accept-Language is ru-RU', () => {
-    const result = controller.getPolicy('ru-RU');
+    const result = controller.getPolicy('ru-RU', undefined);
     expect(result).toContain('<html lang="ru"');
     expect(result).toContain('Политика конфиденциальности');
   });
 
   it('respects q-weights in Accept-Language header', () => {
-    const result = controller.getPolicy('ru;q=0.3, es;q=0.7, en;q=0.5');
+    const result = controller.getPolicy('ru;q=0.3, es;q=0.7, en;q=0.5', undefined);
     expect(result).toContain('<html lang="es"');
   });
 
+  it('supports explicit language selection via query param', () => {
+    const result = controller.getPolicy('en', 'es');
+    expect(result).toContain('<html lang="es"');
+    expect(result).toContain('Política de privacidad');
+  });
+
   it('contains all required policy sections', () => {
-    const result = controller.getPolicy(undefined);
+    const result = controller.getPolicy(undefined, undefined);
     expect(result).toContain('email address');
     expect(result).toContain('blood pressure monitor');
     expect(result).toContain('OpenAI');
@@ -170,13 +190,13 @@ describe('PolicyController', () => {
   });
 
   it('contains footer with navigation links', () => {
-    const result = controller.getPolicy(undefined);
+    const result = controller.getPolicy(undefined, undefined);
     expect(result).toContain('href="/"');
     expect(result).toContain('href="/policy"');
   });
 
   it('marks policy link as active', () => {
-    const result = controller.getPolicy(undefined);
+    const result = controller.getPolicy(undefined, undefined);
     expect(result).toMatch(/href="\/policy"[^>]*class="active"|class="active"[^>]*href="\/policy"/);
   });
 });
@@ -195,6 +215,8 @@ describe('web layout – renderHomePage', () => {
     expect(html).toContain('<footer');
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/policy"');
+    expect(html).toContain('aria-label="Language selector"');
+    expect(html).toContain('/?lang=es');
   });
 
   it('renders Russian home page', () => {

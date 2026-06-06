@@ -1,4 +1,4 @@
-import type { WebTranslations } from './web-i18n';
+import { SUPPORTED_LANGS, type SupportedLang, type WebTranslations } from './web-i18n';
 
 const COLORS = {
   primary: '#1D9E75',
@@ -25,6 +25,20 @@ function heartSvg(): string {
 }
 
 const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
+const LANGUAGE_NAMES: Record<SupportedLang, string> = {
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  pt: 'Português',
+  it: 'Italiano',
+  sv: 'Svenska',
+  ru: 'Русский',
+  zh: '中文',
+  ko: '한국어',
+  ja: '日本語',
+  th: 'ไทย',
+  vi: 'Tiếng Việt',
+};
 
 function linkifySupportEmail(text: string): string {
   const escapedEmail = escapeHtml(SUPPORT_EMAIL);
@@ -43,6 +57,11 @@ export function renderLayout(
 ): string {
   const homeActive = currentPath === '/';
   const policyActive = currentPath === '/policy';
+  const languageLinks = SUPPORTED_LANGS.map((lang) => {
+    const href = currentPath === '/' ? `/?lang=${lang}` : `/policy?lang=${lang}`;
+    const isActive = lang === t.lang;
+    return `<a href="${href}" class="${isActive ? 'active' : ''}">${escapeHtml(LANGUAGE_NAMES[lang])}</a>`;
+  }).join('');
 
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(t.lang)}">
@@ -175,6 +194,26 @@ export function renderLayout(
       justify-content: center;
       gap: 1.5rem;
     }
+    .language-selector {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .language-selector a {
+      font-size: 0.8125rem;
+      color: ${COLORS.muted};
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid ${COLORS.border};
+    }
+    .language-selector a.active,
+    .language-selector a:hover {
+      color: ${COLORS.primary};
+      border-color: ${COLORS.primary};
+      text-decoration: none;
+    }
     .site-footer a {
       font-size: 0.875rem;
       color: ${COLORS.muted};
@@ -204,6 +243,9 @@ export function renderLayout(
     <nav>
       <a href="/" class="${homeActive ? 'active' : ''}">${escapeHtml(t.footer.home)}</a>
       <a href="/policy" class="${policyActive ? 'active' : ''}">${escapeHtml(t.footer.policy)}</a>
+    </nav>
+    <nav class="language-selector" aria-label="Language selector">
+      ${languageLinks}
     </nav>
   </footer>
 </body>
