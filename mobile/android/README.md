@@ -32,7 +32,7 @@ npm run api
 
 ### Configure API host per environment
 
-The app reads `BuildConfig.API_BASE_URL` from a Gradle property named `apiBaseUrl`.
+The app reads `BuildConfig.API_BASE_URL` from `apiBaseUrl` in `mobile/android/local.properties` or from a Gradle property with the same name.
 If not provided, debug builds default to `http://10.0.2.2:3000` and release builds default to `https://bpt.crptmax.com`.
 In debug builds, non-2xx API responses are logged with full URL and status code.
 

@@ -16,6 +16,7 @@ val localProperties = Properties().apply {
 val apiBaseUrlOverride = localProperties.getProperty("apiBaseUrl")
     ?.takeIf { value -> value.isNotBlank() }
     ?: providers.gradleProperty("apiBaseUrl").orNull
+        ?.takeIf { value -> value.isNotBlank() }
 val debugApiBaseUrlDefault = "http://10.0.2.2:3000"
 val releaseApiBaseUrlDefault = "https://bpt.crptmax.com"
 
