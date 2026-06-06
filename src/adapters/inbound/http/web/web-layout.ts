@@ -1,4 +1,4 @@
-import type { WebTranslations } from './web-i18n';
+import { SUPPORTED_LANGS, type SupportedLang, type WebTranslations } from './web-i18n';
 
 const COLORS = {
   primary: '#1D9E75',
@@ -22,6 +22,32 @@ function escapeHtml(text: string): string {
 
 function heartSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${COLORS.primary}" width="24" height="24" aria-hidden="true"><path d="M12 21.593c-.525-.445-4.52-3.888-6.55-5.86C3.15 13.46 2 11.56 2 9.5 2 6.42 4.42 4 7.5 4c1.74 0 3.41.81 4.5 2.09C13.09 4.81 14.76 4 16.5 4 19.58 4 22 6.42 22 9.5c0 2.06-1.15 3.96-3.45 6.233-2.03 1.972-6.025 5.415-6.55 5.86z"/></svg>`;
+}
+
+const LANGUAGE_LABELS: Record<SupportedLang, string> = {
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  pt: 'Português',
+  it: 'Italiano',
+  sv: 'Svenska',
+  ru: 'Русский',
+  zh: '中文',
+  ko: '한국어',
+  ja: '日本語',
+  th: 'ไทย',
+  vi: 'Tiếng Việt',
+};
+
+function languageOptions(selectedLang: SupportedLang): string {
+  return SUPPORTED_LANGS.map((lang) => {
+    const selected = lang === selectedLang ? ' selected' : '';
+    return `<option value="${lang}"${selected}>${escapeHtml(LANGUAGE_LABELS[lang])}</option>`;
+  }).join('');
+}
+
+function withLang(path: '/' | '/policy', lang: string): string {
+  return `${path}?lang=${encodeURIComponent(lang)}`;
 }
 
 const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
@@ -53,6 +79,7 @@ export function renderLayout(
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; }
@@ -83,6 +110,31 @@ export function renderLayout(
       font-weight: 700;
       color: ${COLORS.onBackground};
       letter-spacing: -0.01em;
+    }
+    .site-header .header-spacer { flex: 1; }
+    .language-picker-form {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .language-picker-form .material-icons-outlined {
+      color: ${COLORS.primary};
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+    .language-picker-select {
+      appearance: none;
+      border: 1px solid ${COLORS.border};
+      border-radius: 8px;
+      background: ${COLORS.surface};
+      color: ${COLORS.onBackground};
+      font-size: 0.875rem;
+      padding: 0.375rem 1.75rem 0.375rem 0.625rem;
+      font-family: 'Roboto', sans-serif;
+    }
+    .language-picker-select:focus-visible {
+      outline: 2px solid ${COLORS.secondary};
+      outline-offset: 1px;
     }
 
     /* Main content */
@@ -194,6 +246,14 @@ export function renderLayout(
   <header class="site-header">
     <span class="logo-icon">${heartSvg()}</span>
     <span class="app-name">${escapeHtml(t.appName)}</span>
+    <span class="header-spacer"></span>
+    <form class="language-picker-form" method="get" action="${currentPath}">
+      <span class="material-icons-outlined" aria-hidden="true">language</span>
+      <select id="lang-picker" name="lang" class="language-picker-select" aria-label="Language" onchange="this.form.submit()">
+        ${languageOptions(t.lang as SupportedLang)}
+      </select>
+      <noscript><button type="submit">OK</button></noscript>
+    </form>
   </header>
 
   <main>
@@ -202,8 +262,8 @@ export function renderLayout(
 
   <footer class="site-footer">
     <nav>
-      <a href="/" class="${homeActive ? 'active' : ''}">${escapeHtml(t.footer.home)}</a>
-      <a href="/policy" class="${policyActive ? 'active' : ''}">${escapeHtml(t.footer.policy)}</a>
+      <a href="${withLang('/', t.lang)}" class="${homeActive ? 'active' : ''}">${escapeHtml(t.footer.home)}</a>
+      <a href="${withLang('/policy', t.lang)}" class="${policyActive ? 'active' : ''}">${escapeHtml(t.footer.policy)}</a>
     </nav>
   </footer>
 </body>

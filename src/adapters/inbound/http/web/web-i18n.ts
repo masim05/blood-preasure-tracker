@@ -23,7 +23,7 @@ export interface WebTranslations {
   };
 }
 
-const SUPPORTED_LANGS = ['en', 'es', 'fr', 'pt', 'it', 'sv', 'ru', 'zh', 'ko', 'ja', 'th', 'vi'] as const;
+export const SUPPORTED_LANGS = ['en', 'es', 'fr', 'pt', 'it', 'sv', 'ru', 'zh', 'ko', 'ja', 'th', 'vi'] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
 const translations: Record<SupportedLang, WebTranslations> = {
@@ -628,7 +628,25 @@ const translations: Record<SupportedLang, WebTranslations> = {
   },
 };
 
-export function resolveTranslations(acceptLanguage: string | undefined): WebTranslations {
+function isSupportedLang(lang: string): lang is SupportedLang {
+  return SUPPORTED_LANGS.includes(lang as SupportedLang);
+}
+
+export function resolveTranslations(
+  acceptLanguage: string | undefined,
+  preferredLanguage: string | string[] | undefined = undefined,
+): WebTranslations {
+  const rawPreferredLanguage = Array.isArray(preferredLanguage)
+    ? preferredLanguage[0]
+    : preferredLanguage;
+  const normalizedPreferredLanguage =
+    typeof rawPreferredLanguage === 'string'
+      ? rawPreferredLanguage.trim().toLowerCase()
+      : undefined;
+  if (normalizedPreferredLanguage && isSupportedLang(normalizedPreferredLanguage)) {
+    return translations[normalizedPreferredLanguage];
+  }
+
   if (!acceptLanguage) return translations.en;
 
   const candidates = acceptLanguage
@@ -645,8 +663,8 @@ export function resolveTranslations(acceptLanguage: string | undefined): WebTran
 
   for (const candidate of candidates) {
     const lang = candidate.tag.split('-')[0];
-    if (lang && lang in translations) {
-      return translations[lang as SupportedLang];
+    if (lang && isSupportedLang(lang)) {
+      return translations[lang];
     }
   }
 
