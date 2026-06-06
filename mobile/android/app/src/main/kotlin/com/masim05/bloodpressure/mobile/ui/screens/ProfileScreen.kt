@@ -275,6 +275,11 @@ private fun PolicyPageContent() {
             color = MutedText,
         )
         Spacer(Modifier.height(12.dp))
+        Text(
+            text = stringResource(R.string.profile_policy_last_updated),
+            color = MutedText,
+        )
+        Spacer(Modifier.height(12.dp))
         sections.forEachIndexed { index, section ->
             SectionLabel(stringResource(section.headingRes))
             Spacer(Modifier.height(4.dp))

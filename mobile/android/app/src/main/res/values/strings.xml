@@ -130,6 +130,7 @@
     <string name="profile_story_paragraph_3">After using it myself, I thought: maybe I\'m not the only one with this problem. That\'s why I decided to publish it on Google Play.</string>
     <string name="profile_policy_page_title">Privacy Policy</string>
     <string name="profile_policy_intro">Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.</string>
+    <string name="profile_policy_last_updated">Last updated: June 6, 2026</string>
     <string name="profile_policy_heading_data_collect">Data We Collect</string>
     <string name="profile_policy_content_data_collect">We collect the following information when you use the app: your email address and password (hashed) used to create your account; photos of your blood pressure monitor that you submit for recognition; blood pressure values (systolic, diastolic, pulse, arm side) extracted from those photos or entered manually; and the date and time of each measurement.</string>
     <string name="profile_policy_heading_data_use">How We Use Your Data</string>

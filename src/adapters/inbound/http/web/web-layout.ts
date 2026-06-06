@@ -51,7 +51,6 @@ function withLang(path: '/' | '/policy', lang: string): string {
 }
 
 const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
-
 function linkifySupportEmail(text: string): string {
   const escapedEmail = escapeHtml(SUPPORT_EMAIL);
   const mailto = `mailto:${SUPPORT_EMAIL}`;
@@ -299,6 +298,7 @@ export function renderPolicyPage(t: WebTranslations): string {
 <div class="card">
   <h1 class="policy-page-title">${escapeHtml(t.footer.policy)}</h1>
   <p class="policy-intro">${escapeHtml(t.policy.intro)}</p>
+  <p class="policy-intro">${escapeHtml(t.policy.lastUpdated)}</p>
 ${sections}
 </div>`;
 
