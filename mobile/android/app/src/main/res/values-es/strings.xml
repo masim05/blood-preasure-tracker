@@ -69,7 +69,10 @@
     <string name="nav_profile">Perfil</string>
     <string name="profile_title">Perfil</string>
     <string name="profile_settings">Ajustes</string>
+    <string name="profile_about">ACERCA DE</string>
     <string name="profile_language_title">Idioma</string>
+    <string name="profile_story">Historia</string>
+    <string name="profile_policy">Política</string>
     <string name="language_system_default">Predeterminado del sistema</string>
     <string name="language_name_spanish">Español</string>
     <string name="language_name_french">Francés</string>
@@ -122,4 +125,23 @@
     <string name="profile_logout_confirm_title">¿Cerrar sesión?</string>
     <string name="profile_logout_confirm_message">Deberás iniciar sesión de nuevo para continuar.</string>
     <string name="profile_logout_confirm">Cerrar sesión</string>
+    <string name="profile_story_paragraph_1">Empecé a controlar mi presión arterial con regularidad y pronto me di cuenta de que la parte más molesta no era tomar las mediciones, sino escribir los números de las fotos de mi tensiómetro en una hoja de cálculo.</string>
+    <string name="profile_story_paragraph_2">Como la IA moderna es bastante buena leyendo texto en imágenes, pensé que esto podía automatizarse. Así que creé una sencilla aplicación que convierte una foto de un tensiómetro en un registro de medición con unos pocos toques.</string>
+    <string name="profile_story_paragraph_3">Tras usarla yo mismo, pensé: quizás no soy el único con este problema. Por eso decidí publicarla en Google Play.</string>
+    <string name="profile_policy_page_title">Política de privacidad</string>
+    <string name="profile_policy_intro">Tu privacidad es importante. Esta política explica qué datos recopila Blood Pressure, por qué y cómo se gestionan.</string>
+    <string name="profile_policy_heading_data_collect">Datos que recopilamos</string>
+    <string name="profile_policy_content_data_collect">Recopilamos la siguiente información cuando usas la aplicación: tu dirección de correo electrónico y contraseña (procesada con hash) para crear tu cuenta; fotos de tu tensiómetro que envías para reconocimiento; valores de presión arterial (sistólica, diastólica, pulso, lado del brazo) extraídos de esas fotos o introducidos manualmente; y la fecha y hora de cada medición.</string>
+    <string name="profile_policy_heading_data_use">Cómo usamos tus datos</string>
+    <string name="profile_policy_content_data_use">Tus datos se utilizan únicamente para ofrecer las funciones de la aplicación: autenticar tu cuenta, almacenar tu historial de mediciones para que puedas revisarlo y procesar fotos para extraer automáticamente los valores de presión arterial.</string>
+    <string name="profile_policy_heading_third_party">Servicios de terceros</string>
+    <string name="profile_policy_content_third_party">Para reconocer los valores de presión arterial en las fotos, las imágenes se envían a APIs de IA de terceros (como OpenAI). Las imágenes se transmiten únicamente con fines de reconocimiento y esos terceros no las almacenan ni las usan para entrenamiento. No vendemos ni compartimos tus datos personales con otros terceros.</string>
+    <string name="profile_policy_heading_storage">Almacenamiento de datos</string>
+    <string name="profile_policy_content_storage">Tus datos se almacenan en servidores cloud seguros. Aplicamos medidas estándar del sector para protegerlos del acceso no autorizado.</string>
+    <string name="profile_policy_heading_delete">Eliminar tu cuenta y datos</string>
+    <string name="profile_policy_content_delete">Puedes solicitar la eliminación de tu cuenta y todos los datos asociados en cualquier momento enviando un correo a blood.pressure.by.max@gmail.com. Procesaremos tu solicitud en un plazo de 30 días.</string>
+    <string name="profile_policy_heading_medical">Aviso médico</string>
+    <string name="profile_policy_content_medical">Esta aplicación no es un dispositivo médico y no diagnostica, trata, cura ni previene ninguna condición médica. Consulta siempre a un profesional de la salud cualificado sobre tu presión arterial y cualquier problema de salud.</string>
+    <string name="profile_policy_heading_contact">Contacto</string>
+    <string name="profile_policy_content_contact">Para preguntas relacionadas con la privacidad, contáctanos en blood.pressure.by.max@gmail.com.</string>
 </resources>
