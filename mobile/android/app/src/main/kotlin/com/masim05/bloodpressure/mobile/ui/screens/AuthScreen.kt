@@ -1,5 +1,6 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DesktopWindows
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material3.Button
@@ -38,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -58,6 +58,9 @@ private val PrimaryTint = Color(0xFFF2F2F7)
 private val BorderColor = Color(0xFFE0E0E0)
 private val MutedText = Color(0xFFAAAAAA)
 private val DarkText = Color(0xFF111111)
+
+@DrawableRes
+internal fun authBrandIconRes(): Int = R.drawable.ic_launcher_foreground
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -98,7 +101,7 @@ fun AuthScreen(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Outlined.DesktopWindows,
+                painter = painterResource(authBrandIconRes()),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(26.dp),
