@@ -19,30 +19,6 @@ class ProfileScreenTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun profileSectionsKeepPreferencesAboutAccountOrder() {
-        assertEquals(
-            listOf(
-                R.string.profile_settings,
-                R.string.profile_about,
-                R.string.profile_account,
-            ),
-            profileSectionOrder(),
-        )
-    }
-
-    @Test
-    fun aboutSectionRowsKeepStoryPolicyGuideOrder() {
-        assertEquals(
-            listOf(
-                R.string.profile_story,
-                R.string.profile_policy,
-                R.string.guide_title,
-            ),
-            aboutSectionRowOrder(),
-        )
-    }
-
-    @Test
     fun storyPageUsesSameThreeParagraphStructureAsWeb() {
         assertEquals(
             listOf(

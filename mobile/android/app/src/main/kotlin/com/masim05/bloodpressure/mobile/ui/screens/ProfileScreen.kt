@@ -3,7 +3,6 @@ package com.masim05.bloodpressure.mobile.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -66,18 +65,6 @@ internal data class PolicySectionCopy(
     val contentRes: Int,
 )
 
-internal fun profileSectionOrder(): List<Int> = listOf(
-    R.string.profile_settings,
-    R.string.profile_about,
-    R.string.profile_account,
-)
-
-internal fun aboutSectionRowOrder(): List<Int> = listOf(
-    R.string.profile_story,
-    R.string.profile_policy,
-    R.string.guide_title,
-)
-
 internal fun storyParagraphResIds(): List<Int> = listOf(
     R.string.profile_story_paragraph_1,
     R.string.profile_story_paragraph_2,
@@ -107,19 +94,20 @@ fun ProfileScreen(
     val selectedLanguage = supportedLanguageOptions
         .firstOrNull { it.code == selectedLanguageCode }
         ?: supportedLanguageOptions.first()
+    val aboutPage = selectedAboutPage
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(PageBg)
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
             .testTag(TestTags.ProfileScreen),
-        verticalArrangement = Arrangement.Top,
     ) {
         Text(stringResource(R.string.profile_title), style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(12.dp))
 
-        if (selectedAboutPage == null) {
+        if (aboutPage == null) {
             SectionLabel(stringResource(R.string.profile_settings))
             Spacer(Modifier.height(6.dp))
             CardContainer {
@@ -208,7 +196,7 @@ fun ProfileScreen(
             }
         } else {
             AboutPageScreen(
-                page = selectedAboutPage,
+                page = aboutPage,
                 onBack = { selectedAboutPage = null },
             )
         }
@@ -247,7 +235,7 @@ private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
         Text(stringResource(R.string.detail_back))
     }
     Spacer(Modifier.height(8.dp))
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    Column {
         when (page) {
             AboutPage.Story -> StoryPageContent()
             AboutPage.Policy -> PolicyPageContent()
@@ -257,15 +245,16 @@ private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
 
 @Composable
 private fun StoryPageContent() {
+    val paragraphs = storyParagraphResIds()
     CardContainer {
         Text(
-            text = stringResource(R.string.auth_tagline),
+            text = stringResource(R.string.profile_story_page_title),
             style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(Modifier.height(12.dp))
-        storyParagraphResIds().forEachIndexed { index, paragraphRes ->
+        paragraphs.forEachIndexed { index, paragraphRes ->
             Text(text = stringResource(paragraphRes), color = PrimaryText)
-            if (index < storyParagraphResIds().lastIndex) {
+            if (index < paragraphs.lastIndex) {
                 Spacer(Modifier.height(10.dp))
             }
         }
@@ -274,6 +263,7 @@ private fun StoryPageContent() {
 
 @Composable
 private fun PolicyPageContent() {
+    val sections = policySectionsCopy()
     CardContainer {
         Text(
             text = stringResource(R.string.profile_policy_page_title),
@@ -285,11 +275,11 @@ private fun PolicyPageContent() {
             color = MutedText,
         )
         Spacer(Modifier.height(12.dp))
-        policySectionsCopy().forEachIndexed { index, section ->
+        sections.forEachIndexed { index, section ->
             SectionLabel(stringResource(section.headingRes))
             Spacer(Modifier.height(4.dp))
             Text(text = stringResource(section.contentRes), color = PrimaryText)
-            if (index < policySectionsCopy().lastIndex) {
+            if (index < sections.lastIndex) {
                 Spacer(Modifier.height(12.dp))
             }
         }

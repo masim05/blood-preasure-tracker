@@ -147,4 +147,6 @@
     <string name="profile_policy_content_medical">Questa app non è un dispositivo medico e non diagnostica, tratta, cura né previene alcuna condizione medica. Consulta sempre un medico qualificato riguardo alla tua pressione sanguigna e a qualsiasi preoccupazione di salute.</string>
     <string name="profile_policy_heading_contact">Contatti</string>
     <string name="profile_policy_content_contact">Per domande relative alla privacy, contattaci all&apos;indirizzo blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Tieni traccia delle tue misurazioni facilmente</string>
 </resources>

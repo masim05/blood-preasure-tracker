@@ -146,4 +146,6 @@
     <string name="profile_policy_content_medical">Это приложение не является медицинским устройством и не предназначено для диагностики, лечения или профилактики каких-либо заболеваний. По всем вопросам, связанным с артериальным давлением и состоянием здоровья, обращайтесь к квалифицированному медицинскому специалисту.</string>
     <string name="profile_policy_heading_contact">Контакты</string>
     <string name="profile_policy_content_contact">По вопросам конфиденциальности пишите на blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Отслеживайте показания с лёгкостью</string>
 </resources>

@@ -144,4 +144,6 @@
     <string name="profile_policy_content_medical">This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Always consult a qualified healthcare professional regarding your blood pressure and any health concerns.</string>
     <string name="profile_policy_heading_contact">Contact</string>
     <string name="profile_policy_content_contact">For privacy-related questions, contact us at blood.pressure.by.max@gmail.com.</string>
+
+    <string name="profile_story_page_title">Track your readings easily</string>
 </resources>
