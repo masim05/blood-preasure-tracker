@@ -97,7 +97,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Datos que recopilamos',
-          content: 'Recopilamos la siguiente información cuando usas la aplicación: tu dirección de correo electrónico y contraseña (procesada con hash) para crear tu cuenta; fotos de tu tensiómetro que envías para reconocimiento; valores de presión arterial (sistólica, diastólica, pulso, lado del brazo) extraídos de esas fotos o introducidos manualmente; y la fecha y hora de cada medición.',
+          content: 'Recopilamos la siguiente información cuando usas la aplicación: tu dirección de correo electrónico y una representación cifrada de forma segura de tu contraseña para crear tu cuenta; fotos de tu tensiómetro que envías para reconocimiento; valores de presión arterial (sistólica, diastólica, pulso, lado del brazo) extraídos de esas fotos o introducidos manualmente; y la fecha y hora de cada medición.',
         },
         {
           heading: 'Cómo usamos tus datos',
@@ -105,7 +105,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Servicios de terceros',
-          content: 'Para reconocer los valores de presión arterial en las fotos, las imágenes se envían a APIs de IA de terceros (como OpenAI). Las imágenes se transmiten únicamente con fines de reconocimiento y esos terceros no las almacenan ni las usan para entrenamiento. No vendemos ni compartimos tus datos personales con otros terceros.',
+          content: 'Para reconocer los valores de presión arterial en las fotos, las imágenes se envían a APIs de IA de terceros (como OpenAI). Las imágenes se transmiten únicamente con fines de reconocimiento. No utilizamos las imágenes enviadas para entrenar nuestros propios modelos. No vendemos ni compartimos tus datos personales con otros terceros.',
         },
         {
           heading: 'Almacenamiento de datos',
@@ -117,7 +117,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Aviso médico',
-          content: 'Esta aplicación no es un dispositivo médico y no diagnostica, trata, cura ni previene ninguna condición médica. Consulta siempre a un profesional de la salud cualificado sobre tu presión arterial y cualquier problema de salud.',
+          content: 'Esta aplicación no es un dispositivo médico y no diagnostica, trata, cura ni previene ninguna condición médica. Esta aplicación no está destinada a ser utilizada por menores de 13 años. Consulta siempre a un profesional de la salud cualificado sobre tu presión arterial y cualquier problema de salud.',
         },
         {
           heading: 'Contacto',
@@ -147,7 +147,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Données que nous collectons',
-          content: 'Nous collectons les informations suivantes lors de l\'utilisation de l\'application : votre adresse e-mail et mot de passe (haché) pour créer votre compte ; les photos de votre tensiomètre que vous soumettez pour reconnaissance ; les valeurs de tension artérielle (systolique, diastolique, pouls, côté du bras) extraites de ces photos ou saisies manuellement ; ainsi que la date et l\'heure de chaque mesure.',
+          content: 'Nous collectons les informations suivantes lors de l\'utilisation de l\'application : votre adresse e-mail et une représentation hachée de manière sécurisée de votre mot de passe pour créer votre compte ; les photos de votre tensiomètre que vous soumettez pour reconnaissance ; les valeurs de tension artérielle (systolique, diastolique, pouls, côté du bras) extraites de ces photos ou saisies manuellement ; ainsi que la date et l\'heure de chaque mesure.',
         },
         {
           heading: 'Utilisation de vos données',
@@ -155,7 +155,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Services tiers',
-          content: 'Pour reconnaître les valeurs de tension artérielle dans les photos, les images sont envoyées à des API d\'IA tierces (comme OpenAI). Les images sont transmises uniquement à des fins de reconnaissance et ne sont ni stockées ni utilisées à des fins d\'entraînement par ces tiers. Nous ne vendons ni ne partageons vos données personnelles avec d\'autres tiers.',
+          content: 'Pour reconnaître les valeurs de tension artérielle dans les photos, les images sont envoyées à des API d\'IA tierces (comme OpenAI). Les images sont transmises uniquement à des fins de reconnaissance. Nous n\'utilisons pas les images soumises pour entraîner nos propres modèles. Nous ne vendons ni ne partageons vos données personnelles avec d\'autres tiers.',
         },
         {
           heading: 'Stockage des données',
@@ -167,7 +167,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Avertissement médical',
-          content: 'Cette application n\'est pas un dispositif médical et ne diagnostique, ne traite, ne guérit ni ne prévient aucune condition médicale. Consultez toujours un professionnel de santé qualifié concernant votre tension artérielle et tout problème de santé.',
+          content: 'Cette application n\'est pas un dispositif médical et ne diagnostique, ne traite, ne guérit ni ne prévient aucune condition médicale. Cette application n\'est pas destinée à être utilisée par des enfants de moins de 13 ans. Consultez toujours un professionnel de santé qualifié concernant votre tension artérielle et tout problème de santé.',
         },
         {
           heading: 'Contact',
@@ -197,7 +197,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Dados que coletamos',
-          content: 'Coletamos as seguintes informações ao usar o aplicativo: seu endereço de e-mail e senha (com hash) para criar sua conta; fotos do seu monitor de pressão arterial enviadas para reconhecimento; valores de pressão arterial (sistólica, diastólica, pulso, lado do braço) extraídos dessas fotos ou inseridos manualmente; e a data e hora de cada medição.',
+          content: 'Coletamos as seguintes informações ao usar o aplicativo: seu endereço de e-mail e uma representação com hash seguro de sua senha para criar sua conta; fotos do seu monitor de pressão arterial enviadas para reconhecimento; valores de pressão arterial (sistólica, diastólica, pulso, lado do braço) extraídos dessas fotos ou inseridos manualmente; e a data e hora de cada medição.',
         },
         {
           heading: 'Como usamos seus dados',
@@ -205,7 +205,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Serviços de terceiros',
-          content: 'Para reconhecer valores de pressão arterial em fotos, as imagens são enviadas a APIs de IA de terceiros (como OpenAI). As imagens são transmitidas apenas para fins de reconhecimento e não são armazenadas ou usadas para treinamento por esses terceiros. Não vendemos nem compartilhamos seus dados pessoais com outros terceiros.',
+          content: 'Para reconhecer valores de pressão arterial em fotos, as imagens são enviadas a APIs de IA de terceiros (como OpenAI). As imagens são transmitidas apenas para fins de reconhecimento. Não usamos imagens enviadas para treinar nossos próprios modelos. Não vendemos nem compartilhamos seus dados pessoais com outros terceiros.',
         },
         {
           heading: 'Armazenamento de dados',
@@ -217,7 +217,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Aviso médico',
-          content: 'Este aplicativo não é um dispositivo médico e não diagnostica, trata, cura ou previne nenhuma condição médica. Consulte sempre um profissional de saúde qualificado sobre sua pressão arterial e quaisquer preocupações de saúde.',
+          content: 'Este aplicativo não é um dispositivo médico e não diagnostica, trata, cura ou previne nenhuma condição médica. Este aplicativo não se destina ao uso por crianças menores de 13 anos. Consulte sempre um profissional de saúde qualificado sobre sua pressão arterial e quaisquer preocupações de saúde.',
         },
         {
           heading: 'Contato',
@@ -247,7 +247,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Dati che raccogliamo',
-          content: 'Raccogliamo le seguenti informazioni quando usi l\'app: il tuo indirizzo e-mail e la password (con hash) per creare il tuo account; le foto del tuo misuratore di pressione inviate per il riconoscimento; i valori della pressione sanguigna (sistolica, diastolica, polso, lato del braccio) estratti da quelle foto o inseriti manualmente; e la data e l\'ora di ogni misurazione.',
+          content: 'Raccogliamo le seguenti informazioni quando usi l\'app: il tuo indirizzo e-mail e una rappresentazione con hash sicuro della tua password per creare il tuo account; le foto del tuo misuratore di pressione inviate per il riconoscimento; i valori della pressione sanguigna (sistolica, diastolica, polso, lato del braccio) estratti da quelle foto o inseriti manualmente; e la data e l\'ora di ogni misurazione.',
         },
         {
           heading: 'Come utilizziamo i tuoi dati',
@@ -255,7 +255,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Servizi di terze parti',
-          content: 'Per riconoscere i valori della pressione sanguigna nelle foto, le immagini vengono inviate ad API AI di terze parti (come OpenAI). Le immagini vengono trasmesse esclusivamente per il riconoscimento e non vengono archiviate o utilizzate per l\'addestramento da tali terze parti. Non vendiamo né condividiamo i tuoi dati personali con altre terze parti.',
+          content: 'Per riconoscere i valori della pressione sanguigna nelle foto, le immagini vengono inviate ad API AI di terze parti (come OpenAI). Le immagini vengono trasmesse esclusivamente per il riconoscimento. Non utilizziamo le immagini inviate per addestrare i nostri modelli. Non vendiamo né condividiamo i tuoi dati personali con altre terze parti.',
         },
         {
           heading: 'Archiviazione dei dati',
@@ -267,7 +267,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Dichiarazione medica',
-          content: 'Questa app non è un dispositivo medico e non diagnostica, tratta, cura né previene alcuna condizione medica. Consulta sempre un medico qualificato riguardo alla tua pressione sanguigna e a qualsiasi preoccupazione di salute.',
+          content: 'Questa app non è un dispositivo medico e non diagnostica, tratta, cura né previene alcuna condizione medica. Questa app non è destinata all\'uso da parte di bambini di età inferiore ai 13 anni. Consulta sempre un medico qualificato riguardo alla tua pressione sanguigna e a qualsiasi preoccupazione di salute.',
         },
         {
           heading: 'Contatti',
@@ -297,7 +297,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Uppgifter vi samlar in',
-          content: 'Vi samlar in följande information när du använder appen: din e-postadress och ditt lösenord (hashat) för att skapa ditt konto; foton av din blodtrycksapparat som du skickar in för igenkänning; blodtrycksvärden (systoliskt, diastoliskt, puls, armens sida) extraherade från dessa foton eller angivna manuellt; samt datum och tid för varje mätning.',
+          content: 'Vi samlar in följande information när du använder appen: din e-postadress och en säkert hashad representation av ditt lösenord för att skapa ditt konto; foton av din blodtrycksapparat som du skickar in för igenkänning; blodtrycksvärden (systoliskt, diastoliskt, puls, armens sida) extraherade från dessa foton eller angivna manuellt; samt datum och tid för varje mätning.',
         },
         {
           heading: 'Hur vi använder dina uppgifter',
@@ -305,7 +305,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Tjänster från tredje part',
-          content: 'För att känna igen blodtrycksvärden från foton skickas bilder till AI-API:er från tredje part (t.ex. OpenAI). Bilder överförs enbart i igenkänningssyfte och lagras eller används inte för träning av dessa tredje parter. Vi säljer eller delar inte dina personuppgifter med andra tredje parter.',
+          content: 'För att känna igen blodtrycksvärden från foton skickas bilder till AI-API:er från tredje part (t.ex. OpenAI). Bilder överförs enbart i igenkänningssyfte. Vi använder inte inskickade bilder för att träna våra egna modeller. Vi säljer eller delar inte dina personuppgifter med andra tredje parter.',
         },
         {
           heading: 'Datalagring',
@@ -317,7 +317,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Medicinsk ansvarsfriskrivning',
-          content: 'Denna app är inte en medicinsk enhet och diagnostiserar, behandlar, botar eller förebygger inte några medicinska tillstånd. Rådfråga alltid en kvalificerad sjukvårdspersonal angående ditt blodtryck och eventuella hälsoproblem.',
+          content: 'Denna app är inte en medicinsk enhet och diagnostiserar, behandlar, botar eller förebygger inte några medicinska tillstånd. Appen är inte avsedd att användas av barn under 13 år. Rådfråga alltid en kvalificerad sjukvårdspersonal angående ditt blodtryck och eventuella hälsoproblem.',
         },
         {
           heading: 'Kontakt',
@@ -347,7 +347,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Какие данные мы собираем',
-          content: 'При использовании приложения мы собираем следующие данные: ваш адрес электронной почты и хэш пароля для создания аккаунта; фотографии тонометра, которые вы отправляете для распознавания; значения артериального давления (систолическое, диастолическое, пульс, рука) — извлечённые с фотографий или введённые вручную; а также дату и время каждого измерения.',
+          content: 'При использовании приложения мы собираем следующие данные: ваш адрес электронной почты и защищённый хэш вашего пароля для создания аккаунта; фотографии тонометра, которые вы отправляете для распознавания; значения артериального давления (систолическое, диастолическое, пульс, рука) — извлечённые с фотографий или введённые вручную; а также дату и время каждого измерения.',
         },
         {
           heading: 'Как мы используем ваши данные',
@@ -355,7 +355,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Сторонние сервисы',
-          content: 'Для распознавания значений давления на фотографиях изображения передаются сторонним API на основе ИИ (например, OpenAI). Изображения передаются исключительно для целей распознавания и не сохраняются и не используются для обучения моделей этими сторонними сервисами. Мы не продаём и не передаём ваши персональные данные третьим лицам.',
+          content: 'Для распознавания значений давления на фотографиях изображения передаются сторонним API на основе ИИ (например, OpenAI). Изображения передаются исключительно для целей распознавания. Мы не используем загруженные изображения для обучения собственных моделей. Мы не продаём и не передаём ваши персональные данные третьим лицам.',
         },
         {
           heading: 'Хранение данных',
@@ -367,7 +367,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Медицинское предупреждение',
-          content: 'Это приложение не является медицинским устройством и не предназначено для диагностики, лечения или профилактики каких-либо заболеваний. По всем вопросам, связанным с артериальным давлением и состоянием здоровья, обращайтесь к квалифицированному медицинскому специалисту.',
+          content: 'Это приложение не является медицинским устройством и не предназначено для диагностики, лечения или профилактики каких-либо заболеваний. Приложение не предназначено для использования детьми до 13 лет. По всем вопросам, связанным с артериальным давлением и состоянием здоровья, обращайтесь к квалифицированному медицинскому специалисту.',
         },
         {
           heading: 'Контакты',
@@ -397,7 +397,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: '我们收集的数据',
-          content: '使用本应用时，我们会收集以下信息：您的电子邮件地址和密码（哈希值）用于创建账户；您提交用于识别的血压计照片；从照片中提取或手动输入的血压值（收缩压、舒张压、脉搏、测量手臂）；以及每次测量的日期和时间。',
+          content: '使用本应用时，我们会收集以下信息：您的电子邮件地址和您密码的安全哈希表示用于创建账户；您提交用于识别的血压计照片；从照片中提取或手动输入的血压值（收缩压、舒张压、脉搏、测量手臂）；以及每次测量的日期和时间。',
         },
         {
           heading: '我们如何使用您的数据',
@@ -405,7 +405,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '第三方服务',
-          content: '为了从照片中识别血压值，图像会被发送至第三方 AI API（如 OpenAI）。图像仅用于识别目的，第三方不会存储或用于模型训练。我们不会向任何其他第三方出售或共享您的个人数据。',
+          content: '为了从照片中识别血压值，图像会被发送至第三方 AI API（如 OpenAI）。图像仅用于识别目的。我们不会使用提交的图像来训练我们自己的模型。我们不会向任何其他第三方出售或共享您的个人数据。',
         },
         {
           heading: '数据存储',
@@ -417,7 +417,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '医疗免责声明',
-          content: '本应用不是医疗设备，不用于诊断、治疗、治愈或预防任何疾病。请就您的血压及任何健康问题咨询具有资质的医疗专业人员。',
+          content: '本应用不是医疗设备，不用于诊断、治疗、治愈或预防任何疾病。本应用不适合13岁以下儿童使用。请就您的血压及任何健康问题咨询具有资质的医疗专业人员。',
         },
         {
           heading: '联系方式',
@@ -447,7 +447,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: '수집하는 데이터',
-          content: '앱 사용 시 다음 정보를 수집합니다: 계정 생성에 사용하는 이메일 주소 및 비밀번호(해시 처리됨); 인식을 위해 제출하는 혈압계 사진; 해당 사진에서 추출되거나 수동으로 입력된 혈압 수치(수축기, 이완기, 맥박, 팔 측); 각 측정의 날짜 및 시간.',
+          content: '앱 사용 시 다음 정보를 수집합니다: 계정 생성에 사용하는 이메일 주소 및 비밀번호의 안전한 해시 표현; 인식을 위해 제출하는 혈압계 사진; 해당 사진에서 추출되거나 수동으로 입력된 혈압 수치(수축기, 이완기, 맥박, 팔 측); 각 측정의 날짜 및 시간.',
         },
         {
           heading: '데이터 사용 방법',
@@ -455,7 +455,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '제3자 서비스',
-          content: '사진에서 혈압 수치를 인식하기 위해 이미지는 제3자 AI API(예: OpenAI)로 전송됩니다. 이미지는 인식 목적으로만 전송되며, 해당 제3자가 저장하거나 학습에 사용하지 않습니다. 귀하의 개인 데이터는 다른 제3자에게 판매되거나 공유되지 않습니다.',
+          content: '사진에서 혈압 수치를 인식하기 위해 이미지는 제3자 AI API(예: OpenAI)로 전송됩니다. 이미지는 인식 목적으로만 전송됩니다. 당사는 제출된 이미지를 자체 모델 학습에 사용하지 않습니다. 귀하의 개인 데이터는 다른 제3자에게 판매되거나 공유되지 않습니다.',
         },
         {
           heading: '데이터 저장',
@@ -467,7 +467,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '의료 면책 조항',
-          content: '이 앱은 의료 기기가 아니며, 어떠한 질병도 진단, 치료, 치유 또는 예방하지 않습니다. 혈압 및 건강 문제에 관해서는 항상 자격을 갖춘 의료 전문가와 상담하십시오.',
+          content: '이 앱은 의료 기기가 아니며, 어떠한 질병도 진단, 치료, 치유 또는 예방하지 않습니다. 이 앱은 13세 미만의 어린이가 사용하도록 설계되지 않았습니다. 혈압 및 건강 문제에 관해서는 항상 자격을 갖춘 의료 전문가와 상담하십시오.',
         },
         {
           heading: '문의',
@@ -497,7 +497,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: '収集するデータ',
-          content: 'アプリ使用時に以下の情報を収集します：アカウント作成に使用するメールアドレスおよびパスワード（ハッシュ化）、認識のために送信する血圧計の写真、それらの写真から抽出または手動入力された血圧値（収縮期・拡張期・脈拍・腕の左右）、各測定の日時。',
+          content: 'アプリ使用時に以下の情報を収集します：アカウント作成に使用するメールアドレスおよびパスワードの安全なハッシュ表現、認識のために送信する血圧計の写真、それらの写真から抽出または手動入力された血圧値（収縮期・拡張期・脈拍・腕の左右）、各測定の日時。',
         },
         {
           heading: 'データの利用方法',
@@ -505,7 +505,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'サードパーティサービス',
-          content: '写真から血圧値を認識するために、画像はサードパーティのAI API（OpenAI等）に送信されます。画像は認識目的のみに送信され、それらのサードパーティによって保存または学習に使用されることはありません。お客様の個人データを他のサードパーティに販売・共有することはありません。',
+          content: '写真から血圧値を認識するために、画像はサードパーティのAI API（OpenAI等）に送信されます。画像は認識目的のみに送信されます。当社は送信された画像を自社のモデルのトレーニングに使用しません。お客様の個人データを他のサードパーティに販売・共有することはありません。',
         },
         {
           heading: 'データの保管',
@@ -517,7 +517,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: '医療上の免責事項',
-          content: 'このアプリは医療機器ではなく、いかなる疾患の診断・治療・治癒・予防も行いません。血圧やその他の健康上の懸念については、必ず資格を持つ医療専門家にご相談ください。',
+          content: 'このアプリは医療機器ではなく、いかなる疾患の診断・治療・治癒・予防も行いません。このアプリは13歳未満のお子様のご利用を対象としておりません。血圧やその他の健康上の懸念については、必ず資格を持つ医療専門家にご相談ください。',
         },
         {
           heading: 'お問い合わせ',
@@ -547,7 +547,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'ข้อมูลที่เราเก็บรวบรวม',
-          content: 'เราเก็บรวบรวมข้อมูลต่อไปนี้เมื่อคุณใช้แอป: อีเมลและรหัสผ่าน (แบบ hash) สำหรับสร้างบัญชี รูปถ่ายเครื่องวัดความดันโลหิตที่คุณส่งมาเพื่อการจดจำ ค่าความดันโลหิต (systolic, diastolic, ชีพจร, แขนข้าง) ที่ดึงมาจากรูปถ่ายหรือกรอกเอง และวันที่และเวลาของการวัดแต่ละครั้ง',
+          content: 'เราเก็บรวบรวมข้อมูลต่อไปนี้เมื่อคุณใช้แอป: อีเมลและการแสดงแทนค่าแฮชที่ปลอดภัยของรหัสผ่านของคุณสำหรับสร้างบัญชี รูปถ่ายเครื่องวัดความดันโลหิตที่คุณส่งมาเพื่อการจดจำ ค่าความดันโลหิต (systolic, diastolic, ชีพจร, แขนข้าง) ที่ดึงมาจากรูปถ่ายหรือกรอกเอง และวันที่และเวลาของการวัดแต่ละครั้ง',
         },
         {
           heading: 'วิธีที่เราใช้ข้อมูลของคุณ',
@@ -555,7 +555,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'บริการของบุคคลที่สาม',
-          content: 'เพื่อจดจำค่าความดันโลหิตจากรูปถ่าย รูปภาพจะถูกส่งไปยัง AI API ของบุคคลที่สาม (เช่น OpenAI) รูปภาพถูกส่งเพื่อวัตถุประสงค์การจดจำเท่านั้น ไม่ถูกเก็บหรือนำไปฝึกโมเดลโดยบุคคลที่สาม เราไม่ขายหรือแบ่งปันข้อมูลส่วนตัวของคุณกับบุคคลที่สามอื่น',
+          content: 'เพื่อจดจำค่าความดันโลหิตจากรูปถ่าย รูปภาพจะถูกส่งไปยัง AI API ของบุคคลที่สาม (เช่น OpenAI) รูปภาพถูกส่งเพื่อวัตถุประสงค์การจดจำเท่านั้น เราไม่นำรูปภาพที่ส่งมาใช้ฝึกโมเดลของเราเอง เราไม่ขายหรือแบ่งปันข้อมูลส่วนตัวของคุณกับบุคคลที่สามอื่น',
         },
         {
           heading: 'การจัดเก็บข้อมูล',
@@ -567,7 +567,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'ข้อจำกัดความรับผิดชอบทางการแพทย์',
-          content: 'แอปนี้ไม่ใช่อุปกรณ์ทางการแพทย์ และไม่ได้วินิจฉัย รักษา บำบัด หรือป้องกันภาวะทางการแพทย์ใดๆ โปรดปรึกษาผู้เชี่ยวชาญด้านสุขภาพที่มีคุณสมบัติเกี่ยวกับความดันโลหิตและข้อกังวลด้านสุขภาพเสมอ',
+          content: 'แอปนี้ไม่ใช่อุปกรณ์ทางการแพทย์ และไม่ได้วินิจฉัย รักษา บำบัด หรือป้องกันภาวะทางการแพทย์ใดๆ แอปนี้ไม่ได้มีไว้สำหรับเด็กอายุต่ำกว่า 13 ปี โปรดปรึกษาผู้เชี่ยวชาญด้านสุขภาพที่มีคุณสมบัติเกี่ยวกับความดันโลหิตและข้อกังวลด้านสุขภาพเสมอ',
         },
         {
           heading: 'ติดต่อเรา',
@@ -597,7 +597,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
       sections: [
         {
           heading: 'Dữ liệu chúng tôi thu thập',
-          content: 'Chúng tôi thu thập các thông tin sau khi bạn sử dụng ứng dụng: địa chỉ email và mật khẩu (được băm) để tạo tài khoản; ảnh máy đo huyết áp bạn gửi để nhận dạng; các chỉ số huyết áp (tâm thu, tâm trương, mạch, cánh tay đo) được trích xuất từ ảnh hoặc nhập thủ công; và ngày giờ của từng lần đo.',
+          content: 'Chúng tôi thu thập các thông tin sau khi bạn sử dụng ứng dụng: địa chỉ email và biểu diễn băm bảo mật của mật khẩu của bạn để tạo tài khoản; ảnh máy đo huyết áp bạn gửi để nhận dạng; các chỉ số huyết áp (tâm thu, tâm trương, mạch, cánh tay đo) được trích xuất từ ảnh hoặc nhập thủ công; và ngày giờ của từng lần đo.',
         },
         {
           heading: 'Cách chúng tôi sử dụng dữ liệu của bạn',
@@ -605,7 +605,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Dịch vụ bên thứ ba',
-          content: 'Để nhận dạng chỉ số huyết áp từ ảnh, hình ảnh được gửi đến các API AI của bên thứ ba (như OpenAI). Hình ảnh chỉ được truyền cho mục đích nhận dạng và không được bên thứ ba lưu trữ hay dùng để huấn luyện mô hình. Chúng tôi không bán hoặc chia sẻ dữ liệu cá nhân của bạn với bên thứ ba khác.',
+          content: 'Để nhận dạng chỉ số huyết áp từ ảnh, hình ảnh được gửi đến các API AI của bên thứ ba (như OpenAI). Hình ảnh chỉ được truyền cho mục đích nhận dạng. Chúng tôi không sử dụng hình ảnh đã gửi để huấn luyện mô hình của riêng mình. Chúng tôi không bán hoặc chia sẻ dữ liệu cá nhân của bạn với bên thứ ba khác.',
         },
         {
           heading: 'Lưu trữ dữ liệu',
@@ -617,7 +617,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
         },
         {
           heading: 'Tuyên bố miễn trách nhiệm y tế',
-          content: 'Ứng dụng này không phải là thiết bị y tế và không chẩn đoán, điều trị, chữa khỏi hay phòng ngừa bất kỳ tình trạng y tế nào. Hãy luôn tham khảo ý kiến chuyên gia y tế có chuyên môn về huyết áp và các vấn đề sức khỏe của bạn.',
+          content: 'Ứng dụng này không phải là thiết bị y tế và không chẩn đoán, điều trị, chữa khỏi hay phòng ngừa bất kỳ tình trạng y tế nào. Ứng dụng này không dành cho trẻ em dưới 13 tuổi. Hãy luôn tham khảo ý kiến chuyên gia y tế có chuyên môn về huyết áp và các vấn đề sức khỏe của bạn.',
         },
         {
           heading: 'Liên hệ',
