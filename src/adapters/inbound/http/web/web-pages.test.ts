@@ -79,6 +79,14 @@ describe('web i18n – resolveTranslations', () => {
   it('resolves Vietnamese', () => {
     expect(resolveTranslations('vi-VN').lang).toBe('vi');
   });
+
+  it('prefers explicit language over Accept-Language', () => {
+    expect(resolveTranslations('en-US, en;q=0.9', 'es').lang).toBe('es');
+  });
+
+  it('ignores unsupported explicit language and falls back to Accept-Language', () => {
+    expect(resolveTranslations('fr-FR, fr;q=0.9', 'de').lang).toBe('fr');
+  });
 });
 
 describe('HomeController', () => {
@@ -112,6 +120,11 @@ describe('HomeController', () => {
     expect(result).toContain('<html lang="en"');
   });
 
+  it('uses explicit language query over Accept-Language header', () => {
+    const result = controller.getHome('en-US, en;q=0.9', 'ru');
+    expect(result).toContain('<html lang="ru"');
+  });
+
   it.skip('contains Google Play CTA', () => {
     const result = controller.getHome(undefined);
     expect(result).toContain('Google Play');
@@ -119,13 +132,13 @@ describe('HomeController', () => {
 
   it('contains footer with navigation links', () => {
     const result = controller.getHome(undefined);
-    expect(result).toContain('href="/"');
-    expect(result).toContain('href="/policy"');
+    expect(result).toContain('href="/?lang=en"');
+    expect(result).toContain('href="/policy?lang=en"');
   });
 
   it('marks home link as active', () => {
     const result = controller.getHome(undefined);
-    expect(result).toMatch(/href="\/"[^>]*class="active"|class="active"[^>]*href="\/"/);
+    expect(result).toMatch(/href="\/\?lang=en"[^>]*class="active"|class="active"[^>]*href="\/\?lang=en"/);
   });
 });
 
@@ -160,6 +173,11 @@ describe('PolicyController', () => {
     expect(result).toContain('<html lang="es"');
   });
 
+  it('uses explicit language query over Accept-Language header', () => {
+    const result = controller.getPolicy('en-US, en;q=0.9', 'ja');
+    expect(result).toContain('<html lang="ja"');
+  });
+
   it('contains all required policy sections', () => {
     const result = controller.getPolicy(undefined);
     expect(result).toContain('email address');
@@ -171,13 +189,13 @@ describe('PolicyController', () => {
 
   it('contains footer with navigation links', () => {
     const result = controller.getPolicy(undefined);
-    expect(result).toContain('href="/"');
-    expect(result).toContain('href="/policy"');
+    expect(result).toContain('href="/?lang=en"');
+    expect(result).toContain('href="/policy?lang=en"');
   });
 
   it('marks policy link as active', () => {
     const result = controller.getPolicy(undefined);
-    expect(result).toMatch(/href="\/policy"[^>]*class="active"|class="active"[^>]*href="\/policy"/);
+    expect(result).toMatch(/href="\/policy\?lang=en"[^>]*class="active"|class="active"[^>]*href="\/policy\?lang=en"/);
   });
 });
 
@@ -193,8 +211,12 @@ describe('web layout – renderHomePage', () => {
     expect(html).toContain('blood pressure monitor');
     expect(html).toContain('Google Play');
     expect(html).toContain('<footer');
-    expect(html).toContain('href="/"');
-    expect(html).toContain('href="/policy"');
+    expect(html).toContain('href="/?lang=en"');
+    expect(html).toContain('href="/policy?lang=en"');
+    expect(html).toContain('class="language-picker-form"');
+    expect(html).toContain('material-icons-outlined');
+    expect(html).toContain('>language<');
+    expect(html).toContain('name="lang"');
   });
 
   it('renders Russian home page', () => {
@@ -218,7 +240,7 @@ describe('web layout – renderHomePage', () => {
   it('marks the home link as active on the home page', () => {
     const t = resolveTranslations(undefined);
     const html = renderHomePage(t);
-    expect(html).toMatch(/href="\/"[^>]*class="active"|class="active"[^>]*href="\/"/);
+    expect(html).toMatch(/href="\/\?lang=en"[^>]*class="active"|class="active"[^>]*href="\/\?lang=en"/);
   });
 });
 
@@ -236,8 +258,8 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('not a medical device');
     expect(html).toContain('blood.pressure.by.max@gmail.com');
     expect(html).toContain('<footer');
-    expect(html).toContain('href="/"');
-    expect(html).toContain('href="/policy"');
+    expect(html).toContain('href="/?lang=en"');
+    expect(html).toContain('href="/policy?lang=en"');
   });
 
   it('renders Russian policy page', () => {
@@ -254,7 +276,7 @@ describe('web layout – renderPolicyPage', () => {
   it('marks the policy link as active on the policy page', () => {
     const t = resolveTranslations(undefined);
     const html = renderPolicyPage(t);
-    expect(html).toMatch(/href="\/policy"[^>]*class="active"|class="active"[^>]*href="\/policy"/);
+    expect(html).toMatch(/href="\/policy\?lang=en"[^>]*class="active"|class="active"[^>]*href="\/policy\?lang=en"/);
   });
 
   it('escapes special characters in translated content', () => {
