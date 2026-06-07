@@ -17,7 +17,7 @@ appId: com.masim05.bloodpressure.mobile
 - evalScript: |
     var testEmail = 'maestrotest_' + Date.now() + '@test.example.com';
     var resp = http.post('http://localhost:3000/api/v1/signin', {
-      body: JSON.stringify({email: testEmail, password: 'testpassword123'}),
+      body: JSON.stringify({email: testEmail, password: 'password123'}),
       headers: {'Content-Type': 'application/json'}
     });
     if (resp.status !== 201) throw new Error('Signin API call format check failed with status: ' + resp.status);
