@@ -43,17 +43,20 @@ appId: com.masim05.bloodpressure.mobile
     if (typeof body.pageSize !== 'number') throw new Error('History API response missing pageSize field');
     if (typeof body.hasNextPage !== 'boolean') throw new Error('History API response missing hasNextPage field');
     if (!body.filters || typeof body.filters !== 'object') throw new Error('History API response missing filters field');
+    if (!body.items[0] || typeof body.items[0].id !== 'string' || body.items[0].id.length === 0) throw new Error('History API response missing first measurement id');
+    output.selectedMeasurementId = body.items[0].id;
 - tapOn:
     id: history_row
 - assertVisible:
     id: measurement_detail_screen
 - evalScript: |
-    var resp = http.get('http://localhost:3000/api/v1/measurements/msr_maestro_us5', {
+    var resp = http.get('http://localhost:3000/api/v1/measurements/' + output.selectedMeasurementId, {
       headers: {'Authorization': output.token}
     });
     if (resp.status !== 200) throw new Error('Measurement detail API call format check failed with status: ' + resp.status);
     var body = JSON.parse(resp.body);
     if (typeof body.id !== 'string' || body.id.length === 0) throw new Error('Measurement detail API response missing id field');
+    if (body.id !== output.selectedMeasurementId) throw new Error('Measurement detail API response id does not match selected history item');
     if (typeof body.status !== 'string' || body.status.length === 0) throw new Error('Measurement detail API response missing status field');
     if (typeof body.measurementTime !== 'string' || body.measurementTime.length === 0) throw new Error('Measurement detail API response missing measurementTime field');
     if (typeof body.imageUrl !== 'string' || body.imageUrl.length === 0) throw new Error('Measurement detail API response missing imageUrl field');
@@ -67,7 +70,7 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: measurement_detail_save
 - evalScript: |
-    var saveResp = http.post('http://localhost:3000/api/v1/measurements/msr_maestro_us5/save', {
+    var saveResp = http.post('http://localhost:3000/api/v1/measurements/' + output.selectedMeasurementId + '/save', {
       body: JSON.stringify({systolic: 121, armSide: 'left'}),
       headers: {'Content-Type': 'application/json', 'Authorization': output.token}
     });

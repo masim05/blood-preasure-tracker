@@ -26,6 +26,7 @@ appId: com.masim05.bloodpressure.mobile
     if (body.tokenType !== 'Bearer') throw new Error('Signin API response tokenType is not Bearer');
     if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Signin API response missing expiresAt field');
     if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Signin API response user object is invalid');
+    output.token = body.tokenType + ' ' + body.accessToken;
 - assertVisible:
     id: guide_screen
 - tapOn:
@@ -43,13 +44,8 @@ appId: com.masim05.bloodpressure.mobile
 - assertVisible:
     id: history_screen
 - evalScript: |
-    var loginResp = http.post('http://localhost:3000/api/v1/login', {
-      body: JSON.stringify({email: 'us5@example.com', password: 'password123'}),
-      headers: {'Content-Type': 'application/json'}
-    });
-    var token = JSON.parse(loginResp.body).tokenType + ' ' + JSON.parse(loginResp.body).accessToken;
     var resp = http.get('http://localhost:3000/api/v1/measurements?page=1&pageSize=20', {
-      headers: {'Authorization': token}
+      headers: {'Authorization': output.token}
     });
     if (resp.status !== 200) throw new Error('History API call format check failed with status: ' + resp.status);
     var body = JSON.parse(resp.body);
@@ -58,3 +54,4 @@ appId: com.masim05.bloodpressure.mobile
     if (typeof body.pageSize !== 'number') throw new Error('History API response missing pageSize field');
     if (typeof body.hasNextPage !== 'boolean') throw new Error('History API response missing hasNextPage field');
     if (!body.filters || typeof body.filters !== 'object') throw new Error('History API response missing filters field');
+    if (body.items.length !== 0) throw new Error('History API response expected no measurements for newly created account');
