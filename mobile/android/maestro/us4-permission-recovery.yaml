@@ -6,7 +6,9 @@ appId: com.masim05.bloodpressure.mobile
     id: auth_mode_new_account
 - tapOn:
     id: signin_email
-- inputRandomEmail
+- evalScript: |
+    output.signinEmail = 'maestrotest_' + Date.now() + '@test.example.com';
+- inputText: ${output.signinEmail}
 - hideKeyboard
 - tapOn:
     id: signin_password
@@ -15,9 +17,8 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: signin_submit
 - evalScript: |
-    var testEmail = 'maestrotest_' + Date.now() + '@test.example.com';
     var resp = http.post('http://localhost:3000/api/v1/signin', {
-      body: JSON.stringify({email: testEmail, password: 'password123'}),
+      body: JSON.stringify({email: output.signinEmail, password: 'password123'}),
       headers: {'Content-Type': 'application/json'}
     });
     if (resp.status !== 201) throw new Error('Signin API call format check failed with status: ' + resp.status);
