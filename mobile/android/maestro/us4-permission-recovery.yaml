@@ -16,20 +16,20 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: signin_submit
+- assertVisible:
+    id: guide_screen
 - evalScript: |
-    var resp = http.post('http://localhost:3000/api/v1/signin', {
+    var resp = http.post('http://localhost:3000/api/v1/login', {
       body: JSON.stringify({email: output.signinEmail, password: 'password123'}),
       headers: {'Content-Type': 'application/json'}
     });
-    if (resp.status !== 201) throw new Error('Signin API call format check failed with status: ' + resp.status);
+    if (resp.status !== 201) throw new Error('Login API call format check failed with status: ' + resp.status);
     var body = JSON.parse(resp.body);
-    if (typeof body.accessToken !== 'string' || body.accessToken.length === 0) throw new Error('Signin API response missing accessToken field');
-    if (body.tokenType !== 'Bearer') throw new Error('Signin API response tokenType is not Bearer');
-    if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Signin API response missing expiresAt field');
-    if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Signin API response user object is invalid');
+    if (typeof body.accessToken !== 'string' || body.accessToken.length === 0) throw new Error('Login API response missing accessToken field');
+    if (body.tokenType !== 'Bearer') throw new Error('Login API response tokenType is not Bearer');
+    if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Login API response missing expiresAt field');
+    if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Login API response user object is invalid');
     output.token = body.tokenType + ' ' + body.accessToken;
-- assertVisible:
-    id: guide_screen
 - tapOn:
     id: guide_continue
 - tapOn:
