@@ -162,6 +162,20 @@ vite.config.ts.timestamp-*
 **/.gradle/
 **/local.properties
 
+# iOS / Xcode
+xcuserdata/
+*.xcuserstate
+mobile/ios/**/*.xcscmblueprint
+mobile/ios/**/*.xccheckout
+mobile/ios/**/DerivedData/
+mobile/ios/**/.build/
+mobile/ios/**/Pods/
+mobile/ios/**/xcshareddata/xcbaselines/
+mobile/ios/**/*.hmap
+mobile/ios/**/*.ipa
+mobile/ios/**/*.dSYM.zip
+mobile/ios/**/*.dSYM
+
 # Local planning and agent-instruction artifacts
 .specify/feature.json
 .github/copilot-instructions.md
