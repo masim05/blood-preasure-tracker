@@ -14,6 +14,18 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: signin_submit
+- evalScript: |
+    var testEmail = 'maestrotest_' + Date.now() + '@test.example.com';
+    var resp = http.post('http://localhost:3000/api/v1/signin', {
+      body: JSON.stringify({email: testEmail, password: 'testpassword123'}),
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (resp.status !== 201) throw new Error('Signin API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (typeof body.accessToken !== 'string' || body.accessToken.length === 0) throw new Error('Signin API response missing accessToken field');
+    if (body.tokenType !== 'Bearer') throw new Error('Signin API response tokenType is not Bearer');
+    if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Signin API response missing expiresAt field');
+    if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Signin API response user object is invalid');
 - assertVisible:
     id: guide_screen
 - tapOn:

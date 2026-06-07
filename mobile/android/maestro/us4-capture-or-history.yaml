@@ -14,6 +14,18 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: login_submit
+- evalScript: |
+    var resp = http.post('http://localhost:3000/api/v1/login', {
+      body: JSON.stringify({email: 'us4@example.com', password: 'password123'}),
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (resp.status !== 201) throw new Error('Login API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (typeof body.accessToken !== 'string' || body.accessToken.length === 0) throw new Error('Login API response missing accessToken field');
+    if (body.tokenType !== 'Bearer') throw new Error('Login API response tokenType is not Bearer');
+    if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Login API response missing expiresAt field');
+    if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Login API response user object is invalid');
+    output.token = body.tokenType + ' ' + body.accessToken;
 - tapOn:
     text: (While using the app|Only this time|Allow)
     optional: true
@@ -23,3 +35,14 @@ appId: com.masim05.bloodpressure.mobile
     id: bottom_nav_history
 - assertVisible:
     id: history_table
+- evalScript: |
+    var resp = http.get('http://localhost:3000/api/v1/measurements?page=1&pageSize=20', {
+      headers: {'Authorization': output.token}
+    });
+    if (resp.status !== 200) throw new Error('History API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (!Array.isArray(body.items)) throw new Error('History API response missing items array');
+    if (typeof body.page !== 'number') throw new Error('History API response missing page field');
+    if (typeof body.pageSize !== 'number') throw new Error('History API response missing pageSize field');
+    if (typeof body.hasNextPage !== 'boolean') throw new Error('History API response missing hasNextPage field');
+    if (!body.filters || typeof body.filters !== 'object') throw new Error('History API response missing filters field');

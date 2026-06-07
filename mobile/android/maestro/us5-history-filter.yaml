@@ -14,10 +14,33 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: login_submit
+- evalScript: |
+    var resp = http.post('http://localhost:3000/api/v1/login', {
+      body: JSON.stringify({email: 'us5@example.com', password: 'password123'}),
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (resp.status !== 201) throw new Error('Login API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (typeof body.accessToken !== 'string' || body.accessToken.length === 0) throw new Error('Login API response missing accessToken field');
+    if (body.tokenType !== 'Bearer') throw new Error('Login API response tokenType is not Bearer');
+    if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Login API response missing expiresAt field');
+    if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Login API response user object is invalid');
+    output.token = body.tokenType + ' ' + body.accessToken;
 - assertVisible:
     id: bottom_nav_history
 - tapOn:
     id: bottom_nav_history
+- evalScript: |
+    var resp = http.get('http://localhost:3000/api/v1/measurements?page=1&pageSize=20', {
+      headers: {'Authorization': output.token}
+    });
+    if (resp.status !== 200) throw new Error('History API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (!Array.isArray(body.items)) throw new Error('History API response missing items array');
+    if (typeof body.page !== 'number') throw new Error('History API response missing page field');
+    if (typeof body.pageSize !== 'number') throw new Error('History API response missing pageSize field');
+    if (typeof body.hasNextPage !== 'boolean') throw new Error('History API response missing hasNextPage field');
+    if (!body.filters || typeof body.filters !== 'object') throw new Error('History API response missing filters field');
 - tapOn:
     id: history_from
 - tapOn:
@@ -28,6 +51,22 @@ appId: com.masim05.bloodpressure.mobile
     text: OK
 - tapOn:
     id: history_apply_filter
+- evalScript: |
+    var today = new Date();
+    var from = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + 'T00:00:00.000Z';
+    var to = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + 'T23:59:59.999Z';
+    var resp = http.get('http://localhost:3000/api/v1/measurements?page=1&pageSize=20&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to), {
+      headers: {'Authorization': output.token}
+    });
+    if (resp.status !== 200) throw new Error('History filter API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (!Array.isArray(body.items)) throw new Error('History filter API response missing items array');
+    if (typeof body.page !== 'number') throw new Error('History filter API response missing page field');
+    if (typeof body.pageSize !== 'number') throw new Error('History filter API response missing pageSize field');
+    if (typeof body.hasNextPage !== 'boolean') throw new Error('History filter API response missing hasNextPage field');
+    if (!body.filters || typeof body.filters !== 'object') throw new Error('History filter API response missing filters field');
+    if (typeof body.filters.from !== 'string') throw new Error('History filter API response filters missing from field');
+    if (typeof body.filters.to !== 'string') throw new Error('History filter API response filters missing to field');
 - assertVisible:
     text: "120"
 - assertVisible:
@@ -38,6 +77,16 @@ appId: com.masim05.bloodpressure.mobile
     id: history_row
 - assertVisible:
     id: measurement_detail_screen
+- evalScript: |
+    var resp = http.get('http://localhost:3000/api/v1/measurements/msr_maestro_us5', {
+      headers: {'Authorization': output.token}
+    });
+    if (resp.status !== 200) throw new Error('Measurement detail API call format check failed with status: ' + resp.status);
+    var body = JSON.parse(resp.body);
+    if (typeof body.id !== 'string' || body.id.length === 0) throw new Error('Measurement detail API response missing id field');
+    if (typeof body.status !== 'string' || body.status.length === 0) throw new Error('Measurement detail API response missing status field');
+    if (typeof body.measurementTime !== 'string' || body.measurementTime.length === 0) throw new Error('Measurement detail API response missing measurementTime field');
+    if (typeof body.imageUrl !== 'string' || body.imageUrl.length === 0) throw new Error('Measurement detail API response missing imageUrl field');
 - tapOn:
     id: measurement_detail_back
 - assertVisible:
