@@ -6,9 +6,11 @@ appId: com.masim05.bloodpressure.mobile
     id: auth_mode_new_account
 - tapOn:
     id: signin_email
+- inputRandomEmail
+- copyTextFrom:
+    id: signin_email
 - evalScript: |
-    output.signinEmail = 'maestrotest_' + Date.now() + '@test.example.com';
-- inputText: ${output.signinEmail}
+    output.signinEmail = maestro.copiedText;
 - hideKeyboard
 - tapOn:
     id: signin_password
