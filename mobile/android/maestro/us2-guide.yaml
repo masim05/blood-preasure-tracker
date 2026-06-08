@@ -16,6 +16,10 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: signin_submit
+- extendedWaitUntil:
+    visible:
+      id: guide_screen
+    timeout: 30000
 - assertVisible:
     id: guide_screen
 - evalScript: |
