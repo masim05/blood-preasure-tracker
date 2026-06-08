@@ -162,7 +162,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build Android debug APK
-        run: ./gradlew --no-daemon -PapiBaseUrl=http://127.0.0.1:3000 :app:assembleDebug
+        run: ./gradlew --no-daemon :app:assembleDebug
         working-directory: mobile/android
 
       - name: Upload Android debug APK
