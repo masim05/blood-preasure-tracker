@@ -1,6 +1,6 @@
 # Maestro Flows
 
-These flows cover the happy paths for US1 through US7. They use stable Android resource IDs rather than visible text selectors so localized strings can change without breaking the flows.
+These flows cover the happy paths for US1 through US7. They prefer stable Android resource IDs for app-owned UI, with visible text selectors used only where the asserted content is intentionally stable (for example seeded numeric values or system permission prompts).
 
 Each flow also asserts that the API calls it triggers have been executed: if any API call is disabled the corresponding assertion will fail.
 

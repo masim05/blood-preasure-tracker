@@ -23,9 +23,11 @@ appId: com.masim05.bloodpressure.mobile
     id: camera_upload
 - assertVisible:
     id: history_table
+- assertVisible:
+    id: history_last_uploaded_row
 - tapOn:
-    id: history_row
+    id: history_last_uploaded_row
 - assertVisible:
     id: measurement_detail_image
 - assertVisible:
-    label: "Captured measurement image"
+    id: measurement_detail_image_loaded

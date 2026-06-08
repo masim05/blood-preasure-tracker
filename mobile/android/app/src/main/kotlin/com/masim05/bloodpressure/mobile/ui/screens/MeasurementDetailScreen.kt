@@ -297,7 +297,9 @@ private fun MeasurementImage(
         Image(
             bitmap = loadedBitmap,
             contentDescription = stringResource(R.string.detail_image_content_description),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(TestTags.MeasurementDetailImageLoaded),
             contentScale = ContentScale.Fit,
         )
     } else if (isLoading) {
