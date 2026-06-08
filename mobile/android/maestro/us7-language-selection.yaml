@@ -16,6 +16,12 @@ appId: com.masim05.bloodpressure.mobile
     id: login_submit
 - assertVisible:
     id: bottom_nav_profile
+- evalScript: |
+    var res = http.post('http://127.0.0.1:3000/api/v1/login', {
+      body: JSON.stringify({email: 'us5@example.com', password: 'password123'}),
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (!res.ok) throw new Error('POST /api/v1/login: expected 2xx, got ' + res.status);
 - tapOn:
     id: bottom_nav_profile
 - assertVisible:

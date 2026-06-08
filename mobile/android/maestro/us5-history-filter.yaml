@@ -16,6 +16,17 @@ appId: com.masim05.bloodpressure.mobile
     id: login_submit
 - assertVisible:
     id: bottom_nav_history
+- evalScript: |
+    var loginRes = http.post('http://127.0.0.1:3000/api/v1/login', {
+      body: JSON.stringify({email: 'us5@example.com', password: 'password123'}),
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (!loginRes.ok) throw new Error('POST /api/v1/login: expected 2xx, got ' + loginRes.status);
+    var token = json(loginRes.body).accessToken;
+    var histRes = http.get('http://127.0.0.1:3000/api/v1/measurements', {
+      headers: {Authorization: 'Bearer ' + token}
+    });
+    if (!histRes.ok) throw new Error('GET /api/v1/measurements: expected 2xx, got ' + histRes.status);
 - tapOn:
     id: bottom_nav_history
 - tapOn:
