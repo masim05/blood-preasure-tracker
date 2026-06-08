@@ -16,12 +16,6 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: signin_submit
-- extendedWaitUntil:
-    visible:
-      id: guide_screen
-    timeout: 30000
-- assertVisible:
-    id: guide_screen
 - evalScript: |
     var resp = http.post('http://localhost:3000/api/v1/login', {
       body: JSON.stringify({email: output.signinEmail, password: 'password123'}),
@@ -34,6 +28,12 @@ appId: com.masim05.bloodpressure.mobile
     if (typeof body.expiresAt !== 'string' || body.expiresAt.length === 0) throw new Error('Login API response missing expiresAt field');
     if (!body.user || typeof body.user.id !== 'string' || typeof body.user.email !== 'string') throw new Error('Login API response user object is invalid');
     output.token = body.tokenType + ' ' + body.accessToken;
+- extendedWaitUntil:
+    visible:
+      id: guide_screen
+    timeout: 30000
+- assertVisible:
+    id: guide_screen
 - tapOn:
     id: guide_continue
 - tapOn:
