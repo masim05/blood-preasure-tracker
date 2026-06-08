@@ -8,24 +8,55 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var appState: AppState
+
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "heart.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.red)
-            Text("Hello, World!")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            Text("Blood Pressure Tracker")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+        switch appState.route {
+        case .auth:
+            AuthView()
+        case .guide:
+            GuideView()
+        default:
+            mainTabView
         }
-        .padding()
+    }
+
+    private var mainTabView: some View {
+        TabView {
+            NavigationStack {
+                CameraView()
+                    .navigationDestination(isPresented: Binding(
+                        get: { appState.route == .measurementDetail },
+                        set: { if !$0 { appState.goBack() } }
+                    )) {
+                        MeasurementDetailView()
+                    }
+            }
+            .tabItem {
+                Label("Camera", systemImage: "camera")
+            }
+
+            NavigationStack {
+                HistoryView()
+                    .navigationDestination(isPresented: Binding(
+                        get: { appState.route == .measurementDetail },
+                        set: { if !$0 { appState.goBack() } }
+                    )) {
+                        MeasurementDetailView()
+                    }
+            }
+            .tabItem {
+                Label("History", systemImage: "list.bullet")
+            }
+
+            NavigationStack {
+                ProfileView()
+            }
+            .tabItem {
+                Label("Profile", systemImage: "person")
+            }
+        }
+        .accentColor(AppColors.primaryGreen)
     }
 }
-
-#Preview {
-    ContentView()
-}
-
 
