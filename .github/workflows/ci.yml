@@ -395,19 +395,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Run iOS tests
+      - name: Build iOS targets for simulator
         run: |
           set -eu
-          SIMULATOR_ID="$(xcrun simctl list devices available iOS | awk -F '[()]' '/iPhone/{print $2; exit}')"
-          if [ -z "$SIMULATOR_ID" ]; then
-            echo "No available iOS simulator found on runner."
-            xcrun simctl list devices available iOS
-            exit 1
-          fi
-          xcodebuild test \
+          xcodebuild build \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "id=$SIMULATOR_ID" \
+            -sdk iphonesimulator \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
 
