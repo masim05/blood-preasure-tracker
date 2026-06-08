@@ -74,13 +74,10 @@ appId: com.masim05.bloodpressure.mobile
       body: JSON.stringify({systolic: 121, armSide: 'left'}),
       headers: {'Content-Type': 'application/json', 'Authorization': output.token}
     });
-    if (saveResp.status === 400) throw new Error('Save API rejected payload as invalid: ' + saveResp.body);
-    if (saveResp.status !== 201 && saveResp.status !== 409) throw new Error('Save API unexpected status: ' + saveResp.status);
-    if (saveResp.status === 409) {
-      var errBody = JSON.parse(saveResp.body);
-      if (typeof errBody.error !== 'string' || errBody.error.length === 0) throw new Error('Save API 409 response missing error field');
-      if (typeof errBody.message !== 'string' || errBody.message.length === 0) throw new Error('Save API 409 response missing message field');
-    }
+    if (saveResp.status !== 409) throw new Error('Save API expected 409 conflict for seeded saved measurement but got: ' + saveResp.status);
+    var errBody = JSON.parse(saveResp.body);
+    if (typeof errBody.error !== 'string' || errBody.error.length === 0) throw new Error('Save API 409 response missing error field');
+    if (typeof errBody.message !== 'string' || errBody.message.length === 0) throw new Error('Save API 409 response missing message field');
 - tapOn:
     id: measurement_detail_back
     optional: true
