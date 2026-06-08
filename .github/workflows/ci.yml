@@ -328,6 +328,7 @@ jobs:
           run_maestro mobile/android/maestro/us4-permission-recovery.yaml
           run_maestro mobile/android/maestro/us5-history-filter.yaml
           run_maestro mobile/android/maestro/us6-measurement-detail.yaml
+          run_maestro mobile/android/maestro/us7-language-selection.yaml
           SH
           chmod +x /tmp/run-android-maestro.sh
 

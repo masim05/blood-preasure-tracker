@@ -52,9 +52,8 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: history_apply_filter
 - evalScript: |
-    var today = new Date();
-    var from = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + 'T00:00:00.000Z';
-    var to = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + 'T23:59:59.999Z';
+    var from = '2026-05-27T00:00:00.000Z';
+    var to = '2026-05-27T23:59:59.999Z';
     var resp = http.get('http://localhost:3000/api/v1/measurements?page=1&pageSize=20&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to), {
       headers: {'Authorization': output.token}
     });
