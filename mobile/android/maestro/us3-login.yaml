@@ -1,5 +1,7 @@
 appId: com.masim05.bloodpressure.mobile
 ---
+- runScript:
+    file: scripts/assert-login-api.js
 - launchApp:
     clearState: true
 - tapOn:

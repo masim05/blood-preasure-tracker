@@ -1,21 +1,25 @@
 appId: com.masim05.bloodpressure.mobile
 ---
+- runScript:
+    file: scripts/generate-signup-creds.js
 - launchApp:
     clearState: true
 - tapOn:
     id: auth_mode_new_account
 - tapOn:
     id: signin_email
-- inputRandomEmail
+- inputText: ${output.signupEmail}
 - hideKeyboard
 - tapOn:
     id: signin_password
-- inputText: password123
+- inputText: ${output.signupPassword}
 - hideKeyboard
 - tapOn:
     id: signin_submit
 - assertVisible:
     id: guide_screen
+- runScript:
+    file: scripts/assert-signup-created-user.js
 - tapOn:
     id: guide_continue
 - assertVisible:

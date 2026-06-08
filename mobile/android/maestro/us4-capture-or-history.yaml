@@ -1,5 +1,7 @@
 appId: com.masim05.bloodpressure.mobile
 ---
+- runScript:
+    file: scripts/assert-history-api.js
 - launchApp:
     clearState: true
 - tapOn:
@@ -23,3 +25,9 @@ appId: com.masim05.bloodpressure.mobile
     id: bottom_nav_history
 - assertVisible:
     id: history_table
+- assertVisible:
+    text: "125"
+- assertVisible:
+    text: "82"
+- assertVisible:
+    text: "65"
