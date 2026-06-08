@@ -193,7 +193,16 @@ fun MeasurementDetailScreen(
                     selectedArmSide = armSide,
                     onArmSideSelected = { armSide = it },
                 )
-                Text(stringResource(R.string.detail_status, stringResource(statusLabel(measurementDetail.status))))
+                Text(
+                    modifier = Modifier.testTag(
+                        if (measurementDetail.status == MeasurementStatus.Saved) {
+                            TestTags.MeasurementDetailStatusSaved
+                        } else {
+                            "measurement_detail_status"
+                        },
+                    ),
+                    text = stringResource(R.string.detail_status, stringResource(statusLabel(measurementDetail.status))),
+                )
                 measurementDetail.recognitionError?.takeIf { it.isNotBlank() }?.let {
                     Text(text = stringResource(R.string.detail_recognition_error, it), color = MaterialTheme.colorScheme.error)
                 }

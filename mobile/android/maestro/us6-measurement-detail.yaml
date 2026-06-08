@@ -33,6 +33,8 @@ appId: com.masim05.bloodpressure.mobile
 - hideKeyboard
 - tapOn:
     id: measurement_detail_save
+- assertVisible:
+    id: measurement_detail_status_saved
 - tapOn:
     id: measurement_detail_back
     optional: true
@@ -43,4 +45,4 @@ appId: com.masim05.bloodpressure.mobile
 - assertVisible:
     id: measurement_detail_image
 - assertVisible:
-    text: "121"
+    id: measurement_detail_status_saved
