@@ -5,11 +5,14 @@ import { Client } from 'pg';
 export const MAESTRO_FIXTURE_USER_US3_ID = 'usr_maestro_us3';
 export const MAESTRO_FIXTURE_USER_US4_ID = 'usr_maestro_us4';
 export const MAESTRO_FIXTURE_USER_US5_ID = 'usr_maestro_us5';
+export const MAESTRO_FIXTURE_USER_US6_ID = 'usr_maestro_us6';
 export const MAESTRO_FIXTURE_USER_US3_EMAIL = 'us3@example.com';
 export const MAESTRO_FIXTURE_USER_US4_EMAIL = 'us4@example.com';
 export const MAESTRO_FIXTURE_USER_US5_EMAIL = 'us5@example.com';
+export const MAESTRO_FIXTURE_USER_US6_EMAIL = 'us6@example.com';
 export const MAESTRO_FIXTURE_MEASUREMENT_US4_ID = 'msr_maestro_us4';
 export const MAESTRO_FIXTURE_MEASUREMENT_ID = 'msr_maestro_us5';
+export const MAESTRO_FIXTURE_MEASUREMENT_US6_ID = 'msr_maestro_us6';
 const MAESTRO_PASSWORD = 'password123';
 const MAESTRO_SALT = 'maestro-salt';
 
@@ -29,8 +32,10 @@ export async function seedAndroidMaestroFixtures(databaseUrl = process.env.DATAB
     await upsertUser(client, MAESTRO_FIXTURE_USER_US3_ID, MAESTRO_FIXTURE_USER_US3_EMAIL, now);
     await upsertUser(client, MAESTRO_FIXTURE_USER_US4_ID, MAESTRO_FIXTURE_USER_US4_EMAIL, now);
     await upsertUser(client, MAESTRO_FIXTURE_USER_US5_ID, MAESTRO_FIXTURE_USER_US5_EMAIL, now);
+    await upsertUser(client, MAESTRO_FIXTURE_USER_US6_ID, MAESTRO_FIXTURE_USER_US6_EMAIL, now);
     await upsertSavedMeasurement(client, MAESTRO_FIXTURE_MEASUREMENT_US4_ID, MAESTRO_FIXTURE_USER_US4_ID, 125, 82, 65, now);
     await upsertSavedMeasurement(client, MAESTRO_FIXTURE_MEASUREMENT_ID, MAESTRO_FIXTURE_USER_US5_ID, 120, 80, 68, now);
+    await upsertSavedMeasurement(client, MAESTRO_FIXTURE_MEASUREMENT_US6_ID, MAESTRO_FIXTURE_USER_US6_ID, 120, 80, 68, now);
   } finally {
     await client.end();
   }
