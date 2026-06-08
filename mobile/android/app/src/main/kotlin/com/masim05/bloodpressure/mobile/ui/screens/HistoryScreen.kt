@@ -76,6 +76,7 @@ private val NormalGreen = Color(0xFF639922)
 fun HistoryScreen(
     filter: HistoryFilter,
     measurements: List<Measurement>,
+    lastUploadedMeasurementId: String?,
     isLoading: Boolean,
     errorText: String?,
     onRefresh: () -> Unit,
@@ -197,7 +198,7 @@ fun HistoryScreen(
                 }
             } else {
                 CardContainer(modifier = Modifier.weight(1f, fill = false)) {
-                    HistoryTable(measurements, onMeasurementSelected)
+                    HistoryTable(measurements, lastUploadedMeasurementId, onMeasurementSelected)
                 }
                 if (showHistoryRefreshLoadingIndicator(isLoading, measurements)) {
                     Text(modifier = Modifier.padding(top = 8.dp), text = stringResource(R.string.status_loading))
@@ -231,13 +232,23 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun HistoryTable(measurements: List<Measurement>, onMeasurementSelected: (Measurement) -> Unit) {
+private fun HistoryTable(
+    measurements: List<Measurement>,
+    lastUploadedMeasurementId: String?,
+    onMeasurementSelected: (Measurement) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier
             .testTag(TestTags.HistoryTable),
     ) {
         item { HistoryHeader() }
-        items(measurements) { measurement -> HistoryRow(measurement, onMeasurementSelected) }
+        items(measurements) { measurement ->
+            HistoryRow(
+                measurement = measurement,
+                isLastUploadedMeasurement = measurement.id == lastUploadedMeasurementId,
+                onMeasurementSelected = onMeasurementSelected,
+            )
+        }
     }
 }
 
@@ -258,19 +269,24 @@ private fun HistoryHeader() {
 }
 
 @Composable
-private fun HistoryRow(measurement: Measurement, onMeasurementSelected: (Measurement) -> Unit) {
+private fun HistoryRow(
+    measurement: Measurement,
+    isLastUploadedMeasurement: Boolean,
+    onMeasurementSelected: (Measurement) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (isLastUploadedMeasurement) Modifier.testTag(TestTags.HistoryLastUploadedRow) else Modifier)
             .clickable { onMeasurementSelected(measurement) }
-            .defaultMinSize(minHeight = 48.dp)
-            .testTag(TestTags.HistoryRow),
+            .defaultMinSize(minHeight = 48.dp),
         verticalArrangement = Arrangement.Center,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
+                .testTag(TestTags.HistoryRow),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             HistoryCell(formatHistoryTime(measurement.measurementTime.ifBlank { measurement.savedAt }), 2f)

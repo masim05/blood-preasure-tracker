@@ -174,6 +174,7 @@ class MainActivity : ComponentActivity() {
                                 HistoryScreen(
                                     filter = uiState.filter,
                                     measurements = uiState.measurements,
+                                    lastUploadedMeasurementId = uiState.lastUploadedMeasurementId,
                                     isLoading = uiState.isHistoryLoading,
                                     errorText = uiState.errorText,
                                     onRefresh = ::refreshHistory,
@@ -302,21 +303,26 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun captureAndUpload() {
-        uiState = uiState.copy(isUploading = true, errorText = null)
+        uiState = uiState.copy(isUploading = true, errorText = null, lastUploadedMeasurementId = null)
         runInBackground {
             val state = captureFlow.captureAndUpload()
             state.logErrors("camera_upload")
             runOnUiThread {
                 if (state.route == Route.History) {
-                    openHistory(HistoryFilter())
+                    openHistory(HistoryFilter(), state.lastUploadId)
                 } else {
-                    uiState = uiState.copy(route = state.route, isUploading = false, errorText = state.visibleMessage())
+                    uiState = uiState.copy(
+                        route = state.route,
+                        isUploading = false,
+                        lastUploadedMeasurementId = null,
+                        errorText = state.visibleMessage(),
+                    )
                 }
             }
         }
     }
 
-    private fun openHistory(filter: HistoryFilter) {
+    private fun openHistory(filter: HistoryFilter, lastUploadedMeasurementId: String? = null) {
         if (captureFlow.history().route == Route.Auth) {
             uiState = MobileUiState(route = Route.Auth, authMode = AuthMode.Login)
             return
@@ -329,6 +335,7 @@ class MainActivity : ComponentActivity() {
             measurements = emptyList(),
             isUploading = false,
             isHistoryLoading = true,
+            lastUploadedMeasurementId = lastUploadedMeasurementId,
             errorText = null,
         )
         runInBackground {
@@ -849,6 +856,7 @@ private data class MobileUiState(
     val errorText: String? = null,
     val filter: HistoryFilter = HistoryFilter(),
     val measurements: List<Measurement> = emptyList(),
+    val lastUploadedMeasurementId: String? = null,
     val selectedMeasurementId: String? = null,
     val measurementDetail: MeasurementDetail? = null,
     val isDetailLoading: Boolean = false,

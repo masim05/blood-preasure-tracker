@@ -17,11 +17,17 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     text: (While using the app|Only this time|Allow)
     optional: true
-- assertVisible:
-    id: bottom_nav_history
+- assertNotVisible:
+    id: camera_loading
 - tapOn:
-    id: bottom_nav_history
+    id: camera_upload
 - assertVisible:
     id: history_table
 - assertVisible:
-    text: "125"
+    id: history_last_uploaded_row
+- tapOn:
+    id: history_last_uploaded_row
+- assertVisible:
+    id: measurement_detail_image
+- assertVisible:
+    id: measurement_detail_image_loaded
