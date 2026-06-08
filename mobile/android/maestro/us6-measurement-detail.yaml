@@ -6,7 +6,7 @@ appId: com.masim05.bloodpressure.mobile
     id: auth_mode_login
 - tapOn:
     id: login_email
-- inputText: us5@example.com
+- inputText: us4@example.com
 - hideKeyboard
 - tapOn:
     id: login_password
@@ -16,7 +16,7 @@ appId: com.masim05.bloodpressure.mobile
     id: login_submit
 - evalScript: |
     var resp = http.post('http://localhost:3000/api/v1/login', {
-      body: JSON.stringify({email: 'us5@example.com', password: 'password123'}),
+      body: JSON.stringify({email: 'us4@example.com', password: 'password123'}),
       headers: {'Content-Type': 'application/json'}
     });
     if (resp.status !== 201) throw new Error('Login API call format check failed with status: ' + resp.status);
