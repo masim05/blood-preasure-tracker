@@ -20,6 +20,7 @@ jobs:
     outputs:
       api: ${{ steps.filter.outputs.api }}
       android_app: ${{ steps.filter.outputs.android_app }}
+      ios_app: ${{ steps.filter.outputs.ios_app }}
 
     steps:
       - name: Check out repository
@@ -34,6 +35,8 @@ jobs:
               - 'src/**'
             android_app:
               - 'mobile/android/**'
+            ios_app:
+              - 'mobile/ios/Blood pressure tracker/**'
 
   required-checks-gate:
     name: Required Checks Gate
@@ -46,17 +49,20 @@ jobs:
       - lint
       - android-mobile-build
       - android-mobile-maestro
+      - ios-mobile-tests
     if: always()
 
     env:
       API_CHANGED: ${{ needs.changes.outputs.api }}
       ANDROID_CHANGED: ${{ needs.changes.outputs.android_app }}
+      IOS_CHANGED: ${{ needs.changes.outputs.ios_app }}
       BUILD_RESULT: ${{ needs.build.result }}
       UNIT_CONTRACT_COVERAGE_RESULT: ${{ needs['unit-contract-coverage'].result }}
       INTEGRATION_TESTS_RESULT: ${{ needs['integration-tests'].result }}
       LINT_RESULT: ${{ needs.lint.result }}
       ANDROID_MOBILE_BUILD_RESULT: ${{ needs['android-mobile-build'].result }}
       ANDROID_MOBILE_MAESTRO_RESULT: ${{ needs['android-mobile-maestro'].result }}
+      IOS_MOBILE_TESTS_RESULT: ${{ needs['ios-mobile-tests'].result }}
 
     steps:
       - name: Verify required checks
@@ -87,6 +93,13 @@ jobs:
                 exit 1
               fi
             done
+          fi
+
+          if [ "$IOS_CHANGED" = "true" ]; then
+            if [ "$IOS_MOBILE_TESTS_RESULT" != "success" ]; then
+              echo "iOS required check failed: $IOS_MOBILE_TESTS_RESULT"
+              exit 1
+            fi
           fi
 
   build:
@@ -371,3 +384,27 @@ jobs:
             adb shell settings put global animator_duration_scale 0 || true
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
             /tmp/run-android-maestro.sh
+
+  ios-mobile-tests:
+    name: iOS Mobile Tests
+    runs-on: macos-latest
+    needs: changes
+    if: needs.changes.outputs.ios_app == 'true'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Run iOS tests
+        run: |
+          set -eu
+          xcodebuild test \
+            -project "Blood pressure tracker.xcodeproj" \
+            -scheme "Blood pressure tracker" \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+            -quiet
+        working-directory: mobile/ios/Blood pressure tracker
+
