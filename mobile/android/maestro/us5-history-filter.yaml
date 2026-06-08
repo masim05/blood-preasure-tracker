@@ -37,7 +37,7 @@ appId: com.masim05.bloodpressure.mobile
 - tapOn:
     id: history_row
 - assertVisible:
-    id: measurement_detail_screen
+    id: measurement_detail_image
 - tapOn:
     id: measurement_detail_back
 - assertVisible:
