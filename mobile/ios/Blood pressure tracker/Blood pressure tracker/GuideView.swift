@@ -23,7 +23,7 @@ func guideExamplePanels() -> [GuideExamplePanel] {
 // MARK: - GuideView
 
 struct GuideView: View {
-    var onNext: () -> Void
+    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         ScrollView {
@@ -42,7 +42,7 @@ struct GuideView: View {
                 GuideExampleCollage(examples: guideExamplePanels())
                     .frame(maxWidth: .infinity)
 
-                Button(action: onNext) {
+                Button(action: { appState.continueToCamera() }) {
                     Text("Next")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white)

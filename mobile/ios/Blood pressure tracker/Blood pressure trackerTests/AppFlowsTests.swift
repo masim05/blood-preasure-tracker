@@ -50,7 +50,7 @@ struct AppFlowsTests {
         #expect(CaptureFlow(sessionStore: store, cameraGateway: CameraFailure(), uploadGateway: UploadSuccess()).enterCamera().route == .auth)
         #expect(CaptureFlow(sessionStore: store, cameraGateway: CameraFailure(), uploadGateway: UploadSuccess()).history().route == .auth)
 
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
 
         #expect(GuideFlow(sessionStore: store).enterGuide().session != nil)
         #expect(GuideFlow(sessionStore: store).continueToCamera().route == .camera)
@@ -76,7 +76,7 @@ struct AppFlowsTests {
 
     @Test func captureValidatesImageAndShowsUploadErrors() {
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
 
         let invalid = CaptureFlow(
             sessionStore: store,
@@ -104,7 +104,7 @@ struct AppFlowsTests {
 
     @Test func captureRequiresCameraReadyBeforeUpload() {
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
         let state = CaptureFlow(
             sessionStore: store,
             cameraGateway: CameraNotReady(),
@@ -124,7 +124,7 @@ struct AppFlowsTests {
         #expect(noSession.route == .auth)
 
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
         let cameraFailure = CaptureFlow(
             sessionStore: store,
             cameraGateway: CameraFailure(),
@@ -135,7 +135,7 @@ struct AppFlowsTests {
 
     @Test func historyLoadsFiltersRejectsInvalidDatesAndOpensRows() {
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
         let flow = HistoryFlow(sessionStore: store, historyGateway: HistorySuccess())
 
         let loaded = flow.load(filter: HistoryFilter(from: "2026-05-01", to: "2026-05-31"))
@@ -146,12 +146,12 @@ struct AppFlowsTests {
         let invalid = flow.load(filter: HistoryFilter(from: "2026-05-31", to: "2026-05-01"))
         #expect(invalid.validationError == .dateOrder)
 
-        let detailState = flow.rowOpensDetail(makeMeasurement())
+        let detailState = flow.rowOpensDetail(Self.makeMeasurement())
         #expect(detailState.route == .measurementDetail)
         #expect(detailState.measurementDetail?.id == "msr_1")
 
         #expect(HistoryFlow(sessionStore: MemoryStore(), historyGateway: HistorySuccess())
-            .rowOpensDetail(makeMeasurement()).route == .auth)
+            .rowOpensDetail(Self.makeMeasurement()).route == .auth)
     }
 
     @Test func measurementDetailLoadsSavesAndRequiresSession() {
@@ -159,7 +159,7 @@ struct AppFlowsTests {
             .load(measurementId: "msr_1").route == .auth)
 
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
         let flow = MeasurementDetailFlow(sessionStore: store, detailGateway: DetailSuccess())
 
         let loaded = flow.load(measurementId: "msr_1")
@@ -174,12 +174,12 @@ struct AppFlowsTests {
         #expect(saved.measurementDetail?.status == .saved)
 
         #expect(MeasurementDetailFlow(sessionStore: MemoryStore(), detailGateway: DetailSuccess())
-            .save(detail: makeDetail(status: .recognized)).route == .auth)
+            .save(detail: Self.makeDetail(status: .recognized)).route == .auth)
     }
 
     @Test func measurementDetailDisplaysApiErrors() {
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
 
         let failure = MeasurementDetailFlow(sessionStore: store, detailGateway: DetailFailure())
             .load(measurementId: "msr_1")
@@ -187,7 +187,7 @@ struct AppFlowsTests {
         #expect(failure.error?.message == "api message")
 
         let saveFailure = MeasurementDetailFlow(sessionStore: store, detailGateway: DetailFailure())
-            .save(detail: makeDetail(status: .recognized))
+            .save(detail: Self.makeDetail(status: .recognized))
         #expect(saveFailure.route == .measurementDetail)
         #expect(saveFailure.error?.message == "api message")
         #expect(saveFailure.measurementDetail?.id == "msr_1")
@@ -198,7 +198,7 @@ struct AppFlowsTests {
             .load(filter: HistoryFilter()).route == .auth)
 
         let store = MemoryStore()
-        store.save(makeSession(email: "user@example.com"))
+        store.save(Self.makeSession(email: "user@example.com"))
         let failure = HistoryFlow(sessionStore: store, historyGateway: HistoryFailure())
             .load(filter: HistoryFilter())
         #expect(failure.error?.message == "api message")
@@ -206,7 +206,7 @@ struct AppFlowsTests {
 
     @Test func restoredPersistedSessionRoutesToCameraOnFlowCreation() {
         let store = MemoryStore()
-        store.save(makeSession(email: "restored@example.com"))
+        store.save(Self.makeSession(email: "restored@example.com"))
 
         let captureState = CaptureFlow(
             sessionStore: store,
@@ -250,13 +250,13 @@ struct AppFlowsTests {
     }
 
     private class AuthSuccess: AuthGateway {
-        func signIn(email: String, password: String) -> AppResult<Session> { .success(makeSession(email: email)) }
-        func logIn(email: String, password: String) -> AppResult<Session> { .success(makeSession(email: email)) }
+        func signIn(email: String, password: String) -> AppResult<Session> { .success(AppFlowsTests.makeSession(email: email)) }
+        func logIn(email: String, password: String) -> AppResult<Session> { .success(AppFlowsTests.makeSession(email: email)) }
     }
 
     private class AuthFailure: AuthGateway {
-        func signIn(email: String, password: String) -> AppResult<Session> { .failure(makeApiError()) }
-        func logIn(email: String, password: String) -> AppResult<Session> { .failure(makeApiError()) }
+        func signIn(email: String, password: String) -> AppResult<Session> { .failure(AppFlowsTests.makeApiError()) }
+        func logIn(email: String, password: String) -> AppResult<Session> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     private class CameraSuccess: CameraGateway {
@@ -268,12 +268,12 @@ struct AppFlowsTests {
 
     private class CameraFailure: CameraGateway {
         func isReady() -> Bool { true }
-        func openCamera() -> AppResult<MeasurementImage> { .failure(makeApiError()) }
+        func openCamera() -> AppResult<MeasurementImage> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     private class CameraNotReady: CameraGateway {
         func isReady() -> Bool { false }
-        func openCamera() -> AppResult<MeasurementImage> { .failure(makeApiError()) }
+        func openCamera() -> AppResult<MeasurementImage> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     private class UploadSuccess: MeasurementUploadGateway {
@@ -281,25 +281,25 @@ struct AppFlowsTests {
     }
 
     private class UploadFailure: MeasurementUploadGateway {
-        func upload(session: Session, image: MeasurementImage) -> AppResult<String> { .failure(makeApiError()) }
+        func upload(session: Session, image: MeasurementImage) -> AppResult<String> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     private class HistorySuccess: HistoryGateway {
-        func list(session: Session, filter: HistoryFilter) -> AppResult<[Measurement]> { .success([makeMeasurement()]) }
+        func list(session: Session, filter: HistoryFilter) -> AppResult<[Measurement]> { .success([AppFlowsTests.makeMeasurement()]) }
     }
 
     private class HistoryFailure: HistoryGateway {
-        func list(session: Session, filter: HistoryFilter) -> AppResult<[Measurement]> { .failure(makeApiError()) }
+        func list(session: Session, filter: HistoryFilter) -> AppResult<[Measurement]> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     private class DetailSuccess: MeasurementDetailGateway {
-        func get(session: Session, measurementId: String) -> AppResult<MeasurementDetail> { .success(makeDetail(status: .recognized)) }
-        func save(session: Session, detail: MeasurementDetail) -> AppResult<MeasurementDetail> { .success(makeDetail(status: .saved)) }
+        func get(session: Session, measurementId: String) -> AppResult<MeasurementDetail> { .success(AppFlowsTests.makeDetail(status: .recognized)) }
+        func save(session: Session, detail: MeasurementDetail) -> AppResult<MeasurementDetail> { .success(AppFlowsTests.makeDetail(status: .saved)) }
     }
 
     private class DetailFailure: MeasurementDetailGateway {
-        func get(session: Session, measurementId: String) -> AppResult<MeasurementDetail> { .failure(makeApiError()) }
-        func save(session: Session, detail: MeasurementDetail) -> AppResult<MeasurementDetail> { .failure(makeApiError()) }
+        func get(session: Session, measurementId: String) -> AppResult<MeasurementDetail> { .failure(AppFlowsTests.makeApiError()) }
+        func save(session: Session, detail: MeasurementDetail) -> AppResult<MeasurementDetail> { .failure(AppFlowsTests.makeApiError()) }
     }
 
     // MARK: - Factories
