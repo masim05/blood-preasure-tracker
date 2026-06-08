@@ -285,7 +285,7 @@ private fun HistoryRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
                 .testTag(TestTags.HistoryRow),
             verticalAlignment = Alignment.CenterVertically,
         ) {
