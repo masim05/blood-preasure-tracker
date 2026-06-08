@@ -38,238 +38,336 @@ jobs:
   required-checks-gate:
     name: Required Checks Gate
     runs-on: ubuntu-latest
-    needs: changes
+    needs:
+      - changes
+      - build
+      - unit-contract-coverage
+      - integration-tests
+      - lint
+      - android-mobile-build
+      - android-mobile-maestro
     if: always()
+
+    env:
+      API_CHANGED: ${{ needs.changes.outputs.api }}
+      ANDROID_CHANGED: ${{ needs.changes.outputs.android_app }}
+      BUILD_RESULT: ${{ needs.build.result }}
+      UNIT_CONTRACT_COVERAGE_RESULT: ${{ needs['unit-contract-coverage'].result }}
+      INTEGRATION_TESTS_RESULT: ${{ needs['integration-tests'].result }}
+      LINT_RESULT: ${{ needs.lint.result }}
+      ANDROID_MOBILE_BUILD_RESULT: ${{ needs['android-mobile-build'].result }}
+      ANDROID_MOBILE_MAESTRO_RESULT: ${{ needs['android-mobile-maestro'].result }}
 
     steps:
       - name: Verify required checks
-        env:
-          API_CHANGED: ${{ needs.changes.outputs.api }}
-          ANDROID_CHANGED: ${{ needs.changes.outputs.android_app }}
         run: |
           set -eu
 
           if [ "$API_CHANGED" = "true" ]; then
-            npm ci
-            npm run build
-            npm run test:coverage
-
-            DB_INIT_SKIP_DOCKER=1 npm run db:init -- --env .env.test
-            npm run test:integration -- --verbose
-
-            npm run lint
+            for result in \
+              "$BUILD_RESULT" \
+              "$UNIT_CONTRACT_COVERAGE_RESULT" \
+              "$INTEGRATION_TESTS_RESULT" \
+              "$LINT_RESULT"
+            do
+              if [ "$result" != "success" ]; then
+                echo "API required check failed: $result"
+                exit 1
+              fi
+            done
           fi
 
           if [ "$ANDROID_CHANGED" = "true" ]; then
-            ./gradlew --no-daemon :app:assembleDebug
-
-            cat > /tmp/run-android-maestro.sh <<'SH'
-            set -eu
-
-            run_maestro() {
-              flow="$1"
-              for attempt in 1 2; do
-                echo "Running $flow (attempt $attempt)"
-                if timeout -k 30 420 maestro test --no-ansi "$flow"; then
-                  return 0
-                fi
-                if [ "$attempt" -eq 2 ]; then
-                  return 1
-                fi
-                adb devices || true
-                adb kill-server
-                adb start-server
-                adb wait-for-device
-                adb shell cmd package list packages >/dev/null
-              done
-            }
-
-            run_maestro mobile/android/maestro/us1-signin.yaml
-            run_maestro mobile/android/maestro/us2-guide.yaml
-            run_maestro mobile/android/maestro/us3-login.yaml
-            run_maestro mobile/android/maestro/us4-capture-or-history.yaml
-            run_maestro mobile/android/maestro/us4-permission-recovery.yaml
-            run_maestro mobile/android/maestro/us5-history-filter.yaml
-            run_maestro mobile/android/maestro/us6-measurement-detail.yaml
-            SH
-            chmod +x /tmp/run-android-maestro.sh
-
-            set -a
-            . ./.env.test
-            set +a
-            npm run api > /tmp/bpt-api.log 2>&1 &
-            for attempt in $(seq 1 60); do
-              if curl --silent http://127.0.0.1:3000/api/v1/measurements >/dev/null; then
-                break
-              fi
-              if [ "$attempt" -eq 60 ]; then
-                cat /tmp/bpt-api.log
+            for result in \
+              "$ANDROID_MOBILE_BUILD_RESULT" \
+              "$ANDROID_MOBILE_MAESTRO_RESULT"
+            do
+              if [ "$result" != "success" ]; then
+                echo "Android required check failed: $result"
                 exit 1
               fi
-              sleep 2
-
-                services:
-                  postgres:
-                    image: postgres:17-alpine
-                    env:
-                      POSTGRES_USER: postgres
-                      POSTGRES_PASSWORD: postgres
-                      POSTGRES_DB: blood_pressure_tracker_test
-                    ports:
-                      - 5433:5432
-                    options: >-
-                      --health-cmd "pg_isready -U postgres"
-                      --health-interval 10s
-                      --health-timeout 5s
-                      --health-retries 5
-
-                env:
-                  API_CHANGED: ${{ needs.changes.outputs.api }}
-                  ANDROID_CHANGED: ${{ needs.changes.outputs.android_app }}
             done
+          fi
 
-                  - name: Check out repository
-                    uses: actions/checkout@v4
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
 
-                  - name: Set up Node.js
-                    uses: actions/setup-node@v4
-                    with:
-                      node-version: 24
-                      cache: npm
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-                  - name: Set up JDK
-                    uses: actions/setup-java@v4
-                    with:
-                      distribution: temurin
-                      java-version: '17'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-                  - name: Set up Android SDK
-                    uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: npm ci
 
-                  - name: Install dependencies
-                    run: npm ci
+      - name: Build
+        run: npm run build
 
-                  - name: Build
-                    if: env.API_CHANGED == 'true'
-                    run: npm run build
+  unit-contract-coverage:
+    name: Unit/Contract Coverage
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
 
-                  - name: Coverage
-                    if: env.API_CHANGED == 'true'
-                    run: npm run test:coverage
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-                  - name: Initialize integration database
-                    if: env.API_CHANGED == 'true'
-                    env:
-                      DB_INIT_SKIP_DOCKER: '1'
-                    run: npm run db:init -- --env .env.test
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-                  - name: Integration tests
-                    if: env.API_CHANGED == 'true'
-                    run: npm run test:integration -- --verbose
+      - name: Install dependencies
+        run: npm ci
 
-                  - name: Lint
-                    if: env.API_CHANGED == 'true'
-                    run: npm run lint
+      - name: Coverage
+        run: npm run test:coverage
 
-                  - name: Enable KVM for Android emulator
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: |
-                      echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-                      sudo udevadm control --reload-rules
-                      sudo udevadm trigger --name-match=kvm
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blood_pressure_tracker_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-                  - name: Bootstrap Android Maestro fixtures
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-                  - name: Build Android debug APK
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: ./gradlew --no-daemon :app:assembleDebug
-                    working-directory: mobile/android
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-                  - name: Install Maestro
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: |
-                      curl -Ls "https://get.maestro.mobile.dev" | bash
-                      echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies
+        run: npm ci
 
-                  - name: Start API
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: |
-                      set -a
-                      . ./.env.test
-                      set +a
-                      npm run api > /tmp/bpt-api.log 2>&1 &
-                      for attempt in $(seq 1 60); do
-                        if curl --silent http://127.0.0.1:3000/api/v1/measurements >/dev/null; then
-                          exit 0
-                        fi
-                        if [ "$attempt" -eq 60 ]; then
-                          cat /tmp/bpt-api.log
-                          exit 1
-                        fi
-                        sleep 2
-                      done
+      - name: Initialize integration database
+        env:
+          DB_INIT_SKIP_DOCKER: '1'
+        run: npm run db:init -- --env .env.test
 
-                  - name: Android unit tests and coverage
-                    if: env.ANDROID_CHANGED == 'true'
-                    run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify
-                    working-directory: mobile/android
+      - name: Integration tests
+        run: npm run test:integration -- --verbose
 
-                  - name: Maestro happy paths
-                    if: env.ANDROID_CHANGED == 'true'
-                    uses: reactivecircus/android-emulator-runner@v2
-                    timeout-minutes: 25
-                    env:
-                      MAESTRO_CLI_NO_ANALYTICS: '1'
-                      MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
-                    with:
-                      api-level: 30
-                      target: google_apis
-                      arch: x86_64
-                      profile: pixel_6
-                      emulator-boot-timeout: 1200
-                      disable-animations: true
-                      emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back emulated
-                      script: |
-                        set -eu
-                        adb wait-for-device
-                        adb shell cmd package list packages >/dev/null
-                        adb shell input keyevent KEYCODE_WAKEUP || true
-                        adb shell wm dismiss-keyguard || true
-                        adb shell settings put global window_animation_scale 0 || true
-                        adb shell settings put global transition_animation_scale 0 || true
-                        adb shell settings put global animator_duration_scale 0 || true
-                        adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
 
-                        cat > /tmp/run-android-maestro.sh <<'SH'
-                        set -eu
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-                        run_maestro() {
-                          flow="$1"
-                          for attempt in 1 2; do
-                            echo "Running $flow (attempt $attempt)"
-                            if timeout -k 30 420 maestro test --no-ansi "$flow"; then
-                              return 0
-                            fi
-                            if [ "$attempt" -eq 2 ]; then
-                              return 1
-                            fi
-                            adb devices || true
-                            adb kill-server
-                            adb start-server
-                            adb wait-for-device
-                            adb shell cmd package list packages >/dev/null
-                          done
-                        }
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
 
-                        run_maestro mobile/android/maestro/us1-signin.yaml
-                        run_maestro mobile/android/maestro/us2-guide.yaml
-                        run_maestro mobile/android/maestro/us3-login.yaml
-                        run_maestro mobile/android/maestro/us4-capture-or-history.yaml
-                        run_maestro mobile/android/maestro/us4-permission-recovery.yaml
-                        run_maestro mobile/android/maestro/us5-history-filter.yaml
-                        run_maestro mobile/android/maestro/us6-measurement-detail.yaml
-                        SH
-                        chmod +x /tmp/run-android-maestro.sh
-                        /tmp/run-android-maestro.sh
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+  android-mobile-build:
+    name: Android Mobile Build
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.android_app == 'true'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Android debug APK
+        run: ./gradlew --no-daemon :app:assembleDebug
+        working-directory: mobile/android
+
+      - name: Upload Android debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+
+  android-mobile-maestro:
+    name: Android Mobile Maestro Tests
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - android-mobile-build
+    if: needs.changes.outputs.android_app == 'true'
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blood_pressure_tracker_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install API dependencies
+        run: npm ci
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Enable KVM for Android emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Initialize Android test database
+        env:
+          DB_INIT_SKIP_DOCKER: '1'
+        run: npm run db:init -- --env .env.test
+
+      - name: Bootstrap Android Maestro fixtures
+        run: npx jest --runInBand --runTestsByPath tests/bootstrap/android-ci-bootstrap.test.ts
+
+      - name: Android unit tests and coverage
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:androidCoverageVerify
+        working-directory: mobile/android
+
+      - name: Download Android debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare Maestro runner
+        run: |
+          cat > /tmp/run-android-maestro.sh <<'SH'
+          set -eu
+
+          run_maestro() {
+            flow="$1"
+            for attempt in 1 2; do
+              echo "Running $flow (attempt $attempt)"
+              if timeout -k 30 420 maestro test --no-ansi "$flow"; then
+                return 0
+              fi
+              if [ "$attempt" -eq 2 ]; then
+                return 1
+              fi
+              adb devices || true
+              adb kill-server
+              adb start-server
+              adb wait-for-device
+              adb shell cmd package list packages >/dev/null
+            done
+          }
+
+          run_maestro mobile/android/maestro/us1-signin.yaml
+          run_maestro mobile/android/maestro/us2-guide.yaml
+          run_maestro mobile/android/maestro/us3-login.yaml
+          run_maestro mobile/android/maestro/us4-capture-or-history.yaml
+          run_maestro mobile/android/maestro/us4-permission-recovery.yaml
+          run_maestro mobile/android/maestro/us5-history-filter.yaml
+          run_maestro mobile/android/maestro/us6-measurement-detail.yaml
+          SH
+          chmod +x /tmp/run-android-maestro.sh
+
+      - name: Start API
+        run: |
+          set -a
+          . ./.env.test
+          set +a
+          npm run api > /tmp/bpt-api.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --silent http://127.0.0.1:3000/api/v1/measurements >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/bpt-api.log
+          exit 1
+
+      - name: Maestro happy paths
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 25
+        env:
+          MAESTRO_CLI_NO_ANALYTICS: '1'
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: '300000'
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-boot-timeout: 1200
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back emulated
+          script: |
+            set -eu
+            adb wait-for-device
+            adb shell cmd package list packages >/dev/null
+            adb shell input keyevent KEYCODE_WAKEUP || true
+            adb shell wm dismiss-keyguard || true
+            adb shell settings put global window_animation_scale 0 || true
+            adb shell settings put global transition_animation_scale 0 || true
+            adb shell settings put global animator_duration_scale 0 || true
+            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            /tmp/run-android-maestro.sh
