@@ -252,6 +252,14 @@ class CameraModel: ObservableObject {
             self.captureSession.beginConfiguration()
             defer { self.captureSession.commitConfiguration() }
 
+            // Remove existing inputs/outputs to avoid duplicates
+            for input in self.captureSession.inputs {
+                self.captureSession.removeInput(input)
+            }
+            for output in self.captureSession.outputs {
+                self.captureSession.removeOutput(output)
+            }
+
             guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
                   let input = try? AVCaptureDeviceInput(device: device),
                   self.captureSession.canAddInput(input)

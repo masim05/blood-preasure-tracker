@@ -156,6 +156,11 @@ struct AuthView: View {
                         SecureField("Password", text: $password)
                             .foregroundColor(AppColors.darkText)
                     }
+                    Button(action: { revealPassword.toggle() }) {
+                        Image(systemName: revealPassword ? "eye.slash" : "eye")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color(white: 0.73))
+                    }
                 }
                 .padding(12)
                 .background(Color.white)
@@ -166,9 +171,6 @@ struct AuthView: View {
                 .accessibilityIdentifier(isLogin
                     ? AccessibilityIdentifiers.loginPassword()
                     : AccessibilityIdentifiers.signinPassword())
-                .onChange(of: password) { _, newValue in
-                    revealPassword = !newValue.isEmpty
-                }
 
                 // Error
                 if let msg = errorMessage() {

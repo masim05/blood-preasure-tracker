@@ -51,7 +51,10 @@ struct MeasurementDetailView: View {
             }
         }
         .accessibilityIdentifier(AccessibilityIdentifiers.measurementDetailScreen)
-        .onAppear { syncFields() }
+        .onAppear {
+            syncFields()
+            if let id = detail?.id { appState.loadDetail(measurementId: id) }
+        }
         .onChange(of: appState.measurementDetail) { _, _ in syncFields() }
     }
 

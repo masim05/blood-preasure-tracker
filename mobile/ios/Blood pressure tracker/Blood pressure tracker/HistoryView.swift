@@ -194,6 +194,17 @@ struct HistoryView: View {
         }.joined(separator: "\n")
         let csv = header + rows
         let av = UIActivityViewController(activityItems: [csv], applicationActivities: nil)
+        
+        // Configure popover for iPad
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let root = scene.windows.first?.rootViewController {
+                av.popoverPresentationController?.sourceView = root.view
+                av.popoverPresentationController?.sourceRect = CGRect(x: root.view.bounds.midX, y: root.view.bounds.midY, width: 0, height: 0)
+                av.popoverPresentationController?.permittedArrowDirections = []
+            }
+        }
+        
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let root = scene.windows.first?.rootViewController {
             root.present(av, animated: true)

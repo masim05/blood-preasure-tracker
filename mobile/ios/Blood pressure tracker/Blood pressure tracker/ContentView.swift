@@ -22,7 +22,24 @@ struct ContentView: View {
     }
 
     private var mainTabView: some View {
-        TabView {
+        TabView(selection: Binding(
+            get: { 
+                switch appState.route {
+                case .camera: return 0
+                case .history: return 1
+                case .profile: return 2
+                default: return 0
+                }
+            },
+            set: { newValue in
+                switch newValue {
+                case 0: appState.route = .camera
+                case 1: appState.route = .history
+                case 2: appState.route = .profile
+                default: break
+                }
+            }
+        )) {
             NavigationStack {
                 CameraView()
                     .navigationDestination(isPresented: Binding(
@@ -35,6 +52,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Camera", systemImage: "camera")
             }
+            .tag(0)
 
             NavigationStack {
                 HistoryView()
@@ -48,6 +66,7 @@ struct ContentView: View {
             .tabItem {
                 Label("History", systemImage: "list.bullet")
             }
+            .tag(1)
 
             NavigationStack {
                 ProfileView()
@@ -55,6 +74,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Profile", systemImage: "person")
             }
+            .tag(2)
         }
         .accentColor(AppColors.primaryGreen)
     }

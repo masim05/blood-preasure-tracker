@@ -58,7 +58,10 @@ class HttpApiClient: AuthGateway, HistoryGateway, MeasurementUploadGateway, Meas
                 authorization: session.authorizationHeader
             )
             if (200 ... 299).contains(response.statusCode) {
-                return .success(extractJsonString(from: response.body, field: "id") ?? "")
+                guard let id = extractJsonString(from: response.body, field: "id"), !id.isEmpty else {
+                    return .failure(ApiError(code: nil, message: parseMessage, source: .parse))
+                }
+                return .success(id)
             }
             return .failure(ApiErrorMapper.fromApiBody(response.body, fallback: fallbackApiMessage))
         } catch {
