@@ -32,18 +32,18 @@ class UserDefaultsSessionStore: SessionStore {
     func save(_ session: Session) {
         // Save sensitive token to Keychain
         let tokenData = session.accessToken.data(using: .utf8)!
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecAttrAccount as String: keychainAccount,
-            kSecValueData as String: tokenData
-        ]
+        let query = keychainItemQuery()
+        let addQuery = keychainAddQuery(tokenData: tokenData)
         
         // Delete existing item first
         SecItemDelete(query as CFDictionary)
         
         // Add new item
-        let status = SecItemAdd(query as CFDictionary, nil)
+        var status = SecItemAdd(addQuery as CFDictionary, nil)
+        if status == errSecDuplicateItem {
+            let update: [String: Any] = [kSecValueData as String: tokenData]
+            status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
+        }
         
         if status == errSecSuccess {
             // Save non-sensitive metadata to UserDefaults
@@ -53,10 +53,18 @@ class UserDefaultsSessionStore: SessionStore {
                 "userId": session.user.id,
                 "userEmail": session.user.email,
             ]
-            if let data = try? JSONSerialization.data(withJSONObject: metadata) {
-                defaults.set(data, forKey: metadataKey)
-                errorMessage = nil
+            guard let data = try? JSONSerialization.data(withJSONObject: metadata) else {
+                clearKeychainToken()
+                errorMessage = "Failed to save session securely."
+                return
             }
+            defaults.set(data, forKey: metadataKey)
+            guard defaults.data(forKey: metadataKey) != nil else {
+                clearKeychainToken()
+                errorMessage = "Failed to save session securely."
+                return
+            }
+            errorMessage = nil
         } else {
             errorMessage = "Failed to save session securely."
         }
@@ -91,11 +99,9 @@ class UserDefaultsSessionStore: SessionStore {
               let userId = metadata["userId"] as? String,
               let userEmail = metadata["userEmail"] as? String
         else {
-            if defaults.data(forKey: metadataKey) != nil {
-                errorMessage = "Saved session data is invalid. Please sign in again."
-            } else {
-                errorMessage = nil
-            }
+            clearKeychainToken()
+            defaults.removeObject(forKey: metadataKey)
+            errorMessage = "Saved session data is invalid. Please sign in again."
             return nil
         }
         
@@ -112,15 +118,28 @@ class UserDefaultsSessionStore: SessionStore {
 
     func clear() {
         // Remove from Keychain
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecAttrAccount as String: keychainAccount
-        ]
-        SecItemDelete(query as CFDictionary)
+        clearKeychainToken()
         
         // Remove metadata from UserDefaults
         defaults.removeObject(forKey: metadataKey)
         errorMessage = nil
+    }
+
+    private func keychainItemQuery() -> [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: keychainAccount
+        ]
+    }
+
+    private func keychainAddQuery(tokenData: Data) -> [String: Any] {
+        var query = keychainItemQuery()
+        query[kSecValueData as String] = tokenData
+        return query
+    }
+
+    private func clearKeychainToken() {
+        SecItemDelete(keychainItemQuery() as CFDictionary)
     }
 }
