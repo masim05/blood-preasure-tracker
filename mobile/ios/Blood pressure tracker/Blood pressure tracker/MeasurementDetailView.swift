@@ -125,9 +125,9 @@ struct MeasurementDetailView: View {
         Spacer().frame(height: 6)
         DetailCardContainer {
             HStack(spacing: 8) {
-                DetailNumberField("Systolic", value: $systolic, accessibilityId: AccessibilityIdentifiers.measurementDetailSystolic)
-                DetailNumberField("Diastolic", value: $diastolic, accessibilityId: AccessibilityIdentifiers.measurementDetailDiastolic)
-                DetailNumberField("Pulse", value: $pulse, accessibilityId: AccessibilityIdentifiers.measurementDetailPulse)
+                DetailNumberField(label: "Systolic", value: $systolic, accessibilityId: AccessibilityIdentifiers.measurementDetailSystolic)
+                DetailNumberField(label: "Diastolic", value: $diastolic, accessibilityId: AccessibilityIdentifiers.measurementDetailDiastolic)
+                DetailNumberField(label: "Pulse", value: $pulse, accessibilityId: AccessibilityIdentifiers.measurementDetailPulse)
             }
 
             DetailArmSidePicker(selected: $armSide)

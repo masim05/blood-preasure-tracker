@@ -192,7 +192,7 @@ class MeasurementDetailFlow {
         case .success(let saved):
             return ScreenState(route: .measurementDetail, session: session, measurementDetail: saved)
         case .failure(let error):
-            return ScreenState(route: .measurementDetail, session: session, measurementDetail: detail, error: error)
+            return ScreenState(route: .measurementDetail, session: session, error: error, measurementDetail: detail)
         }
     }
 }

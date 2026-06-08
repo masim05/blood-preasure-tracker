@@ -56,8 +56,8 @@ private class TestHTTPServer {
                 bind(sock, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
             }
         }
-        guard bindResult == 0 else { close(sock); throw TestServerError.bindFailed }
-        guard listen(sock, 10) == 0 else { close(sock); throw TestServerError.listenFailed }
+        guard bindResult == 0 else { Darwin.close(sock); throw TestServerError.bindFailed }
+        guard listen(sock, 10) == 0 else { Darwin.close(sock); throw TestServerError.listenFailed }
 
         var boundAddr = sockaddr_in()
         var addrLen = socklen_t(MemoryLayout<sockaddr_in>.size)

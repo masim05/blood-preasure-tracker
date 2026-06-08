@@ -304,6 +304,32 @@ private struct HistoryCell: View {
     }
 }
 
+private struct DateSelectorButton: View {
+    let label: String
+    let accessibilityId: String
+    let onClick: () -> Void
+
+    var body: some View {
+        Button(action: onClick) {
+            HStack(spacing: 6) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 12))
+                Text(label)
+                    .font(.system(size: 13))
+                Spacer(minLength: 0)
+            }
+            .foregroundColor(AppColors.secondaryText)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 10)
+        }
+        .background(Color.white)
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppColors.inputBorder, lineWidth: 0.5))
+        .cornerRadius(8)
+        .accessibilityIdentifier(accessibilityId)
+    }
+}
+
 // MARK: - Section label
 
 private struct SectionLabel: View {

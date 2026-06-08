@@ -3,6 +3,7 @@
 // Mirrors Android ApiErrorMapperTest.kt
 
 import Testing
+import Foundation
 @testable import Blood_pressure_tracker
 
 struct ApiErrorMapperTests {

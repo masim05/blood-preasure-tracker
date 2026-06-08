@@ -117,10 +117,10 @@ struct ProfileView: View {
                     iconBg: Color(r: 0xE1, g: 0xF5, b: 0xEE),
                     iconTint: AppColors.primaryGreen,
                     label: "Language",
+                    accessibilityId: AccessibilityIdentifiers.profileLanguageSelector,
                     value: selectedLanguage.label,
                     showChevron: true,
-                    divider: false,
-                    accessibilityId: AccessibilityIdentifiers.profileLanguageSelector
+                    divider: false
                 ) { showLanguageMenu = true }
             }
             .overlay(alignment: .topLeading) {
@@ -140,9 +140,9 @@ struct ProfileView: View {
                     iconBg: Color(r: 0xE6, g: 0xF1, b: 0xFB),
                     iconTint: AppColors.blue,
                     label: "Story",
+                    accessibilityId: AccessibilityIdentifiers.profileStory,
                     showChevron: true,
-                    divider: true,
-                    accessibilityId: AccessibilityIdentifiers.profileStory
+                    divider: true
                 ) { selectedAboutPage = .story }
 
                 ProfileRow(
@@ -150,9 +150,9 @@ struct ProfileView: View {
                     iconBg: Color(r: 0xEF, g: 0xF0, b: 0xFE),
                     iconTint: Color(r: 0x5A, g: 0x56, b: 0xD6),
                     label: "Policy",
+                    accessibilityId: AccessibilityIdentifiers.profilePolicy,
                     showChevron: true,
-                    divider: true,
-                    accessibilityId: AccessibilityIdentifiers.profilePolicy
+                    divider: true
                 ) { selectedAboutPage = .policy }
 
                 ProfileRow(
@@ -160,9 +160,9 @@ struct ProfileView: View {
                     iconBg: Color(r: 0xE6, g: 0xF1, b: 0xFB),
                     iconTint: AppColors.blue,
                     label: "Measurement guide",
+                    accessibilityId: AccessibilityIdentifiers.profileGuide,
                     showChevron: true,
-                    divider: false,
-                    accessibilityId: AccessibilityIdentifiers.profileGuide
+                    divider: false
                 ) { appState.openGuideFromProfile() }
             }
 
@@ -177,11 +177,11 @@ struct ProfileView: View {
                     iconBg: Color(r: 0xFC, g: 0xEB, b: 0xEB),
                     iconTint: AppColors.danger,
                     label: "Log out",
-                    labelColor: AppColors.danger,
-                    labelWeight: .medium,
+                    accessibilityId: AccessibilityIdentifiers.profileLogout,
                     showChevron: false,
                     divider: false,
-                    accessibilityId: AccessibilityIdentifiers.profileLogout
+                    labelColor: AppColors.danger,
+                    labelWeight: .medium,
                 ) { showLogoutConfirmation = true }
             }
         }
@@ -324,12 +324,12 @@ private struct ProfileRow: View {
     let iconTint: Color
     let label: String
     let accessibilityId: String
-    let onClick: () -> Void
     var value: String? = nil
     var showChevron: Bool
     var divider: Bool
     var labelColor: Color = AppColors.darkText
     var labelWeight: Font.Weight = .regular
+    let onClick: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {

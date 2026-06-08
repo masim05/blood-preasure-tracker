@@ -4,6 +4,7 @@
 
 import SwiftUI
 import AVFoundation
+import Combine
 
 // MARK: - CameraView
 
