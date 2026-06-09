@@ -11,9 +11,7 @@ struct HistoryViewTests {
         // Android test uses ZoneOffset.ofHours(2) but the iOS formatHistoryTime uses local timezone.
         // We verify the function doesn't crash and transforms a valid ISO timestamp.
         let formatted = formatHistoryTime("2026-05-31T17:31:42.000Z")
-        // Expect "MM-dd HH:mm" format (10 chars like "05-31 19:31" but timezone varies)
-        #expect(formatted.contains("05-31"))
-        #expect(formatted.count == "05-31 19:31".count)
+        #expect(formatted.range(of: #"^\d{2}-\d{2} \d{2}:\d{2}$"#, options: .regularExpression) != nil)
     }
 
     @Test func formatsSpaceSeparatedTimestampToHistoryDisplayFormat() {

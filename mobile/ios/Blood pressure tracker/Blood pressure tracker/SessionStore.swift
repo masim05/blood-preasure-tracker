@@ -137,6 +137,7 @@ class UserDefaultsSessionStore: SessionStore {
     private func keychainAddQuery(tokenData: Data) -> [String: Any] {
         var query = keychainItemQuery()
         query[kSecValueData as String] = tokenData
+        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         return query
     }
 

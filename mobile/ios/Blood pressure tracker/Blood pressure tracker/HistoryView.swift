@@ -17,21 +17,33 @@ func showHistoryRefreshLoadingIndicator(isLoading: Bool, measurements: [Measurem
 
 func formatHistoryTime(_ value: String) -> String {
     if value.isEmpty { return value }
-    let isoFormatter = ISO8601DateFormatter()
-    isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let date = isoFormatter.date(from: value) {
-        let df = DateFormatter()
-        df.dateFormat = "MM-dd HH:mm"
-        return df.string(from: date)
+    if let date = HistoryTimeFormatters.isoWithFractional.date(from: value) {
+        return HistoryTimeFormatters.output.string(from: date)
     }
-    let fallbackFormatter = DateFormatter()
-    fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-    if let date = fallbackFormatter.date(from: value) {
-        let df = DateFormatter()
-        df.dateFormat = "MM-dd HH:mm"
-        return df.string(from: date)
+    if let date = HistoryTimeFormatters.fallback.date(from: value) {
+        return HistoryTimeFormatters.output.string(from: date)
     }
     return value
+}
+
+private enum HistoryTimeFormatters {
+    static let isoWithFractional: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    static let fallback: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter
+    }()
+
+    static let output: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd HH:mm"
+        return formatter
+    }()
 }
 
 func armShortLabel(_ armSide: ArmSide) -> String {

@@ -38,7 +38,12 @@ struct Session: Equatable {
     var authorizationHeader: String { "\(tokenType) \(accessToken)" }
 
     func expiresAtDate() -> Date? {
-        ISO8601DateFormatter().date(from: expiresAt)
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractionalFormatter.date(from: expiresAt) {
+            return date
+        }
+        return ISO8601DateFormatter().date(from: expiresAt)
     }
 
     func isActive(now: Date = Date()) -> Bool {
