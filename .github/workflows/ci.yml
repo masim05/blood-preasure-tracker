@@ -390,7 +390,7 @@ jobs:
             /tmp/run-android-maestro.sh
 
   ios-mobile-tests:
-    name: iOS Mobile Tests
+    name: iOS Mobile Build
     runs-on: macos-latest
     needs: changes
     if: needs.changes.outputs.ios_app == 'true'
