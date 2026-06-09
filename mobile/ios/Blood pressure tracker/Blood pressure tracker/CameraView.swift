@@ -5,6 +5,7 @@
 import SwiftUI
 import AVFoundation
 import Combine
+import UIKit
 
 // MARK: - CameraView
 
@@ -211,6 +212,7 @@ class CameraModel: ObservableObject {
     }
 
     func stop() {
+        isReady = false
         Task.detached { [weak self] in
             self?.captureSession.stopRunning()
         }
@@ -248,6 +250,7 @@ class CameraModel: ObservableObject {
     }
 
     private func setupSession() {
+        isReady = false
         Task.detached { [weak self] in
             guard let self else { return }
             self.captureSession.beginConfiguration()
@@ -265,7 +268,10 @@ class CameraModel: ObservableObject {
                   let input = try? AVCaptureDeviceInput(device: device),
                   self.captureSession.canAddInput(input)
             else {
-                await MainActor.run { self.localError = "Unable to capture image. Try again." }
+                await MainActor.run {
+                    self.isReady = false
+                    self.localError = "Unable to capture image. Try again."
+                }
                 return
             }
             self.captureSession.addInput(input)
@@ -355,5 +361,3 @@ private struct CornerGuidesView: View {
         }
     }
 }
-
-import UIKit

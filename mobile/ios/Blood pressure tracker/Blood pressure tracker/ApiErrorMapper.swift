@@ -42,12 +42,15 @@ enum ApiErrorMapper {
     private static func extractJsonString(from body: String, field: String) -> String? {
         let escapedField = NSRegularExpression.escapedPattern(for: field)
         guard let pattern = try? NSRegularExpression(
-            pattern: #"\"#  + escapedField + #""\s*:\s*"((?:\\.|[^"])*)"#
+            pattern: "\"" + escapedField + "\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\""
         ) else { return nil }
         let range = NSRange(body.startIndex..., in: body)
         guard let match = pattern.firstMatch(in: body, range: range),
               let valueRange = Range(match.range(at: 1), in: body) else { return nil }
         let raw = String(body[valueRange])
-        return raw.replacingOccurrences(of: "\\\"", with: "\"")
+        guard let data = ("\"\(raw)\"").data(using: .utf8),
+              let decoded = try? JSONSerialization.jsonObject(with: data) as? String
+        else { return raw }
+        return decoded
     }
 }

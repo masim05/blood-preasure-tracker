@@ -3,6 +3,7 @@
 // Measurement detail screen mirroring Android's MeasurementDetailScreen.kt
 
 import SwiftUI
+import UIKit
 
 // MARK: - Detail helpers (internal for tests)
 
