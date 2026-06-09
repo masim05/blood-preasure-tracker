@@ -83,12 +83,23 @@ class UserDefaultsSessionStore: SessionStore {
         var dataTypeRef: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
         
-        guard status == errSecSuccess,
-              let tokenData = dataTypeRef as? Data,
-              let accessToken = String(data: tokenData, encoding: .utf8)
-        else {
+        if status == errSecItemNotFound {
             defaults.removeObject(forKey: metadataKey)
             errorMessage = nil
+            return nil
+        }
+
+        guard status == errSecSuccess else {
+            errorMessage = "Failed to access secure session storage."
+            return nil
+        }
+
+        guard let tokenData = dataTypeRef as? Data,
+              let accessToken = String(data: tokenData, encoding: .utf8)
+        else {
+            clearKeychainToken()
+            defaults.removeObject(forKey: metadataKey)
+            errorMessage = "Saved session data is invalid. Please sign in again."
             return nil
         }
         

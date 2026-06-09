@@ -111,7 +111,7 @@ struct MeasurementDetailView: View {
             MeasurementImageView(
                 imageUrl: md.imageUrl,
                 apiBaseUrl: apiBaseUrl,
-                loadImage: { url in appState.fetchMeasurementImage(imageUrl: url) }
+                loadImage: { url in await appState.fetchMeasurementImage(imageUrl: url) }
             )
             .frame(maxWidth: .infinity)
             .frame(height: 260)
@@ -212,7 +212,7 @@ struct MeasurementDetailView: View {
 private struct MeasurementImageView: View {
     let imageUrl: String
     let apiBaseUrl: String
-    let loadImage: (String) -> AppResult<Data>
+    let loadImage: (String) async -> AppResult<Data>
 
     @State private var imageData: Data? = nil
     @State private var imageError: String? = nil
@@ -247,14 +247,12 @@ private struct MeasurementImageView: View {
         }
         isImageLoading = true
         imageError = nil
-        Task.detached {
-            let result = loadImage(resolved)
-            await MainActor.run {
-                isImageLoading = false
-                switch result {
-                case .success(let data): imageData = data
-                case .failure(let err): imageError = err.message
-                }
+        Task {
+            let result = await loadImage(resolved)
+            isImageLoading = false
+            switch result {
+            case .success(let data): imageData = data
+            case .failure(let err): imageError = err.message
             }
         }
     }
