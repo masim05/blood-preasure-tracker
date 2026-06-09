@@ -173,9 +173,11 @@ mobile/ios/**/Pods/
 mobile/ios/**/xcshareddata/xcbaselines/
 mobile/ios/**/*.hmap
 mobile/ios/**/build/
+mobile/ios/**/Build/Products/Release*/
 mobile/ios/**/*.app
 mobile/ios/**/*.xctestrun
 mobile/ios/**/*.ipa
+mobile/ios/**/*.xcarchive
 mobile/ios/**/*.dSYM.zip
 mobile/ios/**/*.dSYM
 
