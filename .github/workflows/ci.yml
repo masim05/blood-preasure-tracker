@@ -402,24 +402,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Select iOS simulator destination
-        run: |
-          set -eu
-          DEST_ID="$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/{print $2; exit}')"
-          if [ -z "$DEST_ID" ]; then
-            echo "No available iPhone simulator found"
-            exit 1
-          fi
-          echo "dest_id=$DEST_ID" >> "$GITHUB_OUTPUT"
-        id: select-destination
-
       - name: Build iOS targets for simulator
         run: |
           set -eu
           xcodebuild build \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "id=${{ steps.select-destination.outputs.dest_id }}" \
+            -sdk iphonesimulator \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
 
@@ -438,13 +427,23 @@ jobs:
       - name: Select iOS simulator destination
         run: |
           set -eu
-          DEST_ID="$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/{print $2; exit}')"
-          if [ -z "$DEST_ID" ]; then
-            echo "No available iPhone simulator found"
+          DESTINATION=""
+          for DEVICE in "iPhone 17" "iPhone 16" "iPhone 15" "iPhone 14"; do
+            if xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | grep -q "name:$DEVICE"; then
+              DESTINATION="platform=iOS Simulator,name=$DEVICE"
+              break
+            fi
+          done
+          if [ -z "$DESTINATION" ]; then
+            DESTINATION="generic/platform=iOS Simulator"
+          fi
+          if [ "$DESTINATION" = "generic/platform=iOS Simulator" ]; then
+            echo "No concrete iPhone simulator was found; tests need an available simulator destination."
             exit 1
           fi
-          echo "dest_id=$DEST_ID" >> "$GITHUB_OUTPUT"
+          echo "destination=$DESTINATION" >> "$GITHUB_OUTPUT"
         id: select-destination
+        working-directory: mobile/ios/Blood pressure tracker
 
       - name: Run all iOS tests
         run: |
@@ -452,7 +451,7 @@ jobs:
           xcodebuild test \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "id=${{ steps.select-destination.outputs.dest_id }}" \
+            -destination "${{ steps.select-destination.outputs.destination }}" \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
 
