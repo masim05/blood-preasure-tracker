@@ -424,6 +424,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Ensure iOS simulator runtime is available
+        run: |
+          set -eu
+          if ! xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | grep -q 'platform:iOS Simulator, arch:'; then
+            xcodebuild -downloadPlatform iOS
+          fi
+        working-directory: mobile/ios/Blood pressure tracker
+
       - name: Select iOS simulator destination
         run: |
           set -eu
@@ -435,9 +443,9 @@ jobs:
             fi
           done
           if [ -z "$DESTINATION" ]; then
-            DEST_ID="$(xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | sed -n 's/.*platform:visionOS Simulator.*id:\([^,]*\),.*name:Apple Vision Pro.*/\1/p' | head -n 1)"
+            DEST_ID="$(xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | sed -n 's/.*platform:iOS Simulator, arch:[^,]*, id:\([^,]*\),.*/\1/p' | head -n 1)"
             if [ -z "$DEST_ID" ]; then
-              echo "Unable to resolve an iOS or visionOS simulator destination"
+              echo "Unable to resolve an iOS simulator destination"
               exit 1
             fi
             DESTINATION="id=$DEST_ID"
