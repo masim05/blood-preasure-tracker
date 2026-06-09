@@ -153,11 +153,21 @@ class AppState: ObservableObject {
         }
     }
 
-    func fetchMeasurementImage(imageUrl: String) -> AppResult<Data> {
+    func fetchMeasurementImage(imageUrl: String) async -> AppResult<Data> {
         guard let session = sessionStore.load() else {
             return .failure(ApiError(code: nil, message: "No session", source: .unexpected))
         }
-        return apiClient.fetchMeasurementImage(imageUrl: imageUrl, authorization: session.authorizationHeader)
+        let authorization = session.authorizationHeader
+        return await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async { [apiClient] in
+                continuation.resume(
+                    returning: apiClient.fetchMeasurementImage(
+                        imageUrl: imageUrl,
+                        authorization: authorization
+                    )
+                )
+            }
+        }
     }
 
     // MARK: - Upload (called from CameraView after capture)
