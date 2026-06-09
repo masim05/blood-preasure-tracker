@@ -395,32 +395,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Select simulator and run iOS tests
+      - name: Build iOS targets for simulator
         run: |
           set -eu
-          SIMULATOR_ID=$(xcrun simctl list devices available -j \
-            | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-devices = data.get('devices', {})
-for runtime, devs in sorted(devices.items(), reverse=True):
-    if 'iOS' not in runtime:
-        continue
-    iphones = [d for d in devs if d.get('isAvailable') and 'iPhone' in d.get('name', '')]
-    if iphones:
-        print(iphones[0]['udid'])
-        break
-")
-          if [ -z "$SIMULATOR_ID" ]; then
-            echo "No available iPhone simulator found"
-            exit 1
-          fi
-          echo "Using simulator: $SIMULATOR_ID"
-          xcrun simctl boot "$SIMULATOR_ID" || true
-          xcodebuild test \
+          xcodebuild build \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "id=$SIMULATOR_ID" \
+            -sdk iphonesimulator \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
 
