@@ -21,6 +21,7 @@
     "test": "jest --runInBand --testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap",
     "test:coverage": "jest --runInBand --coverage --testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap",
     "test:integration": "jest --runInBand --testPathPatterns=tests/integration/.*\\.test\\.ts$",
+    "test:ios": "sh scripts/ios-test-local.sh",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write ."

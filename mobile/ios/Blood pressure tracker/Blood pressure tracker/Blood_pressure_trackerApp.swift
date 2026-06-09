@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Blood_pressure_trackerApp: App {
+    @StateObject private var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appState)
         }
     }
 }
