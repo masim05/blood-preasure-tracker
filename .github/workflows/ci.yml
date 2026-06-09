@@ -394,7 +394,7 @@ jobs:
 
   ios-mobile-build:
     name: iOS Mobile Build
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: changes
     if: needs.changes.outputs.ios_app == 'true'
 
@@ -414,7 +414,7 @@ jobs:
 
   ios-mobile-tests:
     name: iOS Mobile Tests
-    runs-on: macos-14
+    runs-on: macos-latest
     needs:
       - changes
       - ios-mobile-build
@@ -435,18 +435,9 @@ jobs:
             fi
           done
           if [ -z "$DESTINATION" ]; then
-            RUNTIME_ID="$(xcrun simctl list runtimes | grep -E 'iOS .*com\.apple\.CoreSimulator\.SimRuntime\.iOS' | grep -v unavailable | sed -E 's/.* - (com\.apple\.CoreSimulator\.SimRuntime\.iOS[^ ]*).*/\1/' | tail -n 1)"
-            DEVICE_TYPE_ID="$(xcrun simctl list devicetypes | grep 'iPhone 16' | sed -E 's/.*\((com\.apple\.CoreSimulator\.SimDeviceType[^)]*)\).*/\1/' | head -n 1)"
-            if [ -z "$DEVICE_TYPE_ID" ]; then
-              DEVICE_TYPE_ID="$(xcrun simctl list devicetypes | grep 'iPhone' | sed -E 's/.*\((com\.apple\.CoreSimulator\.SimDeviceType[^)]*)\).*/\1/' | head -n 1)"
-            fi
-            if [ -z "$RUNTIME_ID" ] || [ -z "$DEVICE_TYPE_ID" ]; then
-              echo "Unable to resolve an iOS simulator runtime or device type"
-              exit 1
-            fi
-            DEST_ID="$(xcrun simctl create 'CI iPhone' "$DEVICE_TYPE_ID" "$RUNTIME_ID")"
+            DEST_ID="$(xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | sed -n 's/.*platform:visionOS Simulator.*id:\([^,]*\),.*name:Apple Vision Pro.*/\1/p' | head -n 1)"
             if [ -z "$DEST_ID" ]; then
-              echo "Unable to create an iOS simulator device"
+              echo "Unable to resolve an iOS or visionOS simulator destination"
               exit 1
             fi
             DESTINATION="id=$DEST_ID"
