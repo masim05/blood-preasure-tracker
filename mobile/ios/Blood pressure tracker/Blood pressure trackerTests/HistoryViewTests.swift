@@ -3,6 +3,7 @@
 // Mirrors Android HistoryScreenTest.kt
 
 import Testing
+import Foundation
 @testable import Blood_pressure_tracker
 
 struct HistoryViewTests {
@@ -38,8 +39,8 @@ struct HistoryViewTests {
         #expect(showHistoryRefreshLoadingIndicator(isLoading: false, measurements: [sampleMeasurement()]) == false)
     }
 
-    private func sampleMeasurement() -> Measurement {
-        Measurement(
+    private func sampleMeasurement() -> Blood_pressure_tracker.Measurement {
+        Blood_pressure_tracker.Measurement(
             id: "msr_1",
             status: .saved,
             systolic: 120,

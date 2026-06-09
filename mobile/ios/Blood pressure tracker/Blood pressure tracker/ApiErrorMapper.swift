@@ -49,7 +49,7 @@ enum ApiErrorMapper {
               let valueRange = Range(match.range(at: 1), in: body) else { return nil }
         let raw = String(body[valueRange])
         guard let data = ("\"\(raw)\"").data(using: .utf8),
-              let decoded = try? JSONSerialization.jsonObject(with: data) as? String
+              let decoded = try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed]) as? String
         else { return raw }
         return decoded
     }
