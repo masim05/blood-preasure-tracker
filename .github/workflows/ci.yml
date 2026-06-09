@@ -394,7 +394,7 @@ jobs:
 
   ios-mobile-build:
     name: iOS Mobile Build
-    runs-on: macos-latest
+    runs-on: macos-14
     needs: changes
     if: needs.changes.outputs.ios_app == 'true'
 
@@ -414,7 +414,7 @@ jobs:
 
   ios-mobile-tests:
     name: iOS Mobile Tests
-    runs-on: macos-latest
+    runs-on: macos-14
     needs:
       - changes
       - ios-mobile-build
