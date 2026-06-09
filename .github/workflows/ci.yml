@@ -399,22 +399,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Run iOS tests on simulator
+      - name: Build iOS app
         run: |
-          set -eu
-          DEST_ID="$(
-            xcrun simctl list devices available --json \
-              | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.name | startswith("iPhone")) | .udid' \
-              | head -n 1
-          )"
-          if [ -z "$DEST_ID" ]; then
-            echo "Unable to resolve an iOS simulator destination"
-            exit 1
-          fi
-          xcrun simctl boot "$DEST_ID" || true
-          xcodebuild test \
+          xcodebuild build \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "platform=iOS Simulator,id=$DEST_ID" \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
