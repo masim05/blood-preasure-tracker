@@ -435,11 +435,21 @@ jobs:
             fi
           done
           if [ -z "$DESTINATION" ]; then
-            DESTINATION="generic/platform=iOS Simulator"
-          fi
-          if [ "$DESTINATION" = "generic/platform=iOS Simulator" ]; then
-            echo "No concrete iPhone simulator was found; tests need an available simulator destination."
-            exit 1
+            RUNTIME_ID="$(xcrun simctl list runtimes | grep -E 'iOS .*com\.apple\.CoreSimulator\.SimRuntime\.iOS' | grep -v unavailable | sed -E 's/.* - (com\.apple\.CoreSimulator\.SimRuntime\.iOS[^ ]*).*/\1/' | tail -n 1)"
+            DEVICE_TYPE_ID="$(xcrun simctl list devicetypes | grep 'iPhone 16' | sed -E 's/.*\((com\.apple\.CoreSimulator\.SimDeviceType[^)]*)\).*/\1/' | head -n 1)"
+            if [ -z "$DEVICE_TYPE_ID" ]; then
+              DEVICE_TYPE_ID="$(xcrun simctl list devicetypes | grep 'iPhone' | sed -E 's/.*\((com\.apple\.CoreSimulator\.SimDeviceType[^)]*)\).*/\1/' | head -n 1)"
+            fi
+            if [ -z "$RUNTIME_ID" ] || [ -z "$DEVICE_TYPE_ID" ]; then
+              echo "Unable to resolve an iOS simulator runtime or device type"
+              exit 1
+            fi
+            DEST_ID="$(xcrun simctl create 'CI iPhone' "$DEVICE_TYPE_ID" "$RUNTIME_ID")"
+            if [ -z "$DEST_ID" ]; then
+              echo "Unable to create an iOS simulator device"
+              exit 1
+            fi
+            DESTINATION="id=$DEST_ID"
           fi
           echo "destination=$DESTINATION" >> "$GITHUB_OUTPUT"
         id: select-destination
