@@ -204,6 +204,7 @@ class CameraModel: ObservableObject {
 
     let captureSession = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
+    private var activePhotoDelegate: PhotoCaptureDelegate?
 
     var canCapture: Bool { permissionGranted && isReady }
 
@@ -232,7 +233,9 @@ class CameraModel: ObservableObject {
     func capture() {
         guard isReady else { return }
         let settings = AVCapturePhotoSettings()
-        photoOutput.capturePhoto(with: settings, delegate: makeDelegate())
+        let delegate = makeDelegate()
+        activePhotoDelegate = delegate
+        photoOutput.capturePhoto(with: settings, delegate: delegate)
     }
 
     // MARK: - Private
@@ -283,10 +286,11 @@ class CameraModel: ObservableObject {
         }
     }
 
-    private func makeDelegate() -> AVCapturePhotoCaptureDelegate {
+    private func makeDelegate() -> PhotoCaptureDelegate {
         PhotoCaptureDelegate { [weak self] result in
             Task { @MainActor [weak self] in
                 guard let self else { return }
+                self.activePhotoDelegate = nil
                 switch result {
                 case .success(let image):
                     self.capturedImage = image

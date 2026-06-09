@@ -49,7 +49,7 @@ jobs:
       - lint
       - android-mobile-build
       - android-mobile-maestro
-      - ios-mobile-build
+      - ios-mobile-tests
     if: always()
 
     env:
@@ -62,7 +62,7 @@ jobs:
       LINT_RESULT: ${{ needs.lint.result }}
       ANDROID_MOBILE_BUILD_RESULT: ${{ needs['android-mobile-build'].result }}
       ANDROID_MOBILE_MAESTRO_RESULT: ${{ needs['android-mobile-maestro'].result }}
-      IOS_MOBILE_BUILD_RESULT: ${{ needs['ios-mobile-build'].result }}
+      IOS_MOBILE_TESTS_RESULT: ${{ needs['ios-mobile-tests'].result }}
 
     steps:
       - name: Verify required checks
@@ -97,7 +97,7 @@ jobs:
 
           if [ "$IOS_CHANGED" = "true" ]; then
             for result in \
-              "$IOS_MOBILE_BUILD_RESULT"
+              "$IOS_MOBILE_TESTS_RESULT"
             do
               if [ "$result" != "success" ]; then
                 echo "iOS required check failed: $result"
@@ -389,8 +389,8 @@ jobs:
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
             /tmp/run-android-maestro.sh
 
-  ios-mobile-build:
-    name: iOS Mobile Build
+  ios-mobile-tests:
+    name: iOS Mobile Tests
     runs-on: macos-latest
     needs: changes
     if: needs.changes.outputs.ios_app == 'true'
@@ -399,13 +399,31 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Build iOS targets for simulator
+      - name: Run iOS tests on simulator
         run: |
           set -eu
-          xcodebuild build \
+          DESTINATION="$(
+            xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null \
+              | awk -F'[{},]' '/platform:iOS Simulator/ && /id:/ { for (i=1; i<=NF; i++) { if ($i ~ /id:/) { gsub(/^.*id:[[:space:]]*/, "", $i); gsub(/^[[:space:]]+|[[:space:]]+$/, "", $i); if ($i !~ /placeholder/) { print "id=" $i; exit } } } }'
+          )"
+          if [ -z "$DESTINATION" ]; then
+            DEST_ID="$(
+              xcrun simctl list devices available --json \
+                | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.name | startswith("iPhone")) | .udid' \
+                | head -n 1
+            )"
+            if [ -n "$DEST_ID" ]; then
+              xcrun simctl boot "$DEST_ID" || true
+              DESTINATION="id=$DEST_ID"
+            fi
+          fi
+          if [ -z "$DESTINATION" ]; then
+            echo "Unable to resolve an iOS simulator destination"
+            exit 1
+          fi
+          xcodebuild test \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -sdk iphonesimulator \
+            -destination "$DESTINATION" \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
-

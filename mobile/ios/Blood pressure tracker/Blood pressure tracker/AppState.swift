@@ -197,6 +197,7 @@ class AppState: ObservableObject {
                 case .success(let id):
                     self.lastUploadId = id
                     self.route = .history
+                    self.loadHistory()
                 case .failure(let error):
                     self.apiError = error
                 }
@@ -228,9 +229,15 @@ class AppState: ObservableObject {
     // MARK: - Session restore
 
     private func restoreSession() {
-        if let session = sessionStore.load(), session.isActive() {
-            self.session = session
-            route = .camera
+        if let session = sessionStore.load() {
+            if session.isActive() {
+                self.session = session
+                route = .camera
+            } else {
+                sessionStore.clear()
+                self.session = nil
+                route = .auth
+            }
         } else if sessionStore.loadError() != nil {
             route = .auth
         }

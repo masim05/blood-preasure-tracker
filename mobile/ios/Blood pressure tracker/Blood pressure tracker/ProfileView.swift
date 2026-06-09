@@ -386,11 +386,3 @@ private struct SectionLabel: View {
             .kerning(0.6)
     }
 }
-
-// MARK: - Color hex helper
-
-private extension Color {
-    init(r: UInt8, g: UInt8, b: UInt8) {
-        self.init(red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255)
-    }
-}

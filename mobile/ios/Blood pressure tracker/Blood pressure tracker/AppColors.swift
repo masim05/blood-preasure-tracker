@@ -35,7 +35,7 @@ enum AppColors {
     static let tipText     = Color(r: 0x0F, g: 0x6E, b: 0x56)   // #0F6E56
 }
 
-private extension Color {
+extension Color {
     init(r: UInt8, g: UInt8, b: UInt8) {
         self.init(
             red: Double(r) / 255,
