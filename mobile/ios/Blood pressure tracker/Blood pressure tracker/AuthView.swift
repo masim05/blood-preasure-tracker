@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-// MARK: - Accessibilty identifiers (mirrors Android TestTags)
+// MARK: - Accessibility identifiers (mirrors Android TestTags)
 
 enum AccessibilityIdentifiers {
     static let authModeLogin      = "auth_mode_login"

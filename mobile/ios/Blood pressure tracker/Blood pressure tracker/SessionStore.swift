@@ -87,6 +87,7 @@ class UserDefaultsSessionStore: SessionStore {
               let tokenData = dataTypeRef as? Data,
               let accessToken = String(data: tokenData, encoding: .utf8)
         else {
+            defaults.removeObject(forKey: metadataKey)
             errorMessage = nil
             return nil
         }
