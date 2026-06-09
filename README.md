@@ -182,11 +182,12 @@ OpenAPI docs:
 
 ### Requirements
 
+- Xcode 16+ with iOS Simulator runtime (for iOS build/tests)
 - Android Studio with Android SDK
 - Android Studio bundled JDK (Java 17)
 - Running API server reachable from emulator/device
 
-### Installation And Build
+### Android Installation And Build
 
 Open Android project:
 
@@ -226,9 +227,27 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" mobile/a
 - Maestro happy-path flows for US1-US6 live under `mobile/android/maestro`
 - More Android-specific details: [mobile/android/README.md](mobile/android/README.md)
 
+### iOS Build And Test
+
+Build iOS app from repository root:
+
+```bash
+xcodebuild build \
+  -project "mobile/ios/Blood pressure tracker/Blood pressure tracker.xcodeproj" \
+  -scheme "Blood pressure tracker" \
+  -destination "generic/platform=iOS Simulator"
+```
+
+Run iOS tests from repository root:
+
+```bash
+./scripts/ios-test-local.sh
+```
+
 ### Relevant CI Checks
 
 - [Android Mobile Tests job](.github/workflows/ci.yml#L98)
+- [iOS Mobile Build job](.github/workflows/ci.yml)
 - [Build job](.github/workflows/ci.yml#L10)
 
 ## Environment Example
