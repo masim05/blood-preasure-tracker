@@ -342,7 +342,12 @@ class HttpApiClient: AuthGateway, HistoryGateway, MeasurementUploadGateway, Meas
         let range = NSRange(body.startIndex..., in: body)
         guard let match = pattern.firstMatch(in: body, range: range),
               let valueRange = Range(match.range(at: 1), in: body) else { return nil }
-        return String(body[valueRange])
+        let raw = String(body[valueRange])
+        // Decode JSON string escapes (e.g. \" → ", \\ → \, \n → newline)
+        guard let data = ("\"\(raw)\"").data(using: .utf8),
+              let decoded = try? JSONSerialization.jsonObject(with: data) as? String
+        else { return raw }
+        return decoded
     }
 
     func extractJsonInt(from body: String, field: String) -> Int? {
