@@ -404,5 +404,6 @@ jobs:
           xcodebuild build \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
+            -destination "generic/platform=iOS Simulator" \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
