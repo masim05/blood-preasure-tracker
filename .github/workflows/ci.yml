@@ -443,7 +443,17 @@ jobs:
             fi
           done
           if [ -z "$DESTINATION" ]; then
-            DEST_ID="$(xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null | sed -n 's/.*platform:iOS Simulator, arch:[^,]*, id:\([^,]*\),.*/\1/p' | head -n 1)"
+            RUNTIME_ID="$(xcrun simctl list runtimes -j | jq -r '.runtimes[] | select((.identifier | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) and .isAvailable == true) | .identifier' | head -n 1)"
+            DEVICE_TYPE_ID="$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[] | select(.name == "iPhone 16") | .identifier' | head -n 1)"
+            if [ -z "$DEVICE_TYPE_ID" ]; then
+              DEVICE_TYPE_ID="$(xcrun simctl list devicetypes -j | jq -r '.devicetypes[] | select(.name | startswith("iPhone")) | .identifier' | head -n 1)"
+            fi
+            if [ -n "$RUNTIME_ID" ] && [ -n "$DEVICE_TYPE_ID" ]; then
+              DEST_ID="$(xcrun simctl create "CI iPhone" "$DEVICE_TYPE_ID" "$RUNTIME_ID")"
+              xcrun simctl boot "$DEST_ID" || true
+            else
+              DEST_ID=""
+            fi
             if [ -z "$DEST_ID" ]; then
               echo "Unable to resolve an iOS simulator destination"
               exit 1
