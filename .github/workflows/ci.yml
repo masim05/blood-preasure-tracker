@@ -402,28 +402,19 @@ jobs:
       - name: Run iOS tests on simulator
         run: |
           set -eu
-          DESTINATION="$(
-            xcodebuild -project "Blood pressure tracker.xcodeproj" -scheme "Blood pressure tracker" -showdestinations 2>/dev/null \
-              | awk -F'[{},]' '/platform:iOS Simulator/ && /id:/ { for (i=1; i<=NF; i++) { if ($i ~ /id:/) { gsub(/^.*id:[[:space:]]*/, "", $i); gsub(/^[[:space:]]+|[[:space:]]+$/, "", $i); if ($i !~ /placeholder/) { print "id=" $i; exit } } } }'
+          DEST_ID="$(
+            xcrun simctl list devices available --json \
+              | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.name | startswith("iPhone")) | .udid' \
+              | head -n 1
           )"
-          if [ -z "$DESTINATION" ]; then
-            DEST_ID="$(
-              xcrun simctl list devices available --json \
-                | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS")) | .value[] | select(.name | startswith("iPhone")) | .udid' \
-                | head -n 1
-            )"
-            if [ -n "$DEST_ID" ]; then
-              xcrun simctl boot "$DEST_ID" || true
-              DESTINATION="id=$DEST_ID"
-            fi
-          fi
-          if [ -z "$DESTINATION" ]; then
+          if [ -z "$DEST_ID" ]; then
             echo "Unable to resolve an iOS simulator destination"
             exit 1
           fi
+          xcrun simctl boot "$DEST_ID" || true
           xcodebuild test \
             -project "Blood pressure tracker.xcodeproj" \
             -scheme "Blood pressure tracker" \
-            -destination "$DESTINATION" \
+            -destination "platform=iOS Simulator,id=$DEST_ID" \
             -quiet
         working-directory: mobile/ios/Blood pressure tracker
