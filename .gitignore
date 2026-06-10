@@ -163,7 +163,8 @@ vite.config.ts.timestamp-*
 **/local.properties
 
 # iOS / Xcode
-xcuserdata/
+**/xcuserdata/
+**/*.xcuserdatad/
 *.xcuserstate
 mobile/ios/**/*.xcscmblueprint
 mobile/ios/**/*.xccheckout
