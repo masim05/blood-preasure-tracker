@@ -20,7 +20,9 @@ enum AppColors {
     static let labelColor   = Color(r: 0x99, g: 0x99, b: 0x99)   // #999999
 
     // Backgrounds
-    static let pageBackground = Color(r: 0xF2, g: 0xF2, b: 0xF7) // #F2F2F7
+    static let pageBackground = Color(uiColor: .systemGroupedBackground)
+    static let cardBackground = Color(uiColor: .secondarySystemGroupedBackground)
+    static let menuSelectedBackground = Color(uiColor: .tertiarySystemGroupedBackground)
     static let primaryTint    = Color(r: 0xF2, g: 0xF2, b: 0xF7) // #F2F2F7
 
     // Borders
