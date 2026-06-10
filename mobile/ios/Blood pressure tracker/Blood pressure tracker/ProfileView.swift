@@ -204,14 +204,14 @@ struct ProfileView: View {
                         .padding(.vertical, 12)
                         .background(
                             appState.selectedLanguageCode == option.code
-                                ? AppColors.pageBackground
-                                : Color.white
+                                ? AppColors.menuSelectedBackground
+                                : AppColors.cardBackground
                         )
                 }
                 .accessibilityIdentifier(AccessibilityIdentifiers.profileLanguageOptionPrefix + option.code)
             }
         }
-        .background(Color.white)
+        .background(AppColors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.12), radius: 8, y: 2)
         .frame(width: 200)
@@ -308,7 +308,7 @@ private struct ProfileCard<Content: View>: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.white)
+            .background(AppColors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12).stroke(AppColors.cardBorder, lineWidth: 0.5)
