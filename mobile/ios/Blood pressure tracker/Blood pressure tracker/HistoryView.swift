@@ -54,6 +54,26 @@ func armShortLabel(_ armSide: ArmSide) -> String {
     }
 }
 
+struct HistoryColumnTitles: Equatable {
+    let time: String
+    let systolic: String
+    let diastolic: String
+    let pulse: String
+    let arm: String
+}
+
+func historyColumnTitles() -> HistoryColumnTitles {
+    HistoryColumnTitles(time: "Time", systolic: "SYS", diastolic: "DIA", pulse: "Pulse", arm: "Arm")
+}
+
+private enum HistoryTheme {
+    static let pageBackground = Color(uiColor: .systemGroupedBackground)
+    static let cardBackground = Color(uiColor: .secondarySystemGroupedBackground)
+    static let primaryText = Color(uiColor: .label)
+    static let secondaryText = Color(uiColor: .secondaryLabel)
+    static let divider = Color(uiColor: .separator).opacity(0.35)
+}
+
 // MARK: - HistoryView
 
 struct HistoryView: View {
@@ -70,7 +90,7 @@ struct HistoryView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            AppColors.pageBackground.ignoresSafeArea()
+            HistoryTheme.pageBackground.ignoresSafeArea()
 
             RefreshableScrollView(onRefresh: { appState.loadHistory() }) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -241,14 +261,15 @@ private struct HistoryTable: View {
     let onSelected: (Measurement) -> Void
 
     var body: some View {
+        let columns = historyColumnTitles()
         VStack(spacing: 0) {
             // Header row
             HStack(spacing: 0) {
-                HistoryCell("Time",  weight: 2, header: true)
-                HistoryCell("SYS",   weight: 1, header: true)
-                HistoryCell("DIA",   weight: 1, header: true)
-                HistoryCell("♥",     weight: 1, header: true)
-                HistoryCell("Arm",   weight: 1, header: true)
+                HistoryCell(columns.time, weight: 2, header: true)
+                HistoryCell(columns.systolic, weight: 1, header: true)
+                HistoryCell(columns.diastolic, weight: 1, header: true)
+                HistoryCell(columns.pulse, weight: 1, header: true)
+                HistoryCell(columns.arm, weight: 1, header: true)
             }
             .padding(.vertical, 6)
             .accessibilityIdentifier(AccessibilityIdentifiers.historyTable)
@@ -267,18 +288,19 @@ private struct HistoryTable: View {
                                 color: measurement.systolic >= 130 ? AppColors.elevatedRed : AppColors.normalGreen,
                                 bold: true
                             )
-                            HistoryCell("\(measurement.diastolic)", weight: 1, bold: true)
-                            HistoryCell("\(measurement.pulse)", weight: 1)
-                            HistoryCell(armShortLabel(measurement.armSide), weight: 1)
+                            HistoryCell("\(measurement.diastolic)", weight: 1, color: HistoryTheme.primaryText, bold: true)
+                            HistoryCell("\(measurement.pulse)", weight: 1, color: HistoryTheme.secondaryText)
+                            HistoryCell(armShortLabel(measurement.armSide), weight: 1, color: HistoryTheme.secondaryText)
                         }
                         .frame(minHeight: 48)
                         .padding(.vertical, 8)
 
                         Rectangle()
-                            .fill(Color(white: 0.97))
+                            .fill(HistoryTheme.divider)
                             .frame(height: 0.5)
                     }
                 }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier(
                     measurement.id == lastUploadedId
                         ? AccessibilityIdentifiers.historyLastUploadedRow
@@ -296,7 +318,7 @@ private struct HistoryCell: View {
     let color: Color
     let bold: Bool
 
-    init(_ text: String, weight: CGFloat, header: Bool = false, color: Color = AppColors.secondaryText, bold: Bool = false) {
+    init(_ text: String, weight: CGFloat, header: Bool = false, color: Color = HistoryTheme.secondaryText, bold: Bool = false) {
         self.text = text
         self.weight = weight
         self.header = header
@@ -310,7 +332,7 @@ private struct HistoryCell: View {
                 size: header ? 10 : (bold ? 12 : 11),
                 weight: header || bold ? .medium : .regular
             ))
-            .foregroundColor(header ? AppColors.labelColor : color)
+            .foregroundColor(header ? HistoryTheme.secondaryText : color)
             .frame(maxWidth: .infinity, alignment: .leading)
             .layoutPriority(weight == 2 ? 1 : 0)
     }
@@ -335,7 +357,7 @@ private struct DateSelectorButton: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 10)
         }
-        .background(Color.white)
+        .background(HistoryTheme.cardBackground)
         .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppColors.inputBorder, lineWidth: 0.5))
         .cornerRadius(8)
         .accessibilityIdentifier(accessibilityId)
@@ -365,7 +387,7 @@ struct CardContainer<Content: View>: View {
         VStack(alignment: .leading, spacing: 0) { content }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.white)
+            .background(HistoryTheme.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

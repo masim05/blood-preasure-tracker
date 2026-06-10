@@ -39,6 +39,14 @@ struct HistoryViewTests {
         #expect(showHistoryRefreshLoadingIndicator(isLoading: false, measurements: [sampleMeasurement()]) == false)
     }
 
+    @Test func historyColumnsIncludeDiaSysPulseAndArm() {
+        let columns = historyColumnTitles()
+        #expect(columns.systolic == "SYS")
+        #expect(columns.diastolic == "DIA")
+        #expect(columns.pulse == "Pulse")
+        #expect(columns.arm == "Arm")
+    }
+
     private func sampleMeasurement() -> Blood_pressure_tracker.Measurement {
         Blood_pressure_tracker.Measurement(
             id: "msr_1",
