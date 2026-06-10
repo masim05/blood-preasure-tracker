@@ -201,8 +201,7 @@ struct AuthView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 20)
         }
-        .background(AppColors.pageBackground.ignoresSafeArea())
-        .preferredColorScheme(.light)
+        .background(Color(.systemBackground))
         .onAppear { mode = appState.authMode }
     }
 
