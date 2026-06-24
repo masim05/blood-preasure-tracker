@@ -61,6 +61,7 @@
     <string name="detail_systolic">Systolic</string>
     <string name="detail_diastolic">Diastolic</string>
     <string name="detail_pulse">Pulse</string>
+    <string name="detail_arm_side">Arm side: %1$s</string>
     <string name="detail_arm_side_label">Arm side</string>
     <string name="detail_status">Status: %1$s</string>
     <string name="detail_recognition_error">Recognition error: %1$s</string>
