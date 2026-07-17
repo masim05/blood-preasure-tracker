@@ -2,6 +2,51 @@
 
 Blood Pressure Tracker has three deliverables in one repository: a CLI predictor/evaluator for blood-pressure monitor images, a NestJS mobile API for accounts and measurement lifecycle, and an Android app that captures images and displays saved history.
 
+## AI Flow: How To Run
+
+### 1. Run the flow
+
+1. GitHub Copilot in VS Code: run `/ai-development-flow <task brief>` in chat. Entry point: `.github/prompts/ai-development-flow.prompt.md`.
+2. Claude Code: run `/ai-development-flow <task brief>` in a Claude session from repository root. Entry point: `.claude/skills/ai-development-flow/SKILL.md`.
+3. Codex (CLI/IDE/App): run `$ai-development-flow <task brief>` (or use `/skills` and select `ai-development-flow`). Entry point: `.agents/skills/ai-development-flow/SKILL.md`.
+
+### 2. Provide the task brief
+
+Use this template with the command:
+
+```md
+Task type: <feat|change-request|bug|chore|docs>
+Task title: <short title>
+Context: <business/technical context>
+Expected result: <what should be true after delivery>
+Constraints: <known restrictions>
+Out of scope: <what must not be changed>
+Links: <issue, docs, related MR>
+```
+
+### 3. What happens next
+
+- AI Manager asks clarification questions labeled `[REQ]` or `[TECH]`.
+- After clarifications, the flow creates or reuses `tmp/wts/<task-slug>/` before it writes work-item artifacts or implementation changes.
+- AI Manager prepares `spec.md`, `plan.md`, `test-plan.md`, and `e2e-scenarios.md`.
+- AI Developer implements the task and creates or updates the merge request.
+- After each developer code change, AI Reviewer and AI Tester both assess the MR and report either `consensus` or `changes required`.
+- AI Manager orchestrates the developer-reviewer-tester loop until all actors reach consensus (or the iteration cap is hit).
+- On success, the flow returns the merge request reference and `ready for Human Handoff` status.
+
+### 4. Human handoff
+
+After the AI flow completes, a human must add a GitLab comment in the configured communication language with:
+
+- human joined the process;
+- current status (`approved` or `requires changes`);
+- next action if changes are required.
+
+Set the language with `gitlab.language` in `.ai-flow.yml`. It defaults to `en` when the file or setting is absent.
+
+All platform entry points follow `docs/engineering/ai-development-flow.md`, the source of truth for flow behavior.
+
+
 ## CLI Predictor/Evaluator
 
 ### Requirements
