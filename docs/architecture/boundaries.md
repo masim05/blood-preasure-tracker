@@ -47,6 +47,54 @@ Boundary rules for future server changes:
 - Public HTML pages are a web inbound adapter and must not become the owner of mobile API workflow rules.
 - Request logging must remain metadata-only. It must not include bodies, tokens, cookies, passwords, multipart payloads, image bytes, or recognized health values unless a separate user-safe warn/error path explicitly justifies the field.
 
+## Android app
+
+Android app boundary follows the same dependency intent: Android UI and framework code trigger use-case flows; business decisions remain in flow/domain code; infrastructure details remain in adapters.
+
+Android dependency direction:
+
+```txt
+Compose UI + Android activity/navigation
+  -> core flows
+    -> core ports + domain model/validation
+      <- adapters (HTTP API, camera, session persistence)
+```
+
+### Android module responsibilities
+
+- `mobile/android/app/src/main/kotlin/.../MainActivity.kt`
+  - composition root for Android runtime;
+  - wires adapters into flows;
+  - maps flow state to `MobileUiState`;
+  - owns navigation synchronization.
+- `core/flow/*`
+  - route transitions and user-visible operation orchestration;
+  - validation-before-side-effects policy;
+  - no direct dependency on Android framework APIs.
+- `core/model/*`, `core/validation/*`
+  - typed domain state (`Session`, `Measurement`, `MeasurementDetail`, filters);
+  - pure validation rules (email/password/image/date filters).
+- `core/ports/*`
+  - contracts for auth, upload, history, detail, session store, camera.
+- `adapters/api/*`
+  - endpoint/path mapping and HTTP transport details;
+  - API/network/timeout/parse error mapping.
+- `adapters/camera/*`
+  - camera capture readiness and payload handoff.
+- `adapters/session/*`
+  - encrypted token persistence with Android Keystore-backed encryption.
+- `ui/screens/*`
+  - rendering and event emission only.
+
+### Android boundary rules (mandatory)
+
+- Compose screens must not call HTTP clients, camera APIs, or keystore/persistence directly.
+- Flows must depend only on ports/domain validation and must not import Android UI/lifecycle classes.
+- Adapter classes must not own route or feature business policies.
+- Session persistence must remain behind `SessionStore`; switching storage technology must not require changes in flow classes.
+- API base URL/environment selection stays in Gradle/BuildConfig, not in screen logic.
+- Any new mobile capability must preserve `UI -> flow -> port <- adapter` direction and avoid cross-layer shortcuts.
+
 Default repository rules that still apply across all runtimes:
 
 - Keep domain or business logic independent from infrastructure details.
