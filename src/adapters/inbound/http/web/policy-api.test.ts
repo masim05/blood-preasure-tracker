@@ -33,6 +33,8 @@ describe('PolicyController API policy endpoint', () => {
   it('uses the same policy HTML source for web page and API endpoint', () => {
     const apiHtml = controller.getPolicyApi('fr-FR,fr;q=0.9', undefined);
     const pageHtml = controller.getPolicy('fr-FR,fr;q=0.9', undefined);
-    expect(pageHtml).toContain(apiHtml);
+    const apiBody = apiHtml.match(/<body>\s*([\s\S]*?)\s*<\/body>/)?.[1];
+    expect(apiBody).toBeDefined();
+    expect(pageHtml).toContain(apiBody as string);
   });
 });

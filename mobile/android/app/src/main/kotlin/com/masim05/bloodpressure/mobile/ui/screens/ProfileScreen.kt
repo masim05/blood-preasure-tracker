@@ -1,7 +1,6 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
 import android.content.Intent
-import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
