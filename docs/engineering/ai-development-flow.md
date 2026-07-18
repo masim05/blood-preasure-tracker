@@ -111,7 +111,7 @@ Question format requirements:
 
 The worktree gate from `Worktree Gate (Mandatory)` applies to this step and all following steps.
 
-After clarifications, AI Manager must create or update a work item directory:
+After clarifications, AI Manager must create or update a temporary work item artifact directory in the task worktree:
 
 ```txt
 docs/work-items/NNN-<type>-<short-slug>/
@@ -124,7 +124,7 @@ Required artifacts for this flow:
 - `e2e-scenarios.md`
 - `artifacts/` (evidence directory for logs/screenshots/recordings)
 
-Artifact content must be enough for implementation and review.
+Artifact content must be enough for implementation and review. Completed work-item artifact directories are not durable repository structure; remove them before merge unless the task explicitly asks to retain them. Keep `docs/work-items/.gitkeep` tracked so the directory exists when no active artifacts are retained.
 
 Step input:
 - task brief;

@@ -12,11 +12,7 @@ A chore is done only when:
 - Documentation is updated if the chore changes developer workflow, setup, deployment, configuration, or operations.
 - The merge/pull request explains how the change was verified.
 
-A work item directory is required for risky chores:
-
-```txt
-docs/work-items/NNN-chore-<short-slug>/
-```
+AI-flow temporary work-item artifacts are required for risky chores when the AI development flow is used. Completed artifact directories are not required to remain committed unless the task explicitly asks to retain them.
 
 ## Blocking review conditions
 

@@ -12,11 +12,7 @@ A `bug` task is done only when:
 - Related edge cases are considered.
 - The merge/pull request explains how the fix was verified.
 
-A work item directory is required for non-trivial bugfixes:
-
-```txt
-docs/work-items/NNN-bug-<short-slug>/
-```
+AI-flow temporary work-item artifacts are required for non-trivial bugfixes when the AI development flow is used. Completed artifact directories are not required to remain committed unless the task explicitly asks to retain them.
 
 ## Blocking review conditions
 

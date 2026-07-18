@@ -12,11 +12,7 @@ A documentation change is done only when:
 - No product code, tests, or infrastructure behavior is changed unless the task is reclassified from `docs` to another task type.
 - The merge/pull request explains what documentation changed and why.
 
-A work item directory is required for docs changes that change project policy, architecture documentation, onboarding, or agent instructions:
-
-```txt
-docs/work-items/NNN-docs-<short-slug>/
-```
+AI-flow temporary work-item artifacts are required for docs changes that change project policy, architecture documentation, onboarding, or agent instructions when the AI development flow is used. Completed artifact directories are not required to remain committed unless the task explicitly asks to retain them.
 
 ## Blocking review conditions
 

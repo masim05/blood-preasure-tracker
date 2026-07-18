@@ -75,8 +75,7 @@ repo/
       testing-policy.md
 
     work-items/
-      README.md
-      NNN-<type>-<short-slug>/
+      .gitkeep
 
   src/
     ...
@@ -151,47 +150,9 @@ Related server artifacts:
 
 ## Work Items Structure
 
-Work items are organized as a single chronological work stream.
+`docs/work-items/` is retained in the repository with `docs/work-items/.gitkeep` only.
 
-Pattern:
-
-```txt
-docs/work-items/NNN-<type>-<short-slug>/
-```
-
-Allowed task types:
-
-- `feat`
-- `change-request`
-- `bug`
-- `chore`
-- `docs`
-
-Examples:
-
-- `docs/work-items/001-feat-login/`
-- `docs/work-items/002-change-request-checkout-copy/`
-- `docs/work-items/003-bug-user-cant-login/`
-- `docs/work-items/004-chore-docker-tools/`
-- `docs/work-items/005-docs-api-readme/`
-
-## Work Item Requirements
-
-A work item directory is required for:
-
-- every feature;
-- every change request;
-- every non-trivial bugfix;
-- every risky chore;
-- every docs change that changes project policy, architecture documentation, onboarding, or agent instructions.
-
-A work item directory is optional for:
-
-- typo fixes;
-- small obvious bugfixes;
-- mechanical cleanup;
-- simple dependency bumps;
-- small docs edits.
+AI-flow work-item artifacts are temporary handoff artifacts used during a task. They are not required durable repository structure and should be removed before merge unless the task explicitly asks to retain them.
 
 ## Worktree Policy
 

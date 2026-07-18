@@ -66,6 +66,11 @@ is_protected_branch() {
   esac
 }
 
+is_merged_to_default() {
+  branch_name="$1"
+  git merge-base --is-ancestor "$branch_name" "refs/remotes/origin/$default_branch"
+}
+
 has_active_remote_mr() {
   branch_name="$1"
 
@@ -94,6 +99,11 @@ while IFS= read -r branch_name; do
   fi
 
   if has_active_remote_mr "$branch_name"; then
+    continue
+  fi
+
+  if ! is_merged_to_default "$branch_name"; then
+    printf 'Skipping unmerged branch: %s\n' "$branch_name"
     continue
   fi
 
