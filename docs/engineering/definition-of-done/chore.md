@@ -23,4 +23,4 @@ docs/work-items/NNN-chore-<short-slug>/
 The merge/pull request must not be approved until these issues are resolved:
 
 - Product behavior changed as part of the `chore`.
-- The task is actually a `refactoring`, `change-request`, or `bugfix` and was misclassified.
+- The task is actually a `refactoring`, `change-request`, or `bug` and was misclassified.

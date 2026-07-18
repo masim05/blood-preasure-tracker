@@ -4,9 +4,9 @@ This directory defines what “done” means for different task types.
 
 Every task must satisfy the common Definition of Done in this file and the task-specific Definition of Done:
 
-- `feature.md`
+- `feature.md` for `feat` tasks
 - `change-request.md`
-- `bugfix.md`
+- `bugfix.md` for `bug` tasks
 - `chore.md`
 - `docs.md`
 
@@ -14,7 +14,7 @@ Every task must satisfy the common Definition of Done in this file and the task-
 
 A task is done only when:
 
-- The task type is explicit: `feature`, `change-request`, `bugfix`, `chore`, or `docs`.
+- The task type is explicit: `feat`, `change-request`, `bug`, `chore`, or `docs`.
 - The change is understandable from the issue, work item, or merge/pull request description.
 - The implementation follows the project architecture and boundaries.
 - When the workflow or task required isolated execution, the work was carried out from the dedicated git worktree under `tmp/wts/` rather than from the primary checkout.
@@ -27,11 +27,11 @@ A task is done only when:
 
 ## Task Type Selection
 
-Use `feature` when the change adds a new capability without changing the existing behavior contract.
+Use `feat` when the change adds a new capability without changing the existing behavior contract.
 
 Use `change-request` when the change intentionally modifies existing product or system behavior according to a new requirement.
 
-Use `bugfix` when the change fixes behavior that is incorrect, broken, or inconsistent with expectations.
+Use `bug` when the change fixes behavior that is incorrect, broken, or inconsistent with expectations.
 
 Use `chore` when the change is technical maintenance and does not change product behavior.
 

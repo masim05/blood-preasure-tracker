@@ -83,6 +83,7 @@ repo/
 
   tests/
     integration/
+      check-ai-flow-config.sh
       cli.integration.test.ts
       mobile-api.integration.test.ts
     e2e/

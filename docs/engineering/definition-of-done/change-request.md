@@ -18,4 +18,4 @@ A change request is done only when:
 
 The merge/pull request must not be approved until these issues are resolved:
 
-- The change is actually additive-only and should be reclassified as `feature`.
+- The change is actually additive-only and should be reclassified as `feat`.

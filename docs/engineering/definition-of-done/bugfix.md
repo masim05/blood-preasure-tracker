@@ -1,9 +1,10 @@
-# Definition of Done: Bugfix
+# Definition of Done: Bugfix (`bug`)
 
-A bugfix is done only when:
+A `bug` task is done only when:
 
 - The bug is described with actual behavior and expected behavior.
 - The reproduction case is documented when possible.
+- A regression test or reproduction check is shown failing before the fix when practical.
 - The root cause is identified, or the merge/pull request explicitly explains why it could not be determined.
 - The fix is minimal and focused on the bug.
 - Existing behavior remains compatible unless the behavior change is intentional and documented.
@@ -21,4 +22,4 @@ docs/work-items/NNN-bug-<short-slug>/
 
 The merge/pull request must not be approved until these issues are resolved:
 
-- The change expands beyond a focused fix and is really a `change-request` or `feature`.
+- The change expands beyond a focused fix and is really a `change-request` or `feat`.

@@ -324,4 +324,4 @@ For latest status and required checks, see repository Actions.
 
 Contribution guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-All feature and bugfix work must be done in separate Git worktrees, with one worktree per change.
+All `feat` and `bug` work must be done in separate Git worktrees, with one worktree per change.

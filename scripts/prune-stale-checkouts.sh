@@ -100,11 +100,6 @@ while IFS= read -r branch_name; do
     git worktree remove "$worktree_path"
   fi
 
-  if [[ "$branch_name" == "$current_branch" ]]; then
-    printf 'Skipping current branch: %s\n' "$branch_name"
-    continue
-  fi
-
   printf 'Deleting branch: %s\n' "$branch_name"
   git branch -D "$branch_name"
 done < <(git for-each-ref refs/heads --format='%(refname:short)')
