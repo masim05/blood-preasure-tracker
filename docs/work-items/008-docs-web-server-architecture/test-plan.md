@@ -3,7 +3,7 @@
 ## Static Validation
 
 - Run `npm run build` to ensure no product code was changed into a broken state.
-- Run `sh scripts/check-architecture.sh` to validate architecture documentation requirements.
+- Run `bash scripts/check-architecture.sh` to validate architecture documentation requirements.
 
 ## Review Checks
 

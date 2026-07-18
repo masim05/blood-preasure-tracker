@@ -12,7 +12,7 @@ assert_success() {
   expected="$2"
   shift 2
 
-  if ! output="$($validator "$@" 2>&1)"; then
+  if ! output="$(bash "$validator" "$@" 2>&1)"; then
     printf 'FAIL %s: expected success, got failure:\n%s\n' "$name" "$output" >&2
     exit 1
   fi
@@ -29,7 +29,7 @@ assert_failure() {
   shift 2
 
   set +e
-  output="$($validator "$@" 2>&1)"
+  output="$(bash "$validator" "$@" 2>&1)"
   exit_code=$?
   set -e
 

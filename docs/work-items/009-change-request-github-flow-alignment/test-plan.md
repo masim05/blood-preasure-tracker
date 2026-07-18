@@ -2,11 +2,11 @@
 
 ## Policy Checks
 
-- `sh scripts/check-ai-flow-config.sh`
-- `sh scripts/check-pr.sh`
-- `sh scripts/check-architecture.sh`
-- `sh scripts/check-dod.sh`
-- `sh scripts/check-specs.sh`
+- `bash scripts/check-ai-flow-config.sh`
+- `bash scripts/check-pr.sh`
+- `bash scripts/check-architecture.sh`
+- `bash scripts/check-dod.sh`
+- `bash scripts/check-specs.sh`
 
 ## Build Check
 
