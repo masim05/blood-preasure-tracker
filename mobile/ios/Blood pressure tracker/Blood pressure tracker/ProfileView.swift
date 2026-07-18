@@ -47,7 +47,7 @@ func policySections() -> [PolicySection] {
         ),
         PolicySection(
             heading: "Contact",
-            content: "For privacy-related questions, contact us at blood.pressure.by.max@gmail.com."
+            content: "For privacy-related questions, contact Maxim Ryndin at blood.pressure.by.max@gmail.com."
         ),
     ]
 }

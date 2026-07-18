@@ -1,6 +1,7 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
 import android.content.Intent
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -259,6 +260,7 @@ private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> U
 
 @Composable
 private fun PolicyWebViewContent(policyUrl: String) {
+    val allowedPolicyUri = remember(policyUrl) { Uri.parse(policyUrl) }
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     DisposableEffect(Unit) {
         onDispose {
@@ -271,20 +273,21 @@ private fun PolicyWebViewContent(policyUrl: String) {
         AndroidView(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(460.dp),
+                .height(460.dp)
+                .testTag(TestTags.ProfilePolicyWebView),
             factory = { context ->
                 WebView(context).apply {
                     webViewRef = this
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                            val targetUri = request.url ?: return false
+                            val targetUri = request.url
                             if (targetUri.scheme == "mailto") {
                                 val intent = Intent(Intent.ACTION_SENDTO, targetUri)
                                 val canHandleIntent = intent.resolveActivity(view.context.packageManager) != null
                                 if (!canHandleIntent) return false
                                 return runCatching { view.context.startActivity(intent) }.isSuccess
                             }
-                            return false
+                            return !isAllowedPolicyNavigation(targetUri, allowedPolicyUri)
                         }
                     }
                     settings.javaScriptEnabled = false
@@ -300,6 +303,33 @@ private fun PolicyWebViewContent(policyUrl: String) {
                 }
             },
         )
+    }
+}
+
+private fun isAllowedPolicyNavigation(targetUri: Uri, allowedPolicyUri: Uri): Boolean {
+    val targetScheme = targetUri.scheme ?: return false
+    if (targetScheme != "http" && targetScheme != "https") return false
+
+    val allowedScheme = allowedPolicyUri.scheme ?: return false
+    val allowedHost = allowedPolicyUri.host ?: return false
+    val targetHost = targetUri.host ?: return false
+    if (targetScheme != allowedScheme || targetHost != allowedHost) return false
+
+    val allowedPort = normalizedPort(allowedPolicyUri)
+    val targetPort = normalizedPort(targetUri)
+    if (allowedPort != targetPort) return false
+
+    val allowedPath = allowedPolicyUri.path ?: return false
+    val targetPath = targetUri.path ?: return false
+    return targetPath == allowedPath
+}
+
+private fun normalizedPort(uri: Uri): Int {
+    if (uri.port != -1) return uri.port
+    return when (uri.scheme) {
+        "http" -> 80
+        "https" -> 443
+        else -> -1
     }
 }
 

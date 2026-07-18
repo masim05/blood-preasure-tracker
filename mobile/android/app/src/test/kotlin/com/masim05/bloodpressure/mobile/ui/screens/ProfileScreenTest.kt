@@ -91,6 +91,22 @@ class ProfileScreenTest {
     }
 
     @Test
+    fun policyPageUsesWebViewWhenPolicyUrlProvided() {
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = {},
+                onLogout = {},
+                policyUrl = "https://example.com/api/v1/policy?lang=en",
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
+        composeRule.onNodeWithTag(TestTags.ProfilePolicyWebView).assertIsDisplayed()
+    }
+
+    @Test
     fun profileGuideRowInvokesGuideCallback() {
         var guideOpenCount = 0
         composeRule.setContent {

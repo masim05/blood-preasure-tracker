@@ -41,6 +41,7 @@ object TestTags {
     const val ProfileGuide = "profile_guide"
     const val ProfileStory = "profile_story"
     const val ProfilePolicy = "profile_policy"
+    const val ProfilePolicyWebView = "profile_policy_webview"
     const val ProfileAboutBack = "profile_about_back"
     const val ProfileLanguageOptionPrefix = "profile_language_option_"
 }
