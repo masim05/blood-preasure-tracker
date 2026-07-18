@@ -11,11 +11,11 @@ A change request is done only when:
 - Edge cases and error states are considered.
 - Security, privacy, performance, and observability implications are checked where relevant.
 - User-facing documentation is updated when behavior changes.
-- The merge request links to the change-request work item.
-- The merge request explains what behavior changed and how it was verified.
+- The merge/pull request links to the change-request work item.
+- The merge/pull request explains what behavior changed and how it was verified.
 
 ## Blocking review conditions
 
-The merge request must not be approved until these issues are resolved:
+The merge/pull request must not be approved until these issues are resolved:
 
 - The change is actually additive-only and should be reclassified as `feature`.

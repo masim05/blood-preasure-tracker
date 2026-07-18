@@ -10,12 +10,12 @@ A feature is done only when:
 - Edge cases and error states are considered.
 - Security, privacy, performance, and observability implications are checked where relevant.
 - User-facing documentation is updated when behavior changes.
-- The merge request links to the feature work item.
-- The merge request explains how the feature was verified.
+- The merge/pull request links to the feature work item.
+- The merge/pull request explains how the feature was verified.
 
 ## Blocking review conditions
 
-The merge request must not be approved until these issues are resolved:
+The merge/pull request must not be approved until these issues are resolved:
 
 - Existing product code was deleted as part of a `feature` task.
 - The task is actually changing an existing behavior contract and should be reclassified as `change-request`.

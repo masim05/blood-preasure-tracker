@@ -2,19 +2,19 @@
 set -euo pipefail
 
 required_paths=(
-  ".gitlab/merge_request_templates/default.md"
-  ".gitlab/issue_templates/feature.md"
-  ".gitlab/issue_templates/change-request.md"
-  ".gitlab/issue_templates/bug.md"
-  ".gitlab/issue_templates/chore.md"
-  ".gitlab/issue_templates/docs.md"
+  ".github/pull_request_template.md"
+  ".github/ISSUE_TEMPLATE/feature.md"
+  ".github/ISSUE_TEMPLATE/change-request.md"
+  ".github/ISSUE_TEMPLATE/bug.md"
+  ".github/ISSUE_TEMPLATE/chore.md"
+  ".github/ISSUE_TEMPLATE/docs.md"
 )
 
 for path in "${required_paths[@]}"; do
   if [ ! -s "$path" ]; then
-    echo "Missing or empty merge request/issue template: $path" >&2
+    echo "Missing or empty pull request/issue template: $path" >&2
     exit 1
   fi
 done
 
-echo "Merge request policy check passed."
+echo "Pull request policy check passed."

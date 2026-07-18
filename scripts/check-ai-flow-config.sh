@@ -6,7 +6,7 @@ language="en"
 git_cli="glab"
 
 if [[ ! -e "$config_path" ]]; then
-  echo "AI flow config check passed (GitLab language: $language, Git CLI: $git_cli)."
+  echo "AI flow config check passed (Communication language: $language, Git CLI: $git_cli)."
   exit 0
 fi
 
@@ -118,4 +118,4 @@ if [[ "$git_cli" != "glab" && "$git_cli" != "gh" ]]; then
   fail "Invalid git.cli: $git_cli"
 fi
 
-echo "AI flow config check passed (GitLab language: $language, Git CLI: $git_cli)."
+echo "AI flow config check passed (Communication language: $language, Git CLI: $git_cli)."

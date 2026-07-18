@@ -10,5 +10,5 @@ Before generating or modifying code in this repository, read both:
 Codex-specific rules:
 
 - Treat `AGENTS.md` as the source of truth for repository rules.
-- Before push, run the same local checks expected by GitLab CI and confirm the pushed commit turns CI green.
+- Before push, run the same local checks expected by GitHub Actions and confirm the pushed commit turns CI green.
 Do not treat this file as a replacement for `AGENTS.md`.

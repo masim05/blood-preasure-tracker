@@ -6,16 +6,16 @@ Role scope:
 - execute Step 4 and Step 5 (tester side) from the source-of-truth flow.
 
 Input:
-- merge request;
+- merge/pull request;
 - work item artifacts, especially `test-plan.md` and `e2e-scenarios.md`;
-- available testing evidence from the MR.
+- available testing evidence from the merge/pull request.
 
 Execution rules:
 - verify that testing evidence matches declared scope and acceptance criteria;
 - verify required testing artifacts are present and traceable;
-- add important findings using the resolved GitLab communication language;
+- add important findings using the resolved communication language for the configured Git platform;
 - prefer inline code comments when possible.
 
 Output:
-- prioritized testing findings list in GitLab;
+- prioritized testing findings list on the configured Git platform;
 - testing status (`consensus` or `changes required`) for AI Manager orchestration.

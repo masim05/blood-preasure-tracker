@@ -28,7 +28,7 @@ Before creating or updating Git platform content, resolve configuration from the
 
 The resolved communication language for the configured Git platform applies to merge/pull request titles and descriptions, AI comments, review findings, replies, completion comments, and human handoff guidance. It does not control agent chat responses, source code, work-item artifacts, or general repository documentation.
 
-The resolved Git CLI applies to Git platform operations executed by the AI flow (for example MR and comment operations) and must be one of `glab` or `gh`.
+The resolved Git CLI applies to Git platform operations executed by the AI flow (for example merge/pull request and comment operations) and must be one of `glab` or `gh`.
 
 ## Roles
 
@@ -69,7 +69,7 @@ Context: <business/technical context>
 Expected result: <what should be true after delivery>
 Constraints: <known restrictions>
 Out of scope: <what must not be changed>
-Links: <issue, docs, related MR>
+Links: <issue, docs, related merge-or-pull-request>
 ```
 
 ## Worktree Gate (Mandatory)
@@ -157,7 +157,7 @@ Step input:
 - repository guides.
 
 Step output:
-- code implementation pushed to MR/PR branch;
+- code implementation pushed to merge/pull request branch;
 - self-test evidence aligned with `test-plan.md`;
 - actor status to AI Manager:
   - `consensus`, or
@@ -183,7 +183,7 @@ Review behavior:
 
 Step input:
 - output of Step 1 (`spec.md`, `plan.md`, `test-plan.md`, `e2e-scenarios.md`);
-- MR/PR changes;
+- merge/pull request changes;
 - repository guides.
 
 Step output:
@@ -211,7 +211,7 @@ Validation behavior:
 
 Step input:
 - output of Step 1 (`spec.md`, `plan.md`, `test-plan.md`, `e2e-scenarios.md`);
-- MR/PR changes and attached test evidence.
+- merge/pull request changes and attached test evidence.
 
 Step output:
 - assessment of testing completeness and evidence quality;
@@ -274,7 +274,7 @@ Terminal output requirements:
 
 Before considering task ready:
 - all required artifacts exist in work item;
-- MR discussion and comments from the AI cycle use the resolved communication language;
+- merge/pull request discussion and comments from the AI cycle use the resolved communication language;
 - reviewer and tester findings are resolved or explicitly tracked;
-- human handoff comment is present in GitLab;
-- pushed commit has green GitLab CI.
+- human handoff comment is present on the configured Git platform;
+- pushed commit has green CI on the configured Git platform.

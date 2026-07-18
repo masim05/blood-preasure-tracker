@@ -11,10 +11,10 @@ Input:
 
 Execution rules:
 - respect task-type boundaries and all project guides;
-- create/update the MR and respond to review findings using the resolved GitLab communication language;
+- create/update the merge/pull request and respond to review findings using the resolved communication language for the configured Git platform;
 - continue until loop stop condition from the source-of-truth is met.
 
 Output:
 - commits and pushed branch;
-- MR updates;
-- responses to reviewer comments in the resolved GitLab communication language.
+- merge/pull request updates;
+- responses to reviewer comments in the resolved communication language.

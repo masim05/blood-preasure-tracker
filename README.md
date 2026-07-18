@@ -21,7 +21,7 @@ Context: <business/technical context>
 Expected result: <what should be true after delivery>
 Constraints: <known restrictions>
 Out of scope: <what must not be changed>
-Links: <issue, docs, related MR>
+Links: <issue, docs, related merge-or-pull-request>
 ```
 
 ### 3. What happens next
@@ -29,10 +29,10 @@ Links: <issue, docs, related MR>
 - AI Manager asks clarification questions labeled `[REQ]` or `[TECH]`.
 - After clarifications, the flow creates or reuses `tmp/wts/<task-slug>/` before it writes work-item artifacts or implementation changes.
 - AI Manager prepares `spec.md`, `plan.md`, `test-plan.md`, and `e2e-scenarios.md`.
-- AI Developer implements the task and creates or updates the merge request.
-- After each developer code change, AI Reviewer and AI Tester both assess the MR and report either `consensus` or `changes required`.
+- AI Developer implements the task and creates or updates the merge/pull request.
+- After each developer code change, AI Reviewer and AI Tester both assess the merge/pull request and report either `consensus` or `changes required`.
 - AI Manager orchestrates the developer-reviewer-tester loop until all actors reach consensus (or the iteration cap is hit).
-- On success, the flow returns the merge request reference and `ready for Human Handoff` status.
+- On success, the flow returns the merge/pull request reference and `ready for Human Handoff` status.
 
 ### 4. Human handoff
 

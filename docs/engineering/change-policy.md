@@ -16,8 +16,8 @@ This document defines task-type change boundaries and review-blocking rules.
 
 The following findings are blocking in code review:
 
-- A `feature` changes any existing test file without explicit prior agreement and a clear justification in the merge request.
-- A `bugfix` does not include a regression test, unless the merge request explains why no practical regression test could be added.
+- A `feature` changes any existing test file without explicit prior agreement and a clear justification in the merge/pull request.
+- A `bugfix` does not include a regression test, unless the merge/pull request explains why no practical regression test could be added.
 - A `change-request` changes tests outside the behavior contract that intentionally changed.
 - A `chore` changes behavior-level test assertions or changes product behavior.
 - A `docs` task changes code, tests, infrastructure, CI, or configuration.

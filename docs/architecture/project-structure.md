@@ -10,7 +10,7 @@ This document defines the required repository structure.
 - `CODEX.md` — Codex-specific entrypoint that links to `AGENTS.md`.
 - `.ai-flow.yml` — optional repository-specific AI flow configuration; omitted settings use documented defaults.
 - `.github/copilot-instructions.md` — GitHub Copilot-specific entrypoint that links to `AGENTS.md`.
-- `.gitlab-ci.yml` — GitLab CI pipeline for repository policy checks.
+- `.github/workflows/ci.yml` — GitHub Actions CI pipeline for repository policy checks.
 
 ## Required directories
 
@@ -24,6 +24,15 @@ repo/
 
   .github/
     copilot-instructions.md
+    pull_request_template.md
+    ISSUE_TEMPLATE/
+      feature.md
+      change-request.md
+      bug.md
+      chore.md
+      docs.md
+    workflows/
+      ci.yml
     prompts/
       ai-development-flow.prompt.md
 
@@ -38,16 +47,6 @@ repo/
         SKILL.md
         agents/
           openai.yaml
-
-  .gitlab/
-    issue_templates/
-      feature.md
-      change-request.md
-      bug.md
-      chore.md
-      docs.md
-    merge_request_templates/
-      default.md
 
   docs/
     ai/
