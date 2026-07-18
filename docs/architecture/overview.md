@@ -70,7 +70,7 @@ State transitions:
 1. Startup loads encrypted session; active session starts at camera route, invalid session is cleared and redirected to auth.
 2. Auth screen calls `AuthFlow`; validation occurs before network calls; success persists session and routes to guide/camera.
 3. Camera screen publishes captured `MeasurementImage`; `CaptureFlow` verifies readiness, validates image (JPEG/PNG, <=10 MB), uploads, and routes to history.
-4. History screen applies date-filter validation (`yyyy-mm-dd`) and fetches `/api/v1/measurements`.
+4. History screen applies date-filter validation (`yyyy-MM-dd`) and fetches `/api/v1/measurements`.
 5. Measurement detail screen loads and saves via detail endpoints and fetches protected image bytes with authorization.
 6. Profile screen changes language preference and triggers logout/session clear.
 

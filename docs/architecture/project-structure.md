@@ -156,7 +156,7 @@ src/
       http/
         auth.controller.ts            # /api/v1/signin and /api/v1/login
         auth-rate-limit.guard.ts      # per-client/email signin/login rate limit
-        bearer-auth.guard.ts          # Authorization header guard
+        bearer-auth.guard.ts          # Authorization: Bearer guard
         http-error.mapper.ts          # ApiError -> HTTP JSON error response
         http-request-logging.ts       # request/status metadata logging
         measurements.controller.ts    # authenticated measurement API routes
