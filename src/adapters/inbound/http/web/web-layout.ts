@@ -1,4 +1,5 @@
 import { SUPPORTED_LANGS, type SupportedLang, type WebTranslations } from './web-i18n';
+import { renderPolicyContentHtml } from './policy-content';
 
 const COLORS = {
   primary: '#1D9E75',
@@ -48,16 +49,6 @@ function languageOptions(selectedLang: SupportedLang): string {
 
 function withLang(path: '/' | '/policy', lang: string): string {
   return `${path}?lang=${encodeURIComponent(lang)}`;
-}
-
-const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
-function linkifySupportEmail(text: string): string {
-  const escapedEmail = escapeHtml(SUPPORT_EMAIL);
-  const mailto = `mailto:${SUPPORT_EMAIL}`;
-  return text.replaceAll(
-    escapedEmail,
-    `<a href="${mailto}">${escapedEmail}</a>`,
-  );
 }
 
 export function renderLayout(
@@ -283,24 +274,9 @@ ${storyParagraphs}
   return renderLayout(t, t.home.metaTitle, body, '/');
 }
 
-export function renderPolicyPage(t: WebTranslations): string {
-  const sections = t.policy.sections
-    .map(
-      (section) => `
-  <div class="policy-section">
-    <h2>${escapeHtml(section.heading)}</h2>
-    <p>${linkifySupportEmail(escapeHtml(section.content))}</p>
-  </div>`,
-    )
-    .join('');
-
-  const body = `
-<div class="card">
-  <h1 class="policy-page-title">${escapeHtml(t.footer.policy)}</h1>
-  <p class="policy-intro">${escapeHtml(t.policy.intro)}</p>
-  <p class="policy-intro">${escapeHtml(t.policy.lastUpdated)}</p>
-${sections}
-</div>`;
-
-  return renderLayout(t, t.policy.metaTitle, body, '/policy');
+export function renderPolicyPage(
+  t: WebTranslations,
+  policyContentHtml: string = renderPolicyContentHtml(t),
+): string {
+  return renderLayout(t, t.policy.metaTitle, policyContentHtml, '/policy');
 }

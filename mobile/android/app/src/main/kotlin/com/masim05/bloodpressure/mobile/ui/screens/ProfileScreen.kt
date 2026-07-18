@@ -43,9 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.supportedLanguageOptions
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import android.webkit.WebView
+import android.webkit.WebViewClient
 
 private val PageBg = Color(0xFFF2F2F7)
 private val CardBorder = Color(0xFFE5E5E5)
@@ -87,6 +90,7 @@ fun ProfileScreen(
     onLanguageSelected: (String) -> Unit,
     onOpenGuide: () -> Unit,
     onLogout: () -> Unit,
+    policyUrl: String? = null,
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
@@ -197,6 +201,7 @@ fun ProfileScreen(
         } else {
             AboutPageScreen(
                 page = aboutPage,
+                policyUrl = policyUrl,
                 onBack = { selectedAboutPage = null },
             )
         }
@@ -227,7 +232,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
+private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> Unit) {
     TextButton(
         modifier = Modifier.testTag(TestTags.ProfileAboutBack),
         onClick = onBack,
@@ -238,8 +243,40 @@ private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
     Column {
         when (page) {
             AboutPage.Story -> StoryPageContent()
-            AboutPage.Policy -> PolicyPageContent()
+            AboutPage.Policy -> {
+                if (policyUrl.isNullOrBlank()) {
+                    PolicyPageContent()
+                } else {
+                    PolicyWebViewContent(policyUrl)
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun PolicyWebViewContent(policyUrl: String) {
+    CardContainer {
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(460.dp),
+            factory = { context ->
+                WebView(context).apply {
+                    webViewClient = WebViewClient()
+                    settings.javaScriptEnabled = false
+                    settings.domStorageEnabled = false
+                    settings.allowFileAccess = false
+                    settings.allowContentAccess = false
+                    loadUrl(policyUrl)
+                }
+            },
+            update = { webView ->
+                if (webView.url != policyUrl) {
+                    webView.loadUrl(policyUrl)
+                }
+            },
+        )
     }
 }
 

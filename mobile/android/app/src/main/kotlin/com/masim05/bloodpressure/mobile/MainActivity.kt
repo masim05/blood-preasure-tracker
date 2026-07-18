@@ -73,7 +73,9 @@ import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
 import com.masim05.bloodpressure.mobile.ui.screens.ProfileScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
+import java.net.URLEncoder
 import java.time.Instant
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -200,6 +202,7 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onOpenGuide = ::openGuide,
                                     onLogout = ::logout,
+                                    policyUrl = buildPolicyUrl(BuildConfig.API_BASE_URL, selectedLanguageCode),
                                 )
                             }
 
@@ -827,6 +830,17 @@ private fun csvEscape(value: String): String {
 
 internal const val LANGUAGE_PREFERENCES_NAME = "app_preferences"
 internal const val LANGUAGE_CODE_PREFERENCE_KEY = "language_code"
+
+internal fun buildPolicyUrl(apiBaseUrl: String, selectedLanguageCode: String): String {
+    val normalizedLanguageCode = readPreferredLanguageCode(selectedLanguageCode)
+    val normalizedBaseUrl = apiBaseUrl.trimEnd('/')
+    if (normalizedLanguageCode == SYSTEM_LANGUAGE_CODE) {
+        return "$normalizedBaseUrl/api/v1/policy"
+    }
+
+    val encodedLanguage = URLEncoder.encode(normalizedLanguageCode, StandardCharsets.UTF_8.name())
+    return "$normalizedBaseUrl/api/v1/policy?lang=$encodedLanguage"
+}
 
 internal fun readPreferredLanguageCode(languageCode: String?): String {
     return languageCode?.takeIf { it in supportedLanguageCodes } ?: SYSTEM_LANGUAGE_CODE
