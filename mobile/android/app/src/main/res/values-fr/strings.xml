@@ -133,7 +133,7 @@
     <string name="profile_story_paragraph_3">Après l\'avoir utilisée moi-même, je me suis dit : peut-être que je ne suis pas le seul avec ce problème. C\'est pourquoi j\'ai décidé de la publier sur Google Play.</string>
     <string name="profile_policy_page_title">Politique de confidentialité</string>
     <string name="profile_policy_intro">Votre vie privée est importante. Cette politique explique quelles données Blood Pressure collecte, pourquoi et comment elles sont traitées.</string>
-    <string name="profile_policy_last_updated">Dernière mise à jour : 6 juin 2026</string>
+    <string name="profile_policy_last_updated">Dernière mise à jour : 18 juillet 2026</string>
     <string name="profile_policy_heading_data_collect">Données que nous collectons</string>
     <string name="profile_policy_content_data_collect">Nous collectons les informations suivantes lors de l\'utilisation de l\'application : votre adresse e-mail et mot de passe (haché) pour créer votre compte ; les photos de votre tensiomètre que vous soumettez pour reconnaissance ; les valeurs de tension artérielle (systolique, diastolique, pouls, côté du bras) extraites de ces photos ou saisies manuellement ; ainsi que la date et l\'heure de chaque mesure.</string>
     <string name="profile_policy_heading_data_use">Utilisation de vos données</string>

@@ -45,7 +45,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Privacy Policy – Blood Pressure',
       intro: 'Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.',
-      lastUpdated: 'Last updated: June 6, 2026',
+      lastUpdated: 'Last updated: July 18, 2026',
       sections: [
         {
           heading: 'Data We Collect',
@@ -96,7 +96,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Política de privacidad – Blood Pressure',
       intro: 'Tu privacidad es importante. Esta política explica qué datos recopila Blood Pressure, por qué y cómo se gestionan.',
-      lastUpdated: 'Última actualización: 6 de junio de 2026',
+      lastUpdated: 'Última actualización: 18 de julio de 2026',
       sections: [
         {
           heading: 'Datos que recopilamos',
@@ -147,7 +147,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Politique de confidentialité – Blood Pressure',
       intro: 'Votre vie privée est importante. Cette politique explique quelles données Blood Pressure collecte, pourquoi et comment elles sont traitées.',
-      lastUpdated: 'Dernière mise à jour : 6 juin 2026',
+      lastUpdated: 'Dernière mise à jour : 18 juillet 2026',
       sections: [
         {
           heading: 'Données que nous collectons',
@@ -351,7 +351,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Политика конфиденциальности – Blood Pressure',
       intro: 'Ваша конфиденциальность важна для нас. В этой политике описано, какие данные собирает Blood Pressure, для чего и как они используются.',
-      lastUpdated: 'Последнее обновление: 6 июня 2026 г.',
+      lastUpdated: 'Последнее обновление: 18 июля 2026 г.',
       sections: [
         {
           heading: 'Какие данные мы собираем',

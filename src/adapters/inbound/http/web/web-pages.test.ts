@@ -169,7 +169,7 @@ describe('PolicyController', () => {
     const result = controller.getPolicy('es');
     expect(result).toContain('<html lang="es"');
     expect(result).toContain('Política de privacidad');
-    expect(result).toContain('Última actualización: 6 de junio de 2026');
+    expect(result).toContain('Última actualización: 18 de julio de 2026');
   });
 
   it('returns Russian policy page when Accept-Language is ru-RU', () => {
@@ -195,7 +195,7 @@ describe('PolicyController', () => {
 
   it('contains all required policy sections', () => {
     const result = controller.getPolicy(undefined);
-    expect(result).toContain('Last updated: June 6, 2026');
+    expect(result).toContain('Last updated: July 18, 2026');
     expect(result).toContain('email address');
     expect(result).toContain('securely hashed representation of your password');
     expect(result).toContain('blood pressure monitor');
@@ -281,7 +281,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('<html lang="en"');
     expect(html).toContain('Privacy Policy');
-    expect(html).toContain('Last updated: June 6, 2026');
+    expect(html).toContain('Last updated: July 18, 2026');
     expect(html).toContain('email address');
     expect(html).toContain('securely hashed representation of your password');
     expect(html).toContain('blood pressure monitor');
@@ -304,7 +304,7 @@ describe('web layout – renderPolicyPage', () => {
     expect(html).toContain('OpenAI');
     expect(html).toContain('медицинским устройством');
     expect(html).toContain('blood.pressure.by.max@gmail.com');
-    expect(html).toContain('Последнее обновление: 6 июня 2026 г.');
+    expect(html).toContain('Последнее обновление: 18 июля 2026 г.');
   });
 
   it('preserves Russian footer language links on the policy page', () => {
