@@ -95,11 +95,56 @@ repo/
     check-ai-flow-config.sh
 ```
 
-## Web server
+## Android app structure
 
-The web server lives in the root TypeScript project under `src/` and is started from the compiled `dist/api-main.js` entrypoint by `npm run api`.
+Android app code lives in `mobile/android/app/src/main/kotlin/com/masim05/bloodpressure/mobile/` and follows layer intent aligned with `docs/architecture/boundaries.md`.
 
-Server-specific source layout:
+```txt
+mobile/android/
+  app/
+    build.gradle.kts                    # Android app config, BuildConfig API_BASE_URL wiring, coverage gate
+    src/main/
+      AndroidManifest.xml               # app permissions and app entry activity
+      kotlin/com/masim05/bloodpressure/mobile/
+        MainActivity.kt                 # composition root and route/navigation coordinator
+        LanguageSupport.kt              # supported language model + constants
+        adapters/
+          api/
+            HttpApiClient.kt            # HTTP implementation of auth/history/upload/detail gateways
+            ApiErrorMapper.kt           # transport error normalization
+          camera/
+            CameraXCameraGateway.kt     # camera capture handoff to flow layer
+            GeneratedCameraGateway.kt   # generated/test-friendly camera gateway variant
+          session/
+            EncryptedSessionStore.kt    # SessionStore via Android Keystore + SharedPreferences
+            InMemorySessionStore.kt     # non-persistent SessionStore for tests/tools
+        core/
+          flow/
+            AppFlows.kt                 # AuthFlow/GuideFlow/CaptureFlow/HistoryFlow/MeasurementDetailFlow
+          model/
+            DomainModels.kt             # Session, Measurement, detail/filter enums and state records
+          ports/
+            Ports.kt                    # flow-facing interfaces for adapters
+          validation/
+            Validators.kt               # pure input/filter/image validation
+        ui/
+          screens/                      # Auth/Guide/Camera/History/Detail/Profile composables
+          theme/                        # Compose theme
+          TestTags.kt                   # UI automation test tags
+      res/                              # localized strings, guide assets, launcher resources
+```
+
+### Android structure rules
+
+- `MainActivity.kt` remains the only app-level composition root for flow/adapters wiring.
+- `core/flow`, `core/model`, and `core/validation` remain Android-framework agnostic.
+- `adapters/*` own integration details (HTTP/camera/storage) and must implement `core/ports/*` contracts.
+- `ui/screens/*` must stay render/event oriented and must not own persistence/network decisions.
+- `build.gradle.kts` remains the source of truth for API host injection and coverage gate policy.
+
+## Web server structure
+
+The web server lives in the root TypeScript project under `src/` and is started from compiled `dist/api-main.js` by `npm run api`.
 
 ```txt
 src/
@@ -111,7 +156,7 @@ src/
       http/
         auth.controller.ts            # /api/v1/signin and /api/v1/login
         auth-rate-limit.guard.ts      # per-client/email signin/login rate limit
-        bearer-auth.guard.ts          # Authorization: Bearer token guard
+        bearer-auth.guard.ts          # Authorization header guard
         http-error.mapper.ts          # ApiError -> HTTP JSON error response
         http-request-logging.ts       # request/status metadata logging
         measurements.controller.ts    # authenticated measurement API routes
@@ -140,21 +185,13 @@ src/
       migrations/001_mobile_api.sql   # server schema for spec 006
 ```
 
-Related server artifacts:
-
-- `specs/006-mobile-bp-api/` stores the source specification, plan, data model, quickstart, API/logging contracts, and task traceability for the web server.
-- `docs/openapi.yaml` is the generated/public HTTP API contract for mobile and other API clients.
-- `tests/contract/mobile-api.contract.test.ts` and `tests/contract/mobile-api-logging.contract.test.ts` cover HTTP contract behavior.
-- `tests/integration/mobile-api.integration.test.ts` covers API behavior across repositories, auth, uploads, recognition, history, and logging.
-- `src/infrastructure/database/migrations/001_mobile_api.sql` is applied by the DB migration tooling and must stay aligned with Postgres repositories and the API data model.
-
-## Work Items Structure
+## Work items structure
 
 `docs/work-items/` is retained in the repository with `docs/work-items/.gitkeep` only.
 
 AI-flow work-item artifacts are temporary handoff artifacts used during a task. They are not required durable repository structure and should be removed before merge unless the task explicitly asks to retain them.
 
-## Worktree Policy
+## Worktree policy
 
 `ai-development-flow` work must happen in dedicated git worktrees under:
 
