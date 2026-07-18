@@ -1,0 +1,21 @@
+# Definition of Done: Bugfix (`bug`)
+
+A `bug` task is done only when:
+
+- The bug is described with actual behavior and expected behavior.
+- The reproduction case is documented when possible.
+- A regression test or reproduction check is shown failing before the fix when practical.
+- The root cause is identified, or the merge/pull request explicitly explains why it could not be determined.
+- The fix is minimal and focused on the bug.
+- Existing behavior remains compatible unless the behavior change is intentional and documented.
+- The original reproduction case no longer fails.
+- Related edge cases are considered.
+- The merge/pull request explains how the fix was verified.
+
+AI-flow temporary work-item artifacts are required for non-trivial bugfixes when the AI development flow is used. Completed artifact directories are not required to remain committed unless the task explicitly asks to retain them.
+
+## Blocking review conditions
+
+The merge/pull request must not be approved until these issues are resolved:
+
+- The change expands beyond a focused fix and is really a `change-request` or `feat`.
