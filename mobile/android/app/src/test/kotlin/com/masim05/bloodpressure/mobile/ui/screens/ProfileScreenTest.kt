@@ -68,7 +68,7 @@ class ProfileScreenTest {
         composeRule.onNodeWithTag(TestTags.ProfileAboutBack).performClick()
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
         composeRule.onNodeWithText("Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.").assertIsDisplayed()
-        composeRule.onNodeWithText("Last updated: June 6, 2026").assertIsDisplayed()
+        composeRule.onNodeWithText("Last updated: July 18, 2026").assertIsDisplayed()
     }
 
 
@@ -87,7 +87,23 @@ class ProfileScreenTest {
         }
 
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
-        composeRule.onNodeWithText("Última actualización: 6 de junio de 2026").assertIsDisplayed()
+        composeRule.onNodeWithText("Última actualización: 18 de julio de 2026").assertIsDisplayed()
+    }
+
+    @Test
+    fun policyPageUsesWebViewWhenPolicyUrlProvided() {
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = {},
+                onLogout = {},
+                policyUrl = "https://example.com/api/v1/policy?lang=en",
+            )
+        }
+
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
+        composeRule.onNodeWithTag(TestTags.ProfilePolicyWebView).assertIsDisplayed()
     }
 
     @Test

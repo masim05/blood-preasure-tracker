@@ -1,5 +1,10 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.supportedLanguageOptions
 import com.masim05.bloodpressure.mobile.ui.TestTags
@@ -87,6 +94,7 @@ fun ProfileScreen(
     onLanguageSelected: (String) -> Unit,
     onOpenGuide: () -> Unit,
     onLogout: () -> Unit,
+    policyUrl: String? = null,
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
@@ -197,6 +205,7 @@ fun ProfileScreen(
         } else {
             AboutPageScreen(
                 page = aboutPage,
+                policyUrl = policyUrl,
                 onBack = { selectedAboutPage = null },
             )
         }
@@ -227,7 +236,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
+private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> Unit) {
     TextButton(
         modifier = Modifier.testTag(TestTags.ProfileAboutBack),
         onClick = onBack,
@@ -238,8 +247,91 @@ private fun AboutPageScreen(page: AboutPage, onBack: () -> Unit) {
     Column {
         when (page) {
             AboutPage.Story -> StoryPageContent()
-            AboutPage.Policy -> PolicyPageContent()
+            AboutPage.Policy -> {
+                if (policyUrl.isNullOrBlank()) {
+                    PolicyPageContent()
+                } else {
+                    PolicyWebViewContent(policyUrl)
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun PolicyWebViewContent(policyUrl: String) {
+    val allowedPolicyUri = remember(policyUrl) { Uri.parse(policyUrl) }
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    DisposableEffect(Unit) {
+        onDispose {
+            webViewRef?.destroy()
+            webViewRef = null
+        }
+    }
+
+    CardContainer {
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(460.dp)
+                .testTag(TestTags.ProfilePolicyWebView),
+            factory = { context ->
+                WebView(context).apply {
+                    webViewRef = this
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                            val targetUri = request.url
+                            if (targetUri.scheme == "mailto") {
+                                val intent = Intent(Intent.ACTION_SENDTO, targetUri)
+                                val canHandleIntent = intent.resolveActivity(view.context.packageManager) != null
+                                if (canHandleIntent) {
+                                    runCatching { view.context.startActivity(intent) }
+                                }
+                                return true
+                            }
+                            return !isAllowedPolicyNavigation(targetUri, allowedPolicyUri)
+                        }
+                    }
+                    settings.javaScriptEnabled = false
+                    settings.domStorageEnabled = false
+                    settings.allowFileAccess = false
+                    settings.allowContentAccess = false
+                    loadUrl(policyUrl)
+                }
+            },
+            update = { webView ->
+                if (webView.url != policyUrl) {
+                    webView.loadUrl(policyUrl)
+                }
+            },
+        )
+    }
+}
+
+private fun isAllowedPolicyNavigation(targetUri: Uri, allowedPolicyUri: Uri): Boolean {
+    val targetScheme = targetUri.scheme ?: return false
+    if (targetScheme != "http" && targetScheme != "https") return false
+
+    val allowedScheme = allowedPolicyUri.scheme ?: return false
+    val allowedHost = allowedPolicyUri.host ?: return false
+    val targetHost = targetUri.host ?: return false
+    if (targetScheme != allowedScheme || targetHost != allowedHost) return false
+
+    val allowedPort = normalizedPort(allowedPolicyUri)
+    val targetPort = normalizedPort(targetUri)
+    if (allowedPort != targetPort) return false
+
+    val allowedPath = allowedPolicyUri.path ?: return false
+    val targetPath = targetUri.path ?: return false
+    return targetPath == allowedPath
+}
+
+private fun normalizedPort(uri: Uri): Int {
+    if (uri.port != -1) return uri.port
+    return when (uri.scheme) {
+        "http" -> 80
+        "https" -> 443
+        else -> -1
     }
 }
 

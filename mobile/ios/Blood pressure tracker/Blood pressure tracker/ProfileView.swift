@@ -47,7 +47,7 @@ func policySections() -> [PolicySection] {
         ),
         PolicySection(
             heading: "Contact",
-            content: "For privacy-related questions, contact us at blood.pressure.by.max@gmail.com."
+            content: "For privacy-related questions, contact Maxim Ryndin at blood.pressure.by.max@gmail.com."
         ),
     ]
 }
@@ -277,7 +277,7 @@ private struct PolicyPageView: View {
                 .foregroundColor(AppColors.mutedText)
                 .padding(.bottom, 8)
 
-            Text("Last updated: June 6, 2026")
+            Text("Last updated: July 18, 2026")
                 .font(.body)
                 .foregroundColor(AppColors.mutedText)
                 .padding(.bottom, 12)

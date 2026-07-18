@@ -1,4 +1,6 @@
 import { SUPPORTED_LANGS, type SupportedLang, type WebTranslations } from './web-i18n';
+import { escapeHtml } from './html-escape';
+import { renderPolicyContentHtml } from './policy-content';
 
 const COLORS = {
   primary: '#1D9E75',
@@ -10,15 +12,6 @@ const COLORS = {
   border: '#E5E5E5',
   error: '#E24B4A',
 } as const;
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function heartSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${COLORS.primary}" width="24" height="24" aria-hidden="true"><path d="M12 21.593c-.525-.445-4.52-3.888-6.55-5.86C3.15 13.46 2 11.56 2 9.5 2 6.42 4.42 4 7.5 4c1.74 0 3.41.81 4.5 2.09C13.09 4.81 14.76 4 16.5 4 19.58 4 22 6.42 22 9.5c0 2.06-1.15 3.96-3.45 6.233-2.03 1.972-6.025 5.415-6.55 5.86z"/></svg>`;
@@ -48,16 +41,6 @@ function languageOptions(selectedLang: SupportedLang): string {
 
 function withLang(path: '/' | '/policy', lang: string): string {
   return `${path}?lang=${encodeURIComponent(lang)}`;
-}
-
-const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
-function linkifySupportEmail(text: string): string {
-  const escapedEmail = escapeHtml(SUPPORT_EMAIL);
-  const mailto = `mailto:${SUPPORT_EMAIL}`;
-  return text.replaceAll(
-    escapedEmail,
-    `<a href="${mailto}">${escapedEmail}</a>`,
-  );
 }
 
 export function renderLayout(
@@ -283,24 +266,9 @@ ${storyParagraphs}
   return renderLayout(t, t.home.metaTitle, body, '/');
 }
 
-export function renderPolicyPage(t: WebTranslations): string {
-  const sections = t.policy.sections
-    .map(
-      (section) => `
-  <div class="policy-section">
-    <h2>${escapeHtml(section.heading)}</h2>
-    <p>${linkifySupportEmail(escapeHtml(section.content))}</p>
-  </div>`,
-    )
-    .join('');
-
-  const body = `
-<div class="card">
-  <h1 class="policy-page-title">${escapeHtml(t.footer.policy)}</h1>
-  <p class="policy-intro">${escapeHtml(t.policy.intro)}</p>
-  <p class="policy-intro">${escapeHtml(t.policy.lastUpdated)}</p>
-${sections}
-</div>`;
-
-  return renderLayout(t, t.policy.metaTitle, body, '/policy');
+export function renderPolicyPage(
+  t: WebTranslations,
+): string {
+  const policyContentHtml = renderPolicyContentHtml(t);
+  return renderLayout(t, t.policy.metaTitle, policyContentHtml, '/policy');
 }
