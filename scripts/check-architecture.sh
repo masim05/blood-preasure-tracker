@@ -7,7 +7,7 @@ required_paths=(
   "docs/architecture/boundaries.md"
   "docs/engineering/testing-policy.md"
   "docs/engineering/definition-of-done/README.md"
-  "docs/work-items/README.md"
+  "docs/work-items/.gitkeep"
 )
 
 for path in "${required_paths[@]}"; do
