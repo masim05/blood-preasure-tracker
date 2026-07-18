@@ -36,7 +36,7 @@ Links: <issue, docs, related MR>
 
 ### 4. Human handoff
 
-After the AI flow completes, a human must add a GitLab comment in the configured communication language with:
+After the AI flow completes, a human must add a merge/pull request comment in the configured communication language with:
 
 - human joined the process;
 - current status (`approved` or `requires changes`);

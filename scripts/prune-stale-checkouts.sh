@@ -20,6 +20,9 @@ default_branch=""
 origin_head="$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || true)"
 if [[ -n "$origin_head" ]]; then
   default_branch="${origin_head#origin/}"
+else
+  printf 'Unable to determine default branch from refs/remotes/origin/HEAD. Run `git remote set-head origin --auto` and retry.\n' >&2
+  exit 1
 fi
 
 worktree_lookup=""
@@ -65,11 +68,13 @@ has_active_remote_mr() {
 
   case "$git_cli" in
     gh)
-      [[ "$(gh pr list --state open --head "$branch_name" --json number --jq 'length > 0')" == "true" ]]
+      gh_output="$(gh pr list --state open --head "$branch_name" --json number --jq 'length > 0')"
+      [[ "$gh_output" == "true" ]]
       ;;
     glab)
-      glab_output="$(glab mr list --source-branch "$branch_name" -F json 2>/dev/null || true)"
-      grep -Fq "\"source_branch\":\"$branch_name\"" <<<"$glab_output" || grep -Fq "\"sourceBranch\":\"$branch_name\"" <<<"$glab_output"
+      glab_output="$(glab mr list --source-branch "$branch_name" -F json)"
+      compact_glab_output="$(tr -d '[:space:]' <<<"$glab_output")"
+      grep -Fq "\"source_branch\":\"$branch_name\"" <<<"$compact_glab_output" || grep -Fq "\"sourceBranch\":\"$branch_name\"" <<<"$compact_glab_output"
       ;;
     *)
       printf 'Unsupported git CLI: %s\n' "$git_cli" >&2

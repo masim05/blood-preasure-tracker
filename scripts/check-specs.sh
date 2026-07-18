@@ -10,9 +10,6 @@ invalid=0
 shopt -s nullglob
 for dir in docs/work-items/*/; do
   base="$(basename "$dir")"
-  if [ "$base" = "README.md" ]; then
-    continue
-  fi
   if [[ ! "$base" =~ ^[0-9]{3}-(feat|change-request|bug|chore|docs)-[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
     echo "Invalid work item directory name: docs/work-items/$base" >&2
     echo "Expected pattern: docs/work-items/NNN-<feat|change-request|bug|chore|docs>-<short-slug>/" >&2

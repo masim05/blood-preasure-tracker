@@ -18,7 +18,7 @@ Documentation boundary:
 
 ## Configuration
 
-Before creating or updating GitLab content, resolve configuration from the repository root:
+Before creating or updating Git platform content, resolve configuration from the repository root:
 
 1. Read `gitlab.language` from `.ai-flow.yml` when the file and setting are present.
 2. Otherwise, use `en`.
@@ -26,17 +26,17 @@ Before creating or updating GitLab content, resolve configuration from the repos
 4. Otherwise, use `glab`.
 5. If the configuration exists but fails `scripts/check-ai-flow-config.sh`, stop and report the validation error instead of guessing values.
 
-The resolved GitLab communication language applies to merge request titles and descriptions, AI comments, review findings, replies, completion comments, and human handoff guidance. It does not control agent chat responses, source code, work-item artifacts, or general repository documentation.
+The resolved communication language for the configured Git platform applies to merge/pull request titles and descriptions, AI comments, review findings, replies, completion comments, and human handoff guidance. It does not control agent chat responses, source code, work-item artifacts, or general repository documentation.
 
 The resolved Git CLI applies to Git platform operations executed by the AI flow (for example MR and comment operations) and must be one of `glab` or `gh`.
 
 ## Roles
 
 - AI Manager: clarifies scope and requirements, prepares required work-item artifacts, and orchestrates actor handoffs.
-- AI Developer: implements the task according to all project rules, pushes changes, and creates/updates MR.
-- AI Reviewer: performs requirement/guideline/security review and leaves findings in GitLab.
-- AI Tester: verifies evidence and quality against test plan/e2e scenarios and leaves findings in GitLab.
-- Human: joins after AI consensus loop and records final human handoff/decision in GitLab.
+- AI Developer: implements the task according to all project rules, pushes changes, and creates/updates the merge/pull request.
+- AI Reviewer: performs requirement/guideline/security review and leaves findings on the configured Git platform.
+- AI Tester: verifies evidence and quality against test plan/e2e scenarios and leaves findings on the configured Git platform.
+- Human: joins after AI consensus loop and records final human handoff/decision on the configured Git platform.
 
 ## Orchestration Model (Required)
 
@@ -141,15 +141,15 @@ Step DoD (verifiable):
 - implementation and testing can start without unresolved ambiguity;
 - AI Manager emits handoff package to AI Developer and immediately starts Step 2 without waiting for another user prompt.
 
-## Step 2: AI Developer Implementation And MR
+## Step 2: AI Developer Implementation And Merge/Pull Request
 
 AI Developer must:
 - follow `AGENTS.md` and all referenced project rules;
 - continue from the worktree created or reused in Step 1;
 - keep task-type boundaries from `docs/engineering/change-policy.md`;
 - update documentation when required;
-- use the resolved GitLab communication language for merge request text, comments, and replies;
-- push changes and create/update the MR in GitLab with verification details.
+- use the resolved communication language for the configured Git platform for merge/pull request text, comments, and replies;
+- push changes and create/update the merge/pull request on the configured Git platform with verification details.
 
 Step input:
 - output of Step 1 (`spec.md`, `plan.md`, `test-plan.md`, `e2e-scenarios.md`);
@@ -169,7 +169,7 @@ Step DoD (verifiable):
   - code fixes are committed/pushed, Git platform comments are updated, and control is returned to AI Manager;
 - every code change is accompanied by updated implementation notes and verification evidence.
 
-## Step 3: AI Reviewer Review In GitLab
+## Step 3: AI Reviewer Review On The Configured Git Platform
 
 AI Reviewer checks:
 - conformance with task requirements and produced artifacts;
@@ -177,7 +177,7 @@ AI Reviewer checks:
 - security risks (input validation, auth/access boundaries, secret handling, unsafe defaults, dependency/security regressions).
 
 Review behavior:
-- leave important findings in GitLab using the resolved communication language;
+- leave important findings on the configured Git platform using the resolved communication language;
 - prefer inline code comments where possible;
 - resolve outdated/handled old review threads where possible.
 
@@ -197,7 +197,7 @@ Step DoD (verifiable):
   - `consensus` message to AI Manager when review is clear, or
   - findings are posted (inline when possible) and control is returned to AI Manager.
 
-## Step 4: AI Tester Validation In GitLab
+## Step 4: AI Tester Validation On The Configured Git Platform
 
 AI Tester checks:
 - evidence of testing against `test-plan.md` and `e2e-scenarios.md`;
@@ -205,7 +205,7 @@ AI Tester checks:
 - business logic correctness based on available test evidence.
 
 Validation behavior:
-- leave important findings in GitLab using the resolved communication language;
+- leave important findings on the configured Git platform using the resolved communication language;
 - prefer inline comments where possible;
 - request missing evidence explicitly when tests are claimed but not demonstrated.
 
@@ -251,7 +251,7 @@ Missing Git platform access (for example unavailable or unauthenticated `glab`/`
 
 ## Step 6: Human Handoff (Mandatory)
 
-After AI loop ends with full actor consensus, human participation is mandatory and must be recorded as a GitLab comment in the resolved communication language.
+After AI loop ends with full actor consensus, human participation is mandatory and must be recorded as a merge/pull request comment in the resolved communication language.
 
 Minimum handoff comment meaning:
 - human joined review/approval process;
@@ -267,7 +267,7 @@ The orchestrator must finish with exactly one terminal state:
 
 Terminal output requirements:
 
-- For `ready for Human Handoff`, include merge request link/reference and short verification summary.
+- For `ready for Human Handoff`, include merge/pull request link/reference and short verification summary.
 - For `blocked`, include blocked-state details from the blocked state policy section.
 
 ## Completion Checklist
