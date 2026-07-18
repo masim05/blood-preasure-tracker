@@ -1,5 +1,10 @@
 package com.masim05.bloodpressure.mobile.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,8 +52,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.supportedLanguageOptions
 import com.masim05.bloodpressure.mobile.ui.TestTags
-import android.webkit.WebView
-import android.webkit.WebViewClient
 
 private val PageBg = Color(0xFFF2F2F7)
 private val CardBorder = Color(0xFFE5E5E5)
@@ -263,7 +266,17 @@ private fun PolicyWebViewContent(policyUrl: String) {
                 .height(460.dp),
             factory = { context ->
                 WebView(context).apply {
-                    webViewClient = WebViewClient()
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                            val targetUri = request.url ?: return false
+                            if (targetUri.scheme == "mailto") {
+                                val intent = Intent(Intent.ACTION_SENDTO, targetUri)
+                                runCatching { view.context.startActivity(intent) }
+                                return true
+                            }
+                            return false
+                        }
+                    }
                     settings.javaScriptEnabled = false
                     settings.domStorageEnabled = false
                     settings.allowFileAccess = false

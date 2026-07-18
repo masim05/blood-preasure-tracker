@@ -1,7 +1,6 @@
-/* istanbul ignore file */
 import { Controller, Get, Header, Headers, Query } from '@nestjs/common';
 
-import { renderPolicyContentHtml } from './policy-content';
+import { renderPolicyContentHtml, renderPolicyStandaloneHtml } from './policy-content';
 import { resolveTranslations } from './web-i18n';
 import { renderPolicyPage } from './web-layout';
 
@@ -24,6 +23,6 @@ export class PolicyController {
     @Query('lang') preferredLanguage: string | string[] | undefined,
   ): string {
     const t = resolveTranslations(acceptLanguage, preferredLanguage);
-    return renderPolicyContentHtml(t);
+    return renderPolicyStandaloneHtml(t);
   }
 }
