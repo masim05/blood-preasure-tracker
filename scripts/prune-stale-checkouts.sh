@@ -11,9 +11,12 @@ if ! config_output="$(bash "$repo_root/scripts/check-ai-flow-config.sh" "$config
   exit 1
 fi
 
-git_cli="${config_output##*Git CLI: }"
-git_cli="${git_cli%%)*}"
-git_cli="${git_cli%.}"
+if [[ "$config_output" =~ Git[[:space:]]CLI:[[:space:]](gh|glab)([^A-Za-z0-9_-]|$) ]]; then
+  git_cli="${BASH_REMATCH[1]}"
+else
+  printf 'Unable to parse git CLI from config validator output: %s\n' "$config_output" >&2
+  exit 1
+fi
 
 current_branch="$(git branch --show-current)"
 default_branch=""

@@ -67,7 +67,7 @@ while IFS= read -r raw_line || [[ -n "$raw_line" ]]; do
     continue
   fi
 
-  if [[ "$line" =~ ^[[:space:]][[:space:]]cli:[[:space:]]*(.+)$ ]]; then
+  if [[ "$line" =~ ^[[:space:]]{2,}cli:[[:space:]]*(.+)$ ]]; then
     if [[ "$context" != "git" ]]; then
       fail "Malformed .ai-flow.yml at line $line_number"
     fi
@@ -79,7 +79,7 @@ while IFS= read -r raw_line || [[ -n "$raw_line" ]]; do
     continue
   fi
 
-  if [[ "$line" =~ ^[[:space:]][[:space:]]language:[[:space:]]*(.+)$ ]]; then
+  if [[ "$line" =~ ^[[:space:]]{2,}language:[[:space:]]*(.+)$ ]]; then
     if [[ "$context" != "gitlab" ]]; then
       fail "Malformed .ai-flow.yml at line $line_number"
     fi

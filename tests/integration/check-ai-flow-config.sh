@@ -80,6 +80,16 @@ gitlab:
   language: en"
 assert_success "explicit gh" "Communication language: en, Git CLI: gh" "$explicit_gh_config"
 
+wide_indent_config="$tmp_dir/wide-indent.yml"
+write_config "$wide_indent_config" "version: 1
+
+git:
+    cli: gh
+
+gitlab:
+    language: pt-BR"
+assert_success "wide nested indentation" "Communication language: pt-BR, Git CLI: gh" "$wide_indent_config"
+
 duplicate_git_cli_config="$tmp_dir/duplicate-git-cli.yml"
 write_config "$duplicate_git_cli_config" "version: 1
 
