@@ -280,8 +280,9 @@ private fun PolicyWebViewContent(policyUrl: String) {
                             val targetUri = request.url ?: return false
                             if (targetUri.scheme == "mailto") {
                                 val intent = Intent(Intent.ACTION_SENDTO, targetUri)
-                                runCatching { view.context.startActivity(intent) }
-                                return true
+                                val canHandleIntent = intent.resolveActivity(view.context.packageManager) != null
+                                if (!canHandleIntent) return false
+                                return runCatching { view.context.startActivity(intent) }.isSuccess
                             }
                             return false
                         }
