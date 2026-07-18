@@ -268,7 +268,7 @@ ${storyParagraphs}
 
 export function renderPolicyPage(
   t: WebTranslations,
-  policyContentHtml: string = renderPolicyContentHtml(t),
 ): string {
+  const policyContentHtml = renderPolicyContentHtml(t);
   return renderLayout(t, t.policy.metaTitle, policyContentHtml, '/policy');
 }

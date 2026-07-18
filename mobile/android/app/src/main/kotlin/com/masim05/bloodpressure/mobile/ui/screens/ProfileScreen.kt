@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -258,6 +259,14 @@ private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> U
 
 @Composable
 private fun PolicyWebViewContent(policyUrl: String) {
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    DisposableEffect(Unit) {
+        onDispose {
+            webViewRef?.destroy()
+            webViewRef = null
+        }
+    }
+
     CardContainer {
         AndroidView(
             modifier = Modifier
@@ -265,6 +274,7 @@ private fun PolicyWebViewContent(policyUrl: String) {
                 .height(460.dp),
             factory = { context ->
                 WebView(context).apply {
+                    webViewRef = this
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                             val targetUri = request.url ?: return false

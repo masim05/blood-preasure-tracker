@@ -1,6 +1,6 @@
 import { Controller, Get, Header, Headers, Query } from '@nestjs/common';
 
-import { renderPolicyContentHtml, renderPolicyStandaloneHtml } from './policy-content';
+import { renderPolicyStandaloneHtml } from './policy-content';
 import { resolveTranslations } from './web-i18n';
 import { renderPolicyPage } from './web-layout';
 
@@ -13,7 +13,7 @@ export class PolicyController {
     @Query('lang') preferredLanguage: string | string[] | undefined,
   ): string {
     const t = resolveTranslations(acceptLanguage, preferredLanguage);
-    return renderPolicyPage(t, renderPolicyContentHtml(t));
+    return renderPolicyPage(t);
   }
 
   @Get('/api/v1/policy')
