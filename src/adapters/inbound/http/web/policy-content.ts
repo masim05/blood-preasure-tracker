@@ -6,10 +6,11 @@ const DEVELOPER_NAME = 'Maxim Ryndin';
 
 function linkifySupportEmail(text: string): string {
   const escapedEmail = escapeHtml(SUPPORT_EMAIL);
+  const escapedDeveloperName = escapeHtml(DEVELOPER_NAME);
   const mailto = `mailto:${SUPPORT_EMAIL}`;
   return text.replaceAll(
     escapedEmail,
-    `<a href="${mailto}">${escapedEmail}</a>`,
+    `<a href="${mailto}">${escapedEmail}</a> (${escapedDeveloperName})`,
   );
 }
 
@@ -29,7 +30,6 @@ export function renderPolicyContentHtml(t: WebTranslations): string {
   <h1 class="policy-page-title">${escapeHtml(t.footer.policy)}</h1>
   <p class="policy-intro">${escapeHtml(t.policy.intro)}</p>
   <p class="policy-intro">${escapeHtml(t.policy.lastUpdated)}</p>
-  <p class="policy-intro">${escapeHtml(DEVELOPER_NAME)}</p>
 ${sections}
 </div>`;
 }
