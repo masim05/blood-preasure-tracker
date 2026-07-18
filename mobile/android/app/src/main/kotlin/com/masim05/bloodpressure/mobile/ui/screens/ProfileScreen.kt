@@ -284,8 +284,10 @@ private fun PolicyWebViewContent(policyUrl: String) {
                             if (targetUri.scheme == "mailto") {
                                 val intent = Intent(Intent.ACTION_SENDTO, targetUri)
                                 val canHandleIntent = intent.resolveActivity(view.context.packageManager) != null
-                                if (!canHandleIntent) return false
-                                return runCatching { view.context.startActivity(intent) }.isSuccess
+                                if (canHandleIntent) {
+                                    runCatching { view.context.startActivity(intent) }
+                                }
+                                return true
                             }
                             return !isAllowedPolicyNavigation(targetUri, allowedPolicyUri)
                         }
