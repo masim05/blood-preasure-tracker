@@ -147,6 +147,7 @@
     <string name="profile_policy_content_medical">本应用不是医疗设备，不用于诊断、治疗、治愈或预防任何疾病。请就您的血压及任何健康问题咨询具有资质的医疗专业人员。</string>
     <string name="profile_policy_heading_contact">联系方式</string>
     <string name="profile_policy_content_contact">如有隐私相关问题，请发送邮件至 blood.pressure.by.max@gmail.com。</string>
+    <string name="privacy_policy_accept">我接受</string>
 
     <string name="profile_story_page_title">轻松追踪您的血压读数</string>
 </resources>

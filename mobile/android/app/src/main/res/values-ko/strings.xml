@@ -147,6 +147,7 @@
     <string name="profile_policy_content_medical">이 앱은 의료 기기가 아니며, 어떠한 질병도 진단, 치료, 치유 또는 예방하지 않습니다. 혈압 및 건강 문제에 관해서는 항상 자격을 갖춘 의료 전문가와 상담하십시오.</string>
     <string name="profile_policy_heading_contact">문의</string>
     <string name="profile_policy_content_contact">개인정보 관련 문의는 blood.pressure.by.max@gmail.com으로 연락하시기 바랍니다.</string>
+    <string name="privacy_policy_accept">동의합니다</string>
 
     <string name="profile_story_page_title">혈압 수치를 손쉽게 기록하세요</string>
 </resources>

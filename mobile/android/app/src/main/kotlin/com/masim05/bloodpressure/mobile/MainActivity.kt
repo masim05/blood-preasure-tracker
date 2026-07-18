@@ -71,6 +71,7 @@ import com.masim05.bloodpressure.mobile.ui.screens.CameraScreen
 import com.masim05.bloodpressure.mobile.ui.screens.GuideScreen
 import com.masim05.bloodpressure.mobile.ui.screens.HistoryScreen
 import com.masim05.bloodpressure.mobile.ui.screens.MeasurementDetailScreen
+import com.masim05.bloodpressure.mobile.ui.screens.PrivacyPolicyGateScreen
 import com.masim05.bloodpressure.mobile.ui.screens.ProfileScreen
 import com.masim05.bloodpressure.mobile.ui.theme.AppTheme
 import java.net.URLEncoder
@@ -110,116 +111,130 @@ class MainActivity : ComponentActivity() {
             var selectedLanguageCode by remember {
                 mutableStateOf(readPreferredLanguageCode(settingsPreferences.getString(LANGUAGE_CODE_PREFERENCE_KEY, null)))
             }
+            var hasAcceptedPrivacyPolicy by remember {
+                mutableStateOf(isPrivacyPolicyAccepted(settingsPreferences))
+            }
+            val updateLanguageSelection = { selectedCode: String ->
+                val normalizedCode = readPreferredLanguageCode(selectedCode)
+                if (normalizedCode != selectedLanguageCode) {
+                    selectedLanguageCode = normalizedCode
+                    settingsPreferences.edit()
+                        .putString(LANGUAGE_CODE_PREFERENCE_KEY, normalizedCode)
+                        .apply()
+                    recreate()
+                }
+            }
             AppTheme {
-                val navController = rememberNavController()
-                val backStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = backStackEntry?.destination
-                val mainTab = remember(currentDestination?.route, uiState.route) {
-                    topLevelMainTabForDestinationRoute(currentDestination?.route, uiState.route)
-                }
+                if (!hasAcceptedPrivacyPolicy) {
+                    PrivacyPolicyGateScreen(
+                        selectedLanguageCode = selectedLanguageCode,
+                        onLanguageSelected = updateLanguageSelection,
+                        onAccept = {
+                            markPrivacyPolicyAccepted(settingsPreferences)
+                            hasAcceptedPrivacyPolicy = true
+                        },
+                    )
+                } else {
+                    val navController = rememberNavController()
+                    val backStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = backStackEntry?.destination
+                    val mainTab = remember(currentDestination?.route, uiState.route) {
+                        topLevelMainTabForDestinationRoute(currentDestination?.route, uiState.route)
+                    }
 
-                LaunchedEffect(uiState.route, uiState.selectedMeasurementId) {
-                    syncNavigationState(navController, uiState.route, uiState.selectedMeasurementId)
-                }
+                    LaunchedEffect(uiState.route, uiState.selectedMeasurementId) {
+                        syncNavigationState(navController, uiState.route, uiState.selectedMeasurementId)
+                    }
 
-                Scaffold(
-                    containerColor = Color(0xFFF2F2F7),
-                    bottomBar = {
-                        if (showBottomNavigation(currentDestination)) {
-                            MainBottomNavigation(
-                                selectedTab = mainTab,
-                                onCaptureSelected = ::openCamera,
-                                onHistorySelected = { openHistory(uiState.filter) },
-                                onProfileSelected = ::openProfile,
-                            )
-                        }
-                    },
-                ) { innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = startGraphFor(uiState.route),
-                        modifier = Modifier.padding(innerPadding),
-                    ) {
-                        navigation(startDestination = AuthDestination.Login.route, route = RootGraph.Auth.route) {
-                            composable(AuthDestination.Login.route) {
-                                AuthScreen(
-                                    mode = uiState.authMode,
-                                    isSubmitting = uiState.isSubmitting,
-                                    errorText = uiState.errorText,
-                                    onModeChange = { uiState = uiState.copy(authMode = it, errorText = null) },
-                                    onSubmit = ::submitAuth,
+                    Scaffold(
+                        containerColor = Color(0xFFF2F2F7),
+                        bottomBar = {
+                            if (showBottomNavigation(currentDestination)) {
+                                MainBottomNavigation(
+                                    selectedTab = mainTab,
+                                    onCaptureSelected = ::openCamera,
+                                    onHistorySelected = { openHistory(uiState.filter) },
+                                    onProfileSelected = ::openProfile,
                                 )
                             }
-                        }
-
-                        navigation(startDestination = MainDestination.Capture.route, route = RootGraph.Main.route) {
-                            composable(MainDestination.Capture.route) {
-                                CameraScreen(
-                                    isUploading = uiState.isUploading,
-                                    errorText = uiState.errorText,
-                                    onUpload = ::captureAndUpload,
-                                    onCaptureReady = { image ->
-                                        cameraGateway.publishCapture(image)
-                                    },
-                                    onCaptureFailure = { message ->
-                                        cameraGateway.publishFailure(message)
-                                        uiState = uiState.copy(errorText = message)
-                                    },
-                                )
+                        },
+                    ) { innerPadding ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = startGraphFor(uiState.route),
+                            modifier = Modifier.padding(innerPadding),
+                        ) {
+                            navigation(startDestination = AuthDestination.Login.route, route = RootGraph.Auth.route) {
+                                composable(AuthDestination.Login.route) {
+                                    AuthScreen(
+                                        mode = uiState.authMode,
+                                        isSubmitting = uiState.isSubmitting,
+                                        errorText = uiState.errorText,
+                                        onModeChange = { uiState = uiState.copy(authMode = it, errorText = null) },
+                                        onSubmit = ::submitAuth,
+                                    )
+                                }
                             }
 
-                            composable(MainDestination.Guide.route) {
-                                GuideScreen(onNext = ::openCamera)
-                            }
+                            navigation(startDestination = MainDestination.Capture.route, route = RootGraph.Main.route) {
+                                composable(MainDestination.Capture.route) {
+                                    CameraScreen(
+                                        isUploading = uiState.isUploading,
+                                        errorText = uiState.errorText,
+                                        onUpload = ::captureAndUpload,
+                                        onCaptureReady = { image ->
+                                            cameraGateway.publishCapture(image)
+                                        },
+                                        onCaptureFailure = { message ->
+                                            cameraGateway.publishFailure(message)
+                                            uiState = uiState.copy(errorText = message)
+                                        },
+                                    )
+                                }
 
-                            composable(MainDestination.History.route) {
-                                HistoryScreen(
-                                    filter = uiState.filter,
-                                    measurements = uiState.measurements,
-                                    lastUploadedMeasurementId = uiState.lastUploadedMeasurementId,
-                                    isLoading = uiState.isHistoryLoading,
-                                    errorText = uiState.errorText,
-                                    onRefresh = ::refreshHistory,
-                                    onApplyFilter = ::openHistory,
-                                    onClearFilter = { openHistory(HistoryFilter()) },
-                                    onExportCsv = { exportHistoryCsv(uiState.measurements) },
-                                    onMeasurementSelected = { openMeasurementDetail(it.id) },
-                                )
-                            }
+                                composable(MainDestination.Guide.route) {
+                                    GuideScreen(onNext = ::openCamera)
+                                }
 
-                            composable(MainDestination.Profile.route) {
-                                ProfileScreen(
-                                    selectedLanguageCode = selectedLanguageCode,
-                                    onLanguageSelected = { selectedCode ->
-                                        val normalizedCode = readPreferredLanguageCode(selectedCode)
-                                        if (normalizedCode != selectedLanguageCode) {
-                                            selectedLanguageCode = normalizedCode
-                                            settingsPreferences.edit()
-                                                .putString(LANGUAGE_CODE_PREFERENCE_KEY, normalizedCode)
-                                                .apply()
-                                            recreate()
-                                        }
-                                    },
-                                    onOpenGuide = ::openGuide,
-                                    onLogout = ::logout,
-                                    policyUrl = buildPolicyUrl(BuildConfig.API_BASE_URL, selectedLanguageCode),
-                                )
-                            }
+                                composable(MainDestination.History.route) {
+                                    HistoryScreen(
+                                        filter = uiState.filter,
+                                        measurements = uiState.measurements,
+                                        lastUploadedMeasurementId = uiState.lastUploadedMeasurementId,
+                                        isLoading = uiState.isHistoryLoading,
+                                        errorText = uiState.errorText,
+                                        onRefresh = ::refreshHistory,
+                                        onApplyFilter = { openHistory(it) },
+                                        onClearFilter = { openHistory(HistoryFilter()) },
+                                        onExportCsv = { exportHistoryCsv(uiState.measurements) },
+                                        onMeasurementSelected = { openMeasurementDetail(it.id) },
+                                    )
+                                }
 
-                            composable(MainDestination.MeasurementDetail.route) {
-                                MeasurementDetailScreen(
-                                    detail = uiState.measurementDetail,
-                                    isLoading = uiState.isDetailLoading,
-                                    isSaving = uiState.isDetailSaving,
-                                    errorText = uiState.errorText,
-                                    apiBaseUrl = BuildConfig.API_BASE_URL,
-                                    loadMeasurementImage = ::loadMeasurementImage,
-                                    onRefresh = ::refreshMeasurementDetail,
-                                    onBack = ::closeMeasurementDetail,
-                                    onSave = ::saveMeasurementDetail,
-                                )
-                            }
+                                composable(MainDestination.Profile.route) {
+                                    ProfileScreen(
+                                        selectedLanguageCode = selectedLanguageCode,
+                                        onLanguageSelected = updateLanguageSelection,
+                                        onOpenGuide = ::openGuide,
+                                        onLogout = ::logout,
+                                        policyUrl = buildPolicyUrl(BuildConfig.API_BASE_URL, selectedLanguageCode),
+                                    )
+                                }
 
+                                composable(MainDestination.MeasurementDetail.route) {
+                                    MeasurementDetailScreen(
+                                        detail = uiState.measurementDetail,
+                                        isLoading = uiState.isDetailLoading,
+                                        isSaving = uiState.isDetailSaving,
+                                        errorText = uiState.errorText,
+                                        apiBaseUrl = BuildConfig.API_BASE_URL,
+                                        loadMeasurementImage = ::loadMeasurementImage,
+                                        onRefresh = ::refreshMeasurementDetail,
+                                        onBack = ::closeMeasurementDetail,
+                                        onSave = ::saveMeasurementDetail,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -830,6 +845,17 @@ private fun csvEscape(value: String): String {
 
 internal const val LANGUAGE_PREFERENCES_NAME = "app_preferences"
 internal const val LANGUAGE_CODE_PREFERENCE_KEY = "language_code"
+internal const val PRIVACY_POLICY_ACCEPTED_PREFERENCE_KEY = "privacy_policy_accepted"
+
+internal fun isPrivacyPolicyAccepted(preferences: android.content.SharedPreferences): Boolean {
+    return preferences.getBoolean(PRIVACY_POLICY_ACCEPTED_PREFERENCE_KEY, false)
+}
+
+internal fun markPrivacyPolicyAccepted(preferences: android.content.SharedPreferences) {
+    preferences.edit()
+        .putBoolean(PRIVACY_POLICY_ACCEPTED_PREFERENCE_KEY, true)
+        .apply()
+}
 
 internal fun buildPolicyUrl(apiBaseUrl: String, selectedLanguageCode: String): String {
     val normalizedLanguageCode = readPreferredLanguageCode(selectedLanguageCode)

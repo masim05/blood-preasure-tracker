@@ -148,6 +148,7 @@
     <string name="profile_policy_content_medical">Denna app är inte en medicinsk enhet och diagnostiserar, behandlar, botar eller förebygger inte några medicinska tillstånd. Rådfråga alltid en kvalificerad sjukvårdspersonal angående ditt blodtryck och eventuella hälsoproblem.</string>
     <string name="profile_policy_heading_contact">Kontakt</string>
     <string name="profile_policy_content_contact">För integritetsrelaterade frågor, kontakta oss på blood.pressure.by.max@gmail.com.</string>
+    <string name="privacy_policy_accept">Jag godkänner</string>
 
     <string name="profile_story_page_title">Håll koll på dina mätningar enkelt</string>
 </resources>

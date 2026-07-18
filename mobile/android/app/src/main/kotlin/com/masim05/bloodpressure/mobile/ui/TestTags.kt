@@ -44,4 +44,8 @@ object TestTags {
     const val ProfilePolicyWebView = "profile_policy_webview"
     const val ProfileAboutBack = "profile_about_back"
     const val ProfileLanguageOptionPrefix = "profile_language_option_"
+    const val PolicyGateScreen = "policy_gate_screen"
+    const val PolicyGateAccept = "policy_gate_accept"
+    const val PolicyGateLanguageSelector = "policy_gate_language_selector"
+    const val PolicyGateLanguageOptionPrefix = "policy_gate_language_option_"
 }
