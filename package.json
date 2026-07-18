@@ -20,7 +20,7 @@
     "openapi:serve": "node scripts/serve-openapi-docs.mjs",
     "test": "jest --runInBand --testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap",
     "test:coverage": "jest --runInBand --coverage --testPathIgnorePatterns=tests/integration --testPathIgnorePatterns=tests/bootstrap",
-    "test:integration": "bash tests/integration/check-ai-flow-config.sh && jest --runInBand --testPathPatterns=tests/integration/.*\\.test\\.ts$",
+    "test:integration": "jest --runInBand --testPathPatterns=tests/integration/.*\\.test\\.ts$",
     "test:policy": "bash tests/integration/check-ai-flow-config.sh && bash scripts/check-ai-flow-config.sh && bash scripts/check-pr.sh && bash scripts/check-architecture.sh && bash scripts/check-dod.sh && bash scripts/check-specs.sh",
     "test:ios": "sh scripts/ios-test-local.sh",
     "lint": "eslint .",
