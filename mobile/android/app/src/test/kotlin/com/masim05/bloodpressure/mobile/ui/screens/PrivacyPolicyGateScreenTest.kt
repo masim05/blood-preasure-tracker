@@ -3,10 +3,10 @@ package com.masim05.bloodpressure.mobile.ui.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.masim05.bloodpressure.mobile.ui.TestTags
+import com.masim05.bloodpressure.mobile.SYSTEM_LANGUAGE_CODE
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -22,14 +22,14 @@ class PrivacyPolicyGateScreenTest {
     fun privacyPolicyGateShowsPolicyAndAcceptButton() {
         composeRule.setContent {
             PrivacyPolicyGateScreen(
-                selectedLanguageCode = "en",
+                selectedLanguageCode = SYSTEM_LANGUAGE_CODE,
                 onLanguageSelected = {},
                 onAccept = {},
             )
         }
 
         composeRule.onNodeWithTag(TestTags.PolicyGateScreen).assertIsDisplayed()
-        composeRule.onNodeWithText("Privacy Policy").assertIsDisplayed()
+        composeRule.onNodeWithTag(TestTags.PolicyGateLanguageSelector).assertIsDisplayed()
         composeRule.onNodeWithTag(TestTags.PolicyGateAccept).performScrollTo()
         composeRule.onNodeWithTag(TestTags.PolicyGateAccept).assertIsDisplayed()
     }
@@ -39,7 +39,7 @@ class PrivacyPolicyGateScreenTest {
         var accepted = false
         composeRule.setContent {
             PrivacyPolicyGateScreen(
-                selectedLanguageCode = "en",
+                selectedLanguageCode = SYSTEM_LANGUAGE_CODE,
                 onLanguageSelected = {},
                 onAccept = { accepted = true },
             )
@@ -57,7 +57,7 @@ class PrivacyPolicyGateScreenTest {
         var selectedLanguageCode: String? = null
         composeRule.setContent {
             PrivacyPolicyGateScreen(
-                selectedLanguageCode = "en",
+                selectedLanguageCode = SYSTEM_LANGUAGE_CODE,
                 onLanguageSelected = { selectedLanguageCode = it },
                 onAccept = {},
             )

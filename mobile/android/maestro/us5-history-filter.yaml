@@ -4,10 +4,10 @@ appId: com.masim05.bloodpressure.mobile
     clearState: true
 - scrollUntilVisible:
     element:
-      text: I accept
+      id: policy_gate_accept
     direction: DOWN
 - tapOn:
-    text: I accept
+    id: policy_gate_accept
 - tapOn:
     id: auth_mode_login
 - tapOn:
