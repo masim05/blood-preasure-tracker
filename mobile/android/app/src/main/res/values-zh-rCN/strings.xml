@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Blood Pressure</string>
-    <string name="auth_title">Blood Pressure</string>
+    <string name="app_name">AI Blood Pressure Tracker</string>
+    <string name="auth_title">AI Blood Pressure Tracker</string>
     <string name="auth_mode_login">登录</string>
     <string name="auth_mode_new_account">新建账号</string>
     <string name="signin_title">创建账号</string>
@@ -131,7 +131,7 @@
     <string name="profile_story_paragraph_2">现代 AI 非常擅长从图像中识别文字，于是我觉得这个过程可以自动化。我开发了一款简单的应用，只需几次点击，就能把血压计的照片转化为一条测量记录。</string>
     <string name="profile_story_paragraph_3">自己用了一段时间后，我想：也许不止我一个人有这个困扰。于是我决定将这款应用发布到 Google Play。</string>
     <string name="profile_policy_page_title">隐私政策</string>
-    <string name="profile_policy_intro">您的隐私非常重要。本政策说明 Blood Pressure 收集哪些数据、原因及处理方式。</string>
+    <string name="profile_policy_intro">您的隐私非常重要。本政策说明 AI Blood Pressure Tracker 收集哪些数据、原因及处理方式。</string>
     <string name="profile_policy_last_updated">最后更新：2026年6月6日</string>
     <string name="profile_policy_heading_data_collect">我们收集的数据</string>
     <string name="profile_policy_content_data_collect">使用本应用时，我们会收集以下信息：您的电子邮件地址和密码（哈希值）用于创建账户；您提交用于识别的血压计照片；从照片中提取或手动输入的血压值（收缩压、舒张压、脉搏、测量手臂）；以及每次测量的日期和时间。</string>
