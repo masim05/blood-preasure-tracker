@@ -207,6 +207,7 @@ private fun SectionLabel(text: String) {
 private fun languageAutonym(languageCode: String, fallback: String): String {
     if (languageCode == SYSTEM_LANGUAGE_CODE) return fallback
     return when (languageCode) {
+        "en" -> "English"
         "es" -> "Español"
         "fr" -> "Français"
         "pt" -> "Português"

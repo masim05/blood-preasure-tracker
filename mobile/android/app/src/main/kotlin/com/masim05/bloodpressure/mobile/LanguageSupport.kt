@@ -11,6 +11,7 @@ internal const val SYSTEM_LANGUAGE_CODE = "system"
 
 internal val supportedLanguageOptions = listOf(
     LanguageOption(SYSTEM_LANGUAGE_CODE, R.string.language_system_default),
+    LanguageOption("en", R.string.language_name_english),
     LanguageOption("es", R.string.language_name_spanish),
     LanguageOption("fr", R.string.language_name_french),
     LanguageOption("pt", R.string.language_name_portuguese),

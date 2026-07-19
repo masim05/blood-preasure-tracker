@@ -81,6 +81,7 @@
     <string name="history_readings">READINGS</string>
     <string name="profile_language_title">Language</string>
     <string name="language_system_default">System default</string>
+    <string name="language_name_english">English</string>
     <string name="language_name_spanish">Spanish</string>
     <string name="language_name_french">French</string>
     <string name="language_name_portuguese">Portuguese</string>
