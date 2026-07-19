@@ -402,7 +402,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: '隐私政策 – Blood Pressure',
       intro: '您的隐私非常重要。本政策说明 Blood Pressure 收集哪些数据、原因及处理方式。',
-      lastUpdated: '最后更新：2026年6月6日',
+      lastUpdated: '最后更新：2026年7月19日',
       sections: [
         {
           heading: '我们收集的数据',
