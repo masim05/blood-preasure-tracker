@@ -2,6 +2,12 @@ appId: com.masim05.bloodpressure.mobile
 ---
 - launchApp:
     clearState: true
+- scrollUntilVisible:
+    element:
+      text: I accept
+    direction: DOWN
+- tapOn:
+    text: I accept
 - tapOn:
     id: auth_mode_login
 - tapOn:
