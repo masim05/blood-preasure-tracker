@@ -172,6 +172,16 @@ class MainActivityTest {
     }
 
     @Test
+    fun shouldShowPrivacyPolicyGateReturnsTrueWhenNotAccepted() {
+        assertEquals(true, shouldShowPrivacyPolicyGate(false))
+    }
+
+    @Test
+    fun shouldShowPrivacyPolicyGateReturnsFalseWhenAccepted() {
+        assertEquals(false, shouldShowPrivacyPolicyGate(true))
+    }
+
+    @Test
     fun supportedLanguageOptionsExposeExpectedCodes() {
         assertEquals(
             listOf("system", "es", "fr", "pt", "it", "sv", "ru", "zh", "ko", "ja", "th", "vi"),

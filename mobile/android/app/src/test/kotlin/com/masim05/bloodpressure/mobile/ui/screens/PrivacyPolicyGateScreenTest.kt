@@ -9,7 +9,10 @@ import com.masim05.bloodpressure.mobile.ui.TestTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class PrivacyPolicyGateScreenTest {
     @get:Rule
     val composeRule = createComposeRule()

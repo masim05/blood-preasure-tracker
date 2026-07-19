@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             AppTheme {
-                if (!hasAcceptedPrivacyPolicy) {
+                if (shouldShowPrivacyPolicyGate(hasAcceptedPrivacyPolicy)) {
                     PrivacyPolicyGateScreen(
                         selectedLanguageCode = selectedLanguageCode,
                         onLanguageSelected = updateLanguageSelection,
@@ -849,6 +849,10 @@ internal const val PRIVACY_POLICY_ACCEPTED_PREFERENCE_KEY = "privacy_policy_acce
 
 internal fun isPrivacyPolicyAccepted(preferences: android.content.SharedPreferences): Boolean {
     return preferences.getBoolean(PRIVACY_POLICY_ACCEPTED_PREFERENCE_KEY, false)
+}
+
+internal fun shouldShowPrivacyPolicyGate(hasAcceptedPrivacyPolicy: Boolean): Boolean {
+    return !hasAcceptedPrivacyPolicy
 }
 
 internal fun markPrivacyPolicyAccepted(preferences: android.content.SharedPreferences) {

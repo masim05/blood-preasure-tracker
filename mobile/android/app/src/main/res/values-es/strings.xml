@@ -144,7 +144,7 @@
     <string name="profile_policy_heading_medical">Aviso médico</string>
     <string name="profile_policy_content_medical">Esta aplicación no es un dispositivo médico y no diagnostica, trata, cura ni previene ninguna condición médica. Consulta siempre a un profesional de la salud cualificado sobre tu presión arterial y cualquier problema de salud.</string>
     <string name="profile_policy_heading_contact">Contacto</string>
-    <string name="profile_policy_content_contact">Para preguntas relacionadas con la privacidad, contáctanos en blood.pressure.by.max@gmail.com.</string>
+    <string name="profile_policy_content_contact">Para preguntas relacionadas con la privacidad, contáctanos en blood.pressure.by.max@gmail.com (Maxim Ryndin).</string>
     <string name="privacy_policy_accept">Acepto</string>
 
     <string name="profile_story_page_title">Controla tus mediciones fácilmente</string>

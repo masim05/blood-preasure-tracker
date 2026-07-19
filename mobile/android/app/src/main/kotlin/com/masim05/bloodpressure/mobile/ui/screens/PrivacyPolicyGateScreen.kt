@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.supportedLanguageOptions
+import com.masim05.bloodpressure.mobile.SYSTEM_LANGUAGE_CODE
 import com.masim05.bloodpressure.mobile.ui.TestTags
 
 private val PageBg = Color(0xFFF2F2F7)
@@ -45,21 +48,7 @@ private val CardBorder = Color(0xFFE5E5E5)
 private val LabelColor = Color(0xFF999999)
 private val PrimaryText = Color(0xFF111111)
 private val MutedText = Color(0xFFAAAAAA)
-
-private data class PolicyGateSection(
-    val headingRes: Int,
-    val contentRes: Int,
-)
-
-private fun policyGateSections(): List<PolicyGateSection> = listOf(
-    PolicyGateSection(R.string.profile_policy_heading_data_collect, R.string.profile_policy_content_data_collect),
-    PolicyGateSection(R.string.profile_policy_heading_data_use, R.string.profile_policy_content_data_use),
-    PolicyGateSection(R.string.profile_policy_heading_third_party, R.string.profile_policy_content_third_party),
-    PolicyGateSection(R.string.profile_policy_heading_storage, R.string.profile_policy_content_storage),
-    PolicyGateSection(R.string.profile_policy_heading_delete, R.string.profile_policy_content_delete),
-    PolicyGateSection(R.string.profile_policy_heading_medical, R.string.profile_policy_content_medical),
-    PolicyGateSection(R.string.profile_policy_heading_contact, R.string.profile_policy_content_contact),
-)
+private val LanguageIconTint = Color(0xFF1D9E75)
 
 @Composable
 fun PrivacyPolicyGateScreen(
@@ -69,8 +58,9 @@ fun PrivacyPolicyGateScreen(
 ) {
     val selectedLanguage = supportedLanguageOptions.firstOrNull { it.code == selectedLanguageCode }
         ?: supportedLanguageOptions.first()
-    val sections = policyGateSections()
+    val sections = policySectionsCopy()
     var languageMenuExpanded by remember { mutableStateOf(false) }
+    val selectedLanguageLabel = languageAutonym(selectedLanguage.code, stringResource(selectedLanguage.labelRes))
 
     Column(
         modifier = Modifier
@@ -90,7 +80,7 @@ fun PrivacyPolicyGateScreen(
             Box(modifier = Modifier.fillMaxWidth()) {
                 LanguageSelectorRow(
                     modifier = Modifier.testTag(TestTags.PolicyGateLanguageSelector),
-                    selectedLabel = stringResource(selectedLanguage.labelRes),
+                    selectedLabel = selectedLanguageLabel,
                     onClick = { languageMenuExpanded = true },
                 )
                 DropdownMenu(
@@ -100,7 +90,11 @@ fun PrivacyPolicyGateScreen(
                     supportedLanguageOptions.forEach { option ->
                         DropdownMenuItem(
                             modifier = Modifier.testTag("${TestTags.PolicyGateLanguageOptionPrefix}${option.code}"),
-                            text = { Text(stringResource(option.labelRes)) },
+                            text = {
+                                Text(
+                                    languageAutonym(option.code, stringResource(option.labelRes)),
+                                )
+                            },
                             onClick = {
                                 languageMenuExpanded = false
                                 onLanguageSelected(option.code)
@@ -166,11 +160,19 @@ private fun LanguageSelectorRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = selectedLabel,
-            color = PrimaryText,
-            fontWeight = FontWeight.Medium,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Outlined.Language,
+                contentDescription = null,
+                tint = LanguageIconTint,
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = selectedLabel,
+                color = PrimaryText,
+                fontWeight = FontWeight.Medium,
+            )
+        }
         Icon(
             imageVector = Icons.Outlined.ChevronRight,
             contentDescription = null,
@@ -200,4 +202,22 @@ private fun SectionLabel(text: String) {
         fontWeight = FontWeight.Medium,
         letterSpacing = 0.6.sp,
     )
+}
+
+private fun languageAutonym(languageCode: String, fallback: String): String {
+    if (languageCode == SYSTEM_LANGUAGE_CODE) return fallback
+    return when (languageCode) {
+        "es" -> "Español"
+        "fr" -> "Français"
+        "pt" -> "Português"
+        "it" -> "Italiano"
+        "sv" -> "Svenska"
+        "ru" -> "Русский"
+        "zh" -> "中文"
+        "ko" -> "한국어"
+        "ja" -> "日本語"
+        "th" -> "ไทย"
+        "vi" -> "Tiếng Việt"
+        else -> fallback
+    }
 }

@@ -147,7 +147,7 @@
     <string name="profile_policy_heading_medical">医療上の免責事項</string>
     <string name="profile_policy_content_medical">このアプリは医療機器ではなく、いかなる疾患の診断・治療・治癒・予防も行いません。血圧やその他の健康上の懸念については、必ず資格を持つ医療専門家にご相談ください。</string>
     <string name="profile_policy_heading_contact">お問い合わせ</string>
-    <string name="profile_policy_content_contact">プライバシーに関するご質問は blood.pressure.by.max@gmail.com までご連絡ください。</string>
+    <string name="profile_policy_content_contact">プライバシーに関するご質問は blood.pressure.by.max@gmail.com（Maxim Ryndin）までご連絡ください。</string>
     <string name="privacy_policy_accept">同意します</string>
 
     <string name="profile_story_page_title">血圧の記録を手軽に</string>
