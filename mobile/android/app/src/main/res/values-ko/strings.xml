@@ -132,7 +132,7 @@
     <string name="profile_story_paragraph_3">직접 사용해 보고 나서 이런 불편함을 겪는 사람이 저뿐만은 아닐 것이라고 생각했습니다. 그래서 Google Play에 앱을 출시하기로 결심했습니다.</string>
     <string name="profile_policy_page_title">개인정보 처리방침</string>
     <string name="profile_policy_intro">귀하의 개인정보는 중요합니다. 이 방침은 AI Blood Pressure Tracker가 어떤 데이터를 수집하고, 왜 수집하며, 어떻게 처리하는지를 설명합니다.</string>
-    <string name="profile_policy_last_updated">마지막 업데이트: 2026년 6월 6일</string>
+    <string name="profile_policy_last_updated">마지막 업데이트: 2026년 7월 18일</string>
     <string name="profile_policy_heading_data_collect">수집하는 데이터</string>
     <string name="profile_policy_content_data_collect">앱 사용 시 다음 정보를 수집합니다: 계정 생성에 사용하는 이메일 주소 및 비밀번호(해시 처리됨); 인식을 위해 제출하는 혈압계 사진; 해당 사진에서 추출되거나 수동으로 입력된 혈압 수치(수축기, 이완기, 맥박, 팔 측); 각 측정의 날짜 및 시간.</string>
     <string name="profile_policy_heading_data_use">데이터 사용 방법</string>
