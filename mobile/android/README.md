@@ -1,6 +1,6 @@
-# Blood Pressure Tracker Android
+# AI Blood Pressure Tracker Android
 
-Android Studio project for the Blood Pressure Tracker mobile app. The UI uses Jetpack Compose Material 3 for the combined Login/New Account screen, guide, camera, history, and measurement detail journey.
+Android Studio project for the AI Blood Pressure Tracker mobile app. The UI uses Jetpack Compose Material 3 for the combined Login/New Account screen, guide, camera, history, and measurement detail journey.
 
 The history and measurement detail screens support pull-down refresh to reload the latest server data.
 

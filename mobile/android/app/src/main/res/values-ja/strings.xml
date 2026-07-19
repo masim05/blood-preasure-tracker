@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Blood Pressure</string>
-    <string name="auth_title">Blood Pressure</string>
+    <string name="app_name">AI Blood Pressure Tracker</string>
+    <string name="auth_title">AI Blood Pressure Tracker</string>
     <string name="auth_mode_login">ログイン</string>
     <string name="auth_mode_new_account">新規アカウント</string>
     <string name="signin_title">アカウント作成</string>
@@ -132,7 +132,7 @@
     <string name="profile_story_paragraph_2">最近のAIは画像からテキストを読み取るのが得意なので、これを自動化できるはずだと考えました。そこで、血圧計の写真を数回タップするだけで測定記録に変換できるシンプルなアプリを作りました。</string>
     <string name="profile_story_paragraph_3">自分で使ってみて思ったのは、この問題を抱えているのは自分だけではないかもしれないということです。だからこそ、Google Playに公開することにしました。</string>
     <string name="profile_policy_page_title">プライバシーポリシー</string>
-    <string name="profile_policy_intro">お客様のプライバシーは重要です。このポリシーでは、Blood Pressureが収集するデータ、その目的、および取り扱い方法について説明します。</string>
+    <string name="profile_policy_intro">お客様のプライバシーは重要です。このポリシーでは、AI Blood Pressure Trackerが収集するデータ、その目的、および取り扱い方法について説明します。</string>
     <string name="profile_policy_last_updated">最終更新日：2026年6月6日</string>
     <string name="profile_policy_heading_data_collect">収集するデータ</string>
     <string name="profile_policy_content_data_collect">アプリ使用時に以下の情報を収集します：アカウント作成に使用するメールアドレスおよびパスワード（ハッシュ化）、認識のために送信する血圧計の写真、それらの写真から抽出または手動入力された血圧値（収縮期・拡張期・脈拍・腕の左右）、各測定の日時。</string>

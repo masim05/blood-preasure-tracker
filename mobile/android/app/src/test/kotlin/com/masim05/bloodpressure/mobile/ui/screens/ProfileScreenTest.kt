@@ -67,7 +67,7 @@ class ProfileScreenTest {
 
         composeRule.onNodeWithTag(TestTags.ProfileAboutBack).performClick()
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
-        composeRule.onNodeWithText("Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.").assertIsDisplayed()
+        composeRule.onNodeWithText("Your privacy matters. This policy explains what data AI Blood Pressure Tracker collects, why, and how it is handled.").assertIsDisplayed()
         composeRule.onNodeWithText("Last updated: July 18, 2026").assertIsDisplayed()
     }
 
