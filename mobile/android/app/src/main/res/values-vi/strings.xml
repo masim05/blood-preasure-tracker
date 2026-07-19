@@ -147,7 +147,8 @@
     <string name="profile_policy_heading_medical">Tuyên bố miễn trách nhiệm y tế</string>
     <string name="profile_policy_content_medical">Ứng dụng này không phải là thiết bị y tế và không chẩn đoán, điều trị, chữa khỏi hay phòng ngừa bất kỳ tình trạng y tế nào. Hãy luôn tham khảo ý kiến chuyên gia y tế có chuyên môn về huyết áp và các vấn đề sức khỏe của bạn.</string>
     <string name="profile_policy_heading_contact">Liên hệ</string>
-    <string name="profile_policy_content_contact">Với các câu hỏi liên quan đến quyền riêng tư, vui lòng liên hệ với chúng tôi tại blood.pressure.by.max@gmail.com.</string>
+    <string name="profile_policy_content_contact">Với các câu hỏi liên quan đến quyền riêng tư, vui lòng liên hệ với chúng tôi tại blood.pressure.by.max@gmail.com (Maxim Ryndin).</string>
+    <string name="privacy_policy_accept">Tôi đồng ý</string>
 
     <string name="profile_story_page_title">Theo dõi chỉ số huyết áp dễ dàng</string>
 </resources>
