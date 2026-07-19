@@ -133,7 +133,7 @@
     <string name="profile_story_paragraph_3">Dopo averla usata io stesso, ho pensato: forse non sono l\'unico ad avere questo problema. Per questo ho deciso di pubblicarla su Google Play.</string>
     <string name="profile_policy_page_title">Informativa sulla privacy</string>
     <string name="profile_policy_intro">La tua privacy è importante. Questa informativa spiega quali dati raccoglie AI Blood Pressure Tracker, perché e come vengono gestiti.</string>
-    <string name="profile_policy_last_updated">Ultimo aggiornamento: 6 giugno 2026</string>
+    <string name="profile_policy_last_updated">Ultimo aggiornamento: 18 luglio 2026</string>
     <string name="profile_policy_heading_data_collect">Dati che raccogliamo</string>
     <string name="profile_policy_content_data_collect">Raccogliamo le seguenti informazioni quando usi l\'app: il tuo indirizzo e-mail e la password (con hash) per creare il tuo account; le foto del tuo misuratore di pressione inviate per il riconoscimento; i valori della pressione sanguigna (sistolica, diastolica, polso, lato del braccio) estratti da quelle foto o inseriti manualmente; e la data e l\'ora di ogni misurazione.</string>
     <string name="profile_policy_heading_data_use">Come utilizziamo i tuoi dati</string>

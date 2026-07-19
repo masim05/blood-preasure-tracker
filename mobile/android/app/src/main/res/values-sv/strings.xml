@@ -133,7 +133,7 @@
     <string name="profile_story_paragraph_3">Efter att ha använt den själv tänkte jag: kanske är jag inte den enda med det här problemet. Det är därför jag bestämde mig för att publicera den på Google Play.</string>
     <string name="profile_policy_page_title">Integritetspolicy</string>
     <string name="profile_policy_intro">Din integritet är viktig. Denna policy förklarar vilka uppgifter AI Blood Pressure Tracker samlar in, varför och hur de hanteras.</string>
-    <string name="profile_policy_last_updated">Senast uppdaterad: 6 juni 2026</string>
+    <string name="profile_policy_last_updated">Senast uppdaterad: 18 juli 2026</string>
     <string name="profile_policy_heading_data_collect">Uppgifter vi samlar in</string>
     <string name="profile_policy_content_data_collect">Vi samlar in följande information när du använder appen: din e-postadress och ditt lösenord (hashat) för att skapa ditt konto; foton av din blodtrycksapparat som du skickar in för igenkänning; blodtrycksvärden (systoliskt, diastoliskt, puls, armens sida) extraherade från dessa foton eller angivna manuellt; samt datum och tid för varje mätning.</string>
     <string name="profile_policy_heading_data_use">Hur vi använder dina uppgifter</string>

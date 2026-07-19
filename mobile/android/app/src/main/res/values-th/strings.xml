@@ -132,7 +132,7 @@
     <string name="profile_story_paragraph_3">หลังจากใช้งานด้วยตัวเองแล้ว ฉันคิดว่าคงไม่ใช่คนเดียวที่มีปัญหานี้ นั่นจึงเป็นเหตุผลที่ฉันตัดสินใจเผยแพร่แอปนี้บน Google Play</string>
     <string name="profile_policy_page_title">นโยบายความเป็นส่วนตัว</string>
     <string name="profile_policy_intro">ความเป็นส่วนตัวของคุณมีความสำคัญ นโยบายนี้อธิบายว่า AI Blood Pressure Tracker เก็บรวบรวมข้อมูลใด เพราะเหตุใด และข้อมูลได้รับการจัดการอย่างไร</string>
-    <string name="profile_policy_last_updated">อัปเดตล่าสุด: 6 มิถุนายน 2026</string>
+    <string name="profile_policy_last_updated">อัปเดตล่าสุด: 18 กรกฎาคม 2026</string>
     <string name="profile_policy_heading_data_collect">ข้อมูลที่เราเก็บรวบรวม</string>
     <string name="profile_policy_content_data_collect">เราเก็บรวบรวมข้อมูลต่อไปนี้เมื่อคุณใช้แอป: อีเมลและรหัสผ่าน (แบบ hash) สำหรับสร้างบัญชี รูปถ่ายเครื่องวัดความดันโลหิตที่คุณส่งมาเพื่อการจดจำ ค่าความดันโลหิต (systolic, diastolic, ชีพจร, แขนข้าง) ที่ดึงมาจากรูปถ่ายหรือกรอกเอง และวันที่และเวลาของการวัดแต่ละครั้ง</string>
     <string name="profile_policy_heading_data_use">วิธีที่เราใช้ข้อมูลของคุณ</string>
