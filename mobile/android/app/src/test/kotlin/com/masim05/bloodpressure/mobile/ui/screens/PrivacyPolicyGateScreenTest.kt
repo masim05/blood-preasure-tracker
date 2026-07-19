@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -29,6 +30,7 @@ class PrivacyPolicyGateScreenTest {
 
         composeRule.onNodeWithTag(TestTags.PolicyGateScreen).assertIsDisplayed()
         composeRule.onNodeWithText("Privacy Policy").assertIsDisplayed()
+        composeRule.onNodeWithTag(TestTags.PolicyGateAccept).performScrollTo()
         composeRule.onNodeWithTag(TestTags.PolicyGateAccept).assertIsDisplayed()
     }
 
@@ -43,7 +45,9 @@ class PrivacyPolicyGateScreenTest {
             )
         }
 
+        composeRule.onNodeWithTag(TestTags.PolicyGateAccept).performScrollTo()
         composeRule.onNodeWithTag(TestTags.PolicyGateAccept).performClick()
+        composeRule.waitForIdle()
 
         assertEquals(true, accepted)
     }
