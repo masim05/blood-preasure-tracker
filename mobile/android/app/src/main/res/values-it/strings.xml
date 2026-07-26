@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">AI Blood Pressure Tracker</string>
-    <string name="auth_title">AI Blood Pressure Tracker</string>
+    <string name="app_name">AI Registro della Pressione Sanguigna</string>
+    <string name="auth_title">AI Registro della Pressione Sanguigna</string>
     <string name="auth_mode_login">Accedi</string>
     <string name="auth_mode_new_account">Nuovo account</string>
     <string name="signin_title">Crea account</string>

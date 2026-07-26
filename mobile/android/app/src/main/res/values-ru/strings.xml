@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AI Blood Pressure Tracker</string>
-    <string name="auth_title">AI Blood Pressure Tracker</string>
+    <string name="app_name">AI Дневник артериального давления</string>
+    <string name="auth_title">AI Дневник артериального давления</string>
     <string name="auth_mode_login">Войти</string>
     <string name="auth_mode_new_account">Новый аккаунт</string>
     <string name="signin_title">Создать аккаунт</string>
