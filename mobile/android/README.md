@@ -34,6 +34,7 @@ npm run api
 
 The app reads `BuildConfig.API_BASE_URL` from `apiBaseUrl` in `mobile/android/local.properties` or from a Gradle property with the same name.
 If not provided, debug builds default to `http://10.0.2.2:3000` and release builds default to `https://bpt.crptmax.com`.
+HTTP overrides are supported only for debug builds. Release builds require an HTTPS URL with a valid host and fail before producing an artifact when configured with an insecure URL.
 In debug builds, non-2xx API responses are logged with full URL and status code.
 
 One-off override:

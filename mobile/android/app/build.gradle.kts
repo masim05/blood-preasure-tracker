@@ -1,3 +1,4 @@
+import java.net.URI
 import java.util.Properties
 
 plugins {
@@ -19,6 +20,23 @@ val apiBaseUrlOverride = localProperties.getProperty("apiBaseUrl")
         ?.takeIf { value -> value.isNotBlank() }
 val debugApiBaseUrlDefault = "http://10.0.2.2:3000"
 val releaseApiBaseUrlDefault = "https://bpt.crptmax.com"
+val releaseApiBaseUrl = apiBaseUrlOverride ?: releaseApiBaseUrlDefault
+
+val validateReleaseApiBaseUrl by tasks.registering {
+    doLast {
+        val uri = runCatching { URI(releaseApiBaseUrl) }.getOrNull()
+        check(uri?.scheme.equals("https", ignoreCase = true) && !uri?.host.isNullOrBlank()) {
+            "Release API base URL must use HTTPS and include a host; received '$releaseApiBaseUrl'. " +
+                "Use an HTTPS apiBaseUrl or build a debug variant for local HTTP development."
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name != validateReleaseApiBaseUrl.name && name.contains("Release", ignoreCase = true)) {
+        dependsOn(validateReleaseApiBaseUrl)
+    }
+}
 
 android {
     namespace = "com.masim05.bloodpressure.mobile"
@@ -50,7 +68,7 @@ android {
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                "\"${apiBaseUrlOverride ?: releaseApiBaseUrlDefault}\"",
+                "\"$releaseApiBaseUrl\"",
             )
         }
     }
