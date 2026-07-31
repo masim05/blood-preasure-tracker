@@ -1,4 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 
 import { UnexpectedHttpException } from './http-error.mapper';
 
@@ -12,9 +13,13 @@ type UnexpectedErrorLogEntry = {
   path: string;
   statusCode: 500;
   exception: {
+    type: 'error' | 'non_error';
     name: string;
     message: string;
-    stack?: string;
+    stack?: {
+      frameCount: number;
+      fingerprint: string;
+    };
   };
 };
 
@@ -60,7 +65,7 @@ export function createUnexpectedErrorLogEntry(
   return {
     level: 'error',
     method: request.method,
-    path: request.originalUrl || request.url,
+    path: requestPath(request.originalUrl || request.url),
     statusCode: 500,
     exception: normalizeException(thrown),
   };
@@ -71,28 +76,51 @@ function normalizeException(
 ): UnexpectedErrorLogEntry['exception'] {
   if (!(thrown instanceof Error)) {
     return {
+      type: 'non_error',
       name: 'NonErrorThrown',
       message: 'Unexpected non-Error value thrown',
     };
   }
 
+  const name = safeErrorName(thrown);
+  const stack = safeStackSummary(thrown);
   return {
-    name: sanitizeDiagnosticText(thrown.name || 'Error'),
-    message: sanitizeDiagnosticText(thrown.message),
-    ...(thrown.stack ? { stack: sanitizeDiagnosticText(thrown.stack) } : {}),
+    type: 'error',
+    name,
+    message: `Unexpected ${name}`,
+    ...(stack ? { stack } : {}),
   };
 }
 
-function sanitizeDiagnosticText(value: string): string {
-  return value
-    .slice(0, 16_384)
-    .replace(/\b(bearer)\s+[^\s,;]+/gi, '$1 [REDACTED]')
-    .replace(
-      /\b(postgres(?:ql)?|https?):\/\/[^\s/@:]+:[^\s/@]+@/gi,
-      '$1://[REDACTED]@',
-    )
-    .replace(
-      /\b(authorization|cookie|password|passwd|secret|token|api[_ -]?key|email|systolic|diastolic|pulse)\b\s*[:=]\s*([^\s,;}]+)/gi,
-      '$1=[REDACTED]',
-    );
+function requestPath(url: string): string {
+  return url.split(/[?#]/, 1)[0];
+}
+
+function safeErrorName(error: Error): string {
+  if (error instanceof EvalError) return 'EvalError';
+  if (error instanceof RangeError) return 'RangeError';
+  if (error instanceof ReferenceError) return 'ReferenceError';
+  if (error instanceof SyntaxError) return 'SyntaxError';
+  if (error instanceof TypeError) return 'TypeError';
+  if (error instanceof URIError) return 'URIError';
+  return 'Error';
+}
+
+function safeStackSummary(
+  error: Error,
+): UnexpectedErrorLogEntry['exception']['stack'] | undefined {
+  try {
+    if (typeof error.stack !== 'string' || error.stack.length === 0) {
+      return undefined;
+    }
+
+    const stack = error.stack.slice(0, 65_536);
+    return {
+      frameCount: stack.split('\n').filter((line) => /^\s*at\s/.test(line))
+        .length,
+      fingerprint: createHash('sha256').update(stack).digest('hex'),
+    };
+  } catch {
+    return undefined;
+  }
 }

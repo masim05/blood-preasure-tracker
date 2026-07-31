@@ -13,7 +13,8 @@ describe('UnexpectedErrorFilter', () => {
     const response = { status: jest.fn().mockReturnThis(), json: jest.fn() };
     const request = {
       method: 'POST',
-      originalUrl: '/api/v1/measurements',
+      originalUrl:
+        '/api/v1/measurements?token=query-secret&email=patient@example.com',
       url: '/measurements',
       headers: {
         authorization: 'Bearer private-token',
@@ -21,8 +22,8 @@ describe('UnexpectedErrorFilter', () => {
       },
       body: { password: 'private-password', systolic: 180 },
     };
-    const error = new Error(
-      'database failed password=private-password token=private-token',
+    const error = new TypeError(
+      'Key (email)=(patient@example.com) already exists for Alice; systolic 180',
     );
     const host = {
       switchToHttp: () => ({
@@ -45,17 +46,22 @@ describe('UnexpectedErrorFilter', () => {
       path: '/api/v1/measurements',
       statusCode: 500,
       exception: {
-        name: 'Error',
-        message: 'database failed password=[REDACTED] token=[REDACTED]',
+        type: 'error',
+        name: 'TypeError',
+        message: 'Unexpected TypeError',
       },
     });
-    expect(JSON.parse(serialized).exception.stack).toContain(
-      'Error: database failed password=[REDACTED]',
-    );
+    expect(JSON.parse(serialized).exception.stack).toEqual({
+      frameCount: expect.any(Number),
+      fingerprint: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
     for (const sensitive of [
       'private-token',
       'private-cookie',
       'private-password',
+      'query-secret',
+      'patient@example.com',
+      'Alice',
       '180',
     ]) {
       expect(serialized).not.toContain(sensitive);
@@ -81,9 +87,72 @@ describe('UnexpectedErrorFilter', () => {
       path: '/api/v1/test',
       statusCode: 500,
       exception: {
+        type: 'non_error',
         name: 'NonErrorThrown',
         message: 'Unexpected non-Error value thrown',
       },
+    });
+  });
+
+  it('does not fail when an Error stack accessor throws', () => {
+    const error = new Error('patient free-form value');
+    Object.defineProperty(error, 'stack', {
+      get: () => {
+        throw new Error('stack unavailable');
+      },
+    });
+
+    expect(
+      createUnexpectedErrorLogEntry(
+        { method: 'GET', url: '/api/v1/test?secret=value' },
+        error,
+      ),
+    ).toEqual({
+      level: 'error',
+      method: 'GET',
+      path: '/api/v1/test',
+      statusCode: 500,
+      exception: {
+        type: 'error',
+        name: 'Error',
+        message: 'Unexpected Error',
+      },
+    });
+  });
+
+  it.each([
+    [new EvalError('private'), 'EvalError'],
+    [new RangeError('private'), 'RangeError'],
+    [new ReferenceError('private'), 'ReferenceError'],
+    [new SyntaxError('private'), 'SyntaxError'],
+    [new URIError('private'), 'URIError'],
+  ])('allow-lists the built-in %s name', (error, expectedName) => {
+    expect(
+      createUnexpectedErrorLogEntry(
+        { method: 'GET', url: '/test#private' },
+        error,
+      ),
+    ).toMatchObject({
+      path: '/test',
+      exception: {
+        type: 'error',
+        name: expectedName,
+        message: `Unexpected ${expectedName}`,
+      },
+    });
+  });
+
+  it('omits a missing stack without exposing the error message', () => {
+    const error = new Error('patient@example.com systolic 180');
+    error.stack = '';
+
+    expect(
+      createUnexpectedErrorLogEntry({ method: 'GET', url: '/test' }, error)
+        .exception,
+    ).toEqual({
+      type: 'error',
+      name: 'Error',
+      message: 'Unexpected Error',
     });
   });
 });
