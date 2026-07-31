@@ -1,4 +1,7 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import type { HttpException } from '@nestjs/common';
 
 import { AuthController } from './auth.controller';
@@ -131,6 +134,15 @@ describe('mobile HTTP adapter helpers', () => {
       expect(exception.getStatus()).toBe(status);
       expect(exception.getResponse()).toEqual({ error: code, message });
     }
+  });
+
+  it('preserves already-classified Nest HTTP exceptions', () => {
+    const exception = new BadRequestException({
+      error: 'validation_error',
+      message: 'Invalid request',
+    });
+
+    expect(toHttpException(exception)).toBe(exception);
   });
 });
 

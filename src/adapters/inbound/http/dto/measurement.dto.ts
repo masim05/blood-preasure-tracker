@@ -25,14 +25,16 @@ export type SaveMeasurementDto = {
   armSide?: ArmSide;
 };
 
-export function parseOptionalPositiveInteger(value: string | undefined): number | undefined {
+export function parseOptionalPositiveInteger(
+  value: string | undefined,
+): number | undefined {
   if (value === undefined) {
     return undefined;
   }
 
   const parsed = Number(value);
   if (!Number.isInteger(parsed)) {
-    throw new Error('query value must be an integer');
+    throw new ApiError('validation_error', 'query value must be an integer');
   }
 
   return parsed;
@@ -49,8 +51,15 @@ export function parseMeasurementOverride(
     pulse: parseOptionalBodyInteger(payload.pulse, 'pulse'),
   };
 
-  if (output.systolic === undefined && output.diastolic === undefined && output.pulse === undefined) {
-    throw new Error('at least one of systolic, diastolic, pulse is required');
+  if (
+    output.systolic === undefined &&
+    output.diastolic === undefined &&
+    output.pulse === undefined
+  ) {
+    throw new ApiError(
+      'validation_error',
+      'at least one of systolic, diastolic, pulse is required',
+    );
   }
 
   return output;
@@ -74,7 +83,7 @@ function rejectUnexpectedOverrideFields(payload: MeasurementOverrideDto): void {
   const allowedFields = new Set(['systolic', 'diastolic', 'pulse']);
   for (const field of Object.keys(payload)) {
     if (!allowedFields.has(field)) {
-      throw new Error(`unexpected field: ${field}`);
+      throw new ApiError('validation_error', `unexpected field: ${field}`);
     }
   }
 }
@@ -83,17 +92,23 @@ function rejectUnexpectedSaveFields(payload: SaveMeasurementDto): void {
   const allowedFields = new Set(['systolic', 'diastolic', 'pulse', 'armSide']);
   for (const field of Object.keys(payload)) {
     if (!allowedFields.has(field)) {
-      throw new Error(`unexpected field: ${field}`);
+      throw new ApiError('validation_error', `unexpected field: ${field}`);
     }
   }
 }
 
-function parseOptionalBodyInteger(value: number | undefined, field: string): number | undefined {
+function parseOptionalBodyInteger(
+  value: number | undefined,
+  field: string,
+): number | undefined {
   if (value === undefined) {
     return undefined;
   }
   if (!Number.isInteger(value) || value <= 0) {
-    throw new Error(`${field} must be a positive integer`);
+    throw new ApiError(
+      'validation_error',
+      `${field} must be a positive integer`,
+    );
   }
 
   return value;
@@ -104,9 +119,13 @@ function parseOptionalArmSide(value: string | undefined): ArmSide | undefined {
     return undefined;
   }
   if (value !== 'left' && value !== 'right' && value !== 'unknown') {
-    throw new Error('armSide must be one of left, right, unknown');
+    throw new ApiError(
+      'validation_error',
+      'armSide must be one of left, right, unknown',
+    );
   }
 
   return value;
 }
 import type { ArmSide } from '../../../../domain/entities/measurement';
+import { ApiError } from '../http-error.mapper';

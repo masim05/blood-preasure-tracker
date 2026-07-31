@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
@@ -28,6 +29,10 @@ export class UnexpectedHttpException extends InternalServerErrorException {
 }
 
 export function toHttpException(error: unknown): Error {
+  if (error instanceof HttpException) {
+    return error;
+  }
+
   if (!(error instanceof ApiError)) {
     return new UnexpectedHttpException(error);
   }
