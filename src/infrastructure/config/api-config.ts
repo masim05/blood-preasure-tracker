@@ -8,6 +8,8 @@ export type ApiConfig = {
   accessTokenTtlSeconds: number;
   recognitionWorkerIntervalSeconds: number;
   recognitionWorkerBatchSize: number;
+  recognitionTaskLeaseTimeoutSeconds: number;
+  recognitionMaxAttempts: number;
 };
 
 @Injectable()
@@ -18,7 +20,8 @@ export class ApiConfigService {
     return {
       databaseUrl: readRequired(runtimeEnv, 'DATABASE_URL'),
       apiPort: readPositiveInteger(runtimeEnv.API_PORT, 3000, 'API_PORT'),
-      measurementImageDirectory: runtimeEnv.MEASUREMENT_IMAGE_DIR ?? './tmp/measurement-images',
+      measurementImageDirectory:
+        runtimeEnv.MEASUREMENT_IMAGE_DIR ?? './tmp/measurement-images',
       accessTokenTtlSeconds: readPositiveInteger(
         runtimeEnv.ACCESS_TOKEN_TTL_SECONDS,
         604800,
@@ -33,6 +36,16 @@ export class ApiConfigService {
         runtimeEnv.RECOGNITION_WORKER_BATCH_SIZE,
         4,
         'RECOGNITION_WORKER_BATCH_SIZE',
+      ),
+      recognitionTaskLeaseTimeoutSeconds: readPositiveInteger(
+        runtimeEnv.RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS,
+        600,
+        'RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS',
+      ),
+      recognitionMaxAttempts: readPositiveInteger(
+        runtimeEnv.RECOGNITION_MAX_ATTEMPTS,
+        3,
+        'RECOGNITION_MAX_ATTEMPTS',
       ),
     };
   }

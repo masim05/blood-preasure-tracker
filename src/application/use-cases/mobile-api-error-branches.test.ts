@@ -2,7 +2,10 @@ import { BearerAccessToken } from '../../domain/entities/bearer-access-token';
 import { UserAccount } from '../../domain/entities/user-account';
 import { AuthenticateBearerTokenUseCase } from './authenticate-bearer-token.use-case';
 import { LoginUserUseCase } from './login-user.use-case';
-import { LLM_PROVIDER, ProcessRecognitionTaskUseCase } from './process-recognition-task.use-case';
+import {
+  LLM_PROVIDER,
+  ProcessRecognitionTaskUseCase,
+} from './process-recognition-task.use-case';
 import { SubmitMeasurementImageUseCase } from './submit-measurement-image.use-case';
 import type { LlmProviderPort } from '../ports/llm-provider.port';
 import {
@@ -28,7 +31,12 @@ describe('mobile API use-case error branches', () => {
         new SimplePasswordHasher(),
         new InMemoryBearerTokenStore(),
         new StaticTokenGenerator(),
-      ).execute({ email: 'bad-email', password: 'password123', tokenTtlSeconds: 1, now }),
+      ).execute({
+        email: 'bad-email',
+        password: 'password123',
+        tokenTtlSeconds: 1,
+        now,
+      }),
     ).rejects.toThrow('Email must be valid');
   });
 
@@ -46,17 +54,33 @@ describe('mobile API use-case error branches', () => {
     );
 
     await expect(
-      new AuthenticateBearerTokenUseCase(tokens, new StaticTokenGenerator(), new InMemoryUserStore()).execute({ accessToken: 'raw-token', now }),
+      new AuthenticateBearerTokenUseCase(
+        tokens,
+        new StaticTokenGenerator(),
+        new InMemoryUserStore(),
+      ).execute({ accessToken: 'raw-token', now }),
     ).rejects.toThrow('Bearer token is invalid or expired');
   });
 
-  it('retries once then marks recognition failed when provider returns incomplete values', async () => {
+  it('retries twice then marks recognition failed when provider returns incomplete values', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
     const users = new InMemoryUserStore();
-    await users.save(new UserAccount({ id: 'usr_1', email: 'demo@example.com', passwordHash: 'hash', createdAt: now, updatedAt: now }));
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await users.save(
+      new UserAccount({
+        id: 'usr_1',
+        email: 'demo@example.com',
+        passwordHash: 'hash',
+        createdAt: now,
+        updatedAt: now,
+      }),
+    );
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -65,11 +89,27 @@ describe('mobile API use-case error branches', () => {
     });
     const provider: LlmProviderPort = {
       provider: 'test',
-      infer: jest.fn().mockResolvedValue({ hand: null, systolic: null, diastolic: null, pulse: null, confidence: null, uncertainFields: [], rawNotes: null }),
+      infer: jest.fn().mockResolvedValue({
+        hand: null,
+        systolic: null,
+        diastolic: null,
+        pulse: null,
+        confidence: null,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
     };
 
     const taskId = [...tasks.tasks.keys()][0];
-    const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
+    const useCase = new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    );
+
+    await useCase.execute({ taskId, model: 'model', now });
+    expect(tasks.tasks.get(taskId)?.status).toBe('queued');
 
     await useCase.execute({ taskId, model: 'model', now });
     expect(tasks.tasks.get(taskId)?.status).toBe('queued');

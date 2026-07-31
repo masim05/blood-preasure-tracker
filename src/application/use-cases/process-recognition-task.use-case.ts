@@ -23,20 +23,25 @@ export type ProcessRecognitionTaskInput = {
   model: string;
   now?: Date;
   retryAt?: Date;
+  maxAttempts?: number;
 };
 
 @Injectable()
 export class ProcessRecognitionTaskUseCase {
   constructor(
-    @Inject(RECOGNITION_TASK_STORE) private readonly recognitionTasks: RecognitionTaskStorePort,
-    @Inject(MEASUREMENT_STORE) private readonly measurements: MeasurementStorePort,
-    @Inject(MEASUREMENT_IMAGE_STORE) private readonly images: MeasurementImageStorePort,
+    @Inject(RECOGNITION_TASK_STORE)
+    private readonly recognitionTasks: RecognitionTaskStorePort,
+    @Inject(MEASUREMENT_STORE)
+    private readonly measurements: MeasurementStorePort,
+    @Inject(MEASUREMENT_IMAGE_STORE)
+    private readonly images: MeasurementImageStorePort,
     @Inject(LLM_PROVIDER) private readonly llmProvider: LlmProviderPort,
   ) {}
 
   async execute(input: ProcessRecognitionTaskInput): Promise<void> {
     const now = input.now ?? new Date();
     const retryAt = input.retryAt ?? now;
+    const maxAttempts = input.maxAttempts ?? 3;
     const task = await this.recognitionTasks.findById(input.taskId);
     if (!task) {
       throw new ApiError('not_found', 'Recognition task was not found');
@@ -61,15 +66,27 @@ export class ProcessRecognitionTaskUseCase {
       await this.recognitionTasks.save(activeTask);
     }
 
-    const storedImage = await this.images.readByMeasurementId(activeTask.measurementId);
-    const measurement = storedImage ? await this.measurements.findById(activeTask.measurementId) : null;
+    const storedImage = await this.images.readByMeasurementId(
+      activeTask.measurementId,
+    );
+    const measurement = storedImage
+      ? await this.measurements.findById(activeTask.measurementId)
+      : null;
     if (!storedImage || !measurement) {
-      await this.handleFailure(activeTask, 'Missing measurement image', now, retryAt);
+      await this.handleFailure(
+        activeTask,
+        'Missing measurement image',
+        now,
+        retryAt,
+        maxAttempts,
+      );
       return;
     }
 
     const recognizingMeasurement =
-      measurement.status === 'pending' ? startRecognition(measurement, now) : measurement;
+      measurement.status === 'pending'
+        ? startRecognition(measurement, now)
+        : measurement;
     if (measurement.status === 'pending') {
       await this.measurements.save(recognizingMeasurement);
     }
@@ -89,6 +106,7 @@ export class ProcessRecognitionTaskUseCase {
         error instanceof Error ? error.message : 'Recognition provider failure',
         now,
         retryAt,
+        maxAttempts,
         recognizingMeasurement,
       );
       return;
@@ -105,26 +123,31 @@ export class ProcessRecognitionTaskUseCase {
         'Incomplete recognition result',
         now,
         retryAt,
+        maxAttempts,
         recognizingMeasurement,
       );
       return;
     }
 
-    await this.measurements.save(
-      completeRecognition(
-        recognizingMeasurement,
-        {
-          systolic: response.systolic,
-          diastolic: response.diastolic,
-          pulse: response.pulse,
-          armSide: response.hand,
-        },
+    const completedMeasurement = completeRecognition(
+      recognizingMeasurement,
+      {
+        systolic: response.systolic,
+        diastolic: response.diastolic,
+        pulse: response.pulse,
+        armSide: response.hand,
+      },
+      now,
+    );
+    if (
+      await this.recognitionTasks.completeAttempt(
+        activeTask,
+        completedMeasurement,
         now,
-      ),
-    );
-    await this.recognitionTasks.save(
-      new RecognitionTask({ ...activeTask.toJSON(), status: 'completed', completedAt: now, updatedAt: now }),
-    );
+      )
+    ) {
+      await this.measurements.save(completedMeasurement);
+    }
   }
 
   private async handleFailure(
@@ -132,28 +155,36 @@ export class ProcessRecognitionTaskUseCase {
     errorMessage: string,
     now: Date,
     retryAt: Date,
+    maxAttempts: number,
     measurement: Measurement | null = null,
   ): Promise<void> {
-    if (task.attemptCount < 2) {
-      await this.recognitionTasks.scheduleRetry(task.id, retryAt, errorMessage, now);
+    if (task.attemptCount < maxAttempts) {
+      await this.recognitionTasks.scheduleRetry(
+        task,
+        retryAt,
+        errorMessage,
+        now,
+      );
       return;
     }
 
-    if (measurement && measurement.status === 'recognizing') {
-      await this.measurements.save(
-        failRecognition(measurement, 'Measurement could not be recognized from this image.', now),
-      );
+    const failedMeasurement =
+      measurement?.status === 'recognizing'
+        ? failRecognition(
+            measurement,
+            'Measurement could not be recognized from this image.',
+            now,
+          )
+        : null;
+    if (
+      await this.recognitionTasks.failAttempt(
+        task,
+        errorMessage,
+        now,
+        failedMeasurement?.recognitionError ?? null,
+      )
+    ) {
+      if (failedMeasurement) await this.measurements.save(failedMeasurement);
     }
-
-    await this.recognitionTasks.save(
-      new RecognitionTask({
-        ...task.toJSON(),
-        status: 'failed',
-        lastError: errorMessage,
-        completedAt: now,
-        updatedAt: now,
-      }),
-    );
   }
 }
-

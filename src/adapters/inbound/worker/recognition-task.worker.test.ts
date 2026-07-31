@@ -33,7 +33,10 @@ describe('RecognitionTaskWorker', () => {
       execute: jest.fn(),
     };
     const apiConfig = {
-      load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 1, recognitionWorkerBatchSize: 4 }),
+      load: jest.fn().mockReturnValue({
+        recognitionWorkerIntervalSeconds: 1,
+        recognitionWorkerBatchSize: 4,
+      }),
     };
     const envConfig = {
       load: jest.fn().mockReturnValue({ model: 'gpt-5.4-mini' }),
@@ -48,7 +51,11 @@ describe('RecognitionTaskWorker', () => {
     worker.onModuleInit();
     await jest.advanceTimersByTimeAsync(1000);
 
-    expect(recognitionTasks.claimQueued).toHaveBeenCalledWith(expect.any(Date), 4);
+    expect(recognitionTasks.claimQueued).toHaveBeenCalledWith(
+      expect.any(Date),
+      4,
+      3,
+    );
 
     worker.onModuleDestroy();
     await jest.advanceTimersByTimeAsync(2000);
@@ -60,7 +67,12 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       { claimQueued: jest.fn(), findById: jest.fn() } as never,
       { execute: jest.fn() } as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
 
@@ -89,7 +101,10 @@ describe('RecognitionTaskWorker', () => {
       execute: jest.fn().mockResolvedValue(undefined),
     };
     const apiConfig = {
-      load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }),
+      load: jest.fn().mockReturnValue({
+        recognitionWorkerIntervalSeconds: 10,
+        recognitionWorkerBatchSize: 4,
+      }),
     };
     const envConfig = {
       load: jest.fn().mockReturnValue({ model: 'test-model' }),
@@ -103,12 +118,13 @@ describe('RecognitionTaskWorker', () => {
 
     await worker.runCycle(now);
 
-    expect(recognitionTasks.claimQueued).toHaveBeenCalledWith(now, 4);
+    expect(recognitionTasks.claimQueued).toHaveBeenCalledWith(now, 4, 3);
     expect(processRecognitionTask.execute).toHaveBeenCalledWith({
       taskId: 'rct_1',
       model: 'test-model',
       now,
       retryAt,
+      maxAttempts: 3,
     });
   });
 
@@ -135,7 +151,12 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       recognitionTasks as never,
       processRecognitionTask as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
 
@@ -153,7 +174,12 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       recognitionTasks as never,
       { execute: jest.fn() } as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
     (worker as unknown as { isRunning: boolean }).isRunning = true;
@@ -188,14 +214,24 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       recognitionTasks as never,
       processRecognitionTask as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
 
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
-    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', retryAt, 'boom', now);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith(
+      claimedTask,
+      retryAt,
+      'boom',
+      now,
+    );
     expect(recognitionTasks.save).not.toHaveBeenCalled();
   });
 
@@ -224,22 +260,32 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       recognitionTasks as never,
       processRecognitionTask as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
 
     await worker.runCycle(now);
 
     expect(processRecognitionTask.execute).toHaveBeenCalledTimes(1);
-    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith('rct_1', retryAt, 'Unknown error', now);
+    expect(recognitionTasks.scheduleRetry).toHaveBeenCalledWith(
+      claimedTask,
+      retryAt,
+      'Unknown error',
+      now,
+    );
   });
 
-  it('marks task failed when unexpected throw happens on second attempt', async () => {
+  it('marks task failed when unexpected throw happens on third attempt', async () => {
     const claimedTask = new RecognitionTask({
       id: 'rct_1',
       measurementId: 'msr_1',
       status: 'processing',
-      attemptCount: 2,
+      attemptCount: 3,
       lastError: 'first failure',
       availableAt: now,
       startedAt: now,
@@ -251,6 +297,7 @@ describe('RecognitionTaskWorker', () => {
       claimQueued: jest.fn().mockResolvedValue([claimedTask]),
       findById: jest.fn().mockResolvedValue({ status: 'failed' }),
       scheduleRetry: jest.fn().mockResolvedValue(undefined),
+      failAttempt: jest.fn().mockResolvedValue(true),
       save: jest.fn().mockResolvedValue(undefined),
     };
     const processRecognitionTask = {
@@ -259,20 +306,23 @@ describe('RecognitionTaskWorker', () => {
     const worker = new RecognitionTaskWorker(
       recognitionTasks as never,
       processRecognitionTask as never,
-      { load: jest.fn().mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }) } as never,
+      {
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
+      } as never,
       { load: jest.fn().mockReturnValue({ model: 'test-model' }) } as never,
     );
 
     await worker.runCycle(now);
 
     expect(recognitionTasks.scheduleRetry).not.toHaveBeenCalled();
-    expect(recognitionTasks.save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 'rct_1',
-        status: 'failed',
-        lastError: 'boom',
-        completedAt: now,
-      }),
+    expect(recognitionTasks.failAttempt).toHaveBeenCalledWith(
+      claimedTask,
+      'boom',
+      now,
+      'Measurement could not be recognized from this image.',
     );
   });
 
@@ -280,7 +330,11 @@ describe('RecognitionTaskWorker', () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -318,9 +372,10 @@ describe('RecognitionTaskWorker', () => {
       tasks,
       new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider),
       {
-        load: jest
-          .fn()
-          .mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }),
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
       } as never,
       {
         load: jest.fn().mockReturnValue({ model: 'test-model' }),
@@ -332,6 +387,8 @@ describe('RecognitionTaskWorker', () => {
     expect(tasks.tasks.get('missing-image-task')?.status).toBe('queued');
 
     await worker.runCycle(retryAt);
+    expect(tasks.tasks.get('missing-image-task')?.status).toBe('queued');
+    await worker.runCycle(new Date(retryAt.getTime() + 10_000));
     expect(tasks.tasks.get('missing-image-task')?.status).toBe('failed');
   });
 
@@ -361,9 +418,10 @@ describe('RecognitionTaskWorker', () => {
       tasks,
       new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider),
       {
-        load: jest
-          .fn()
-          .mockReturnValue({ recognitionWorkerIntervalSeconds: 10, recognitionWorkerBatchSize: 4 }),
+        load: jest.fn().mockReturnValue({
+          recognitionWorkerIntervalSeconds: 10,
+          recognitionWorkerBatchSize: 4,
+        }),
       } as never,
       {
         load: jest.fn().mockReturnValue({ model: 'test-model' }),

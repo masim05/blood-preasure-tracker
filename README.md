@@ -46,7 +46,6 @@ Set the language with `gitlab.language` in `.ai-flow.yml`. It defaults to `en` w
 
 All platform entry points follow `docs/engineering/ai-development-flow.md`, the source of truth for flow behavior.
 
-
 ## CLI Predictor/Evaluator
 
 ### Requirements
@@ -90,11 +89,11 @@ npm run cli -- eval --input ./data/eval --csv ./data/eval/p.csv
 
 - CLI flags override env defaults: `--input`, `--csv`, `--provider`, and `--model`
 - Supported env variables:
-    - `OPENAI_API_KEY`
-    - `CLI_INPUT_DIR`
-    - `CLI_EVAL_CSV`
-    - `CLI_PROVIDER`
-    - `CLI_MODEL`
+  - `OPENAI_API_KEY`
+  - `CLI_INPUT_DIR`
+  - `CLI_EVAL_CSV`
+  - `CLI_PROVIDER`
+  - `CLI_MODEL`
 
 Output behavior:
 
@@ -203,19 +202,21 @@ OpenAPI docs:
 ### Configuration Options
 
 - Required for runtime:
-    - `DATABASE_URL`
-    - `MEASUREMENT_IMAGE_DIR`
-    - `ACCESS_TOKEN_TTL_SECONDS`
-    - `API_PORT`
-    - `OPENAI_API_KEY`
+  - `DATABASE_URL`
+  - `MEASUREMENT_IMAGE_DIR`
+  - `ACCESS_TOKEN_TTL_SECONDS`
+  - `API_PORT`
+  - `OPENAI_API_KEY`
 - Optional worker tuning:
-    - `RECOGNITION_WORKER_INTERVAL_SECONDS` (default `10`)
-    - `RECOGNITION_WORKER_BATCH_SIZE` (default `4`)
+  - `RECOGNITION_WORKER_INTERVAL_SECONDS` (default `10`)
+  - `RECOGNITION_WORKER_BATCH_SIZE` (default `4`)
+  - `RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS` (default `600`)
+  - `RECOGNITION_MAX_ATTEMPTS` (default `3`)
 - Logging mode:
-    - `NODE_ENV=production` suppresses debug request logs
-    - any other value enables debug request logs
+  - `NODE_ENV=production` suppresses debug request logs
+  - any other value enables debug request logs
 - DB init override:
-    - `DB_INIT_POSTGRES_IMAGE` chooses another postgres image
+  - `DB_INIT_POSTGRES_IMAGE` chooses another postgres image
 
 ### Relevant CI Checks
 
@@ -311,6 +312,8 @@ export MEASUREMENT_IMAGE_DIR="./tmp/measurement-images"
 export ACCESS_TOKEN_TTL_SECONDS="604800"
 export RECOGNITION_WORKER_INTERVAL_SECONDS="10"
 export RECOGNITION_WORKER_BATCH_SIZE="4"
+export RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS="600"
+export RECOGNITION_MAX_ATTEMPTS="3"
 export NODE_ENV="development"
 ```
 
