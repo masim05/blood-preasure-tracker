@@ -1,6 +1,16 @@
-import { ConflictException, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
-export type ApiErrorCode = 'validation_error' | 'unauthorized' | 'not_found' | 'conflict';
+export type ApiErrorCode =
+  | 'validation_error'
+  | 'unauthorized'
+  | 'not_found'
+  | 'conflict';
 
 export class ApiError extends Error {
   constructor(
@@ -11,9 +21,15 @@ export class ApiError extends Error {
   }
 }
 
+export class UnexpectedHttpException extends InternalServerErrorException {
+  constructor(readonly unexpectedCause: unknown) {
+    super({ error: 'internal_server_error', message: 'Internal server error' });
+  }
+}
+
 export function toHttpException(error: unknown): Error {
   if (!(error instanceof ApiError)) {
-    return new BadRequestException({ error: 'validation_error', message: 'Invalid request' });
+    return new UnexpectedHttpException(error);
   }
 
   const body = { error: error.code, message: error.message };

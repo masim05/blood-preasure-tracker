@@ -1,9 +1,14 @@
-import { BadRequestException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
+import type { HttpException } from '@nestjs/common';
 
 import { AuthController } from './auth.controller';
 import { extractBearerToken } from './bearer-auth.guard';
 import { requireAuthRequest } from './dto/auth.dto';
-import { parseMeasurementOverride, parseOptionalPositiveInteger, parseSaveMeasurement } from './dto/measurement.dto';
+import {
+  parseMeasurementOverride,
+  parseOptionalPositiveInteger,
+  parseSaveMeasurement,
+} from './dto/measurement.dto';
 import { ApiError, toHttpException } from './http-error.mapper';
 import { CreateAccountUseCase } from '../../../application/use-cases/create-account.use-case';
 import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case';
@@ -40,17 +45,26 @@ describe('mobile HTTP adapter helpers', () => {
   });
 
   it('validates auth request DTO shape', () => {
-    expect(requireAuthRequest({ email: 'demo@example.com', password: 'password123' })).toEqual({
+    expect(
+      requireAuthRequest({
+        email: 'demo@example.com',
+        password: 'password123',
+      }),
+    ).toEqual({
       email: 'demo@example.com',
       password: 'password123',
     });
-    expect(() => requireAuthRequest({ email: 'demo@example.com' })).toThrow('email and password are required');
+    expect(() => requireAuthRequest({ email: 'demo@example.com' })).toThrow(
+      'email and password are required',
+    );
   });
 
   it('parses optional positive integer query values', () => {
     expect(parseOptionalPositiveInteger(undefined)).toBeUndefined();
     expect(parseOptionalPositiveInteger('20')).toBe(20);
-    expect(() => parseOptionalPositiveInteger('1.5')).toThrow('query value must be an integer');
+    expect(() => parseOptionalPositiveInteger('1.5')).toThrow(
+      'query value must be an integer',
+    );
   });
 
   it('parses measurement override payloads', () => {
@@ -62,10 +76,12 @@ describe('mobile HTTP adapter helpers', () => {
     expect(() => parseMeasurementOverride(undefined)).toThrow(
       'at least one of systolic, diastolic, pulse is required',
     );
-    expect(() => parseMeasurementOverride({ pulse: 0 })).toThrow('pulse must be a positive integer');
-    expect(() => parseMeasurementOverride({ systolic: 121, unexpected: true } as never)).toThrow(
-      'unexpected field: unexpected',
+    expect(() => parseMeasurementOverride({ pulse: 0 })).toThrow(
+      'pulse must be a positive integer',
     );
+    expect(() =>
+      parseMeasurementOverride({ systolic: 121, unexpected: true } as never),
+    ).toThrow('unexpected field: unexpected');
   });
 
   it('parses save payloads with optional arm side', () => {
@@ -84,14 +100,37 @@ describe('mobile HTTP adapter helpers', () => {
     expect(() => parseSaveMeasurement({ armSide: 'up' as never })).toThrow(
       'armSide must be one of left, right, unknown',
     );
-    expect(() => parseSaveMeasurement({ armSide: 'left', unexpected: true } as never)).toThrow(
-      'unexpected field: unexpected',
-    );
+    expect(() =>
+      parseSaveMeasurement({ armSide: 'left', unexpected: true } as never),
+    ).toThrow('unexpected field: unexpected');
   });
 
-  it('maps unknown errors and API errors to HTTP exceptions', () => {
-    expect(toHttpException(new Error('oops'))).toBeInstanceOf(BadRequestException);
-    expect(toHttpException(new ApiError('validation_error', 'bad request'))).toBeInstanceOf(BadRequestException);
+  it('maps unexpected errors to a sanitized internal-server-error response', () => {
+    const exception = toHttpException(new Error('database password leaked'));
+
+    expect(exception).toBeInstanceOf(InternalServerErrorException);
+    expect((exception as HttpException).getStatus()).toBe(500);
+    expect((exception as HttpException).getResponse()).toEqual({
+      error: 'internal_server_error',
+      message: 'Internal server error',
+    });
+  });
+
+  it('preserves known API error status and body mappings', () => {
+    const cases = [
+      ['validation_error', 'bad request', 400],
+      ['unauthorized', 'sign in', 401],
+      ['not_found', 'missing', 404],
+      ['conflict', 'duplicate', 409],
+    ] as const;
+
+    for (const [code, message, status] of cases) {
+      const exception = toHttpException(
+        new ApiError(code, message),
+      ) as HttpException;
+      expect(exception.getStatus()).toBe(status);
+      expect(exception.getResponse()).toEqual({ error: code, message });
+    }
   });
 });
 
@@ -110,15 +149,31 @@ describe('auth controller TTL propagation', () => {
     const tokens = new InMemoryBearerTokenStore();
     const hasher = new SimplePasswordHasher();
     const controller = new AuthController(
-      new CreateAccountUseCase(users, hasher, tokens, new StaticTokenGenerator('signin-token')),
-      new LoginUserUseCase(users, hasher, tokens, new StaticTokenGenerator('login-token')),
+      new CreateAccountUseCase(
+        users,
+        hasher,
+        tokens,
+        new StaticTokenGenerator('signin-token'),
+      ),
+      new LoginUserUseCase(
+        users,
+        hasher,
+        tokens,
+        new StaticTokenGenerator('login-token'),
+      ),
       makeApiConfig(604800),
     );
 
-    const signinResult = await controller.signin({ email: 'demo@example.com', password: 'password123' });
+    const signinResult = await controller.signin({
+      email: 'demo@example.com',
+      password: 'password123',
+    });
     expect(signinResult.expiresAt).toBe('2026-06-03T12:00:00.000Z');
 
-    const loginResult = await controller.login({ email: 'demo@example.com', password: 'password123' });
+    const loginResult = await controller.login({
+      email: 'demo@example.com',
+      password: 'password123',
+    });
     expect(loginResult.expiresAt).toBe('2026-06-03T12:00:00.000Z');
   });
 
@@ -127,12 +182,20 @@ describe('auth controller TTL propagation', () => {
     const tokens = new InMemoryBearerTokenStore();
     const hasher = new SimplePasswordHasher();
     const controller = new AuthController(
-      new CreateAccountUseCase(users, hasher, tokens, new StaticTokenGenerator()),
+      new CreateAccountUseCase(
+        users,
+        hasher,
+        tokens,
+        new StaticTokenGenerator(),
+      ),
       new LoginUserUseCase(users, hasher, tokens, new StaticTokenGenerator()),
       makeApiConfig(3600),
     );
 
-    const result = await controller.signin({ email: 'demo@example.com', password: 'password123' });
+    const result = await controller.signin({
+      email: 'demo@example.com',
+      password: 'password123',
+    });
     expect(result.expiresAt).toBe('2026-05-27T13:00:00.000Z');
   });
 });
