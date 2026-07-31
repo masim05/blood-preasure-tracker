@@ -76,7 +76,8 @@ State transitions:
 
 - API host comes from `BuildConfig.API_BASE_URL` via Gradle property `apiBaseUrl`.
 - Defaults: debug `http://10.0.2.2:3000`, release `https://bpt.crptmax.com`.
-- Manifest permissions: `CAMERA`, `INTERNET`; cleartext traffic is currently enabled app-wide (`android:usesCleartextTraffic="true"`).
+- Manifest permissions: `CAMERA`, `INTERNET`; release builds deny cleartext traffic and require an HTTPS API URL, while debug builds permit HTTP for emulator and private-LAN development hosts.
+- Android backup remains enabled for non-sensitive state, but backup and device-transfer rules exclude authenticated session preferences and health-capable app file domains.
 - Network and camera operations run off the UI thread; failures are mapped to typed API/validation errors and rendered as user-safe UI messages.
 
 ### Architectural intent
