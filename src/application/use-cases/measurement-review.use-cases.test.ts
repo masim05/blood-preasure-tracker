@@ -44,7 +44,7 @@ describe('measurement use cases', () => {
   it('submits a valid image, stores it, and schedules recognition', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     const output = await new SubmitMeasurementImageUseCase(
       measurements,
       images,
@@ -262,7 +262,7 @@ describe('measurement use cases', () => {
   it('processes recognition task success and failure paths', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     await new SubmitMeasurementImageUseCase(
       measurements,
       images,

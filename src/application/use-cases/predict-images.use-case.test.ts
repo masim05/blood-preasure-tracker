@@ -610,7 +610,7 @@ describe('PredictImagesUseCase', () => {
 
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     const now = new Date('2026-05-30T10:00:00.000Z');
     await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
       userId: 'usr_1',

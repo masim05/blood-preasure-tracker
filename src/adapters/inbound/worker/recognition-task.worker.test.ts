@@ -329,7 +329,7 @@ describe('RecognitionTaskWorker', () => {
   it('processes valid tasks while invalid tasks retry then fail', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     await new SubmitMeasurementImageUseCase(
       measurements,
       images,
@@ -395,7 +395,7 @@ describe('RecognitionTaskWorker', () => {
   it('does not invoke provider for terminal tasks', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     await tasks.save(
       new RecognitionTask({
         id: 'terminal-task',

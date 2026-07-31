@@ -139,15 +139,11 @@ export class ProcessRecognitionTaskUseCase {
       },
       now,
     );
-    if (
-      await this.recognitionTasks.completeAttempt(
-        activeTask,
-        completedMeasurement,
-        now,
-      )
-    ) {
-      await this.measurements.save(completedMeasurement);
-    }
+    await this.recognitionTasks.completeAttempt(
+      activeTask,
+      completedMeasurement,
+      now,
+    );
   }
 
   private async handleFailure(
@@ -176,15 +172,11 @@ export class ProcessRecognitionTaskUseCase {
             now,
           )
         : null;
-    if (
-      await this.recognitionTasks.failAttempt(
-        task,
-        errorMessage,
-        now,
-        failedMeasurement?.recognitionError ?? null,
-      )
-    ) {
-      if (failedMeasurement) await this.measurements.save(failedMeasurement);
-    }
+    await this.recognitionTasks.failAttempt(
+      task,
+      errorMessage,
+      now,
+      failedMeasurement?.recognitionError ?? null,
+    );
   }
 }

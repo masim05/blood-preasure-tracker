@@ -21,6 +21,7 @@ import type { PasswordHasherPort } from '../application/ports/password-hasher.po
 import type { RecognitionTaskStorePort } from '../application/ports/recognition-task-store.port';
 import type { UserAccountStorePort } from '../application/ports/user-account-store.port';
 import { MeasurementImage as MeasurementImageEntity } from '../domain/entities/measurement-image';
+import { failRecognition } from '../domain/services/measurement-state-policy';
 
 export class InMemoryUserStore implements UserAccountStorePort {
   readonly users = new Map<string, UserAccount>();
@@ -165,6 +166,8 @@ export class InMemoryMeasurementImageStore implements MeasurementImageStorePort 
 export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
   readonly tasks = new Map<string, RecognitionTask>();
 
+  constructor(private readonly measurements?: MeasurementStorePort) {}
+
   async findById(id: string): Promise<RecognitionTask | null> {
     return this.tasks.get(id) ?? null;
   }
@@ -174,6 +177,7 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
     now: Date,
     maxAttempts: number,
     lastError: string,
+    _recognitionError?: string,
   ): Promise<void> {
     for (const task of this.tasks.values()) {
       if (
@@ -265,7 +269,7 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
 
   async completeAttempt(
     owner: RecognitionTask,
-    _measurement: Measurement,
+    measurement: Measurement,
     now: Date,
   ): Promise<boolean> {
     const task = this.tasks.get(owner.id);
@@ -279,6 +283,7 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
         updatedAt: now,
       }),
     );
+    await this.measurements?.save(measurement);
     return true;
   }
 
@@ -286,7 +291,7 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
     owner: RecognitionTask,
     lastError: string,
     now: Date,
-    _recognitionError: string | null,
+    recognitionError: string | null,
   ): Promise<boolean> {
     const task = this.tasks.get(owner.id);
     if (!ownsAttempt(task, owner)) return false;
@@ -300,6 +305,14 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
         updatedAt: now,
       }),
     );
+    if (recognitionError && this.measurements) {
+      const measurement = await this.measurements.findById(task.measurementId);
+      if (measurement?.status === 'recognizing') {
+        await this.measurements.save(
+          failRecognition(measurement, recognitionError, now),
+        );
+      }
+    }
     return true;
   }
 

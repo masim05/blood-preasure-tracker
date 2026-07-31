@@ -13,6 +13,14 @@ import {
 } from '../../src/adapters/inbound/http/http-request-logging';
 import { PostgresPool } from '../../src/adapters/outbound/postgres/postgres-pool';
 import { RecognitionTaskWorker } from '../../src/adapters/inbound/worker/recognition-task.worker';
+import {
+  MEASUREMENT_STORE,
+  type MeasurementStorePort,
+} from '../../src/application/ports/measurement-store.port';
+import {
+  RECOGNITION_TASK_STORE,
+  type RecognitionTaskStorePort,
+} from '../../src/application/ports/recognition-task-store.port';
 import type {
   LlmProviderPort,
   LlmProviderRequest,
@@ -25,6 +33,7 @@ import {
 import { ApiConfigService } from '../../src/infrastructure/config/api-config';
 import { loadApiLoggingConfig } from '../../src/infrastructure/config/api-logging-config';
 import { pngBytes } from '../../src/test-support/image-bytes';
+import { completeRecognition } from '../../src/domain/services/measurement-state-policy';
 
 describe('mobile API integration flow', () => {
   let fixture: MobileApiFixture;
@@ -415,6 +424,139 @@ describe('mobile API integration flow', () => {
       );
       expect(await taskStatus(fixture.pool, taskId)).toBe('failed');
       expect(fixture.llmProvider.calls).toHaveLength(0);
+    });
+
+    it('recovers and claims once across competing PostgreSQL operations without exceeding the maximum', async () => {
+      const accessToken = await signedInAccessToken(fixture);
+      const upload = await uploadMeasurement(fixture, accessToken);
+      const measurementId = readString(upload.body.id, 'measurement id');
+      const taskId = await queuedTaskId(fixture.pool, measurementId);
+      const cycleAt = new Date('2026-05-30T10:10:00.000Z');
+      const cutoff = new Date(cycleAt.getTime() - 600_000);
+      await fixture.pool.query(
+        "UPDATE measurements SET status = 'recognizing' WHERE id = $1",
+        [measurementId],
+      );
+      await fixture.pool.query(
+        "UPDATE recognition_tasks SET status = 'processing', attempt_count = 2, started_at = $2 WHERE id = $1",
+        [taskId, cutoff],
+      );
+
+      await Promise.all([
+        fixture.recognitionTasks.recoverAbandoned(
+          cutoff,
+          cycleAt,
+          3,
+          'lease expired',
+          'safe failure',
+        ),
+        fixture.recognitionTasks.recoverAbandoned(
+          cutoff,
+          cycleAt,
+          3,
+          'lease expired',
+          'safe failure',
+        ),
+      ]);
+      const competingClaims = await Promise.all([
+        fixture.recognitionTasks.claimQueued(cycleAt, 1, 3),
+        fixture.recognitionTasks.claimQueued(cycleAt, 1, 3),
+      ]);
+      const claimed = competingClaims.flat();
+
+      expect(claimed).toHaveLength(1);
+      expect(claimed[0]).toMatchObject({
+        id: taskId,
+        attemptCount: 3,
+        status: 'processing',
+      });
+      await expect(
+        fixture.recognitionTasks.claimQueued(cycleAt, 1, 3),
+      ).resolves.toEqual([]);
+      expect(await countRows(fixture.pool, 'measurements')).toBe(1);
+      expect(await countRows(fixture.pool, 'recognition_tasks')).toBe(1);
+    });
+
+    it('rejects every stale owner write after a newer PostgreSQL attempt completes', async () => {
+      const accessToken = await signedInAccessToken(fixture);
+      const upload = await uploadMeasurement(fixture, accessToken);
+      const measurementId = readString(upload.body.id, 'measurement id');
+      const taskId = await queuedTaskId(fixture.pool, measurementId);
+      const cycleAt = new Date('2026-05-30T10:10:00.000Z');
+      const cutoff = new Date(cycleAt.getTime() - 600_000);
+      await fixture.pool.query(
+        "UPDATE measurements SET status = 'recognizing' WHERE id = $1",
+        [measurementId],
+      );
+      await fixture.pool.query(
+        "UPDATE recognition_tasks SET status = 'processing', attempt_count = 1, started_at = $2 WHERE id = $1",
+        [taskId, cutoff],
+      );
+      const staleOwner = await fixture.recognitionTasks.findById(taskId);
+      const recognizingMeasurement =
+        await fixture.measurements.findById(measurementId);
+      if (!staleOwner || !recognizingMeasurement)
+        throw new Error('expected stale ownership fixture');
+
+      await fixture.recognitionTasks.recoverAbandoned(
+        cutoff,
+        cycleAt,
+        3,
+        'lease expired',
+        'safe failure',
+      );
+      const [newOwner] = await fixture.recognitionTasks.claimQueued(
+        cycleAt,
+        1,
+        3,
+      );
+      await fixture.processor.execute({
+        taskId: newOwner.id,
+        model: readRequiredEnv('CLI_MODEL'),
+        now: cycleAt,
+        maxAttempts: 3,
+      });
+      const staleResult = completeRecognition(
+        recognizingMeasurement,
+        { systolic: 199, diastolic: 119, pulse: 99, armSide: 'left' },
+        cycleAt,
+      );
+
+      await expect(
+        fixture.recognitionTasks.scheduleRetry(
+          staleOwner,
+          cycleAt,
+          'late retry',
+          cycleAt,
+        ),
+      ).resolves.toBe(false);
+      await expect(
+        fixture.recognitionTasks.failAttempt(
+          staleOwner,
+          'late failure',
+          cycleAt,
+          'late failure',
+        ),
+      ).resolves.toBe(false);
+      await expect(
+        fixture.recognitionTasks.completeAttempt(
+          staleOwner,
+          staleResult,
+          cycleAt,
+        ),
+      ).resolves.toBe(false);
+
+      expect(await taskStatus(fixture.pool, taskId)).toBe('completed');
+      expect(await measurementStatus(fixture.pool, measurementId)).toBe(
+        'recognized',
+      );
+      expect(await measurementReadings(fixture.pool, measurementId)).toEqual({
+        systolic: 122,
+        diastolic: 82,
+        pulse: 70,
+      });
+      expect(await countRows(fixture.pool, 'measurements')).toBe(1);
+      expect(await countRows(fixture.pool, 'recognition_tasks')).toBe(1);
     });
   });
 
@@ -907,6 +1049,8 @@ type MobileApiFixture = {
   pool: PostgresPool;
   processor: ProcessRecognitionTaskUseCase;
   worker: RecognitionTaskWorker;
+  recognitionTasks: RecognitionTaskStorePort;
+  measurements: MeasurementStorePort;
   llmProvider: MockLlmProvider;
   apiConfig: ApiConfigService;
   requestLogs: HttpRequestLogEntry[];
@@ -1000,6 +1144,8 @@ async function createMobileApiFixture(): Promise<MobileApiFixture> {
     pool: app.get(PostgresPool),
     processor: app.get(ProcessRecognitionTaskUseCase),
     worker: app.get(RecognitionTaskWorker),
+    recognitionTasks: app.get(RECOGNITION_TASK_STORE),
+    measurements: app.get(MEASUREMENT_STORE),
     llmProvider,
     apiConfig: app.get(ApiConfigService),
     requestLogs,

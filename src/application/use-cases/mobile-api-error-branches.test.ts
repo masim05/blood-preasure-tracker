@@ -65,7 +65,7 @@ describe('mobile API use-case error branches', () => {
   it('retries twice then marks recognition failed when provider returns incomplete values', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
     const users = new InMemoryUserStore();
     await users.save(
       new UserAccount({
