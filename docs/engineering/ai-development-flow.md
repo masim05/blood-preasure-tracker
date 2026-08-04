@@ -72,9 +72,25 @@ Out of scope: <what must not be changed>
 Links: <issue, docs, related merge-or-pull-request>
 ```
 
+## Startup Hygiene Gate (Mandatory)
+
+When `ai-development-flow` is invoked, run startup hygiene before artifact writing or implementation:
+
+1. Resolve the default branch dynamically from remote metadata (for example `origin/HEAD`) instead of hardcoding branch names.
+2. Pull/sync the default branch from remote before flow execution continues.
+3. Prune stale local branches already merged into the default branch, excluding default/protected/current branches.
+4. Prune stale worktrees whose branches are already merged into the default branch.
+5. Rename the active AI session to an informative title-derived name when the platform supports session rename.
+
+Rules:
+
+- Startup actions must be safe and idempotent across repeated flow runs.
+- Startup reporting must list updated, pruned, renamed, and skipped entries.
+- If startup hygiene fails, terminate with `blocked` and include blocked-state details.
+
 ## Worktree Gate (Mandatory)
 
-When `ai-development-flow` is invoked, the first required operational action is to create or reuse a dedicated task worktree:
+After `Startup Hygiene Gate (Mandatory)`, create or reuse a dedicated task worktree:
 
 ```txt
 tmp/wts/<task-slug>/
@@ -109,7 +125,7 @@ Question format requirements:
   - `[TECH]` for technical/implementation clarifications.
 - questions can be asked in small batches or one-by-one, but each question must keep the label.
 
-The worktree gate from `Worktree Gate (Mandatory)` applies to this step and all following steps.
+The startup hygiene and worktree gates from `Startup Hygiene Gate (Mandatory)` and `Worktree Gate (Mandatory)` apply to this step and all following steps.
 
 After clarifications, AI Manager must create or update a temporary work item artifact directory in the task worktree:
 

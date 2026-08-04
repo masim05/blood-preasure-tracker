@@ -15,6 +15,7 @@ $ARGUMENTS
 
 Execution requirements are defined in `docs/engineering/ai-development-flow.md`.
 Worktree, autonomy, and terminal-state rules are mandatory per:
+- `Startup Hygiene Gate (Mandatory)`
 - `Worktree Gate (Mandatory)`
 - `Autonomy Contract (Required)`
 - `Blocked State Policy (Mandatory)`
