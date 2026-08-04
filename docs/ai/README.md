@@ -11,6 +11,7 @@ Rule:
 - role files may define only role scope, inputs, and outputs, then reference the source-of-truth sections.
 
 Required flow references for wrappers:
+- `Startup Hygiene Gate (Mandatory)` in `docs/engineering/ai-development-flow.md`;
 - `Worktree Gate (Mandatory)` in `docs/engineering/ai-development-flow.md`;
 - `Autonomy Contract (Required)` in `docs/engineering/ai-development-flow.md`;
 - `Blocked State Policy (Mandatory)` in `docs/engineering/ai-development-flow.md`;
