@@ -85,6 +85,7 @@ When `ai-development-flow` is invoked, run startup hygiene before artifact writi
 Rules:
 
 - Startup actions must be safe and idempotent across repeated flow runs.
+- Pruning must avoid data loss: only delete merged branches/worktrees when the target worktree is clean; otherwise skip and report.
 - Startup reporting must list updated, pruned, renamed, and skipped entries.
 - If startup hygiene fails, terminate with `blocked` and include blocked-state details.
 
