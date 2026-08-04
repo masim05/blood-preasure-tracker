@@ -77,7 +77,7 @@ Links: <issue, docs, related merge-or-pull-request>
 When `ai-development-flow` is invoked, run startup hygiene before artifact writing or implementation:
 
 1. Resolve the default branch dynamically from remote metadata (for example `origin/HEAD`) instead of hardcoding branch names.
-2. Pull/sync the default branch from remote before flow execution continues.
+2. Fetch from remote and fast-forward update the local default branch (no merge commits) before flow execution continues.
 3. Prune stale local branches already merged into the default branch, excluding default/protected/current branches.
 4. Prune stale worktrees whose branches are already merged into the default branch.
 5. Rename the active AI session to an informative title-derived name when the platform supports session rename.
