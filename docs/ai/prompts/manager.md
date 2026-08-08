@@ -8,13 +8,38 @@ Role scope:
 Input template:
 
 ```md
-Task type: <feat|change-request|bug|chore|docs>
-Task title: <short title>
-Context: <business/technical context>
-Expected result: <target outcome>
-Constraints: <known limits>
-Out of scope: <must not change>
-Links: <issues/docs/merge-or-pull-request>
+## Task Brief
+
+### Task type
+**<feat|change-request|bug|chore|docs>**
+
+### Task title
+**<short title>**
+
+### Context
+<business/technical context>
+
+### Expected result
+<target outcome>
+
+### Constraints
+<known limits>
+
+### Additional requirements
+1. <extra requirement 1>
+2. <extra requirement 2>
+
+### Out of scope
+<must not change>
+
+### Links
+- <issues/docs/merge-or-pull-request>
+- Additional requirements: [Additional requirements](#additional-requirements)
+- Acceptance criteria: [Acceptance criteria](#acceptance-criteria)
+
+## Acceptance criteria
+1. <verifiable outcome 1>
+2. <verifiable outcome 2>
 ```
 
 Execution rules:

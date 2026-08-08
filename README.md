@@ -15,17 +15,44 @@ Blood Pressure Tracker has three deliverables in one repository: a CLI predictor
 Use this template with the command:
 
 ```md
-Task type: <feat|change-request|bug|chore|docs>
-Task title: <short title>
-Context: <business/technical context>
-Expected result: <what should be true after delivery>
-Constraints: <known restrictions>
-Out of scope: <what must not be changed>
-Links: <issue, docs, related merge-or-pull-request>
+## Task Brief
+
+### Task type
+**<feat|change-request|bug|chore|docs>**
+
+### Task title
+**<short title>**
+
+### Context
+<business/technical context>
+
+### Expected result
+<what should be true after delivery>
+
+### Constraints
+<known restrictions>
+
+### Additional requirements
+1. <extra requirement 1>
+2. <extra requirement 2>
+
+### Out of scope
+<what must not be changed>
+
+### Links
+- <issue, docs, related merge-or-pull-request>
+- Additional requirements: [Additional requirements](#additional-requirements)
+- Acceptance criteria: [Acceptance criteria](#acceptance-criteria)
+
+## Acceptance criteria
+
+1. <verifiable outcome 1>
+2. <verifiable outcome 2>
 ```
 
 ### 3. What happens next
 
+- On startup, the flow syncs default-branch state, prunes stale merged branches/worktrees, and renames the session with a title-derived name.
 - AI Manager asks clarification questions labeled `[REQ]` or `[TECH]`.
 - After clarifications, the flow creates or reuses `tmp/wts/<task-slug>/` before it writes work-item artifacts or implementation changes.
 - AI Manager prepares `spec.md`, `plan.md`, `test-plan.md`, and `e2e-scenarios.md`.
