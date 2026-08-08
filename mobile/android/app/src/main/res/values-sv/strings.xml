@@ -143,11 +143,11 @@
     <string name="profile_policy_heading_storage">Datalagring</string>
     <string name="profile_policy_content_storage">Dina uppgifter lagras på säkra molnservrar. Vi tillämpar branschstandardiserade åtgärder för att skydda dem mot obehörig åtkomst.</string>
     <string name="profile_policy_heading_delete">Ta bort ditt konto och dina uppgifter</string>
-    <string name="profile_policy_content_delete">Du kan begära radering av ditt konto och alla tillhörande uppgifter när som helst genom att skicka e-post till blood.pressure.by.max@gmail.com. Vi behandlar din begäran inom 30 dagar.</string>
+    <string name="profile_policy_content_delete">Du kan begära radering av ditt konto och alla tillhörande uppgifter när som helst genom att skicka e-post till contact@bpt.crptmax.com. Vi behandlar din begäran inom 30 dagar.</string>
     <string name="profile_policy_heading_medical">Medicinsk ansvarsfriskrivning</string>
     <string name="profile_policy_content_medical">Denna app är inte en medicinsk enhet och diagnostiserar, behandlar, botar eller förebygger inte några medicinska tillstånd. Rådfråga alltid en kvalificerad sjukvårdspersonal angående ditt blodtryck och eventuella hälsoproblem.</string>
     <string name="profile_policy_heading_contact">Kontakt</string>
-    <string name="profile_policy_content_contact">För integritetsrelaterade frågor, kontakta oss på blood.pressure.by.max@gmail.com (Maxim Ryndin).</string>
+    <string name="profile_policy_content_contact">För integritetsrelaterade frågor, kontakta oss på contact@bpt.crptmax.com (Maxim Ryndin).</string>
     <string name="privacy_policy_accept">Jag godkänner</string>
 
     <string name="profile_story_page_title">Håll koll på dina mätningar enkelt</string>

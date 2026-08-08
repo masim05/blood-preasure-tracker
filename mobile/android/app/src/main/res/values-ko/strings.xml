@@ -142,11 +142,11 @@
     <string name="profile_policy_heading_storage">데이터 저장</string>
     <string name="profile_policy_content_storage">귀하의 데이터는 안전한 클라우드 서버에 저장됩니다. 당사는 무단 접근으로부터 보호하기 위해 업계 표준 조치를 적용합니다.</string>
     <string name="profile_policy_heading_delete">계정 및 데이터 삭제</string>
-    <string name="profile_policy_content_delete">blood.pressure.by.max@gmail.com으로 이메일을 보내 언제든지 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다. 요청은 30일 이내에 처리됩니다.</string>
+    <string name="profile_policy_content_delete">contact@bpt.crptmax.com으로 이메일을 보내 언제든지 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다. 요청은 30일 이내에 처리됩니다.</string>
     <string name="profile_policy_heading_medical">의료 면책 조항</string>
     <string name="profile_policy_content_medical">이 앱은 의료 기기가 아니며, 어떠한 질병도 진단, 치료, 치유 또는 예방하지 않습니다. 혈압 및 건강 문제에 관해서는 항상 자격을 갖춘 의료 전문가와 상담하십시오.</string>
     <string name="profile_policy_heading_contact">문의</string>
-    <string name="profile_policy_content_contact">개인정보 관련 문의는 blood.pressure.by.max@gmail.com(Maxim Ryndin)으로 연락하시기 바랍니다.</string>
+    <string name="profile_policy_content_contact">개인정보 관련 문의는 contact@bpt.crptmax.com(Maxim Ryndin)으로 연락하시기 바랍니다.</string>
     <string name="privacy_policy_accept">동의합니다</string>
 
     <string name="profile_story_page_title">혈압 수치를 손쉽게 기록하세요</string>

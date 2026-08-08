@@ -143,11 +143,11 @@
     <string name="profile_policy_heading_storage">Archiviazione dei dati</string>
     <string name="profile_policy_content_storage">I tuoi dati sono archiviati su server cloud sicuri. Applichiamo misure standard del settore per proteggerli da accessi non autorizzati.</string>
     <string name="profile_policy_heading_delete">Eliminazione del tuo account e dei tuoi dati</string>
-    <string name="profile_policy_content_delete">Puoi richiedere la cancellazione del tuo account e di tutti i dati associati in qualsiasi momento inviando una e-mail a blood.pressure.by.max@gmail.com. Elaboreremo la tua richiesta entro 30 giorni.</string>
+    <string name="profile_policy_content_delete">Puoi richiedere la cancellazione del tuo account e di tutti i dati associati in qualsiasi momento inviando una e-mail a contact@bpt.crptmax.com. Elaboreremo la tua richiesta entro 30 giorni.</string>
     <string name="profile_policy_heading_medical">Dichiarazione medica</string>
     <string name="profile_policy_content_medical">Questa app non è un dispositivo medico e non diagnostica, tratta, cura né previene alcuna condizione medica. Consulta sempre un medico qualificato riguardo alla tua pressione sanguigna e a qualsiasi preoccupazione di salute.</string>
     <string name="profile_policy_heading_contact">Contatti</string>
-    <string name="profile_policy_content_contact">Per domande relative alla privacy, contattaci all\'indirizzo blood.pressure.by.max@gmail.com (Maxim Ryndin).</string>
+    <string name="profile_policy_content_contact">Per domande relative alla privacy, contattaci all\'indirizzo contact@bpt.crptmax.com (Maxim Ryndin).</string>
     <string name="privacy_policy_accept">Accetto</string>
 
     <string name="profile_story_page_title">Tieni traccia delle tue misurazioni facilmente</string>

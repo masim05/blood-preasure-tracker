@@ -39,7 +39,7 @@ func policySections() -> [PolicySection] {
         ),
         PolicySection(
             heading: "Deleting Your Account and Data",
-            content: "You can request deletion of your account and all associated data at any time by emailing blood.pressure.by.max@gmail.com. We will process your request within 30 days."
+            content: "You can request deletion of your account and all associated data at any time by emailing contact@bpt.crptmax.com. We will process your request within 30 days."
         ),
         PolicySection(
             heading: "Medical Disclaimer",
@@ -47,7 +47,7 @@ func policySections() -> [PolicySection] {
         ),
         PolicySection(
             heading: "Contact",
-            content: "For privacy-related questions, contact Maxim Ryndin at blood.pressure.by.max@gmail.com."
+            content: "For privacy-related questions, contact Maxim Ryndin at contact@bpt.crptmax.com."
         ),
     ]
 }

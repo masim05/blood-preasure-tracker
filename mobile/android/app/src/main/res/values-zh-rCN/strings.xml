@@ -142,11 +142,11 @@
     <string name="profile_policy_heading_storage">数据存储</string>
     <string name="profile_policy_content_storage">您的数据存储在安全的云服务器上。我们采用行业标准措施防止未经授权的访问。</string>
     <string name="profile_policy_heading_delete">删除账户和数据</string>
-    <string name="profile_policy_content_delete">您可以随时通过发送电子邮件至 blood.pressure.by.max@gmail.com 申请删除账户及所有相关数据。我们将在 30 天内处理您的申请。</string>
+    <string name="profile_policy_content_delete">您可以随时通过发送电子邮件至 contact@bpt.crptmax.com 申请删除账户及所有相关数据。我们将在 30 天内处理您的申请。</string>
     <string name="profile_policy_heading_medical">医疗免责声明</string>
     <string name="profile_policy_content_medical">本应用不是医疗设备，不用于诊断、治疗、治愈或预防任何疾病。请就您的血压及任何健康问题咨询具有资质的医疗专业人员。</string>
     <string name="profile_policy_heading_contact">联系方式</string>
-    <string name="profile_policy_content_contact">如有隐私相关问题，请发送邮件至 blood.pressure.by.max@gmail.com（Maxim Ryndin）。</string>
+    <string name="profile_policy_content_contact">如有隐私相关问题，请发送邮件至 contact@bpt.crptmax.com（Maxim Ryndin）。</string>
     <string name="privacy_policy_accept">我接受</string>
 
     <string name="profile_story_page_title">轻松追踪您的血压读数</string>

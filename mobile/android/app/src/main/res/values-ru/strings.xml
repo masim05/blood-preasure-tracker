@@ -142,11 +142,11 @@
     <string name="profile_policy_heading_storage">Хранение данных</string>
     <string name="profile_policy_content_storage">Ваши данные хранятся на защищённых облачных серверах. Мы применяем отраслевые стандарты безопасности для защиты от несанкционированного доступа.</string>
     <string name="profile_policy_heading_delete">Удаление аккаунта и данных</string>
-    <string name="profile_policy_content_delete">Вы можете в любое время запросить удаление аккаунта и всех связанных данных, написав на blood.pressure.by.max@gmail.com. Мы обработаем ваш запрос в течение 30 дней.</string>
+    <string name="profile_policy_content_delete">Вы можете в любое время запросить удаление аккаунта и всех связанных данных, написав на contact@bpt.crptmax.com. Мы обработаем ваш запрос в течение 30 дней.</string>
     <string name="profile_policy_heading_medical">Медицинское предупреждение</string>
     <string name="profile_policy_content_medical">Это приложение не является медицинским устройством и не предназначено для диагностики, лечения или профилактики каких-либо заболеваний. По всем вопросам, связанным с артериальным давлением и состоянием здоровья, обращайтесь к квалифицированному медицинскому специалисту.</string>
     <string name="profile_policy_heading_contact">Контакты</string>
-    <string name="profile_policy_content_contact">По вопросам конфиденциальности пишите на blood.pressure.by.max@gmail.com (Maxim Ryndin).</string>
+    <string name="profile_policy_content_contact">По вопросам конфиденциальности пишите на contact@bpt.crptmax.com (Maxim Ryndin).</string>
     <string name="privacy_policy_accept">Я принимаю</string>
 
     <string name="profile_story_page_title">Отслеживайте показания с лёгкостью</string>
