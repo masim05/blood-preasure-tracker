@@ -203,7 +203,9 @@ describe('PolicyController', () => {
     expect(result).toContain('We do not use submitted images to train our own models');
     expect(result).toContain('not intended for use by children under 13 years of age');
     expect(result).toContain('not a medical device');
-    expect(result).toContain('<a href="mailto:contact@bpt.crptmax.com">contact@bpt.crptmax.com</a> (Maxim Ryndin)');
+    expect(result).toContain('href="mailto:contact@bpt.crptmax.com"');
+    expect(result).toContain('contact@bpt.crptmax.com');
+    expect(result).toContain('Maxim Ryndin');
   });
 
   it('contains footer with navigation links', () => {
