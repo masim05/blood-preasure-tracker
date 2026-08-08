@@ -89,6 +89,8 @@ Task brief template (Markdown-first):
 
 ### Links
 - <issue, docs, related merge-or-pull-request>
+- Additional requirements: [Additional requirements](#additional-requirements)
+- Acceptance criteria: [Acceptance criteria](#acceptance-criteria)
 
 ## Acceptance criteria
 

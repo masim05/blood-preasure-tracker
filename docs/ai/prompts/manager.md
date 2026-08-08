@@ -34,6 +34,8 @@ Input template:
 
 ### Links
 - <issues/docs/merge-or-pull-request>
+- Additional requirements: [Additional requirements](#additional-requirements)
+- Acceptance criteria: [Acceptance criteria](#acceptance-criteria)
 
 ## Acceptance criteria
 1. <verifiable outcome 1>
