@@ -60,16 +60,40 @@ Preferred execution mode: single-command orchestration.
 
 In single-command mode, one command starts the full flow. The agent asks Manager clarification questions, waits for user answers, then continues automatically through Developer, Reviewer, and Tester stages (including the consensus loop) until stop conditions are met.
 
-Task brief template:
+Task brief template (Markdown-first):
 
 ```md
-Task type: <feat|change-request|bug|chore|docs>
-Task title: <short title>
-Context: <business/technical context>
-Expected result: <what should be true after delivery>
-Constraints: <known restrictions>
-Out of scope: <what must not be changed>
-Links: <issue, docs, related merge-or-pull-request>
+## Task Brief
+
+### Task type
+**<feat|change-request|bug|chore|docs>**
+
+### Task title
+**<short title>**
+
+### Context
+<business/technical context>
+
+### Expected result
+<what should be true after delivery>
+
+### Constraints
+<known restrictions>
+
+### Additional requirements
+1. <extra requirement 1>
+2. <extra requirement 2>
+
+### Out of scope
+<what must not be changed>
+
+### Links
+- <issue, docs, related merge-or-pull-request>
+
+## Acceptance criteria
+
+1. <verifiable outcome 1>
+2. <verifiable outcome 2>
 ```
 
 ## Startup Hygiene Gate (Mandatory)
