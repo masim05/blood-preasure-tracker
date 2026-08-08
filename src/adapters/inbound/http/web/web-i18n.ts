@@ -45,7 +45,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Privacy Policy – Blood Pressure',
       intro: 'Your privacy matters. This policy explains what data Blood Pressure collects, why, and how it is handled.',
-      lastUpdated: 'Last updated: July 18, 2026',
+      lastUpdated: 'Last updated: August 11, 2026',
       sections: [
         {
           heading: 'Data We Collect',
@@ -96,7 +96,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Política de privacidad – Blood Pressure',
       intro: 'Tu privacidad es importante. Esta política explica qué datos recopila Blood Pressure, por qué y cómo se gestionan.',
-      lastUpdated: 'Última actualización: 18 de julio de 2026',
+      lastUpdated: 'Última actualización: 11 de agosto de 2026',
       sections: [
         {
           heading: 'Datos que recopilamos',
@@ -147,7 +147,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Politique de confidentialité – Blood Pressure',
       intro: 'Votre vie privée est importante. Cette politique explique quelles données Blood Pressure collecte, pourquoi et comment elles sont traitées.',
-      lastUpdated: 'Dernière mise à jour : 18 juillet 2026',
+      lastUpdated: 'Dernière mise à jour : 11 août 2026',
       sections: [
         {
           heading: 'Données que nous collectons',
@@ -198,7 +198,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Política de privacidade – Blood Pressure',
       intro: 'Sua privacidade é importante. Esta política explica quais dados o Blood Pressure coleta, por quê e como são tratados.',
-      lastUpdated: 'Última atualização: 18 de julho de 2026',
+      lastUpdated: 'Última atualização: 11 de agosto de 2026',
       sections: [
         {
           heading: 'Dados que coletamos',
@@ -249,7 +249,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Informativa sulla privacy – Blood Pressure',
       intro: 'La tua privacy è importante. Questa informativa spiega quali dati raccoglie Blood Pressure, perché e come vengono gestiti.',
-      lastUpdated: 'Ultimo aggiornamento: 18 luglio 2026',
+      lastUpdated: 'Ultimo aggiornamento: 11 agosto 2026',
       sections: [
         {
           heading: 'Dati che raccogliamo',
@@ -300,7 +300,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Integritetspolicy – Blood Pressure',
       intro: 'Din integritet är viktig. Denna policy förklarar vilka uppgifter Blood Pressure samlar in, varför och hur de hanteras.',
-      lastUpdated: 'Senast uppdaterad: 18 juli 2026',
+      lastUpdated: 'Senast uppdaterad: 11 augusti 2026',
       sections: [
         {
           heading: 'Uppgifter vi samlar in',
@@ -351,7 +351,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Политика конфиденциальности – Blood Pressure',
       intro: 'Ваша конфиденциальность важна для нас. В этой политике описано, какие данные собирает Blood Pressure, для чего и как они используются.',
-      lastUpdated: 'Последнее обновление: 18 июля 2026 г.',
+      lastUpdated: 'Последнее обновление: 11 августа 2026 г.',
       sections: [
         {
           heading: 'Какие данные мы собираем',
@@ -402,7 +402,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: '隐私政策 – Blood Pressure',
       intro: '您的隐私非常重要。本政策说明 Blood Pressure 收集哪些数据、原因及处理方式。',
-      lastUpdated: '最后更新：2026年7月18日',
+      lastUpdated: '最后更新：2026年8月11日',
       sections: [
         {
           heading: '我们收集的数据',
@@ -453,7 +453,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: '개인정보 처리방침 – Blood Pressure',
       intro: '귀하의 개인정보는 중요합니다. 이 방침은 Blood Pressure가 어떤 데이터를 수집하고, 왜 수집하며, 어떻게 처리하는지를 설명합니다.',
-      lastUpdated: '마지막 업데이트: 2026년 7월 18일',
+      lastUpdated: '마지막 업데이트: 2026년 8월 11일',
       sections: [
         {
           heading: '수집하는 데이터',
@@ -504,7 +504,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'プライバシーポリシー – Blood Pressure',
       intro: 'お客様のプライバシーは重要です。このポリシーでは、Blood Pressureが収集するデータ、その目的、および取り扱い方法について説明します。',
-      lastUpdated: '最終更新日：2026年7月18日',
+      lastUpdated: '最終更新日：2026年8月11日',
       sections: [
         {
           heading: '収集するデータ',
@@ -555,7 +555,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'นโยบายความเป็นส่วนตัว – Blood Pressure',
       intro: 'ความเป็นส่วนตัวของคุณมีความสำคัญ นโยบายนี้อธิบายว่า Blood Pressure เก็บรวบรวมข้อมูลใด เพราะเหตุใด และข้อมูลได้รับการจัดการอย่างไร',
-      lastUpdated: 'อัปเดตล่าสุด: 18 กรกฎาคม 2026',
+      lastUpdated: 'อัปเดตล่าสุด: 11 สิงหาคม 2026',
       sections: [
         {
           heading: 'ข้อมูลที่เราเก็บรวบรวม',
@@ -606,7 +606,7 @@ const translations: Record<SupportedLang, WebTranslations> = {
     policy: {
       metaTitle: 'Chính sách quyền riêng tư – Blood Pressure',
       intro: 'Quyền riêng tư của bạn rất quan trọng. Chính sách này giải thích Blood Pressure thu thập dữ liệu gì, tại sao và cách xử lý dữ liệu đó.',
-      lastUpdated: 'Cập nhật lần cuối: ngày 18 tháng 7 năm 2026',
+      lastUpdated: 'Cập nhật lần cuối: ngày 11 tháng 8 năm 2026',
       sections: [
         {
           heading: 'Dữ liệu chúng tôi thu thập',
