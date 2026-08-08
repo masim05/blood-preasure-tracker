@@ -1,7 +1,7 @@
 import { type WebTranslations } from './web-i18n';
 import { escapeHtml } from './html-escape';
 
-const SUPPORT_EMAIL = 'blood.pressure.by.max@gmail.com';
+const SUPPORT_EMAIL = 'contact@bpt.crptmax.com';
 const DEVELOPER_NAME = 'Maxim Ryndin';
 
 function linkifySupportEmail(text: string): string {

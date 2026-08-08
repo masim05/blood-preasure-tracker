@@ -142,11 +142,11 @@
     <string name="profile_policy_heading_storage">การจัดเก็บข้อมูล</string>
     <string name="profile_policy_content_storage">ข้อมูลของคุณถูกเก็บบนเซิร์ฟเวอร์คลาวด์ที่ปลอดภัย เราใช้มาตรการมาตรฐานอุตสาหกรรมเพื่อปกป้องข้อมูลจากการเข้าถึงโดยไม่ได้รับอนุญาต</string>
     <string name="profile_policy_heading_delete">การลบบัญชีและข้อมูลของคุณ</string>
-    <string name="profile_policy_content_delete">คุณสามารถขอลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดได้ตลอดเวลาโดยส่งอีเมลมาที่ blood.pressure.by.max@gmail.com เราจะดำเนินการตามคำขอภายใน 30 วัน</string>
+    <string name="profile_policy_content_delete">คุณสามารถขอลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดได้ตลอดเวลาโดยส่งอีเมลมาที่ contact@bpt.crptmax.com เราจะดำเนินการตามคำขอภายใน 30 วัน</string>
     <string name="profile_policy_heading_medical">ข้อจำกัดความรับผิดชอบทางการแพทย์</string>
     <string name="profile_policy_content_medical">แอปนี้ไม่ใช่อุปกรณ์ทางการแพทย์ และไม่ได้วินิจฉัย รักษา บำบัด หรือป้องกันภาวะทางการแพทย์ใดๆ โปรดปรึกษาผู้เชี่ยวชาญด้านสุขภาพที่มีคุณสมบัติเกี่ยวกับความดันโลหิตและข้อกังวลด้านสุขภาพเสมอ</string>
     <string name="profile_policy_heading_contact">ติดต่อเรา</string>
-    <string name="profile_policy_content_contact">สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อเราได้ที่ blood.pressure.by.max@gmail.com (Maxim Ryndin)</string>
+    <string name="profile_policy_content_contact">สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อเราได้ที่ contact@bpt.crptmax.com (Maxim Ryndin)</string>
     <string name="privacy_policy_accept">ฉันยอมรับ</string>
 
     <string name="profile_story_page_title">ติดตามค่าความดันโลหิตของคุณได้อย่างง่ายดาย</string>
