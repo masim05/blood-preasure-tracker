@@ -159,10 +159,14 @@ if [ -z "\$DB_URL" ]; then
   echo "ERROR: DATABASE_URL not found in bpt-api systemd unit" >&2
   exit 1
 fi
+# Back up any existing .env and restore it (or remove the temp file) on exit
+BAK="\$DEST/.env.migrated.bak"
+[ -f "\$DEST/.env" ] && cp "\$DEST/.env" "\$BAK" || true
+cleanup() { [ -f "\$BAK" ] && mv "\$BAK" "\$DEST/.env" || rm -f "\$DEST/.env"; }
+trap cleanup EXIT
 printf 'DATABASE_URL=%s\\n' "\$DB_URL" > "\$DEST/.env"
 chown bpt:bpt "\$DEST/.env"
-su - bpt -c "cd \$DEST && npm run db:migrate"
-rm -f "\$DEST/.env"`,
+su - bpt -c "cd \$DEST && npm run db:migrate"`,
     '\n[4/5] Running db:migrate…',
   );
 
@@ -204,11 +208,14 @@ if [ -z "\$DB_URL" ]; then
   echo "ERROR: DATABASE_URL not found in bpt-api systemd unit" >&2
   exit 1
 fi
+BAK="\$DEST/.env.migrated.bak"
+[ -f "\$DEST/.env" ] && cp "\$DEST/.env" "\$BAK" || true
+cleanup() { [ -f "\$BAK" ] && mv "\$BAK" "\$DEST/.env" || rm -f "\$DEST/.env"; }
+trap cleanup EXIT
 printf 'DATABASE_URL=%s\\n' "\$DB_URL" > "\$DEST/.env"
 chown bpt:bpt "\$DEST/.env"
 
 su - bpt -c "cd \$DEST && npm run db:migrate"
-rm -f "\$DEST/.env"
 
 # Restart systemd service
 systemctl daemon-reload
