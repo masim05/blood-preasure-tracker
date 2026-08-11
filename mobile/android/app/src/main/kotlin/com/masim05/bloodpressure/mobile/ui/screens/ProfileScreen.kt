@@ -103,13 +103,14 @@ fun ProfileScreen(
         .firstOrNull { it.code == selectedLanguageCode }
         ?: supportedLanguageOptions.first()
     val aboutPage = selectedAboutPage
+    val profileScrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(PageBg)
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .then(if (aboutPage == null) Modifier.verticalScroll(profileScrollState) else Modifier)
             .testTag(TestTags.ProfileScreen),
     ) {
         Text(stringResource(R.string.profile_title), style = MaterialTheme.typography.headlineSmall)
@@ -204,6 +205,7 @@ fun ProfileScreen(
             }
         } else {
             AboutPageScreen(
+                modifier = Modifier.weight(1f),
                 page = aboutPage,
                 policyUrl = policyUrl,
                 onBack = { selectedAboutPage = null },
@@ -236,22 +238,44 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> Unit) {
-    TextButton(
-        modifier = Modifier.testTag(TestTags.ProfileAboutBack),
-        onClick = onBack,
-    ) {
-        Text(stringResource(R.string.detail_back))
-    }
-    Spacer(Modifier.height(8.dp))
-    Column {
+private fun AboutPageScreen(
+    modifier: Modifier = Modifier,
+    page: AboutPage,
+    policyUrl: String?,
+    onBack: () -> Unit,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        TextButton(
+            modifier = Modifier.testTag(TestTags.ProfileAboutBack),
+            onClick = onBack,
+        ) {
+            Text(stringResource(R.string.detail_back))
+        }
+        Spacer(Modifier.height(8.dp))
         when (page) {
-            AboutPage.Story -> StoryPageContent()
+            AboutPage.Story -> {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    StoryPageContent()
+                }
+            }
             AboutPage.Policy -> {
                 if (policyUrl.isNullOrBlank()) {
-                    PolicyPageContent()
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        PolicyPageContent()
+                    }
                 } else {
-                    PolicyWebViewContent(policyUrl)
+                    PolicyWebViewContent(
+                        policyUrl = policyUrl,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -259,7 +283,7 @@ private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> U
 }
 
 @Composable
-private fun PolicyWebViewContent(policyUrl: String) {
+private fun PolicyWebViewContent(policyUrl: String, modifier: Modifier = Modifier) {
     val allowedPolicyUri = remember(policyUrl) { Uri.parse(policyUrl) }
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     DisposableEffect(Unit) {
@@ -269,11 +293,10 @@ private fun PolicyWebViewContent(policyUrl: String) {
         }
     }
 
-    CardContainer {
+    CardContainer(modifier = modifier) {
         AndroidView(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(460.dp)
+                .fillMaxSize()
                 .testTag(TestTags.ProfilePolicyWebView),
             factory = { context ->
                 WebView(context).apply {
@@ -395,9 +418,12 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun CardContainer(content: @Composable ColumnScope.() -> Unit) {
+private fun CardContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
             .background(Color.White, RoundedCornerShape(12.dp))

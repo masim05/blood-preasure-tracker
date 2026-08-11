@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.masim05.bloodpressure.mobile.R
 import com.masim05.bloodpressure.mobile.ui.TestTags
 import org.junit.After
@@ -104,6 +105,25 @@ class ProfileScreenTest {
 
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
         composeRule.onNodeWithTag(TestTags.ProfilePolicyWebView).assertIsDisplayed()
+    }
+
+    @Test
+    fun policyPageScrollsToBottomAndBackStillWorks() {
+        composeRule.setContent {
+            ProfileScreen(
+                selectedLanguageCode = "en",
+                onLanguageSelected = {},
+                onOpenGuide = {},
+                onLogout = {},
+            )
+        }
+
+        val contactPolicyLine = "For privacy-related questions, contact us at contact@bpt.crptmax.com (Maxim Ryndin)."
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
+        composeRule.onNodeWithText(contactPolicyLine).performScrollTo()
+        composeRule.onNodeWithText(contactPolicyLine).assertIsDisplayed()
+        composeRule.onNodeWithTag(TestTags.ProfileAboutBack).performClick()
+        composeRule.onNodeWithTag(TestTags.ProfilePolicy).assertIsDisplayed()
     }
 
     @Test
