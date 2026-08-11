@@ -52,6 +52,10 @@ let verbose = false;
 for (let i = 0; i < rawArgs.length; i++) {
   if (rawArgs[i] === '-h') {
     host = rawArgs[++i];
+    if (!host || host.startsWith('-')) {
+      console.error('Error: -h requires a host argument');
+      process.exit(1);
+    }
   } else if (rawArgs[i] === '-v' || rawArgs[i] === '--verbose') {
     verbose = true;
   } else if (!rawArgs[i].startsWith('-')) {
