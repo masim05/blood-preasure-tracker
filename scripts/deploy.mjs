@@ -106,7 +106,7 @@ function pipeToRemote(buf, remotePath) {
 }
 
 /* ── 1. archive branch and stream to server ─────────────────────────────── */
-console.log('\n[1/4] Archiving branch and streaming to server…');
+console.log(`\n[1/${verbose ? 5 : 4}] Archiving branch and streaming to server…`);
 const archiveResult = spawnSync(
   'git',
   ['archive', '--format=tar', branch],
