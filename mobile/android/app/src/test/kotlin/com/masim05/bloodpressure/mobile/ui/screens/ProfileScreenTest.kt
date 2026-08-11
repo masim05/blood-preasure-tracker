@@ -68,7 +68,7 @@ class ProfileScreenTest {
         composeRule.onNodeWithTag(TestTags.ProfileAboutBack).performClick()
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
         composeRule.onNodeWithText("Your privacy matters. This policy explains what data AI Blood Pressure Tracker collects, why, and how it is handled.").assertIsDisplayed()
-        composeRule.onNodeWithText("Last updated: July 18, 2026").assertIsDisplayed()
+        composeRule.onNodeWithText("Last updated: August 11, 2026").assertIsDisplayed()
     }
 
 
@@ -87,7 +87,7 @@ class ProfileScreenTest {
         }
 
         composeRule.onNodeWithTag(TestTags.ProfilePolicy).performClick()
-        composeRule.onNodeWithText("Última actualización: 18 de julio de 2026").assertIsDisplayed()
+        composeRule.onNodeWithText("Última actualización: 11 de agosto de 2026").assertIsDisplayed()
     }
 
     @Test
