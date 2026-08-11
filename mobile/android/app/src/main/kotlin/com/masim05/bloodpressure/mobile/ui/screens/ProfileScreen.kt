@@ -206,6 +206,7 @@ fun ProfileScreen(
             }
         } else {
             AboutPageScreen(
+                modifier = Modifier.weight(1f),
                 page = aboutPage,
                 policyUrl = policyUrl,
                 onBack = { selectedAboutPage = null },
@@ -238,8 +239,13 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun AboutPageScreen(page: AboutPage, policyUrl: String?, onBack: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize()) {
+private fun AboutPageScreen(
+    modifier: Modifier = Modifier,
+    page: AboutPage,
+    policyUrl: String?,
+    onBack: () -> Unit,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
         TextButton(
             modifier = Modifier.testTag(TestTags.ProfileAboutBack),
             onClick = onBack,
