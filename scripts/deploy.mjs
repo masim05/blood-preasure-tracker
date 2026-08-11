@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
- * npm run api:deploy -- [branch-name] [-h host]
+ * npm run api:deploy -- [branch-name] [-h host] [-v|--verbose]
  *
  * Positional:  branch-name  (default: main)
- * Option:     -h <host>     (default: con01.crptmax.com)
+ * Options:
+ *   -h <host>       remote host  (default: con01.crptmax.com)
+ *   -v, --verbose   print every sub-command and its live output
  *
  * Steps executed on the server:
  *   1. Archive the local git branch and stream it to the server via ssh
- *   2. npm ci
+ *   2. Unpack archive and install dependencies (npm ci)
  *   3. npm run db:migrate  (DATABASE_URL injected from systemd unit)
  *   4. systemctl restart bpt-api
  */
@@ -45,16 +47,24 @@ if (!ROOT_PASSWORD) {
 const rawArgs = process.argv.slice(2);
 let branch = 'main';
 let host = 'con01.crptmax.com';
+let verbose = false;
 
 for (let i = 0; i < rawArgs.length; i++) {
   if (rawArgs[i] === '-h') {
     host = rawArgs[++i];
+    if (!host || host.startsWith('-')) {
+      console.error('Error: -h requires a host argument');
+      process.exit(1);
+    }
+  } else if (rawArgs[i] === '-v' || rawArgs[i] === '--verbose') {
+    verbose = true;
   } else if (!rawArgs[i].startsWith('-')) {
     branch = rawArgs[i];
   }
 }
 
 console.log(`Deploying branch "${branch}" to ${host}:/home/bpt/blood-preasure-tracker`);
+if (verbose) console.log('Verbose mode enabled.\n');
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 function run(cmd, args, opts = {}) {
@@ -69,7 +79,8 @@ function run(cmd, args, opts = {}) {
  * Run a shell script on the remote host as root via `sudo -S bash -s`,
  * piping ROOT_PASSWORD followed by the script body.
  */
-function ssh(script) {
+function ssh(script, label) {
+  if (label) console.log(label);
   // sudo -S reads the password from stdin; we prepend it on its own line.
   const input = ROOT_PASSWORD + '\n' + script;
   const result = spawnSync(
@@ -99,7 +110,7 @@ function pipeToRemote(buf, remotePath) {
 }
 
 /* ── 1. archive branch and stream to server ─────────────────────────────── */
-console.log('\n[1/4] Archiving branch and streaming to server…');
+console.log(`\n[1/${verbose ? 5 : 4}] Archiving branch and streaming to server…`);
 const archiveResult = spawnSync(
   'git',
   ['archive', '--format=tar', branch],
@@ -111,12 +122,68 @@ if (archiveResult.status !== 0) {
 }
 pipeToRemote(archiveResult.stdout, '/tmp/bpt-deploy.tar');
 
-/* ── 2. unpack + npm ci + db:migrate + restart ──────────────────────────── */
-console.log('\n[2/4] Unpacking and running npm ci on server…');
-console.log('[3/4] Running db:migrate…');
-console.log('[4/4] Restarting bpt-api…\n');
+/* ── 2–4. unpack + npm ci + db:migrate + restart ────────────────────────── */
+if (verbose) {
+  /* In verbose mode each sub-step runs in its own ssh call so output appears
+   * immediately after the step header rather than all at the end. */
 
-ssh(`set -euo pipefail
+  ssh(
+    `set -euo pipefail
+DEST="/home/bpt/blood-preasure-tracker"
+find "\$DEST" -mindepth 1 -maxdepth 1 \\
+  ! -name 'node_modules' \\
+  ! -name '.env' ! -name '.env.migrated.bak' \\
+  -exec rm -rf {} +
+tar -xf /tmp/bpt-deploy.tar -C "\$DEST"
+chown -R bpt:bpt "\$DEST"
+rm -f /tmp/bpt-deploy.tar`,
+    '\n[2/5] Unpacking archive on server…',
+  );
+
+  ssh(
+    `set -euo pipefail
+DEST="/home/bpt/blood-preasure-tracker"
+su - bpt -c "cd \$DEST && npm ci"`,
+    '\n[3/5] Running npm ci on server…',
+  );
+
+  ssh(
+    `set -euo pipefail
+DEST="/home/bpt/blood-preasure-tracker"
+DB_URL=\$(systemctl show bpt-api -p Environment --no-pager \\
+  | tr ' ' '\\n' \\
+  | grep '^DATABASE_URL=' \\
+  | head -n1 \\
+  | cut -d= -f2-)
+if [ -z "\$DB_URL" ]; then
+  echo "ERROR: DATABASE_URL not found in bpt-api systemd unit" >&2
+  exit 1
+fi
+# Back up any existing .env and restore it (or remove the temp file) on exit
+BAK="\$DEST/.env.migrated.bak"
+[ -f "\$DEST/.env" ] && cp "\$DEST/.env" "\$BAK" || true
+cleanup() { [ -f "\$BAK" ] && mv "\$BAK" "\$DEST/.env" || rm -f "\$DEST/.env"; }
+trap cleanup EXIT
+printf 'DATABASE_URL=%s\\n' "\$DB_URL" > "\$DEST/.env"
+chown bpt:bpt "\$DEST/.env"
+su - bpt -c "cd \$DEST && npm run db:migrate"`,
+    '\n[4/5] Running db:migrate…',
+  );
+
+  ssh(
+    `set -euo pipefail
+systemctl daemon-reload
+systemctl restart bpt-api
+systemctl is-active bpt-api
+echo "Deploy complete."`,
+    '\n[5/5] Restarting bpt-api…',
+  );
+} else {
+  console.log('\n[2/4] Unpacking and running npm ci on server…');
+  console.log('[3/4] Running db:migrate…');
+  console.log('[4/4] Restarting bpt-api…\n');
+
+  ssh(`set -euo pipefail
 DEST="/home/bpt/blood-preasure-tracker"
 
 # Unpack archive over existing directory, preserve node_modules and .env files
@@ -141,11 +208,14 @@ if [ -z "\$DB_URL" ]; then
   echo "ERROR: DATABASE_URL not found in bpt-api systemd unit" >&2
   exit 1
 fi
+BAK="\$DEST/.env.migrated.bak"
+[ -f "\$DEST/.env" ] && cp "\$DEST/.env" "\$BAK" || true
+cleanup() { [ -f "\$BAK" ] && mv "\$BAK" "\$DEST/.env" || rm -f "\$DEST/.env"; }
+trap cleanup EXIT
 printf 'DATABASE_URL=%s\\n' "\$DB_URL" > "\$DEST/.env"
 chown bpt:bpt "\$DEST/.env"
 
 su - bpt -c "cd \$DEST && npm run db:migrate"
-rm -f "\$DEST/.env"
 
 # Restart systemd service
 systemctl daemon-reload
@@ -153,5 +223,6 @@ systemctl restart bpt-api
 systemctl is-active bpt-api
 echo "Deploy complete."
 `);
+}
 
 console.log('\nDone.');
