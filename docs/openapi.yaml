@@ -65,6 +65,8 @@ paths:
                     message: Email is already registered
         '429':
           $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/login:
     post:
       tags:
@@ -105,6 +107,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/measurements:
     post:
       tags:
@@ -144,6 +148,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     get:
       tags:
         - Measurements
@@ -194,6 +200,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/measurements/{id}:
     get:
       tags:
@@ -240,6 +248,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/measurements/{id}/save:
     post:
       tags:
@@ -284,6 +294,8 @@ paths:
                   value:
                     error: conflict
                     message: Measurement must be recognized before it can be saved
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/measurements/{id}/image:
     get:
       tags:
@@ -311,6 +323,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -409,6 +423,17 @@ components:
               value:
                 error: rate_limited
                 message: Too many authentication attempts; try again later
+    InternalServerError:
+      description: An unexpected internal failure occurred. Diagnostic details are never returned to the client.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            default:
+              value:
+                error: internal_server_error
+                message: Internal server error
   schemas:
     AuthRequest:
       type: object
@@ -669,6 +694,7 @@ components:
             - not_found
             - conflict
             - rate_limited
+            - internal_server_error
         message:
           type: string
           example: Human-readable user-safe message

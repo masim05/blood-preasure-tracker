@@ -10,10 +10,14 @@ export type AuthResponseDto = {
   user: { id: string; email: string };
 };
 
-export function requireAuthRequest(body: AuthRequestDto): { email: string; password: string } {
+export function requireAuthRequest(body: AuthRequestDto): {
+  email: string;
+  password: string;
+} {
   if (typeof body.email !== 'string' || typeof body.password !== 'string') {
-    throw new Error('email and password are required');
+    throw new ApiError('validation_error', 'email and password are required');
   }
 
   return { email: body.email, password: body.password };
 }
+import { ApiError } from '../http-error.mapper';

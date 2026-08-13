@@ -46,17 +46,43 @@ describe('mobile API contract controllers', () => {
   it('supports POST /api/v1/signin and duplicate conflict', async () => {
     const users = new InMemoryUserStore();
     const controller = new AuthController(
-      new CreateAccountUseCase(users, new SimplePasswordHasher(), new InMemoryBearerTokenStore(), new StaticTokenGenerator()),
-      new LoginUserUseCase(users, new SimplePasswordHasher(), new InMemoryBearerTokenStore(), new StaticTokenGenerator()),
+      new CreateAccountUseCase(
+        users,
+        new SimplePasswordHasher(),
+        new InMemoryBearerTokenStore(),
+        new StaticTokenGenerator(),
+      ),
+      new LoginUserUseCase(
+        users,
+        new SimplePasswordHasher(),
+        new InMemoryBearerTokenStore(),
+        new StaticTokenGenerator(),
+      ),
       apiConfig,
     );
 
-    await expect(controller.signin({ email: 'demo@example.com', password: 'password123' })).resolves.toMatchObject({
+    await expect(
+      controller.signin({ email: 'demo@example.com', password: 'password123' }),
+    ).resolves.toMatchObject({
       tokenType: 'Bearer',
       user: { email: 'demo@example.com' },
     });
-    await expectStatus(controller.signin({ email: 'demo@example.com', password: 'password123' }), 409);
-    await expectStatus(controller.signin({ email: 'invalid', password: 'password123' }), 400);
+    await expectStatus(
+      controller.signin({ email: 'demo@example.com', password: 'password123' }),
+      409,
+    );
+    await expectStatus(
+      controller.signin({ email: 'invalid', password: 'password123' }),
+      400,
+    );
+    await expectErrorBody(
+      controller.signin({ email: 'demo@example.com' }),
+      400,
+      {
+        error: 'validation_error',
+        message: 'email and password are required',
+      },
+    );
   });
 
   it('supports POST /api/v1/login credential success and failure', async () => {
@@ -64,24 +90,49 @@ describe('mobile API contract controllers', () => {
     const tokens = new InMemoryBearerTokenStore();
     const hasher = new SimplePasswordHasher();
     const controller = new AuthController(
-      new CreateAccountUseCase(users, hasher, tokens, new StaticTokenGenerator('signin-token')),
-      new LoginUserUseCase(users, hasher, tokens, new StaticTokenGenerator('login-token')),
+      new CreateAccountUseCase(
+        users,
+        hasher,
+        tokens,
+        new StaticTokenGenerator('signin-token'),
+      ),
+      new LoginUserUseCase(
+        users,
+        hasher,
+        tokens,
+        new StaticTokenGenerator('login-token'),
+      ),
       apiConfig,
     );
-    await controller.signin({ email: 'demo@example.com', password: 'password123' });
+    await controller.signin({
+      email: 'demo@example.com',
+      password: 'password123',
+    });
 
-    await expect(controller.login({ email: 'demo@example.com', password: 'password123' })).resolves.toMatchObject({
+    await expect(
+      controller.login({ email: 'demo@example.com', password: 'password123' }),
+    ).resolves.toMatchObject({
       accessToken: 'login-token',
       expiresAt: '2026-06-03T12:00:00.000Z',
     });
-    await expectStatus(controller.login({ email: 'demo@example.com', password: 'wrong-password' }), 401);
+    await expectStatus(
+      controller.login({
+        email: 'demo@example.com',
+        password: 'wrong-password',
+      }),
+      401,
+    );
   });
 
   it('supports measurement upload, detail, image retrieval, save, and history contracts', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const controller = new MeasurementsController(
-      new SubmitMeasurementImageUseCase(measurements, images, new InMemoryRecognitionTaskStore()),
+      new SubmitMeasurementImageUseCase(
+        measurements,
+        images,
+        new InMemoryRecognitionTaskStore(),
+      ),
       new GetMeasurementDetailUseCase(measurements, images),
       new SaveMeasurementUseCase(measurements),
       new ListMeasurementsUseCase(measurements),
@@ -98,7 +149,11 @@ describe('mobile API contract controllers', () => {
     expect(upload).toMatchObject({ status: 'pending' });
     const measurementId = (upload as { id: string }).id;
     const pending = await controller.detail(request, measurementId);
-    expect(pending).toMatchObject({ id: measurementId, status: 'pending', imageUrl: `/api/v1/measurements/${measurementId}/image` });
+    expect(pending).toMatchObject({
+      id: measurementId,
+      status: 'pending',
+      imageUrl: `/api/v1/measurements/${measurementId}/image`,
+    });
 
     const original = measurements.measurements.get(measurementId);
     if (!original) {
@@ -114,12 +169,22 @@ describe('mobile API contract controllers', () => {
         armSide: 'left',
       }),
     );
-    await expect(controller.save(request, measurementId, { armSide: 'right' })).resolves.toMatchObject({
+    await expect(
+      controller.save(request, measurementId, { armSide: 'right' }),
+    ).resolves.toMatchObject({
       status: 'saved',
       armSide: 'right',
     });
-    await expect(controller.list(request, { page: '1', pageSize: '20' })).resolves.toMatchObject({
-      items: [expect.objectContaining({ id: measurementId, status: 'saved', armSide: 'right' })],
+    await expect(
+      controller.list(request, { page: '1', pageSize: '20' }),
+    ).resolves.toMatchObject({
+      items: [
+        expect.objectContaining({
+          id: measurementId,
+          status: 'saved',
+          armSide: 'right',
+        }),
+      ],
       hasNextPage: false,
     });
 
@@ -129,18 +194,30 @@ describe('mobile API contract controllers', () => {
     });
     expect(image).toBeInstanceOf(StreamableFile);
     expect(headers.get('Content-Type')).toBe('image/jpeg');
-    expect(headers.get('Content-Disposition')).toBe(`attachment; filename="${measurementId}.jpg"`);
+    expect(headers.get('Content-Disposition')).toBe(
+      `attachment; filename="${measurementId}.jpg"`,
+    );
     expect(headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 
   it('supports saving recognized measurements', async () => {
     const measurements = new InMemoryMeasurementStore();
     const controller = new MeasurementsController(
-      new SubmitMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore(), new InMemoryRecognitionTaskStore()),
-      new GetMeasurementDetailUseCase(measurements, new InMemoryMeasurementImageStore()),
+      new SubmitMeasurementImageUseCase(
+        measurements,
+        new InMemoryMeasurementImageStore(),
+        new InMemoryRecognitionTaskStore(),
+      ),
+      new GetMeasurementDetailUseCase(
+        measurements,
+        new InMemoryMeasurementImageStore(),
+      ),
       new SaveMeasurementUseCase(measurements),
       new ListMeasurementsUseCase(measurements),
-      new GetMeasurementImageUseCase(measurements, new InMemoryMeasurementImageStore()),
+      new GetMeasurementImageUseCase(
+        measurements,
+        new InMemoryMeasurementImageStore(),
+      ),
     );
     const request = authenticatedRequest();
     await measurements.save(
@@ -168,15 +245,54 @@ describe('mobile API contract controllers', () => {
         new InMemoryMeasurementImageStore(),
         new InMemoryRecognitionTaskStore(),
       ),
-      new GetMeasurementDetailUseCase(new InMemoryMeasurementStore(), new InMemoryMeasurementImageStore()),
+      new GetMeasurementDetailUseCase(
+        new InMemoryMeasurementStore(),
+        new InMemoryMeasurementImageStore(),
+      ),
       new SaveMeasurementUseCase(new InMemoryMeasurementStore()),
       new ListMeasurementsUseCase(new InMemoryMeasurementStore()),
-      new GetMeasurementImageUseCase(new InMemoryMeasurementStore(), new InMemoryMeasurementImageStore()),
+      new GetMeasurementImageUseCase(
+        new InMemoryMeasurementStore(),
+        new InMemoryMeasurementImageStore(),
+      ),
     );
 
-    await expectStatus(controller.upload(authenticatedRequest(), undefined), 400);
-    await expectStatus(controller.detail(authenticatedRequest(), 'missing'), 404);
-    await expectStatus(controller.upload({ headers: {} }, { originalname: 'bp.jpg', mimetype: 'image/jpeg', buffer: Buffer.from('x'), size: 1 }), 401);
+    await expectStatus(
+      controller.upload(authenticatedRequest(), undefined),
+      400,
+    );
+    await expectErrorBody(
+      controller.list(authenticatedRequest(), { page: '1.5' }),
+      400,
+      {
+        error: 'validation_error',
+        message: 'query value must be an integer',
+      },
+    );
+    await expectErrorBody(
+      controller.save(authenticatedRequest(), 'missing', { pulse: 0 }),
+      400,
+      {
+        error: 'validation_error',
+        message: 'pulse must be a positive integer',
+      },
+    );
+    await expectStatus(
+      controller.detail(authenticatedRequest(), 'missing'),
+      404,
+    );
+    await expectStatus(
+      controller.upload(
+        { headers: {} },
+        {
+          originalname: 'bp.jpg',
+          mimetype: 'image/jpeg',
+          buffer: Buffer.from('x'),
+          size: 1,
+        },
+      ),
+      401,
+    );
   });
 });
 
@@ -184,7 +300,25 @@ function authenticatedRequest(): AuthenticatedHttpRequest {
   return { headers: {}, user: { id: 'usr_1', email: 'demo@example.com' } };
 }
 
-async function expectStatus(promise: Promise<unknown>, status: number): Promise<void> {
+async function expectErrorBody(
+  promise: Promise<unknown>,
+  status: number,
+  body: { error: string; message: string },
+): Promise<void> {
+  try {
+    await promise;
+    throw new Error(`Expected status ${status}`);
+  } catch (error) {
+    expect(error).toBeInstanceOf(HttpException);
+    expect((error as HttpException).getStatus()).toBe(status);
+    expect((error as HttpException).getResponse()).toEqual(body);
+  }
+}
+
+async function expectStatus(
+  promise: Promise<unknown>,
+  status: number,
+): Promise<void> {
   try {
     await promise;
     throw new Error(`Expected status ${status}`);
