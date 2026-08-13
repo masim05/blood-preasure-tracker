@@ -8,6 +8,7 @@ import {
 import { jpegBytes } from '../../test-support/image-bytes';
 import { SubmitMeasurementImageUseCase } from './submit-measurement-image.use-case';
 import { ProcessRecognitionTaskUseCase } from './process-recognition-task.use-case';
+import { saveRecognizedMeasurement } from '../../domain/services/measurement-state-policy';
 
 const now = new Date('2026-05-30T10:00:00.000Z');
 
@@ -17,8 +18,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
   it('marks queued task completed when recognition succeeds', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -39,7 +44,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId,
       model: 'test-model',
       now,
@@ -47,14 +57,78 @@ describe('ProcessRecognitionTaskUseCase', () => {
     });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('completed');
-    expect([...measurements.measurements.values()][0].status).toBe('recognized');
+    expect([...measurements.measurements.values()][0].status).toBe(
+      'recognized',
+    );
+  });
+
+  it('does not revert a user save interleaved after atomic recognition completion', async () => {
+    const measurements = new InMemoryMeasurementStore();
+    const images = new InMemoryMeasurementImageStore();
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
+      userId: 'usr_1',
+      contentType: 'image/jpeg',
+      originalName: 'bp.jpg',
+      data: jpegBytes,
+      now,
+    });
+    const taskId = [...tasks.tasks.keys()][0];
+    const atomicComplete = tasks.completeAttempt.bind(tasks);
+    jest
+      .spyOn(tasks, 'completeAttempt')
+      .mockImplementation(async (task, measurement, completedAt) => {
+        const persisted = await atomicComplete(task, measurement, completedAt);
+        const recognized = await measurements.findById(measurement.id);
+        if (persisted && recognized) {
+          await measurements.save(
+            saveRecognizedMeasurement(
+              recognized,
+              new Date(completedAt.getTime() + 1),
+            ),
+          );
+        }
+        return persisted;
+      });
+    const provider: LlmProviderPort = {
+      provider: 'test',
+      infer: jest.fn().mockResolvedValue({
+        hand: 'left',
+        systolic: 120,
+        diastolic: 80,
+        pulse: 70,
+        confidence: 0.9,
+        uncertainFields: [],
+        rawNotes: null,
+      }),
+    };
+
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({ taskId, model: 'test-model', now });
+
+    expect(
+      (await measurements.findById([...measurements.measurements.keys()][0]))
+        ?.status,
+    ).toBe('saved');
   });
 
   it('requeues task after first failed recognition attempt', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -75,7 +149,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId,
       model: 'test-model',
       now,
@@ -87,11 +166,15 @@ describe('ProcessRecognitionTaskUseCase', () => {
     expect(tasks.tasks.get(taskId)?.availableAt).toEqual(retryAt);
   });
 
-  it('marks task failed after second failed attempt', async () => {
+  it('marks task failed after third failed attempt', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -111,8 +194,14 @@ describe('ProcessRecognitionTaskUseCase', () => {
         rawNotes: null,
       }),
     };
-    const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
+    const useCase = new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    );
 
+    await useCase.execute({ taskId, model: 'test-model', now, retryAt });
     await useCase.execute({ taskId, model: 'test-model', now, retryAt });
     await useCase.execute({ taskId, model: 'test-model', now, retryAt });
 
@@ -142,7 +231,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       infer: jest.fn(),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId: task.id,
       model: 'test-model',
       now,
@@ -175,7 +269,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       infer: jest.fn(),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId: task.id,
       model: 'test-model',
       now,
@@ -190,7 +289,11 @@ describe('ProcessRecognitionTaskUseCase', () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -203,7 +306,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       infer: jest.fn().mockRejectedValue('provider-down'),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId,
       model: 'test-model',
       now,
@@ -211,7 +319,9 @@ describe('ProcessRecognitionTaskUseCase', () => {
     });
 
     expect(tasks.tasks.get(taskId)?.status).toBe('queued');
-    expect(tasks.tasks.get(taskId)?.lastError).toBe('Recognition provider failure');
+    expect(tasks.tasks.get(taskId)?.lastError).toBe(
+      'Recognition provider failure',
+    );
     expect(tasks.tasks.get(taskId)?.availableAt).toEqual(retryAt);
   });
 
@@ -219,7 +329,11 @@ describe('ProcessRecognitionTaskUseCase', () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -232,7 +346,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       infer: jest.fn().mockRejectedValue(new Error('provider exploded')),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId,
       model: 'test-model',
       now,
@@ -247,7 +366,11 @@ describe('ProcessRecognitionTaskUseCase', () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -268,19 +391,30 @@ describe('ProcessRecognitionTaskUseCase', () => {
       }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId,
       model: 'test-model',
     });
 
-    expect(tasks.tasks.get(taskId)?.availableAt.getTime()).toBeGreaterThanOrEqual(now.getTime());
+    expect(
+      tasks.tasks.get(taskId)?.availableAt.getTime(),
+    ).toBeGreaterThanOrEqual(now.getTime());
   });
 
   it('processes a task already in processing state without incrementing attempts', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
     const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -310,7 +444,12 @@ describe('ProcessRecognitionTaskUseCase', () => {
       }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({
       taskId: task.id,
       model: 'test-model',
       now,

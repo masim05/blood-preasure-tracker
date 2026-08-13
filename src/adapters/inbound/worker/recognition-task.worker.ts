@@ -1,8 +1,16 @@
-import { Inject, Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  type OnModuleDestroy,
+  type OnModuleInit,
+} from '@nestjs/common';
 
-import { RECOGNITION_TASK_STORE, type RecognitionTaskStorePort } from '../../../application/ports/recognition-task-store.port';
+import {
+  RECOGNITION_TASK_STORE,
+  type RecognitionTaskStorePort,
+} from '../../../application/ports/recognition-task-store.port';
 import { ProcessRecognitionTaskUseCase } from '../../../application/use-cases/process-recognition-task.use-case';
-import { RecognitionTask } from '../../../domain/entities/recognition-task';
 import { ApiConfigService } from '../../../infrastructure/config/api-config';
 import { EnvConfigService } from '../../../infrastructure/config/env-config';
 
@@ -14,7 +22,8 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
 
   /* istanbul ignore next */
   constructor(
-    @Inject(RECOGNITION_TASK_STORE) private readonly recognitionTasks: RecognitionTaskStorePort,
+    @Inject(RECOGNITION_TASK_STORE)
+    private readonly recognitionTasks: RecognitionTaskStorePort,
     private readonly processRecognitionTask: ProcessRecognitionTaskUseCase,
     private readonly apiConfig: ApiConfigService,
     private readonly envConfig: EnvConfigService,
@@ -44,8 +53,25 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
     try {
       const config = this.apiConfig.load();
       const env = this.envConfig.load();
-      const retryAt = new Date(now.getTime() + config.recognitionWorkerIntervalSeconds * 1000);
-      const claimed = await this.recognitionTasks.claimQueued(now, config.recognitionWorkerBatchSize);
+      const leaseTimeoutSeconds =
+        config.recognitionTaskLeaseTimeoutSeconds ?? 600;
+      const maxAttempts = config.recognitionMaxAttempts ?? 3;
+      const retryAt = new Date(
+        now.getTime() + config.recognitionWorkerIntervalSeconds * 1000,
+      );
+      const cutoff = new Date(now.getTime() - leaseTimeoutSeconds * 1000);
+      await this.recognitionTasks.recoverAbandoned?.(
+        cutoff,
+        now,
+        maxAttempts,
+        'Recognition task lease expired.',
+        'Measurement could not be recognized from this image.',
+      );
+      const claimed = await this.recognitionTasks.claimQueued(
+        now,
+        config.recognitionWorkerBatchSize,
+        maxAttempts,
+      );
       let completed = 0;
       let retried = 0;
       let failed = 0;
@@ -56,6 +82,7 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
             model: env.model,
             now,
             retryAt,
+            maxAttempts,
           });
 
           const updatedTask = await this.recognitionTasks.findById(task.id);
@@ -67,19 +94,22 @@ export class RecognitionTaskWorker implements OnModuleInit, OnModuleDestroy {
             failed += 1;
           }
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          if (task.attemptCount < 2) {
-            await this.recognitionTasks.scheduleRetry(task.id, retryAt, errorMessage, now);
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+          if (task.attemptCount < maxAttempts) {
+            await this.recognitionTasks.scheduleRetry(
+              task,
+              retryAt,
+              errorMessage,
+              now,
+            );
             retried += 1;
           } else {
-            await this.recognitionTasks.save(
-              new RecognitionTask({
-                ...task.toJSON(),
-                status: 'failed',
-                lastError: errorMessage,
-                completedAt: now,
-                updatedAt: now,
-              }),
+            await this.recognitionTasks.failAttempt(
+              task,
+              errorMessage,
+              now,
+              'Measurement could not be recognized from this image.',
             );
             failed += 1;
           }

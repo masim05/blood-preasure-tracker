@@ -21,12 +21,15 @@ import type { PasswordHasherPort } from '../application/ports/password-hasher.po
 import type { RecognitionTaskStorePort } from '../application/ports/recognition-task-store.port';
 import type { UserAccountStorePort } from '../application/ports/user-account-store.port';
 import { MeasurementImage as MeasurementImageEntity } from '../domain/entities/measurement-image';
+import { failRecognition } from '../domain/services/measurement-state-policy';
 
 export class InMemoryUserStore implements UserAccountStorePort {
   readonly users = new Map<string, UserAccount>();
 
   async findByEmail(email: string): Promise<UserAccount | null> {
-    return [...this.users.values()].find((user) => user.email === email) ?? null;
+    return (
+      [...this.users.values()].find((user) => user.email === email) ?? null
+    );
   }
 
   async findById(id: string): Promise<UserAccount | null> {
@@ -42,7 +45,11 @@ export class InMemoryBearerTokenStore implements BearerTokenStorePort {
   readonly tokens = new Map<string, BearerAccessToken>();
 
   async findByHash(tokenHash: string): Promise<BearerAccessToken | null> {
-    return [...this.tokens.values()].find((token) => token.tokenHash === tokenHash) ?? null;
+    return (
+      [...this.tokens.values()].find(
+        (token) => token.tokenHash === tokenHash,
+      ) ?? null
+    );
   }
 
   async save(token: BearerAccessToken): Promise<void> {
@@ -79,7 +86,10 @@ export class InMemoryMeasurementStore implements MeasurementStorePort {
     return this.measurements.get(id) ?? null;
   }
 
-  async findByIdForUser(id: string, userId: string): Promise<Measurement | null> {
+  async findByIdForUser(
+    id: string,
+    userId: string,
+  ): Promise<Measurement | null> {
     const measurement = this.measurements.get(id) ?? null;
     return measurement?.userId === userId ? measurement : null;
   }
@@ -88,19 +98,25 @@ export class InMemoryMeasurementStore implements MeasurementStorePort {
     this.measurements.set(measurement.id, measurement);
   }
 
-  async listHistoryForUser(filter: ListMeasurementsFilter): Promise<MeasurementHistoryPage> {
+  async listHistoryForUser(
+    filter: ListMeasurementsFilter,
+  ): Promise<MeasurementHistoryPage> {
     const filtered = [...this.measurements.values()]
       .filter(
         (measurement) =>
           measurement.userId === filter.userId &&
-          (measurement.status === 'recognized' || measurement.status === 'saved'),
+          (measurement.status === 'recognized' ||
+            measurement.status === 'saved'),
       )
       .filter(
         (measurement) =>
           (!filter.from || measurement.measurementTime >= filter.from) &&
           (!filter.to || measurement.measurementTime <= filter.to),
       )
-      .sort((left, right) => right.measurementTime.getTime() - left.measurementTime.getTime());
+      .sort(
+        (left, right) =>
+          right.measurementTime.getTime() - left.measurementTime.getTime(),
+      );
     const start = (filter.page - 1) * filter.pageSize;
 
     return {
@@ -130,11 +146,15 @@ export class InMemoryMeasurementImageStore implements MeasurementImageStorePort 
     return image;
   }
 
-  async findByMeasurementId(measurementId: string): Promise<MeasurementImage | null> {
+  async findByMeasurementId(
+    measurementId: string,
+  ): Promise<MeasurementImage | null> {
     return this.images.get(measurementId)?.image ?? null;
   }
 
-  async readByMeasurementId(measurementId: string): Promise<StoredMeasurementImageData | null> {
+  async readByMeasurementId(
+    measurementId: string,
+  ): Promise<StoredMeasurementImageData | null> {
     return this.images.get(measurementId) ?? null;
   }
 
@@ -146,15 +166,57 @@ export class InMemoryMeasurementImageStore implements MeasurementImageStorePort 
 export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
   readonly tasks = new Map<string, RecognitionTask>();
 
+  constructor(private readonly measurements?: MeasurementStorePort) {}
+
   async findById(id: string): Promise<RecognitionTask | null> {
     return this.tasks.get(id) ?? null;
   }
 
-  async claimQueued(now: Date, batchSize: number): Promise<RecognitionTask[]> {
+  async recoverAbandoned(
+    cutoff: Date,
+    now: Date,
+    maxAttempts: number,
+    lastError: string,
+    _recognitionError?: string,
+  ): Promise<void> {
+    for (const task of this.tasks.values()) {
+      if (
+        task.status !== 'processing' ||
+        !task.startedAt ||
+        task.startedAt > cutoff
+      )
+        continue;
+      this.tasks.set(
+        task.id,
+        new RecognitionTask({
+          ...task.toJSON(),
+          status: task.attemptCount >= maxAttempts ? 'failed' : 'queued',
+          lastError,
+          availableAt:
+            task.attemptCount >= maxAttempts ? task.availableAt : now,
+          startedAt: null,
+          completedAt: task.attemptCount >= maxAttempts ? now : null,
+          updatedAt: now,
+        }),
+      );
+    }
+  }
+
+  async claimQueued(
+    now: Date,
+    batchSize: number,
+    maxAttempts = Number.MAX_SAFE_INTEGER,
+  ): Promise<RecognitionTask[]> {
     const queued = [...this.tasks.values()]
-      .filter((task) => task.status === 'queued' && task.availableAt <= now)
+      .filter(
+        (task) =>
+          task.status === 'queued' &&
+          task.availableAt <= now &&
+          task.attemptCount < maxAttempts,
+      )
       .sort((left, right) => {
-        const availableAtOrder = left.availableAt.getTime() - right.availableAt.getTime();
+        const availableAtOrder =
+          left.availableAt.getTime() - right.availableAt.getTime();
         if (availableAtOrder !== 0) {
           return availableAtOrder;
         }
@@ -180,14 +242,19 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
     return queued;
   }
 
-  async scheduleRetry(taskId: string, availableAt: Date, lastError: string, now: Date): Promise<void> {
-    const task = this.tasks.get(taskId);
-    if (!task) {
-      return;
+  async scheduleRetry(
+    owner: RecognitionTask,
+    availableAt: Date,
+    lastError: string,
+    now: Date,
+  ): Promise<boolean> {
+    const task = this.tasks.get(owner.id);
+    if (!ownsAttempt(task, owner)) {
+      return false;
     }
 
     this.tasks.set(
-      taskId,
+      owner.id,
       new RecognitionTask({
         ...task.toJSON(),
         status: 'queued',
@@ -197,9 +264,70 @@ export class InMemoryRecognitionTaskStore implements RecognitionTaskStorePort {
         updatedAt: now,
       }),
     );
+    return true;
+  }
+
+  async completeAttempt(
+    owner: RecognitionTask,
+    measurement: Measurement,
+    now: Date,
+  ): Promise<boolean> {
+    const task = this.tasks.get(owner.id);
+    if (!ownsAttempt(task, owner)) return false;
+    this.tasks.set(
+      owner.id,
+      new RecognitionTask({
+        ...task.toJSON(),
+        status: 'completed',
+        completedAt: now,
+        updatedAt: now,
+      }),
+    );
+    await this.measurements?.save(measurement);
+    return true;
+  }
+
+  async failAttempt(
+    owner: RecognitionTask,
+    lastError: string,
+    now: Date,
+    recognitionError: string | null,
+  ): Promise<boolean> {
+    const task = this.tasks.get(owner.id);
+    if (!ownsAttempt(task, owner)) return false;
+    this.tasks.set(
+      owner.id,
+      new RecognitionTask({
+        ...task.toJSON(),
+        status: 'failed',
+        lastError,
+        completedAt: now,
+        updatedAt: now,
+      }),
+    );
+    if (recognitionError && this.measurements) {
+      const measurement = await this.measurements.findById(task.measurementId);
+      if (measurement?.status === 'recognizing') {
+        await this.measurements.save(
+          failRecognition(measurement, recognitionError, now),
+        );
+      }
+    }
+    return true;
   }
 
   async save(task: RecognitionTask): Promise<void> {
     this.tasks.set(task.id, task);
   }
+}
+
+function ownsAttempt(
+  current: RecognitionTask | undefined,
+  owner: RecognitionTask,
+): current is RecognitionTask {
+  return (
+    current?.status === 'processing' &&
+    current.attemptCount === owner.attemptCount &&
+    current.startedAt?.getTime() === owner.startedAt?.getTime()
+  );
 }

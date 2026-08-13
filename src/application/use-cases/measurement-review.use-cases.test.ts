@@ -3,7 +3,10 @@ import { RecognitionTask } from '../../domain/entities/recognition-task';
 import { GetMeasurementDetailUseCase } from './get-measurement-detail.use-case';
 import { GetMeasurementImageUseCase } from './get-measurement-image.use-case';
 import { ListMeasurementsUseCase } from './list-measurements.use-case';
-import { LLM_PROVIDER, ProcessRecognitionTaskUseCase } from './process-recognition-task.use-case';
+import {
+  LLM_PROVIDER,
+  ProcessRecognitionTaskUseCase,
+} from './process-recognition-task.use-case';
 import { OverrideMeasurementUseCase } from './override-measurement.use-case';
 import { SaveMeasurementUseCase } from './save-measurement.use-case';
 import { SubmitMeasurementImageUseCase } from './submit-measurement-image.use-case';
@@ -41,8 +44,12 @@ describe('measurement use cases', () => {
   it('submits a valid image, stores it, and schedules recognition', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
-    const output = await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    const output = await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -63,7 +70,13 @@ describe('measurement use cases', () => {
         measurements,
         new InMemoryMeasurementImageStore(),
         new InMemoryRecognitionTaskStore(),
-      ).execute({ userId: 'usr_1', contentType: 'image/gif', originalName: 'bp.gif', data: Buffer.from('x'), now }),
+      ).execute({
+        userId: 'usr_1',
+        contentType: 'image/gif',
+        originalName: 'bp.gif',
+        data: Buffer.from('x'),
+        now,
+      }),
     ).rejects.toThrow('image must be JPEG or PNG');
     expect(measurements.measurements.size).toBe(0);
   });
@@ -86,12 +99,22 @@ describe('measurement use cases', () => {
       createdAt: now,
     });
 
-    expect(await new GetMeasurementDetailUseCase(measurements, images).execute({ userId: 'usr_1', measurementId: 'msr_1' })).toMatchObject({
+    expect(
+      await new GetMeasurementDetailUseCase(measurements, images).execute({
+        userId: 'usr_1',
+        measurementId: 'msr_1',
+      }),
+    ).toMatchObject({
       id: 'msr_1',
       status: 'recognized',
       imageUrl: '/api/v1/measurements/msr_1/image',
     });
-    await expect(new GetMeasurementImageUseCase(measurements, images).execute({ userId: 'other', measurementId: 'msr_1' })).rejects.toThrow('Measurement was not found');
+    await expect(
+      new GetMeasurementImageUseCase(measurements, images).execute({
+        userId: 'other',
+        measurementId: 'msr_1',
+      }),
+    ).rejects.toThrow('Measurement was not found');
 
     const saved = await new SaveMeasurementUseCase(measurements).execute({
       userId: 'usr_1',
@@ -102,7 +125,11 @@ describe('measurement use cases', () => {
     expect(saved.status).toBe('saved');
     expect(saved.armSide).toBe('right');
 
-    const history = await new ListMeasurementsUseCase(measurements).execute({ userId: 'usr_1', page: 1, pageSize: 20 });
+    const history = await new ListMeasurementsUseCase(measurements).execute({
+      userId: 'usr_1',
+      page: 1,
+      pageSize: 20,
+    });
     expect(history.items).toHaveLength(1);
     expect(history.items[0].armSide).toBe('right');
     expect(history.items[0]).not.toHaveProperty('imageUrl');
@@ -181,7 +208,9 @@ describe('measurement use cases', () => {
         measurementId: 'msr_1',
         systolic: 121,
       }),
-    ).rejects.toThrow('Measurement must be recognized before override can be applied');
+    ).rejects.toThrow(
+      'Measurement must be recognized before override can be applied',
+    );
   });
 
   it('rejects overriding a missing measurement', async () => {
@@ -214,7 +243,13 @@ describe('measurement use cases', () => {
       }),
     );
 
-    await expect(new SaveMeasurementUseCase(measurements).execute({ userId: 'usr_1', measurementId: 'msr_1', now })).rejects.toThrow('Measurement must be recognized before it can be saved');
+    await expect(
+      new SaveMeasurementUseCase(measurements).execute({
+        userId: 'usr_1',
+        measurementId: 'msr_1',
+        now,
+      }),
+    ).rejects.toThrow('Measurement must be recognized before it can be saved');
     await expect(
       new ListMeasurementsUseCase(measurements).execute({
         userId: 'usr_1',
@@ -227,8 +262,12 @@ describe('measurement use cases', () => {
   it('processes recognition task success and failure paths', async () => {
     const measurements = new InMemoryMeasurementStore();
     const images = new InMemoryMeasurementImageStore();
-    const tasks = new InMemoryRecognitionTaskStore();
-    await new SubmitMeasurementImageUseCase(measurements, images, tasks).execute({
+    const tasks = new InMemoryRecognitionTaskStore(measurements);
+    await new SubmitMeasurementImageUseCase(
+      measurements,
+      images,
+      tasks,
+    ).execute({
       userId: 'usr_1',
       contentType: 'image/jpeg',
       originalName: 'bp.jpg',
@@ -249,9 +288,16 @@ describe('measurement use cases', () => {
       }),
     };
 
-    await new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider).execute({ taskId, model: 'test-model', now });
+    await new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    ).execute({ taskId, model: 'test-model', now });
 
-    expect([...measurements.measurements.values()][0].status).toBe('recognized');
+    expect([...measurements.measurements.values()][0].status).toBe(
+      'recognized',
+    );
     expect(tasks.tasks.get(taskId)?.status).toBe('completed');
 
     await tasks.save(
@@ -268,7 +314,14 @@ describe('measurement use cases', () => {
         updatedAt: now,
       }),
     );
-    const useCase = new ProcessRecognitionTaskUseCase(tasks, measurements, images, provider);
+    const useCase = new ProcessRecognitionTaskUseCase(
+      tasks,
+      measurements,
+      images,
+      provider,
+    );
+    await useCase.execute({ taskId: 'missing-task', model: 'test-model', now });
+    expect(tasks.tasks.get('missing-task')?.status).toBe('queued');
     await useCase.execute({ taskId: 'missing-task', model: 'test-model', now });
     expect(tasks.tasks.get('missing-task')?.status).toBe('queued');
     await useCase.execute({ taskId: 'missing-task', model: 'test-model', now });

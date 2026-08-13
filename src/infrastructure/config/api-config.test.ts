@@ -2,13 +2,17 @@ import { ApiConfigService } from './api-config';
 
 describe('ApiConfigService', () => {
   it('loads required database URL with defaults', () => {
-    expect(new ApiConfigService().load({ DATABASE_URL: 'postgres://example' })).toEqual({
+    expect(
+      new ApiConfigService().load({ DATABASE_URL: 'postgres://example' }),
+    ).toEqual({
       databaseUrl: 'postgres://example',
       apiPort: 3000,
       measurementImageDirectory: './tmp/measurement-images',
       accessTokenTtlSeconds: 604800,
       recognitionWorkerIntervalSeconds: 10,
       recognitionWorkerBatchSize: 4,
+      recognitionTaskLeaseTimeoutSeconds: 600,
+      recognitionMaxAttempts: 3,
     });
   });
 
@@ -21,6 +25,8 @@ describe('ApiConfigService', () => {
         ACCESS_TOKEN_TTL_SECONDS: '120',
         RECOGNITION_WORKER_INTERVAL_SECONDS: '30',
         RECOGNITION_WORKER_BATCH_SIZE: '8',
+        RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS: '120',
+        RECOGNITION_MAX_ATTEMPTS: '5',
       }),
     ).toEqual({
       databaseUrl: 'postgres://example',
@@ -29,6 +35,8 @@ describe('ApiConfigService', () => {
       accessTokenTtlSeconds: 120,
       recognitionWorkerIntervalSeconds: 30,
       recognitionWorkerBatchSize: 8,
+      recognitionTaskLeaseTimeoutSeconds: 120,
+      recognitionMaxAttempts: 5,
     });
   });
 
@@ -37,7 +45,9 @@ describe('ApiConfigService', () => {
     process.env.DATABASE_URL = 'postgres://runtime';
 
     try {
-      expect(new ApiConfigService().load().databaseUrl).toBe('postgres://runtime');
+      expect(new ApiConfigService().load().databaseUrl).toBe(
+        'postgres://runtime',
+      );
     } finally {
       if (previousDatabaseUrl === undefined) {
         delete process.env.DATABASE_URL;
@@ -48,16 +58,48 @@ describe('ApiConfigService', () => {
   });
 
   it('rejects missing or invalid values', () => {
-    expect(() => new ApiConfigService().load({})).toThrow('DATABASE_URL is required');
-    expect(() => new ApiConfigService().load({ DATABASE_URL: 'postgres://example', API_PORT: '0' })).toThrow('API_PORT must be a positive integer');
+    expect(() => new ApiConfigService().load({})).toThrow(
+      'DATABASE_URL is required',
+    );
     expect(() =>
-      new ApiConfigService().load({ DATABASE_URL: 'postgres://example', ACCESS_TOKEN_TTL_SECONDS: 'nope' }),
+      new ApiConfigService().load({
+        DATABASE_URL: 'postgres://example',
+        API_PORT: '0',
+      }),
+    ).toThrow('API_PORT must be a positive integer');
+    expect(() =>
+      new ApiConfigService().load({
+        DATABASE_URL: 'postgres://example',
+        ACCESS_TOKEN_TTL_SECONDS: 'nope',
+      }),
     ).toThrow('ACCESS_TOKEN_TTL_SECONDS must be a positive integer');
     expect(() =>
-      new ApiConfigService().load({ DATABASE_URL: 'postgres://example', RECOGNITION_WORKER_INTERVAL_SECONDS: '-1' }),
+      new ApiConfigService().load({
+        DATABASE_URL: 'postgres://example',
+        RECOGNITION_WORKER_INTERVAL_SECONDS: '-1',
+      }),
     ).toThrow('RECOGNITION_WORKER_INTERVAL_SECONDS must be a positive integer');
     expect(() =>
-      new ApiConfigService().load({ DATABASE_URL: 'postgres://example', RECOGNITION_WORKER_BATCH_SIZE: '0' }),
+      new ApiConfigService().load({
+        DATABASE_URL: 'postgres://example',
+        RECOGNITION_WORKER_BATCH_SIZE: '0',
+      }),
     ).toThrow('RECOGNITION_WORKER_BATCH_SIZE must be a positive integer');
+    for (const value of ['0', '-1', '1.5', 'nope']) {
+      expect(() =>
+        new ApiConfigService().load({
+          DATABASE_URL: 'postgres://example',
+          RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS: value,
+        }),
+      ).toThrow(
+        'RECOGNITION_TASK_LEASE_TIMEOUT_SECONDS must be a positive integer',
+      );
+      expect(() =>
+        new ApiConfigService().load({
+          DATABASE_URL: 'postgres://example',
+          RECOGNITION_MAX_ATTEMPTS: value,
+        }),
+      ).toThrow('RECOGNITION_MAX_ATTEMPTS must be a positive integer');
+    }
   });
 });
