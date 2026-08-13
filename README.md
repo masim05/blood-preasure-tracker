@@ -289,6 +289,7 @@ npm run api
 
 - App API base URL comes from `apiBaseUrl` in `mobile/android/local.properties` or Gradle property `apiBaseUrl`, and maps to `BuildConfig.API_BASE_URL`
 - Default `apiBaseUrl` when unset: debug builds use `http://10.0.2.2:3000`, release builds use `https://bpt.crptmax.com`
+- HTTP API URL overrides are debug-only; release builds require an HTTPS URL with a valid host
 - One-off override example:
 
 ```bash
